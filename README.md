@@ -13,7 +13,7 @@ Sporta connects users who are passionate about playing sports, enabling them to 
 | Monika Moanes	| 40188452 | MonikaaMoanes | |
 | Khalil Garaali	| 40226310 | KhalilGarali | garalikhalil@gmail.com |
 | Youssef Alsheghri	| 40108014 | yousfino | |
-| Ziad	|  |  | |
+| Ziad	| 40213438 | Ziadsharkos | ziadelsharkawi@outlook.com |
 | Patrick	|  |  | |
 
 ### Getting Started with Sporta:  
