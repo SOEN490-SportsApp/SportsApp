@@ -15,6 +15,7 @@ Sporta connects users who are passionate about playing sports, enabling them to 
 | Youssef Alsheghri	| 40108014 | yousfino | |
 | Ziad	| 40213438 | Ziadsharkos | ziadelsharkawi@outlook.com |
 | Patrick MacEachen	| 40209790 | patrickmac3  | patrickmaceachen9@gmail.com |
+| Joud Babik | 40031039 | JRB958 | j_babik@live.concordia.ca
 
 ### Getting Started with Sporta:  
 
