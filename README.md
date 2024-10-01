@@ -14,7 +14,7 @@ Sporta connects users who are passionate about playing sports, enabling them to 
 | Khalil Garaali	| 40226310 | KhalilGarali | garalikhalil@gmail.com |
 | Youssef Alsheghri	| 40108014 | yousfino | |
 | Ziad	| 40213438 | Ziadsharkos | ziadelsharkawi@outlook.com |
-| Patrick	|  |  | |
+| Patrick MacEachen	| 40209790 | patrickmac3  | patrickmaceachen9@gmail.com |
 
 ### Getting Started with Sporta:  
 
