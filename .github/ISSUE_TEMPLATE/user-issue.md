@@ -7,23 +7,24 @@ assignees: ''
 
 ---
 
-As a user, I want to X so that I X.
+## Description
+As a user, I want to _ so that I _.
 
 Story Points: 
 Priority: 
 Risk: High
 Child Tasks:
 
-**Acceptance Criteria:**
+### Acceptance Criteria:
 
 
-**Task Breakdown:**
+### Task Breakdown:
 
-**Implementation Breakdown:**
-- Frontend:
-- Backend:
+### Implementation Breakdown:
+#### Frontend:
+#### Backend:
 
-**Blackbox Testing:**
-**Regression Testing:**
+### Blackbox Testing:
+### Regression Testing:
 
-**Demo Steps:**
+### Demo Steps:
