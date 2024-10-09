@@ -2,7 +2,7 @@
 name: Event  template
 about: Describe this issue template's purpose here.
 title: ''
-labels: backend, Event, frontend, user story
+labels: backend, frontend, user story
 assignees: ''
 
 ---
