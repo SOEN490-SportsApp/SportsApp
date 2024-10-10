@@ -6,7 +6,7 @@ Sporta connects users who are passionate about playing sports, enabling them to 
 ### Team Members:
 | Name                   | Student ID | GitHub ID | Email Address |
 | ------------------------ | ------------ | ----------------- | ----------------- |
-| Daniel Duguay	 | 40202775 | DanDuguay | |
+| Daniel Duguay	 | 40202775 | DanDuguay | Duguay9@gmail.com |
 | Nicolas Chelico	| 40156158 | NicolasChelico |nicolas.chelico@outlook.com |
 | Wadeh Hamati	| 40216893 | wade3hamati | |
 | Walid Achlaf	| 40210355 | walidoow | |
