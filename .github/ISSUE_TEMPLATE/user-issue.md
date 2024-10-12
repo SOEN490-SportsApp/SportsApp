@@ -1,8 +1,8 @@
 ---
 name: User issue
-about: Template for the issues
+about: Template for the issues. Please use it
 title: "#.# Name of Issue"
-labels: epic
+labels: ''
 assignees: ''
 
 ---
