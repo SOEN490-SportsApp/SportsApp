@@ -12,7 +12,7 @@ As a user, I want to _ so that I _.
 
 Story Points: 
 Priority: 
-Risk: High
+Risk:
 Child Tasks:
 
 ### Acceptance Criteria:
@@ -21,8 +21,6 @@ Child Tasks:
 ### Task Breakdown:
 
 ### Implementation Breakdown:
-#### Frontend:
-#### Backend:
 
 ### Blackbox Testing:
 ### Regression Testing:
