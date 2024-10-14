@@ -8,8 +8,8 @@ Sporta connects users who are passionate about playing sports, enabling them to 
 | ------------------------ | ------------ | ----------------- | ----------------- |
 | Daniel Duguay	 | 40202775 | DanDuguay | Duguay9@gmail.com |
 | Nicolas Chelico	| 40156158 | NicolasChelico |nicolas.chelico@outlook.com |
-| Wadeh Hamati	| 40216893 | wade3hamati | |
-| Walid Achlaf	| 40210355 | walidoow | |
+| Wadeh Hamati	| 40216893 | wade3hamati | wade3_hamati@outlook.com |
+| Walid Achlaf	| 40210355 | walidoow | walidachlaf@gmail.com |
 | Monika Moanes	| 40188452 | MonikaaMoanes | monicanasser6@gmail.com |
 | Khalil Garaali	| 40226310 | KhalilGarali | garalikhalil@gmail.com |
 | Youssef Alsheghri	| 40108014 | yousfino | youssef.alsheghri@gmail.com |
