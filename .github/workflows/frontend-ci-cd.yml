@@ -1,0 +1,22 @@
+name: Frontend CI/CD
+
+on:
+  pull_request:
+    branches: [ "*" ]
+  push:
+    branches: 
+      - main
+      - dev
+      - 'releases/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install depedencies
+        run: npm install
+        working-directory: ./ClientApp
+      - name: Run tests
+        run: npm run ci-test
+        working-directory: ./ClientApp
