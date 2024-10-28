@@ -1,0 +1,25 @@
+#!/bin/bash
+
+echo "***** Checking Commit Message ******"
+
+# shellcheck disable=SC2320
+status=$?
+
+message="$(cat "$1")"
+
+regex_commit_format='(^GH-[0-9]{1,5}): \[(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)\] [A-Z]'
+error_msg="Commit not allowed, message should have an issue number, and follow conventional commits. Please see https://www.conventionalcommits.org/en/v1.0.0/"
+
+if ! [[ $message =~ $regex_commit_format ]]; then
+    echo "$error_msg" >&2
+    echo "Example: GH-2: [feat] Message"
+    echo "The rules are:"
+    echo "$regex_commit_format"
+    exit 1
+else
+    echo "Commit Is Successful"
+fi
+
+echo "***** Done ******"
+
+exit $status
