@@ -1,0 +1,45 @@
+{
+    "env": {
+      "browser": true,
+      "node": true,
+      "es2021": true,
+      "react-native/react-native": true
+    },
+    "extends": [
+      "eslint:recommended",
+      "plugin:react/recommended",
+      "plugin:react-native/all",
+      "airbnb"
+    ],
+    "parserOptions": {
+      "ecmaFeatures": {
+        "jsx": true
+      },
+      "ecmaVersion": "latest",
+      "sourceType": "module"
+    },
+    "plugins": [
+      "react",
+      "react-native",
+      "import",
+      "jsx-a11y"
+    ],
+    "rules": {
+      "react-native/no-inline-styles": "warn",
+      "react-native/no-unused-styles": "warn",
+      "react-native/no-color-literals": "error",
+      "react-native/no-raw-text": "warn",
+      "react/prop-types": "off",
+      "react/jsx-filename-extension": ["warn", { "extensions": [".tsx", ".jsx"] }],
+      "import/prefer-default-export": "off",
+      "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+      "react/react-in-jsx-scope": "off",
+      "max-len": "off"
+    },
+    "settings": {
+      "react": {
+        "version": "detect"
+      }
+    }
+  }
+  
