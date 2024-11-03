@@ -6,9 +6,9 @@ const LoginScreen = () => {
   const router = useRouter();
 
   return (
-    <View>
-      <Text>Login Page</Text>
-      <Text>Click the following button to start the registration process</Text>
+    <View className="flex-1 justify-center items-center px-5">
+      <Text className="text-center mb-2 text-lg font-semibold">Login Page</Text>
+      <Text className="text-center mb-4">Click the following button to start the registration process</Text>
       <Button title="Register" onPress={() => router.push('/auth/register')} />
     </View>
   );
