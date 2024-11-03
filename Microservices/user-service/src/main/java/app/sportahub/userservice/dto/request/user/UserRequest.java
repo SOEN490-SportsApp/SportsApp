@@ -1,4 +1,4 @@
-package app.sportahub.userservice.request;
+package app.sportahub.userservice.dto.request.user;
 
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Email;

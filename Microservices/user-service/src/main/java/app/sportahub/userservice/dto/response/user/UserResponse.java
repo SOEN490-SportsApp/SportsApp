@@ -1,4 +1,4 @@
-package app.sportahub.userservice.response.user;
+package app.sportahub.userservice.dto.response.user;
 
 import app.sportahub.userservice.model.user.User;
 
