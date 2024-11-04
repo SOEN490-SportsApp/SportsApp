@@ -13,7 +13,7 @@
 
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { showAlert, ALERT_MESSAGES } from './alertUtils.js';
+import { showAlert, ALERT_MESSAGES } from './alertUtils';
 
 
 // Axios configuration options
