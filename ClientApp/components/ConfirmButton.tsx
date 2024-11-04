@@ -10,13 +10,13 @@ interface CustomButtonProps {
 const ConfirmButton: React.FC<CustomButtonProps> = ({ icon, text, onPress, }) => {
   return (
     <TouchableOpacity 
-      className="p-6 rounded-full items-center mb-4 shadow-slate-500" 
+      className="p-5 rounded-3xl items-center mb-4 shadow-slate-500" 
       onPress={onPress} 
       style={{ backgroundColor: '#0C9E04' }}
     >
       <View className="flex-row items-center">
         {icon}
-        <Text className="font-bold text-white text-2xl ml-2">{text}</Text>
+        <Text className="font-bold ml-2" style={{fontSize: 20, color: '#fff'}}>{text}</Text>
         </View>
     </TouchableOpacity>
   );
