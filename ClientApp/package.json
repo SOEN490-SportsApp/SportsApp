@@ -15,14 +15,21 @@
   },
   "jest": {
     "preset": "jest-expo",
-    "setupFilesAfterEnv": ["<rootDir>/jestSetup.ts"],
+    "setupFilesAfterEnv": [
+    "<rootDir>/jestSetup.ts",
+    "@testing-library/jest-native/extend-expect"
+    ],
     "moduleNameMapper": {
       "^@react-native-async-storage/async-storage$": "<rootDir>/__mocks__/@react-native-async-storage/async-storage.ts"
     },
     "transform": {
-      "^.+\\.[tj]sx?$": "ts-jest"
-    }
-  },
+      "^.+\\.[tj]sx?$": "babel-jest"
+      },
+    "transformIgnorePatterns": [
+      "node_modules/(?!(react-native|@react-native|@react-native-async-storage|expo|@expo|axios)/)"
+      ],
+    "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"]
+},
   "dependencies": {
     "@expo/vector-icons": "^14.0.2",
     "@react-navigation/native": "^6.0.2",
@@ -53,11 +60,14 @@
     "@react-native-async-storage/async-storage": "^2.0.0",
     "@types/axios": "^0.9.36",
     "@testing-library/react-native": "^12.8.1",
+    "@testing-library/react-native": "^12.8.1",
     "@types/jest": "^29.5.14",
     "@types/react": "~18.2.45",
     "@types/react-test-renderer": "^18.0.7",
     "axios": "^1.7.7",
     "axios-mock-adapter": "^2.1.0",
+    "babel-jest": "^29.7.0",
+    "babel-preset-expo": "^11.0.15",
     "eslint": "^8.57.1",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-plugin-import": "^2.31.0",
