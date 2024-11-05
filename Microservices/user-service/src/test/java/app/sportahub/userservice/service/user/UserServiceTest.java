@@ -23,6 +23,8 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import app.sportahub.userservice.exception.user.UserDoesNotExistException;
+
 public class UserServiceTest {
 
     @Mock
@@ -171,5 +173,47 @@ public class UserServiceTest {
         verify(userRepository, times(1)).findUserByEmail(userRequest.email());
         verify(userRepository, times(1)).findUserByUsername(userRequest.username());
         verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    public void getUserByIdShouldReturnUser() {
+        String userId = "123";
+        User expectedUser = User.builder()
+                .withId(userId)
+                .withEmail("test@example.com")
+                .withUsername("testUser")
+                .withProfile(Profile.builder()
+                        .withFirstName("John")
+                        .withLastName("Doe")
+                        .withDateOfBirth(LocalDate.of(1990, 1, 1))
+                        .withPhoneNumber("1234567890")
+                        .withRanking("100")
+                        .build())
+                .build();
+
+        when(userRepository.findUserById(userId)).thenReturn(expectedUser);
+
+        User result = userService.getUserById(userId);
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(userId, result.getId());
+        Assertions.assertEquals("test@example.com", result.getEmail());
+        Assertions.assertEquals("testUser", result.getUsername());
+        verify(userRepository, times(1)).findUserById(userId);
+    }
+
+    @Test
+    public void getUserByIdShouldThrowUserDoesNotExistException() {
+        String userId = "nonexistent";
+        when(userRepository.findUserById(userId)).thenReturn(null);
+
+        UserDoesNotExistException exception = Assertions.assertThrows(
+                UserDoesNotExistException.class,
+                () -> userService.getUserById(userId)
+        );
+
+        Assertions.assertEquals("404 NOT_FOUND \"User with id:" + userId + "does not exist.\"",
+                exception.getMessage());
+        verify(userRepository, times(1)).findUserById(userId);
     }
 }

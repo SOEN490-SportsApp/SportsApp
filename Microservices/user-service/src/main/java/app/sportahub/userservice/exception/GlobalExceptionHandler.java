@@ -1,5 +1,6 @@
 package app.sportahub.userservice.exception;
 
+import app.sportahub.userservice.exception.user.UserDoesNotExistException;
 import app.sportahub.userservice.exception.user.UserEmailAlreadyExistsException;
 import app.sportahub.userservice.exception.user.keycloak.KeycloakCommunicationException;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,14 @@ public class GlobalExceptionHandler {
 
         response.put("errors", errors);
         return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(UserDoesNotExistException.class)
+    public ResponseEntity<Map<String, Object>> handleUserDoesNotExistException(UserDoesNotExistException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("error", ex.getReason());
+        response.put("status", ex.getStatusCode().value());
+        return ResponseEntity.status(ex.getStatusCode()).body(response);
     }
 
     @ExceptionHandler(UserEmailAlreadyExistsException.class)
