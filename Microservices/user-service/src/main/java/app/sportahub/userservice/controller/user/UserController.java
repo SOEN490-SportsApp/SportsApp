@@ -15,6 +15,12 @@ public class UserController {
 
     private final UserService userService;
 
+    @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public UserResponse getUserById(@PathVariable String id) {
+        return UserResponse.from(userService.getUserById(id));
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public UserResponse createUser(@Valid @RequestBody UserRequest userRequest) {

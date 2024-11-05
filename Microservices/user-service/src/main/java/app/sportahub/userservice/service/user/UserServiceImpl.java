@@ -1,6 +1,7 @@
 package app.sportahub.userservice.service.user;
 
 import app.sportahub.userservice.dto.request.user.UserRequest;
+import app.sportahub.userservice.exception.user.UserDoesNotExistException;
 import app.sportahub.userservice.exception.user.UserEmailAlreadyExistsException;
 import app.sportahub.userservice.exception.user.UsernameAlreadyExistsException;
 import app.sportahub.userservice.model.user.Preferences;
@@ -60,5 +61,11 @@ public class UserServiceImpl implements UserService {
         User savedUser = userRepository.save(user);
         log.info("UserServiceImpl::createUser: User with id:{} was successfully created", savedUser.getId());
         return savedUser;
+    }
+
+    @Override
+    public User getUserById(String id) {
+        return Optional.of(userRepository.findUserById(id))
+                .orElseThrow(() -> new UserDoesNotExistException(id));
     }
 }
