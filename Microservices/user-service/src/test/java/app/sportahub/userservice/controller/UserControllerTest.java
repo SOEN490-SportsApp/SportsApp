@@ -5,6 +5,7 @@ import app.sportahub.userservice.controller.user.UserController;
 import app.sportahub.userservice.dto.request.user.PreferencesRequest;
 import app.sportahub.userservice.dto.request.user.ProfileRequest;
 import app.sportahub.userservice.dto.request.user.UserRequest;
+import app.sportahub.userservice.exception.user.UserDoesNotExistException;
 import app.sportahub.userservice.model.user.Profile;
 import app.sportahub.userservice.model.user.User;
 import app.sportahub.userservice.service.user.UserService;
@@ -29,7 +30,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ActiveProfiles("user-service.test")
 @WebMvcTest(UserController.class)
 @Import(TestSecurityConfig.class)
 public class UserControllerTest {
@@ -122,5 +122,39 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.errors.email").value("Valid email is required"))
                 .andExpect(jsonPath("$.errors.username").value("Username must be provided"))
                 .andExpect(jsonPath("$.errors.password").value("Password must be provided"));
+    }
+
+    @Test
+    public void shouldGetUserByIdSuccessfully() throws Exception {
+        String userId = "123";
+        when(userService.getUserById(userId)).thenReturn(user);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/user/{id}", userId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.email").value(user.getEmail()))
+                .andExpect(jsonPath("$.username").value(user.getUsername()))
+                .andExpect(jsonPath("$.profile.firstName").value(user.getProfile().getFirstName()))
+                .andExpect(jsonPath("$.profile.lastName").value(user.getProfile().getLastName()))
+                .andExpect(jsonPath("$.profile.dateOfBirth").value(user.getProfile().getDateOfBirth().toString()))
+                .andExpect(jsonPath("$.profile.phoneNumber").value(user.getProfile().getPhoneNumber()))
+                .andExpect(jsonPath("$.profile.ranking").value(user.getProfile().getRanking()));
+
+        verify(userService).getUserById(userId);
+    }
+
+    @Test
+    public void shouldReturnNotFoundWhenUserDoesNotExist() throws Exception {
+        String id = "nonexistent";
+        when(userService.getUserById(id))
+                .thenThrow(new UserDoesNotExistException(id));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/user/{id}", id)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("User with id:" + id + "does not exist."));
+
+        verify(userService).getUserById(id);
     }
 }
