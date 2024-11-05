@@ -14,22 +14,23 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "jest": {
-    "preset": "jest-expo",
-    "setupFilesAfterEnv": [
+  "preset": "jest-expo",
+  "setupFilesAfterEnv": [
     "<rootDir>/jestSetup.ts",
     "@testing-library/jest-native/extend-expect"
-    ],
-    "moduleNameMapper": {
-      "^@react-native-async-storage/async-storage$": "<rootDir>/__mocks__/@react-native-async-storage/async-storage.ts"
-    },
-    "transform": {
-      "^.+\\.[tj]sx?$": "babel-jest"
-      },
-    "transformIgnorePatterns": [
-      "node_modules/(?!(react-native|@react-native|@react-native-async-storage|expo|@expo|axios)/)"
-      ],
-    "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"]
-},
+  ],
+  "moduleNameMapper": {
+    "^@react-native-async-storage/async-storage$": "<rootDir>/__mocks__/@react-native-async-storage/async-storage.ts"
+  },
+  "transform": {
+    "^.+\\.[tj]sx?$": "babel-jest"
+  },
+  "transformIgnorePatterns": [
+    "node_modules/(?!(react-native|@react-native|@react-native-async-storage|expo|@expo|expo-modules-core|axios)/)"
+  ],
+  "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"]
+}
+,
   "dependencies": {
     "@expo/vector-icons": "^14.0.2",
     "@react-navigation/native": "^6.0.2",
@@ -54,6 +55,7 @@
   "devDependencies": {
     "@babel/core": "^7.20.0",
     "@react-native-async-storage/async-storage": "^2.0.0",
+    "@testing-library/jest-native": "^5.4.3",
     "@testing-library/react-native": "^12.8.1",
     "@types/jest": "^29.5.14",
     "@types/react": "~18.2.45",
