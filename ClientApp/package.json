@@ -14,7 +14,14 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "jest": {
-    "preset": "jest-expo"
+    "preset": "jest-expo",
+    "setupFilesAfterEnv": ["<rootDir>/jestSetup.ts"],
+    "moduleNameMapper": {
+      "^@react-native-async-storage/async-storage$": "<rootDir>/__mocks__/@react-native-async-storage/async-storage.ts"
+    },
+    "transform": {
+      "^.+\\.[tj]sx?$": "ts-jest"
+    }
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.2",

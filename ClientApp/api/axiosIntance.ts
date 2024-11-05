@@ -3,12 +3,11 @@
  * 
  * This module contains: 
  * - Axios configuration options: The configuration options specify the base URL, timeout, and headers for the Axios instance
- * - Helper functions: Manage the access and refresh tokens in AsyncStorage
+ * - Helper functions: Manage the access and refresh tokens in AsyncStorage used by the interceptors
  * - Request interceptor: Adds the Authorization header with the access token
  * - Response interceptor to handle 401 Unauthorized errors by refreshing the access token
  *  
  * 
- * The response interceptor handles 401 Unauthorized errors by refreshing the access token
  */
 
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
@@ -17,6 +16,7 @@ import { showAlert, ALERT_MESSAGES } from './alertUtils';
 
 
 // Axios configuration options
+// *********************************
 const config: AxiosRequestConfig = {
   //TODO change this to the server URL
   baseURL: 'http://localhost:8000/',
@@ -28,14 +28,19 @@ const config: AxiosRequestConfig = {
 };
 
 // Helper functions for token management
+// *************************************
+
+// getAccessToken function to retrieve the access token from AsyncStorage
 const getAccessToken = async (): Promise<string | null> => {
   return await AsyncStorage.getItem('access_token');
 };
 
+// setAccessToken function to store the access token in AsyncStorage
 const setAccessToken = async (token: string) => {
   await AsyncStorage.setItem('access_token', token);
 };
 
+// getRefreshToken function to retrieve the refresh token from AsyncStorage
 const getRefreshToken = async (): Promise<string | null> => {
   return await AsyncStorage.getItem('refresh_token');
 };
@@ -91,9 +96,11 @@ const refreshAccessToken = async (): Promise<string | null> => {
 
 
 // Create Axios instance with the config
+// **************************************
 const axiosInstance: AxiosInstance = axios.create(config);
 
 // Request Interceptor to add Authorization Token
+// **********************************************
 axiosInstance.interceptors.request.use(
   async (config) => {
     const token = await getAccessToken();
@@ -106,6 +113,7 @@ axiosInstance.interceptors.request.use(
 );
 
 // Response Interceptor for Error Handling
+// ****************************************
 axiosInstance.interceptors.response.use(
   (response: AxiosResponse) => response,
   async (error) => {

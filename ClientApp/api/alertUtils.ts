@@ -1,7 +1,7 @@
 /**
- * This file contains utility functions for showing alerts.
+ * This file contains utility functions used by the axiosInstance file for showing error messages.
  * 
- * This offers the advantage of centralizing alert messages and handling using constants.
+ * This offers the advantage of centralizing error messages and handling using constants.
  * showAlert function wraps the "Alert" component from "react-native".
  * It uses the constants defined in ALERT_MESSAGES to show the alert and allow for easy centralized changes.
  */
