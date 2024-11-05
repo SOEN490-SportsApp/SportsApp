@@ -6,4 +6,6 @@ import app.sportahub.userservice.model.user.User;
 public interface UserService {
 
     User createUser(UserRequest userRequest);
+
+    User getUserById(String id);
 }
