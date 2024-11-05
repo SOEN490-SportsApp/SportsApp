@@ -8,11 +8,10 @@ import ConfirmButton from "@/components/ConfirmButton";
 import AuthenticationDivider from "@/components/AuthenticationDivider";
 
 interface RegisterFormData {
-  firstName: string;
-  lastName: string;
   username: string;
   email: string;
   password: string;
+  confirmPassword: string;
   agreeToTerms: boolean;
 }
 
@@ -20,69 +19,27 @@ const Register: React.FC = () => {
   const { control, handleSubmit, formState: { errors }, watch, setValue } = useForm<RegisterFormData>();
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-
-
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const onSubmit = (data: RegisterFormData) => {
     if (!data.agreeToTerms) {
       Alert.alert("", "You must agree to the terms to continue.");
       return;
     }
-    // TODO: Logic when user registers
+    if (data.password !== data.confirmPassword) {
+      Alert.alert("Oh oh!", "Passwords do not match.");
+      return;
+    }
+    // TODO: push to the next registration process page when it is done
     router.back();
   };
 
   return (
-    <View className="flex-1 justify-between p-5 bg-white pt-32 pr-12 pl-12 pb-8">
+    <View className="flex-1 justify-between p-5 bg-white pt-52 pr-12 pl-12 pb-8">
       <View>
-        <Text className="text-lg text-center mb-2">Hey there,</Text>
-        <Text className="text-2xl font-bold text-center mb-5">Create an Account</Text>
+        <Text className="text-3xl font-bold text-center mb-5">Create an Account</Text>
 
-        <View className="h-24" />
-
-        {/* First Name Field */}
-        <View className="flex-row items-center bg-gray-100 rounded-3xl p-2 pl-4 min-h-16">
-          <MaterialCommunityIcons name="account" size={20} color="#aaa" />
-          <Controller
-            control={control}
-            name="firstName"
-            rules={{ required: "First name is required" }}
-            render={({ field: { onChange, onBlur, value } }) => (
-              <TextInput
-                className="flex-1 ml-2 text-lg h-full"
-                placeholder="First Name"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-              />
-            )}
-          />
-        </View>
-        {errors.firstName && <Text className="text-red-500 text-xs mb-2">{errors.firstName.message}</Text>}
-
-        <View className="h-4" />
-
-        {/* Last Name Field */}
-        <View className="flex-row items-center bg-gray-100 rounded-3xl p-2 pl-4 min-h-16">
-          <MaterialCommunityIcons name="account" size={20} color="#aaa" />
-          <Controller
-            control={control}
-            name="lastName"
-            rules={{ required: "Last name is required" }}
-            render={({ field: { onChange, onBlur, value } }) => (
-              <TextInput
-                className="flex-1 ml-2 text-lg h-full"
-                placeholder="Last Name"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-              />
-            )}
-          />
-        </View>
-        {errors.lastName && <Text className="text-red-500 text-xs mb-2">{errors.lastName.message}</Text>}
-
-        <View className="h-4" />
+        <View className="h-28" />
 
         {/* Username Field */}
         <View className="flex-row items-center bg-gray-100 rounded-3xl p-2 pl-4 min-h-16">
@@ -163,6 +120,38 @@ const Register: React.FC = () => {
         </View>
         {errors.password && <Text className="text-red-500 text-xs mb-2">{errors.password.message}</Text>}
 
+        <View className="h-4" />
+
+         {/* Confirm Password Field */}
+         <View className="flex-row items-center bg-gray-100 rounded-3xl p-2 pl-4 min-h-16">
+          <MaterialCommunityIcons name="lock" size={20} color="#aaa" />
+          <Controller
+            control={control}
+            name="confirmPassword"
+            rules={{ required: "Please confirm your password" }}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <View className="flex-1">
+                <TextInput
+                  className="text-lg ml-2"
+                  placeholder="Confirm Password"
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                  secureTextEntry={!showConfirmPassword}
+                />
+                <TouchableOpacity onPress={() => setShowConfirmPassword(prevState => !prevState)} className="absolute right-2">
+                  <MaterialCommunityIcons
+                    name={showConfirmPassword ? "eye" : "eye-off"}
+                    size={24}
+                    color="#aaa"
+                  />
+                </TouchableOpacity>
+              </View>
+            )}
+          />
+        </View>
+        {errors.confirmPassword && <Text className="text-red-500 text-xs mb-2">{errors.confirmPassword.message}</Text>}
+
         <View className="h-2" />
 
         {/* Terms and Conditions Checkbox */}
@@ -178,7 +167,7 @@ const Register: React.FC = () => {
           </Text>
         </View>
 
-        <View className="h-12" />
+        <View className="h-16" />
 
         {/* Register Button */}
         <ConfirmButton
