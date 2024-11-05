@@ -157,6 +157,7 @@ const Register: React.FC = () => {
         {/* Terms and Conditions Checkbox */}
         <View className="flex-row items-center mb-4">
           <Checkbox
+            testID="agreeToTermsCheckbox"
             value={watch("agreeToTerms")}
             onValueChange={(value) => setValue("agreeToTerms", value)}
           />
