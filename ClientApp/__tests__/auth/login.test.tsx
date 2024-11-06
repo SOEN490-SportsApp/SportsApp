@@ -25,10 +25,8 @@ describe('Login Screen', () => {
 
         fireEvent.press(getByText('Login'));
 
-        await waitFor(() => {
-            expect(getByText('Email is required')).toBeTruthy();
-            expect(getByText('Password is required')).toBeTruthy();
-        });
+        expect(await screen.findByText('Email is required')).toBeTruthy();
+        expect(await screen.findByText('Password is required')).toBeTruthy();
     });
 
     it('shows an error for invalid email format', async () => {
