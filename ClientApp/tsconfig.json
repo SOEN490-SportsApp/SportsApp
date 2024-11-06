@@ -13,6 +13,10 @@
     "**/*.ts",
     "**/*.tsx",
     ".expo/types/**/*.ts",
-    "expo-env.d.ts"
-, "api/axiosIntance", "api/axiosInstance"  ]
+    "expo-env.d.ts", 
+    "api/axiosIntance", 
+    "api/axiosInstance", 
+    "nativewind-env.d.ts"  
+  ]
 }
+
