@@ -31,7 +31,7 @@ const Register: React.FC = () => {
       return;
     }
     // TODO: push to the next registration process page when it is done
-    router.back();
+    router.push('/tabs');
   };
 
   return (
