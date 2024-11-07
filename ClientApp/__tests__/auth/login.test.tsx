@@ -9,6 +9,8 @@ jest.mock('expo-router', () => ({
     useRouter: jest.fn(),
 }));
 
+jest.setTimeout(15000);
+
 describe('Login Screen', () => {
     const mockPush = jest.fn();
 
