@@ -14,6 +14,7 @@ export default function RootLayout() {
           title: "Create Profile",
         }}
       />
+      <Stack.Screen name="tabs" options={{ headerShown: false }} />
     </Stack>
   );
 }
