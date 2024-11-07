@@ -19,4 +19,4 @@ Sporta connects users who are passionate about playing sports, enabling them to 
 
 ### Getting Started with Sporta:  
 
-//todo
+### Follow --> https://github.com/SOEN490-SportsApp/SportsApp/blob/main/ClientApp/README.md#welcome-to-your-expo-app- for frontend readme. 
