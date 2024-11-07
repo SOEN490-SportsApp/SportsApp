@@ -25,7 +25,7 @@ const LoginScreen: React.FC = () => {
     <View className="flex-1 justify-between p-5 bg-white pt-20 pr-12 pl-12 pb-8">
       <View className="items-center mb-5">
         {/* Logo Image */}
-        <Image 
+        <Image
           source={require("../../assets/images/sporta_logo.png")}
           className="w-24 h-24 rounded-full"
         />
