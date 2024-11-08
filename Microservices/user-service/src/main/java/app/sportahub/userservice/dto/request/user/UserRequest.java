@@ -1,6 +1,7 @@
 package app.sportahub.userservice.dto.request.user;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
@@ -17,6 +18,9 @@ public record UserRequest(String keycloakId,
                           @NotBlank(message = "Password must be provided")
                           String password,
 
+                          @Nullable
                           ProfileRequest profile,
+
+                          @Nullable
                           PreferencesRequest preferences) {
 }
