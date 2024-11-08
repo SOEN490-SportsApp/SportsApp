@@ -1,15 +1,22 @@
 import React from 'react';
 import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity } from 'react-native';
-import { Button, Icon } from 'react-native-elements';
+import { Icon } from 'react-native-elements';
 import { useRouter } from 'expo-router';
 
-const feedData = [
+interface FeedItem {
+  id: string;
+  image: any;  
+  username: string;
+  time: string;
+}
+
+const feedData: FeedItem[] = [
   { id: '1', image: require('../../assets/images/feed1.jpg'), username: 'User1', time: '5 min ago' },
   { id: '2', image: require('../../assets/images/feed2.jpg'), username: 'User2', time: '10 min ago' },
   { id: '3', image: require('../../assets/images/feed3.jpg'), username: 'User3', time: '15 min ago' },
 ];
 
-const HomeScreen = () => {
+const HomeScreen: React.FC = () => {
   const router = useRouter();
 
   const renderPostActions = () => {
@@ -29,13 +36,19 @@ const HomeScreen = () => {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>Sporta</Text>
-        <Button
-          title="Logout"
-          buttonStyle={styles.logoutButton}
-          titleStyle={styles.logoutButtonTitle} 
-          onPress={() => router.push('/auth/login')}
-        />
+        <Text style={styles.logoText}>sporta</Text>
+        <View style={styles.iconContainer}>
+          <TouchableOpacity style={styles.iconButton}>
+            <View style={styles.iconCircle}>
+              <Icon name="search" type="font-awesome" color="#000" size={20} />
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.iconButton}>
+            <View style={styles.iconCircle}>
+              <Icon name="comments" type="font-awesome" color="#000" size={20} />
+            </View>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Feed */}
@@ -63,48 +76,45 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     padding: 15,
-    backgroundColor: '#0C9E04',
+    backgroundColor: '#f5f5f5',
     marginTop: 50,
-  },
-  title: {
-    fontSize: 16,  
-    fontWeight: 'bold',
-    color: 'white',
-    letterSpacing: 1,
-  },
-  logoutButton: {
-    backgroundColor: '#fff', 
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 25, // Rounded corners
-    elevation: 3, // Shadow for depth
-    marginLeft: 10,
+    justifyContent: 'space-between',
   },
-  logoutButtonTitle: {
-    color: 'black',
-    marginLeft: 8, // Space between the icon and text
-    fontSize: 16,
+  logoText: {
+    color: '#0C9E04',
+    fontSize: 28,
     fontWeight: 'bold',
+  },
+  iconContainer: {
+    flexDirection: 'row',
+  },
+  iconButton: {
+    marginLeft: 15,
+  },
+  iconCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#d3d3d3',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   feedContainer: {
     paddingHorizontal: 10,
   },
   feedItem: {
     marginVertical: 10,
-    backgroundColor: 'white',  // Cards with white background
+    backgroundColor: 'white',
     borderRadius: 10,
-    elevation: 3,  // Elevation to give it a floating look
+    elevation: 3,
     padding: 10,
   },
   feedImage: {
     width: '100%',
-    height: 220,
+    height: 200,
     borderRadius: 10,
   },
   username: {
@@ -126,6 +136,4 @@ const styles = StyleSheet.create({
 });
 
 export default HomeScreen;
-
-
 
