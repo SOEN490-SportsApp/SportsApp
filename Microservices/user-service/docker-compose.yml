@@ -11,3 +11,31 @@ services:
       MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
     volumes:
       - ./data:/data/db
+  keycloak-mysql:
+    container_name: keycloak-mysql
+    image: mysql:9.1.0
+    volumes:
+      - ./volume-data/mysql_keycloak_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${KEYCLOAK_MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${KEYCLOAK_MYSQL_DATABASE}
+      MYSQL_USER: ${KEYCLOAK_MYSQL_USER}
+      MYSQL_PASSWORD: ${KEYCLOAK_MYSQL_PASSWORD}
+  keycloak:
+    container_name: keycloak
+    image: quay.io/keycloak/keycloak:26.0
+    command: [ "start-dev", "--import-realm" ]
+    environment:
+      DB_VENDOR: MYSQL
+      DB_ADDR: mysql
+      DB_DATABASE: ${KEYCLOAK_MYSQL_DATABASE}
+      DB_USER: ${KEYCLOAK_MYSQL_USER}
+      DB_PASSWORD: ${KEYCLOAK_MYSQL_PASSWORD}
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+    ports:
+      - "8181:8080"
+    volumes:
+      - ./docker/keycloak/realms/:/opt/keycloak/data/import/
+    depends_on:
+      - keycloak-mysql
