@@ -1,11 +1,13 @@
 package app.sportahub.userservice.service.user;
 
-import app.sportahub.userservice.exception.user.UserEmailAlreadyExists;
-import app.sportahub.userservice.exception.user.UsernameAlreadyExists;
+import app.sportahub.userservice.dto.request.user.PreferencesRequest;
+import app.sportahub.userservice.exception.user.UserEmailAlreadyExistsException;
+import app.sportahub.userservice.exception.user.UsernameAlreadyExistsException;
 import app.sportahub.userservice.model.user.Profile;
 import app.sportahub.userservice.model.user.User;
 import app.sportahub.userservice.repository.UserRepository;
 import app.sportahub.userservice.dto.request.user.UserRequest;
+import app.sportahub.userservice.dto.request.user.ProfileRequest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,6 +18,7 @@ import org.mockito.MockitoAnnotations;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -36,8 +39,27 @@ public class UserServiceTest {
     @Test
     public void createUserShouldReturnSuccessfulCreation() {
         // Arrange
-        UserRequest userRequest = new UserRequest("test@example.com", "testUser", "123", "John", "Doe",
-                LocalDate.of(1990, 1, 1), "1234567890", "100");
+        ProfileRequest profileRequest = new ProfileRequest(
+                "John",
+                "Doe",
+                LocalDate.of(1990, 1, 1),
+                "M",
+                "12345",
+                "123-456-7890",
+                List.of("Basketball", "Soccer"),
+                "A"
+        );
+
+        PreferencesRequest preferences = new PreferencesRequest(true, "english");
+
+        UserRequest userRequest = new UserRequest(
+                "keycloak-123",
+                "test@example.com",
+                "testUser",
+                "123",
+                profileRequest,
+                preferences
+        );
 
         when(userRepository.findUserByEmail(userRequest.email())).thenReturn(null);
         when(userRepository.findUserByUsername(userRequest.username())).thenReturn(null);
@@ -49,11 +71,11 @@ public class UserServiceTest {
                 .withEmail(userRequest.email())
                 .withUsername(userRequest.username())
                 .withProfile(Profile.builder()
-                        .withFirstName(userRequest.firstName())
-                        .withLastName(userRequest.lastName())
-                        .withDateOfBirth(userRequest.dateOfBirth())
-                        .withPhoneNumber(userRequest.phoneNumber())
-                        .withRanking(userRequest.ranking())
+                        .withFirstName(userRequest.profile().firstName())
+                        .withLastName(userRequest.profile().lastName())
+                        .withDateOfBirth(userRequest.profile().dateOfBirth())
+                        .withPhoneNumber(userRequest.profile().phoneNumber())
+                        .withRanking(userRequest.profile().ranking())
                         .build())
                 .build();
 
@@ -67,7 +89,12 @@ public class UserServiceTest {
         Assertions.assertEquals("123", result.getId());
         Assertions.assertEquals(userRequest.email(), result.getEmail());
         Assertions.assertEquals(userRequest.username(), result.getUsername());
-        Assertions.assertEquals(userRequest.firstName(), result.getProfile().getFirstName());
+        Assertions.assertEquals(userRequest.profile().firstName(), result.getProfile().getFirstName());
+        Assertions.assertEquals(userRequest.profile().lastName(), result.getProfile().getLastName());
+        Assertions.assertEquals(userRequest.profile().dateOfBirth(), result.getProfile().getDateOfBirth());
+        Assertions.assertEquals(userRequest.profile().phoneNumber(), result.getProfile().getPhoneNumber());
+        Assertions.assertEquals(userRequest.profile().ranking(), result.getProfile().getRanking());
+
         verify(userRepository, times(1)).findUserByEmail(userRequest.email());
         verify(userRepository, times(1)).findUserByUsername(userRequest.username());
         verify(userRepository, times(1)).save(any(User.class));
@@ -75,13 +102,32 @@ public class UserServiceTest {
 
     @Test
     public void createUserShouldThrowEmailAlreadyExists() {
-        UserRequest userRequest = new UserRequest("test@example.com", "testUser", "123", "John", "Doe",
-                LocalDate.of(1990, 1, 1), "1234567890", "100");
+        ProfileRequest profileRequest = new ProfileRequest(
+                "John",
+                "Doe",
+                LocalDate.of(1990, 1, 1),
+                "M",
+                "12345",
+                "123-456-7890",
+                List.of("Basketball", "Soccer"),
+                "A"
+        );
+
+        PreferencesRequest preferences = new PreferencesRequest(true, "english");
+
+        UserRequest userRequest = new UserRequest(
+                "keycloak-123",
+                "test@example.com",
+                "testUser",
+                "123",
+                profileRequest,
+                preferences
+        );
 
         User existingUser = new User();
         when(userRepository.findUserByEmail(userRequest.email())).thenReturn(existingUser);
 
-        UserEmailAlreadyExists exception = Assertions.assertThrows(UserEmailAlreadyExists.class,
+        UserEmailAlreadyExistsException exception = Assertions.assertThrows(UserEmailAlreadyExistsException.class,
                 () -> userService.createUser(userRequest));
         Assertions.assertEquals("409 CONFLICT \"User with this email:test@example.com already exists.\"", exception.getMessage());
 
@@ -92,14 +138,33 @@ public class UserServiceTest {
 
     @Test
     public void createUserShouldThrowUsernameAlreadyExists() {
-        UserRequest userRequest = new UserRequest("test@example.com", "testUser", "123", "John", "Doe",
-                LocalDate.of(1990, 1, 1), "1234567890", "100");
+        ProfileRequest profileRequest = new ProfileRequest(
+                "John",
+                "Doe",
+                LocalDate.of(1990, 1, 1),
+                "M",
+                "12345",
+                "123-456-7890",
+                List.of("Basketball", "Soccer"),
+                "A"
+        );
+
+        PreferencesRequest preferences = new PreferencesRequest(true, "english");
+
+        UserRequest userRequest = new UserRequest(
+                "keycloak-123",
+                "test@example.com",
+                "testUser",
+                "123",
+                profileRequest,
+                preferences
+        );
 
         when(userRepository.findUserByEmail(userRequest.email())).thenReturn(null);
         User existingUser = new User();
         when(userRepository.findUserByUsername(userRequest.username())).thenReturn(existingUser);
 
-        UsernameAlreadyExists exception = Assertions.assertThrows(UsernameAlreadyExists.class,
+        UsernameAlreadyExistsException exception = Assertions.assertThrows(UsernameAlreadyExistsException.class,
                 () -> userService.createUser(userRequest));
         Assertions.assertEquals("409 CONFLICT \"User with this username:testUser already exists.\"", exception.getMessage());
 
