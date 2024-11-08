@@ -15,20 +15,26 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "jest": {
-  "preset": "jest-expo",
-  "setupFilesAfterEnv": [
-    "<rootDir>/jestSetup.ts",
-    "@testing-library/jest-native/extend-expect"
-  ],
-  "moduleNameMapper": {
-    "^@react-native-async-storage/async-storage$": "<rootDir>/__mocks__/@react-native-async-storage/async-storage.ts"
+    "preset": "jest-expo",
+    "setupFilesAfterEnv": [
+      "<rootDir>/jestSetup.ts",
+      "@testing-library/jest-native/extend-expect"
+    ],
+    "moduleNameMapper": {
+      "^@react-native-async-storage/async-storage$": "<rootDir>/__mocks__/@react-native-async-storage/async-storage.ts"
+    },
+    "transform": {
+      "^.+\\.[tj]sx?$": "babel-jest"
+    },
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ]
   },
-  "transform": {
-    "^.+\\.[tj]sx?$": "babel-jest"
-  },
-  "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"]
-}
-,
   "dependencies": {
     "@expo/vector-icons": "^14.0.3",
     "@react-native-community/datetimepicker": "8.0.1",
@@ -41,7 +47,7 @@
     "expo-font": "~12.0.9",
     "expo-image-picker": "^15.0.7",
     "expo-linking": "~6.3.1",
-    "expo-router": "~3.5.23",
+    "expo-router": "^3.5.23",
     "expo-splash-screen": "~0.27.5",
     "expo-status-bar": "~1.12.1",
     "expo-system-ui": "~3.0.7",
