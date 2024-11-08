@@ -2,7 +2,7 @@ package app.sportahub.userservice.client;
 
 import app.sportahub.userservice.config.auth.KeycloakConfig;
 import app.sportahub.userservice.dto.request.user.keycloak.KeycloakRequest;
-import app.sportahub.userservice.exception.user.KeycloakCommunicationException;
+import app.sportahub.userservice.exception.user.keycloak.KeycloakCommunicationException;
 import app.sportahub.userservice.model.user.keycloak.KeycloakUser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

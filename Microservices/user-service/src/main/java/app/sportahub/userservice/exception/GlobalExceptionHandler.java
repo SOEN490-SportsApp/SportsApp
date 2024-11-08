@@ -1,7 +1,7 @@
 package app.sportahub.userservice.exception;
 
-import app.sportahub.userservice.exception.user.KeycloakCommunicationException;
 import app.sportahub.userservice.exception.user.UserEmailAlreadyExistsException;
+import app.sportahub.userservice.exception.user.keycloak.KeycloakCommunicationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;

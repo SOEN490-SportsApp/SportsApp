@@ -1,4 +1,4 @@
-package app.sportahub.userservice.controller;
+package app.sportahub.userservice.controller.user;
 
 import app.sportahub.userservice.dto.request.user.UserRequest;
 import app.sportahub.userservice.dto.response.user.UserResponse;

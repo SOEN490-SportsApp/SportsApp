@@ -1,6 +1,7 @@
 package app.sportahub.userservice.controller;
 
 import app.sportahub.userservice.config.auth.TestSecurityConfig;
+import app.sportahub.userservice.controller.user.UserController;
 import app.sportahub.userservice.dto.request.user.PreferencesRequest;
 import app.sportahub.userservice.dto.request.user.ProfileRequest;
 import app.sportahub.userservice.dto.request.user.UserRequest;
