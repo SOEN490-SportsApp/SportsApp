@@ -16,6 +16,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 public class User extends BaseEntity {
 
+    @NotBlank
+    private String keycloakId;
+
     @NotBlank(message = "Email must be provided")
     @Email(message = "Valid email is required")
     private String email;

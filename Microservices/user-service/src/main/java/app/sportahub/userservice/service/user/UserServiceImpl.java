@@ -1,11 +1,12 @@
 package app.sportahub.userservice.service.user;
 
-import app.sportahub.userservice.exception.user.UserEmailAlreadyExists;
-import app.sportahub.userservice.exception.user.UsernameAlreadyExists;
+import app.sportahub.userservice.dto.request.user.UserRequest;
+import app.sportahub.userservice.exception.user.UserEmailAlreadyExistsException;
+import app.sportahub.userservice.exception.user.UsernameAlreadyExistsException;
+import app.sportahub.userservice.model.user.Preferences;
 import app.sportahub.userservice.model.user.Profile;
 import app.sportahub.userservice.model.user.User;
 import app.sportahub.userservice.repository.UserRepository;
-import app.sportahub.userservice.dto.request.user.UserRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,13 +26,13 @@ public class UserServiceImpl implements UserService {
     public User createUser(UserRequest userRequest) {
         Optional<User> optionalUserByEmail = Optional.ofNullable(userRepository.findUserByEmail(userRequest.email()));
         if (optionalUserByEmail.isPresent()) {
-            throw new UserEmailAlreadyExists(userRequest.email());
+            throw new UserEmailAlreadyExistsException(userRequest.email());
         }
 
         Optional<User> optionalUserByUsername = Optional
                 .ofNullable(userRepository.findUserByUsername(userRequest.username()));
         if (optionalUserByUsername.isPresent()) {
-            throw new UsernameAlreadyExists(userRequest.username());
+            throw new UsernameAlreadyExistsException(userRequest.username());
         }
 
         User user = User.builder()
@@ -40,11 +41,15 @@ public class UserServiceImpl implements UserService {
                 .withEmail(userRequest.email())
                 .withUsername(userRequest.username())
                 .withProfile(Profile.builder()
-                        .withFirstName(userRequest.firstName())
-                        .withLastName(userRequest.lastName())
-                        .withDateOfBirth(userRequest.dateOfBirth())
-                        .withPhoneNumber(userRequest.phoneNumber())
-                        .withRanking(userRequest.ranking())
+                        .withFirstName(userRequest.profile().firstName())
+                        .withLastName(userRequest.profile().lastName())
+                        .withDateOfBirth(userRequest.profile().dateOfBirth())
+                        .withPhoneNumber(userRequest.profile().phoneNumber())
+                        .withRanking(userRequest.profile().ranking())
+                        .build())
+                .withPreferences(Preferences.builder()
+                        .notifications(userRequest.preferences().notifications())
+                        .language(userRequest.preferences().language())
                         .build())
                 .build();
         User savedUser = userRepository.save(user);
