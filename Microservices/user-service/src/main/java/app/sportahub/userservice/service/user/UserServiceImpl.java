@@ -40,18 +40,23 @@ public class UserServiceImpl implements UserService {
                 .withUpdatedAt(Timestamp.valueOf(LocalDateTime.now()))
                 .withEmail(userRequest.email())
                 .withUsername(userRequest.username())
-                .withProfile(Profile.builder()
+                .withProfile(userRequest.profile() != null
+                        ? Profile.builder()
                         .withFirstName(userRequest.profile().firstName())
                         .withLastName(userRequest.profile().lastName())
                         .withDateOfBirth(userRequest.profile().dateOfBirth())
                         .withPhoneNumber(userRequest.profile().phoneNumber())
                         .withRanking(userRequest.profile().ranking())
-                        .build())
-                .withPreferences(Preferences.builder()
+                        .build()
+                        : null)
+                .withPreferences(userRequest.preferences() != null
+                        ? Preferences.builder()
                         .notifications(userRequest.preferences().notifications())
                         .language(userRequest.preferences().language())
-                        .build())
+                        .build()
+                        : null)
                 .build();
+
         User savedUser = userRepository.save(user);
         log.info("UserServiceImpl::createUser: User with id:{} was successfully created", savedUser.getId());
         return savedUser;
