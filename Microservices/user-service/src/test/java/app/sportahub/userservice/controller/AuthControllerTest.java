@@ -44,9 +44,6 @@ public class AuthControllerTest {
 
     private LoginRequest validLoginRequest;
     private LoginResponse loginResponse;
-    private JsonNode jsonNode;
-    private Mono<JsonNode> mono;
-
 
     @SneakyThrows
     @BeforeEach
