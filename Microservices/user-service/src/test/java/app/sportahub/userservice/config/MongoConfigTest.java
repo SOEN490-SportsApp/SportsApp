@@ -16,6 +16,7 @@ import org.mockito.*;
 import org.mockito.stubbing.Answer;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
+import org.springframework.test.context.TestPropertySource;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -24,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
+@TestPropertySource(properties = "spring.data.mongodb.uri=mongodb://root:password@localhost:27017/user-service?authSource=admin")
 public class MongoConfigTest {
 
     @Mock
