@@ -1,8 +1,6 @@
 package app.sportahub.userservice.controller;
 
-import app.sportahub.userservice.client.KeycloakApiClient;
 import app.sportahub.userservice.config.auth.TestSecurityConfig;
-import app.sportahub.userservice.config.client.WebClientTestConfig;
 import app.sportahub.userservice.controller.auth.AuthController;
 import app.sportahub.userservice.dto.request.auth.LoginRequest;
 import app.sportahub.userservice.dto.response.auth.LoginResponse;
@@ -29,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ActiveProfiles("user-service.test")
 @WebMvcTest(AuthController.class)
-@Import({TestSecurityConfig.class, AuthController.class, KeycloakApiClient.class, AuthServiceImpl.class, WebClientTestConfig.class})
+@Import({TestSecurityConfig.class, AuthServiceImpl.class})
 public class AuthControllerTest {
 
     @Autowired
@@ -50,20 +48,20 @@ public class AuthControllerTest {
         validLoginRequest = new LoginRequest("danDuguay", "mypassword");
 
         TokenResponse tokenResponse = new TokenResponse("accessTokenResponse", "refreshTokenResponse");
-
         loginResponse = new LoginResponse("userIDResponse", tokenResponse);
+
+        when(authService.loginUser(any())).thenReturn(loginResponse);
     }
 
+    @SneakyThrows
     @Test
-    public void shouldLoginUserSuccessfully() throws Exception {
-        when(authService.loginUser(any())).thenReturn(loginResponse);
-
+    public void shouldLoginUserSuccessfully() {
         Assertions.assertEquals(loginResponse, authService.loginUser(validLoginRequest));
-
 
         mockMvc.perform(MockMvcRequestBuilders.post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(validLoginRequest))).andExpect(status().isOk())
+                        .content(objectMapper.writeValueAsString(validLoginRequest)))
+                .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.userID").value(loginResponse.userID()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.tokenResponse.accessToken").value(loginResponse.tokenResponse().accessToken()))
