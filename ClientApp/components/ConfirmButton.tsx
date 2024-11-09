@@ -10,7 +10,7 @@ interface CustomButtonProps {
   icon: React.ReactNode | null; 
   text: string;          
   onPress: () => void;
-  iconDirection: IconDirection;
+  iconDirection: IconDirection | null;
 }
 
 const ConfirmButton: React.FC<CustomButtonProps> = ({ icon, text, onPress, iconDirection }) => {
