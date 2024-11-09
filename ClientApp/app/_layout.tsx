@@ -11,7 +11,7 @@ export default function RootLayout() {
         options={{
           headerShown: true,
           headerBackTitle: "Back",
-          title: "Profile preference",
+          title: "Create Profile",
         }}
       />
     </Stack>

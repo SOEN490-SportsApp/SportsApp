@@ -18,6 +18,7 @@ const LoginScreen: React.FC = () => {
 
   const onSubmit = (data: LoginFormData) => {
     console.log("Login data:", data);
+    router.push('/auth/profilePreferenceForm')
   };
 
   return (
@@ -100,9 +101,10 @@ const LoginScreen: React.FC = () => {
 
         {/* Login Button */}
         <ConfirmButton
-          icon={<MaterialCommunityIcons name="login" size={25} color="#fff" />}
+          icon={<MaterialCommunityIcons name="login" size={25} color="#fff"  />}
           text="Login"
           onPress={handleSubmit(onSubmit)}
+          iconDirection ={null}
         />
 
         <AuthenticationDivider text="Or" />
