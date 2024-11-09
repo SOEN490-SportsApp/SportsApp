@@ -15,9 +15,9 @@ export default function TabLayout() {
           height: 100,
         },
         tabBarLabelStyle: {
-          marginTop: -10,
+          marginTop: -5,  // Adjust the margin to reduce the spacing between the text and icon
           fontSize: 12,
-          padding: 10,
+          padding: 5,     // Reduce padding to make text closer to icon
           textAlign: 'center',
         },
       }}
@@ -28,7 +28,7 @@ export default function TabLayout() {
         options={{
           title: 'Home',
           headerShown: false,
-          tabBarIcon: ({ color }) => <FontAwesome size={28} name="home" color={color} />,
+          tabBarIcon: ({ color }) => <FontAwesome size={24} name="home" color={color} style={{ marginBottom: -5 }} />,  // Reduce space between icon and text
         }}
       />
       
@@ -37,7 +37,7 @@ export default function TabLayout() {
         name="plus"
         options={{
           title: 'Add',
-          tabBarIcon: ({ color }) => <FontAwesome size={28} name="plus" color={color} />,
+          tabBarIcon: ({ color }) => <FontAwesome size={24} name="plus" color={color} style={{ marginBottom: -5 }} />, // Adjust icon margin
         }}
       />
 
@@ -46,7 +46,7 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ color }) => <FontAwesome size={28} name="user" color={color} />,
+          tabBarIcon: ({ color }) => <FontAwesome size={24} name="user" color={color} style={{ marginBottom: -5 }} />, // Adjust icon margin
         }}
       />
       
@@ -55,7 +55,7 @@ export default function TabLayout() {
         name="settings"
         options={{
           title: 'Settings',
-          tabBarIcon: ({ color }) => <FontAwesome size={28} name="cog" color={color} />,
+          tabBarIcon: ({ color }) => <FontAwesome size={24} name="cog" color={color} style={{ marginBottom: -5 }} />, // Adjust icon margin
         }}
         listeners={{
           tabPress: (e) => {
@@ -67,6 +67,7 @@ export default function TabLayout() {
     </Tabs>
   );
 }
+
 
 
 
