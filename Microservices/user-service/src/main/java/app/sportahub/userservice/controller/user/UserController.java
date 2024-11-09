@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-
 @RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor
@@ -37,7 +36,6 @@ public class UserController {
         return UserResponse.from(userService.createUser(userRequest));
     }
 
-
     @PutMapping("/{id}/profile")
     @ResponseStatus(HttpStatus.OK)
     public ProfileResponse updateProfile(@PathVariable String id, @Valid @RequestBody ProfileRequest profileRequest) {
@@ -49,5 +47,4 @@ public class UserController {
     public ProfileResponse patchProfile(@PathVariable String id, @Valid @RequestBody ProfileRequest profileRequest) {
         return ProfileResponse.from(userService.patchUserProfile(id, profileRequest));
     }
-
 }

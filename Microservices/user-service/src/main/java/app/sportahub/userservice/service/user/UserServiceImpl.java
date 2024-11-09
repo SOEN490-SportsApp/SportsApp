@@ -27,10 +27,8 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-
     private final UserRepository userRepository;
     private final KeycloakApiClient keycloakApiClient;
-
 
     @Override
     public User createUser(UserRequest userRequest) {
@@ -101,6 +99,7 @@ public class UserServiceImpl implements UserService {
         User savedUser = userRepository.save(user);
         Profile updatedProfile = savedUser.getProfile();
         if(
+                previousProfile == null ||
                 !Objects.equals(updatedProfile.getFirstName(), previousProfile.getFirstName()) ||
                 !Objects.equals(updatedProfile.getLastName(), previousProfile.getLastName())
         ) {
@@ -148,10 +147,8 @@ public class UserServiceImpl implements UserService {
                     updatedProfile.getLastName()
             ));
         }
-
         log.info("UserServiceImpl::patchUserProfile: User with id:{} was updated", savedUser.getId());
         return savedUser.getProfile();
-
     }
 
 }
