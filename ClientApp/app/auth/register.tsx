@@ -6,6 +6,7 @@ import Checkbox from 'expo-checkbox';
 import { useRouter } from "expo-router";
 import ConfirmButton from "@/components/ConfirmButton";
 import AuthenticationDivider from "@/components/AuthenticationDivider";
+import { IconDirection } from "@/components/ConfirmButton";
 
 interface RegisterFormData {
   username: string;
@@ -14,6 +15,7 @@ interface RegisterFormData {
   confirmPassword: string;
   agreeToTerms: boolean;
 }
+
 
 const Register: React.FC = () => {
   const { control, handleSubmit, formState: { errors }, watch, setValue } = useForm<RegisterFormData>();
@@ -30,7 +32,6 @@ const Register: React.FC = () => {
       Alert.alert("Oh oh!", "Passwords do not match.");
       return;
     }
-    // TODO: push to the next registration process page when it is done
     router.push('/auth/profilePreferenceForm');
   };
 
@@ -175,6 +176,7 @@ const Register: React.FC = () => {
           icon={<MaterialCommunityIcons name="login" size={25} color="#fff" />}
           text="Sign Up"
           onPress={handleSubmit(onSubmit)}
+          iconDirection={IconDirection.left}
         />
 
         <AuthenticationDivider text="Or"/>
