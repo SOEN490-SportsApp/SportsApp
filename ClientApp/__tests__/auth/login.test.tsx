@@ -27,20 +27,8 @@ describe('Login Screen', () => {
 
         fireEvent.press(getByText('Login'));
 
-        expect(await screen.findByText('Email is required')).toBeTruthy();
+        expect(await screen.findByText('Email or username is required')).toBeTruthy();
         expect(await screen.findByText('Password is required')).toBeTruthy();
-    });
-
-    it('shows an error for invalid email format', async () => {
-        const { getByPlaceholderText, getByText } = render(<LoginScreen />);
-
-        fireEvent.changeText(getByPlaceholderText('Email/username'), 'invalid-email');
-        fireEvent.changeText(getByPlaceholderText('Password'), 'testPassword');
-        fireEvent.press(getByText('Login'));
-
-        await waitFor(() => {
-            expect(getByText('Invalid email')).toBeTruthy();
-        });
     });
 
     it('calls login function when valid data is entered', async () => {
