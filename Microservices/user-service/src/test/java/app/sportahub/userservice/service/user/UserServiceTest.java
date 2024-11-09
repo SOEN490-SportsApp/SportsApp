@@ -1,8 +1,12 @@
 package app.sportahub.userservice.service.user;
 
 import app.sportahub.userservice.dto.request.user.PreferencesRequest;
+import app.sportahub.userservice.exception.user.UserDoesNotExistException;
 import app.sportahub.userservice.exception.user.UserEmailAlreadyExistsException;
+import app.sportahub.userservice.exception.user.UserDoesNotExistException;
 import app.sportahub.userservice.exception.user.UsernameAlreadyExistsException;
+import app.sportahub.userservice.model.user.Preferences;
+import app.sportahub.userservice.model.user.Preferences;
 import app.sportahub.userservice.model.user.Profile;
 import app.sportahub.userservice.model.user.User;
 import app.sportahub.userservice.repository.UserRepository;
@@ -228,4 +232,134 @@ public class UserServiceTest {
                 exception.getMessage());
         verify(userRepository, times(1)).findUserById(userId);
     }
+
+    @Test
+    public void updateUserProfileShouldReturnOK() {
+        User existingUser = User.builder()
+                .withProfile(Profile.builder().build())
+                .withEmail("test@example.com")
+                .withUsername("testUser")
+                .withKeycloakId("keycloak-123")
+                .withPreferences(Preferences.builder().build())
+                .build();
+        ProfileRequest profileRequest = new ProfileRequest(
+                "John",
+                "Doe",
+                LocalDate.of(1990, 1, 1),
+                "M",
+                "12345",
+                "123-456-7890",
+                List.of("Basketball", "Soccer"),
+                "A"
+        );
+
+        existingUser.setProfile(Profile.builder()
+                .withFirstName(profileRequest.firstName())
+                .withLastName(profileRequest.lastName())
+                .withDateOfBirth(profileRequest.dateOfBirth())
+                .withRanking(profileRequest.ranking())
+                .withPhoneNumber(profileRequest.phoneNumber())
+                .withGender(profileRequest.gender())
+                .withPostalCode(profileRequest.postalCode())
+                .withSportsOfPreference(profileRequest.sportsOfPreference())
+                .build());
+
+
+        when(userRepository.findUserById(existingUser.getId())).thenReturn(existingUser);
+        when(userRepository.save(any(User.class))).thenReturn(existingUser);
+        Profile updatedProfile = userService.updateUserProfile( existingUser.getId(), profileRequest);
+
+        Assertions.assertNotNull(updatedProfile);
+        Assertions.assertEquals(updatedProfile.getFirstName(), profileRequest.firstName());
+        Assertions.assertEquals(updatedProfile.getLastName(), profileRequest.lastName());
+        Assertions.assertEquals(updatedProfile.getDateOfBirth(), profileRequest.dateOfBirth());
+        Assertions.assertEquals(updatedProfile.getPhoneNumber(), profileRequest.phoneNumber());
+        Assertions.assertEquals(updatedProfile.getRanking(), profileRequest.ranking());
+        Assertions.assertEquals(updatedProfile.getGender(), profileRequest.gender());
+        Assertions.assertEquals(updatedProfile.getPostalCode(), profileRequest.postalCode());
+        Assertions.assertEquals(updatedProfile.getSportsOfPreference(), profileRequest.sportsOfPreference());
+
+        verify(userRepository, times(1)).findUserById(existingUser.getId());
+        verify(userRepository, times(1)).save(any(User.class));
+
+    }
+
+    @Test
+    public void updateUserProfileShouldThrowUserNotFound() {
+        ProfileRequest profileRequest = new ProfileRequest(
+                "John",
+                "Doe",
+                LocalDate.of(1990, 1, 1),
+                "M",
+                "12345",
+                "123-456-7890",
+                List.of("Basketball", "Soccer"),
+                "A"
+        );
+
+        when(userRepository.findUserById("1")).thenReturn(null);
+        UserDoesNotExistException exception = Assertions.assertThrows(UserDoesNotExistException.class,
+                ()-> userService.updateUserProfile("1", profileRequest) );
+
+        Assertions.assertEquals("404 NOT_FOUND \"User with id:1does not exist.\"", exception.getMessage());
+
+        verify(userRepository, times(1)).findUserById("1");
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    public void patchUserProfileShouldReturnOK() {
+        Profile existingProfile = new Profile(
+                "John",
+                "Doe",
+                LocalDate.now(),
+                "M",
+                "12345",
+                "123-456-7890",
+                List.of("Basketball", "Soccer"),
+                "A"
+        );
+        ProfileRequest profileRequest = new ProfileRequest(
+                null,
+                null,
+                existingProfile.getDateOfBirth().minusDays(1),
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
+        User existingUser = new User("keycloak-123", "test@gmail.com", "testusername", existingProfile, null);
+
+        when(userRepository.findUserById(existingUser.getId())).thenReturn(existingUser);
+
+        existingUser.getProfile().setDateOfBirth(profileRequest.dateOfBirth());
+        when(userRepository.save(any(User.class))).thenReturn(existingUser);
+
+        Profile updatedProfile = userService.patchUserProfile(existingUser.getId(), profileRequest);
+
+        Assertions.assertNotNull(updatedProfile);
+        Assertions.assertEquals(updatedProfile.getDateOfBirth(), profileRequest.dateOfBirth());
+
+        verify(userRepository, times(1)).findUserById(existingUser.getId());
+        verify(userRepository, times(1)).save(any(User.class));
+
+    }
+
+    @Test
+    public void patchUserProfileShouldThrowUserNotFound() {
+        ProfileRequest profileRequest = new ProfileRequest("John", null, null, null, null ,null , null, null);
+
+        when(userRepository.findUserById("1")).thenReturn(null);
+
+        UserDoesNotExistException exception = Assertions.assertThrows(UserDoesNotExistException.class,
+                ()-> userService.patchUserProfile("1", profileRequest) );
+
+        Assertions.assertEquals("404 NOT_FOUND \"User with id:1does not exist.\"", exception.getMessage());
+
+        verify(userRepository, times(1)).findUserById("1");
+        verify(userRepository, never()).save(any(User.class));
+    }
+
 }
