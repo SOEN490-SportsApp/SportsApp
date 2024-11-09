@@ -1,6 +1,8 @@
 package app.sportahub.userservice.controller.user;
 
+import app.sportahub.userservice.dto.request.user.ProfileRequest;
 import app.sportahub.userservice.dto.request.user.UserRequest;
+import app.sportahub.userservice.dto.response.user.ProfileResponse;
 import app.sportahub.userservice.dto.response.user.UserResponse;
 import app.sportahub.userservice.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
 
 @RestController
 @RequestMapping("/user")
@@ -33,4 +36,18 @@ public class UserController {
     public UserResponse createUser(@Valid @RequestBody UserRequest userRequest) {
         return UserResponse.from(userService.createUser(userRequest));
     }
+
+
+    @PutMapping("/{id}/profile")
+    @ResponseStatus(HttpStatus.OK)
+    public ProfileResponse updateProfile(@PathVariable String id, @Valid @RequestBody ProfileRequest profileRequest) {
+        return ProfileResponse.from(userService.updateUserProfile(id, profileRequest));
+    }
+
+    @PatchMapping("/{id}/profile")
+    @ResponseStatus(HttpStatus.OK)
+    public ProfileResponse patchProfile(@PathVariable String id, @Valid @RequestBody ProfileRequest profileRequest) {
+        return ProfileResponse.from(userService.patchUserProfile(id, profileRequest));
+    }
+
 }
