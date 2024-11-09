@@ -1,5 +1,15 @@
 package app.sportahub.userservice.service.user;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.Objects;
+import java.util.Optional;
+
+import app.sportahub.userservice.client.KeycloakApiClient;
+import app.sportahub.userservice.dto.request.user.keycloak.KeycloakRequest;
+import org.springframework.stereotype.Service;
+
+import app.sportahub.userservice.dto.request.user.ProfileRequest;
 import app.sportahub.userservice.dto.request.user.UserRequest;
 import app.sportahub.userservice.exception.user.UserDoesNotExistException;
 import app.sportahub.userservice.exception.user.UserEmailAlreadyExistsException;
@@ -10,18 +20,17 @@ import app.sportahub.userservice.model.user.User;
 import app.sportahub.userservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
+
     private final UserRepository userRepository;
+    private final KeycloakApiClient keycloakApiClient;
+
 
     @Override
     public User createUser(UserRequest userRequest) {
@@ -68,4 +77,81 @@ public class UserServiceImpl implements UserService {
         return Optional.ofNullable(userRepository.findUserById(id))
                 .orElseThrow(() -> new UserDoesNotExistException(id));
     }
+
+
+    @Override
+    public Profile updateUserProfile(String id, ProfileRequest profileRequest) {
+        Optional<User> optionalUserById = Optional.ofNullable(userRepository.findUserById(id));
+        if (optionalUserById.isEmpty()) {
+            throw new UserDoesNotExistException(id);
+        }
+        User user = optionalUserById.get();
+        Profile previousProfile = user.getProfile();
+        user.setProfile(Profile.builder()
+                .withFirstName(profileRequest.firstName())
+                .withLastName(profileRequest.lastName())
+                .withDateOfBirth(profileRequest.dateOfBirth())
+                .withRanking(profileRequest.ranking())
+                .withPhoneNumber(profileRequest.phoneNumber())
+                .withGender(profileRequest.gender())
+                .withPostalCode(profileRequest.postalCode())
+                .withSportsOfPreference(profileRequest.sportsOfPreference())
+                .build());
+
+        User savedUser = userRepository.save(user);
+        Profile updatedProfile = savedUser.getProfile();
+        if(
+                !Objects.equals(updatedProfile.getFirstName(), previousProfile.getFirstName()) ||
+                !Objects.equals(updatedProfile.getLastName(), previousProfile.getLastName())
+        ) {
+            keycloakApiClient.updateUser(savedUser.getKeycloakId(), new KeycloakRequest(
+                    updatedProfile.getFirstName(),
+                    updatedProfile.getLastName()
+            ));
+        }
+        log.info("UserServiceImpl::updateUserProfile: User with id:{} was updated", savedUser.getId());
+        return updatedProfile;
+    }
+
+    @Override
+    public Profile patchUserProfile(String id, ProfileRequest profileRequest) {
+        Optional<User> optionalUserById = Optional.ofNullable(userRepository.findUserById(id));
+        if (optionalUserById.isEmpty()) {
+            throw new UserDoesNotExistException(id);
+        }
+        User user = optionalUserById.get();
+        Profile currentProfile = user.getProfile();
+        Profile updatedProfile = Profile.builder()
+                .withFirstName(
+                        profileRequest.firstName() != null ? profileRequest.firstName() : currentProfile.getFirstName())
+                .withLastName(
+                        profileRequest.lastName() != null ? profileRequest.lastName() : currentProfile.getLastName())
+                .withDateOfBirth(profileRequest.dateOfBirth() != null ? profileRequest.dateOfBirth()
+                        : currentProfile.getDateOfBirth())
+                .withRanking(profileRequest.ranking() != null ? profileRequest.ranking() : currentProfile.getRanking())
+                .withPhoneNumber(profileRequest.phoneNumber() != null ? profileRequest.phoneNumber()
+                        : currentProfile.getPhoneNumber())
+                .withGender(profileRequest.gender() != null ? profileRequest.gender() : currentProfile.getGender())
+                .withPostalCode(profileRequest.postalCode() != null ? profileRequest.postalCode()
+                        : currentProfile.getPostalCode())
+                .withSportsOfPreference(
+                        profileRequest.sportsOfPreference() != null ? profileRequest.sportsOfPreference()
+                                : currentProfile.getSportsOfPreference())
+                .build();
+
+        user.setProfile(updatedProfile);
+        User savedUser = userRepository.save(user);
+
+        if(profileRequest.firstName() != null || profileRequest.lastName() != null) {
+            keycloakApiClient.updateUser(savedUser.getKeycloakId(), new KeycloakRequest(
+                    updatedProfile.getFirstName(),
+                    updatedProfile.getLastName()
+            ));
+        }
+
+        log.info("UserServiceImpl::patchUserProfile: User with id:{} was updated", savedUser.getId());
+        return savedUser.getProfile();
+
+    }
+
 }

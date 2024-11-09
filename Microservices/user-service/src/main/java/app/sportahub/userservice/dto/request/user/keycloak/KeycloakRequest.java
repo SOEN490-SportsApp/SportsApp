@@ -18,7 +18,11 @@ public record KeycloakRequest(
     }
 
     public KeycloakRequest(String email, String username, String password) {
-        this(email, username, "", "", true, List.of(new Credentials(password)));
+        this(email, username, null, null, null, List.of(new Credentials(password)));
+    }
+
+    public KeycloakRequest(String firstName, String lastName)  {
+        this(null, null, firstName, lastName, null, null);
     }
 
     public record Credentials(
@@ -30,4 +34,6 @@ public record KeycloakRequest(
             this("password", password, false);
         }
     }
+
+
 }
