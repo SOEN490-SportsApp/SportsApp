@@ -10,7 +10,6 @@ import app.sportahub.userservice.exception.user.UserEmailAlreadyExistsException;
 import app.sportahub.userservice.exception.user.UsernameAlreadyExistsException;
 import app.sportahub.userservice.model.user.User;
 import app.sportahub.userservice.repository.UserRepository;
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
