@@ -2,6 +2,7 @@ package app.sportahub.userservice.service.auth;
 
 import app.sportahub.userservice.client.KeycloakApiClient;
 import app.sportahub.userservice.dto.request.auth.LoginRequest;
+import app.sportahub.userservice.dto.request.auth.RefreshTokenRequest;
 import app.sportahub.userservice.dto.request.auth.RegistrationRequest;
 import app.sportahub.userservice.dto.request.user.keycloak.KeycloakRequest;
 import app.sportahub.userservice.dto.response.auth.LoginResponse;
@@ -31,6 +32,7 @@ public class AuthServiceImpl implements AuthService {
     private final KeycloakApiClient keycloakApiClient;
 
     @SneakyThrows
+    @Override
     public User registerUser(RegistrationRequest userRequest) {
         Optional<User> optionalUserByEmail = Optional.ofNullable(userRepository.findUserByEmail(userRequest.email()));
         if (optionalUserByEmail.isPresent()) {
@@ -68,6 +70,7 @@ public class AuthServiceImpl implements AuthService {
                         .build());
     }
 
+    @Override
     public LoginResponse loginUser(LoginRequest loginRequest) {
         User user = userRepository.findUserByEmailOrUsername(loginRequest.identifier(), loginRequest.identifier());
 
@@ -78,5 +81,15 @@ public class AuthServiceImpl implements AuthService {
             }).block();
 
         return new LoginResponse(user.getId(),tokenResponse);
+    }
+
+    @Override
+    public TokenResponse refreshToken(RefreshTokenRequest tokenRequest) {
+
+        return Mono.from(keycloakApiClient.refreshToken(tokenRequest.refreshToken())).map(jsonNode -> {
+            String refreshToken = jsonNode.get("refresh_token").asText();
+            String accessToken = jsonNode.get("access_token").asText();
+            return new TokenResponse(accessToken, refreshToken);
+        }).block();
     }
 }
