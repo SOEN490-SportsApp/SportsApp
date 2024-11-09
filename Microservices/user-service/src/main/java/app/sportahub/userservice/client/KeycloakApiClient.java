@@ -333,7 +333,7 @@ public class KeycloakApiClient {
                 .bodyValue(body)
                 .exchangeToMono(response -> {
                     if (response.statusCode().is2xxSuccessful()) {
-                        return Mono.empty();
+                        return response.bodyToMono(JsonNode.class);
                     } else {
                         return handleErrorResponse(response).then(Mono.empty());
                     }
