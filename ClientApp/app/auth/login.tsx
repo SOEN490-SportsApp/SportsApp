@@ -33,15 +33,14 @@ const LoginScreen: React.FC = () => {
       </View>
 
       <View>
-        {/* Email Field */}
+        {/* Email/Username Field */}
         <View className="flex-row items-center bg-gray-100 rounded-3xl p-2 pl-4 min-h-16">
           <MaterialCommunityIcons name="email" size={20} color="#aaa" />
           <Controller
             control={control}
             name="email"
             rules={{
-              required: "Email is required",
-              pattern: { value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/, message: "Invalid email" }
+              required: "Email or username is required"
             }}
             render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
