@@ -26,7 +26,7 @@ const screenHeight = Dimensions.get('window').height;
 const maxHeight = screenHeight * 0.5
 
 // Function to calculate age based on dateOfBirth
-function calculateAge(dateOfBirth: string): number {
+export function calculateAge(dateOfBirth: string): number {
     const dob = new Date(dateOfBirth);
     const today = new Date();
     let age = today.getFullYear() - dob.getFullYear();
@@ -41,15 +41,23 @@ function calculateAge(dateOfBirth: string): number {
 const ActivityTab = () => (
     //TODO fix the overlap between the two scroll views when the events are scolled up 
     <View className="p-4 bg-white">
-        {/* Horizontal Scroll for Circles */}
+        {/* Horizontal Scroll for Badges */}
+        {/*TODO change this to a badge component */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View className="flex-row gap-x-4">
                 <View className="w-20 h-20 bg-gray-700 rounded-full" />
-                
+                <View className="w-20 h-20 bg-gray-700 rounded-full" />
+                <View className="w-20 h-20 bg-gray-700 rounded-full" />
+                <View className="w-20 h-20 bg-gray-700 rounded-full" />
+                <View className="w-20 h-20 bg-gray-700 rounded-full" />
+                <View className="w-20 h-20 bg-gray-700 rounded-full" />
+                <View className="w-20 h-20 bg-gray-700 rounded-full" />
+                <View className="w-20 h-20 bg-gray-700 rounded-full" />
             </View>
         </ScrollView>
 
         {/* Vertical Scroll for Event Cards */}
+        {/*TODO change this to an event component */}
         <ScrollView className=" pt-3 space-y-4" style={{ maxHeight}}>
             {Array.from({ length: 6 }).map((_, index) => (
                 <View key={index} className="mt-4 p-4 bg-green-300 rounded-lg">
@@ -73,14 +81,13 @@ const StatsTab = () => (
 
 // About tab content
 const AboutTab: React.FC<{ profile: Profile }> = ({ profile }) => (
+    //TODO change this to an About component
     <View className="p-4 bg-white flex-1">
         <View className="bg-green-300 rounded-lg p-4">
-            <Text className="text-black text-base">Bio: {profile.bio}</Text>
-            <Text className="text-black text-base mt-2">Age: {calculateAge(profile.dateOfBirth)}</Text>
-            <Text className="text-black text-base mt-2">email: {profile.email}</Text>
-            <Text className="text-black text-base mt-2">phone: {profile.phoneNumber}</Text>
-
-
+            <Text testID="Bio" className="text-black text-base">Bio: {profile.bio}</Text>
+            <Text testID="Age" className="text-black text-base mt-2">Age: {calculateAge(profile.dateOfBirth)}</Text>
+            <Text testID="email" className="text-black text-base mt-2">email: {profile.email}</Text>
+            <Text testID="phone" className="text-black text-base mt-2">phone: {profile.phoneNumber}</Text>
         </View>
     </View>
 );
@@ -131,9 +138,9 @@ const ProfilePage: React.FC = () => {
 
     // CustomTabMenu links for titles and content 
     const routes = [
-        { key: 'activity', title: 'Activity' },
-        { key: 'stats', title: 'Stats' },
-        { key: 'about', title: 'About' },
+        { key: 'activity', title: 'Activity', testID: 'Activity' },
+        { key: 'stats', title: 'Stats', testID: 'Stats' },
+        { key: 'about', title: 'About', testID: 'About'},
     ];
     const scenes = {
         activity: <ActivityTab />,
@@ -164,8 +171,8 @@ const ProfilePage: React.FC = () => {
                 <Text testID="firstName" className="text-2xl font-bold text-black mt-4">
                     {profile.firstName} {profile.lastName}
                 </Text>
-                //TODO change this with update data base option
-                <Text testID="LastName" className="text-sm text-gray-500">Add Location</Text>
+                {/*TODO change this with update data base option*/}
+                <Text className="text-sm text-gray-500">Add Location</Text>
             </View>
 
             {/* CustomTabMenu with dynamic routes and scenes */}
