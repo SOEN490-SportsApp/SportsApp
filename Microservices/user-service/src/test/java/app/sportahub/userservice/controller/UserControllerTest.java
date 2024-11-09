@@ -6,6 +6,7 @@ import app.sportahub.userservice.dto.request.user.PreferencesRequest;
 import app.sportahub.userservice.dto.request.user.ProfileRequest;
 import app.sportahub.userservice.dto.request.user.UserRequest;
 import app.sportahub.userservice.exception.user.UserDoesNotExistException;
+import app.sportahub.userservice.model.user.Preferences;
 import app.sportahub.userservice.model.user.Profile;
 import app.sportahub.userservice.model.user.User;
 import app.sportahub.userservice.service.user.UserService;
@@ -23,12 +24,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import static org.hamcrest.Matchers.*;
 
 @WebMvcTest(UserController.class)
 @Import(TestSecurityConfig.class)
@@ -78,7 +82,14 @@ public class UserControllerTest {
                         .withLastName("Doe")
                         .withDateOfBirth(LocalDate.of(2000, 1, 1))
                         .withPhoneNumber("123-456-7890")
+                        .withGender("Male")
+                        .withPostalCode("123-456")
+                        .withSportsOfPreference(List.of("Basketball", "Soccer"))
                         .withRanking("A")
+                        .build())
+                .withPreferences(Preferences.builder()
+                        .notifications(true)
+                        .language("english")
                         .build())
                 .build();
     }
@@ -126,9 +137,8 @@ public class UserControllerTest {
 
     @Test
     public void shouldGetUserByIdSuccessfully() throws Exception {
-        String userId = "123";
+        String userId = "672e9f6d42c893263fe0275a";
         when(userService.getUserById(userId)).thenReturn(user);
-
         mockMvc.perform(MockMvcRequestBuilders.get("/user/{id}", userId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -138,7 +148,10 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.profile.firstName").value(user.getProfile().getFirstName()))
                 .andExpect(jsonPath("$.profile.lastName").value(user.getProfile().getLastName()))
                 .andExpect(jsonPath("$.profile.dateOfBirth").value(user.getProfile().getDateOfBirth().toString()))
+                .andExpect(jsonPath("$.profile.gender").value(user.getProfile().getGender()))
+                .andExpect(jsonPath("$.profile.postalCode").value(user.getProfile().getPostalCode()))
                 .andExpect(jsonPath("$.profile.phoneNumber").value(user.getProfile().getPhoneNumber()))
+                .andExpect(jsonPath("$.profile.sportsOfPreference", containsInAnyOrder(user.getProfile().getSportsOfPreference().toArray())))
                 .andExpect(jsonPath("$.profile.ranking").value(user.getProfile().getRanking()));
 
         verify(userService).getUserById(userId);
@@ -153,8 +166,9 @@ public class UserControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/user/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("User with id:" + id + "does not exist."));
+                .andExpect(jsonPath("$.error").value("User with id:" + id + "does not exist."));
 
         verify(userService).getUserById(id);
     }
+
 }

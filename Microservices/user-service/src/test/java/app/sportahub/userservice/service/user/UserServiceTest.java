@@ -186,7 +186,10 @@ public class UserServiceTest {
                         .withFirstName("John")
                         .withLastName("Doe")
                         .withDateOfBirth(LocalDate.of(1990, 1, 1))
+                        .withGender("Male")
+                        .withPostalCode("12345")
                         .withPhoneNumber("1234567890")
+                        .withSportsOfPreference(List.of("Basketball", "Soccer"))
                         .withRanking("100")
                         .build())
                 .build();
@@ -199,6 +202,15 @@ public class UserServiceTest {
         Assertions.assertEquals(userId, result.getId());
         Assertions.assertEquals("test@example.com", result.getEmail());
         Assertions.assertEquals("testUser", result.getUsername());
+        Assertions.assertEquals("John", result.getProfile().getFirstName());
+        Assertions.assertEquals("Doe", result.getProfile().getLastName());
+        Assertions.assertEquals(LocalDate.of(1990, 1, 1), result.getProfile().getDateOfBirth());
+        Assertions.assertEquals("Male", result.getProfile().getGender());
+        Assertions.assertEquals("12345", result.getProfile().getPostalCode());
+        Assertions.assertEquals("1234567890", result.getProfile().getPhoneNumber());
+        Assertions.assertEquals(List.of("Basketball", "Soccer"), result.getProfile().getSportsOfPreference());
+        Assertions.assertEquals("100", result.getProfile().getRanking());
+
         verify(userRepository, times(1)).findUserById(userId);
     }
 
