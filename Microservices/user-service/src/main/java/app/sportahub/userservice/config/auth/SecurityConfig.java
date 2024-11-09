@@ -18,9 +18,16 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         return http
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers("/auth/register").permitAll()
-                        .requestMatchers("/auth/login").permitAll()
-                        .requestMatchers("/auth/refresh").permitAll()
+                        .requestMatchers(
+                                "/auth/register",
+                                "/auth/login",
+                                "/auth/refresh",
+                                "/swagger-ui.html",
+                                "/api-docs",
+                                "/api-docs/**",
+                                "/swagger-ui/**",
+                                "/webjars/**"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .csrf(AbstractHttpConfigurer::disable)
