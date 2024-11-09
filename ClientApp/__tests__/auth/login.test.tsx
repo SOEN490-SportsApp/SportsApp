@@ -53,6 +53,7 @@ describe('Login Screen', () => {
         await waitFor(() => {
             expect(Alert.alert).not.toHaveBeenCalled();
         });
+        //TODO: assert the calling of the login function when it has been implemented
     });
 
     it('navigates to registration page when "Register Now" is pressed', async () => {
