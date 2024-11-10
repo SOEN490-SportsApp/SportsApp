@@ -22,8 +22,5 @@ public class Profile {
     private String phoneNumber;
     private List<String> sportsOfPreference;
     private String ranking;
-
-    public static class Updater {
-
-    }
+    
 }
