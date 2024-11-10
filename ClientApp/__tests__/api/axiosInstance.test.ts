@@ -6,7 +6,7 @@
 import axiosInstance from '../../api/axiosIntance';
 import MockAdapter from 'axios-mock-adapter'; //used to mock the axios instance
 import AsyncStorage from "@react-native-async-storage/async-storage/jest/async-storage-mock"; //mock AsyncStorage for token storage mocking
-import { showAlert } from '../../api/alertUtils'; // Import showAlert function for testing
+import { showAlert } from '../../utils/api/errorHandlers'; // Import showAlert function for testing
 
 jest.mock('../../api/alertUtils'); // Mock showAlert for testing alert calls
 
