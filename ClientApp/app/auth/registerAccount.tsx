@@ -7,6 +7,8 @@ import { useRouter } from "expo-router";
 import ConfirmButton from "@/components/ConfirmButton";
 import AuthenticationDivider from "@/components/AuthenticationDivider";
 import { IconPlacement } from '@/utils/constants/enums';
+import axiosInstance from "@/api/axiosIntance";
+import { API_ENDPOINTS } from "@/utils/api/endpoints";
 
 interface RegisterAccountPageFormData {
   username: string;
@@ -16,6 +18,7 @@ interface RegisterAccountPageFormData {
   agreeToTerms: boolean;
 }
 
+// const [userINFO, setUserINFO] = useState({id: 0, email: "", username: ""});
 
 const RegisterAccountPage: React.FC = () => {
   const { control, handleSubmit, formState: { errors }, watch, setValue } = useForm<RegisterAccountPageFormData>();
@@ -23,7 +26,7 @@ const RegisterAccountPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const onSubmit = (data: RegisterAccountPageFormData) => {
+  const onSubmit = async (data: RegisterAccountPageFormData) => {
     if (!data.agreeToTerms) {
       Alert.alert("", "You must agree to the terms to continue.");
       return;
@@ -32,7 +35,57 @@ const RegisterAccountPage: React.FC = () => {
       Alert.alert("Oh oh!", "Passwords do not match.");
       return;
     }
-    router.push('/auth/registerProfile');
+
+    // result is of type RegisteredUserResponse
+    const result = await registerUser({
+      email: data.email,
+      username: data.username,
+      password: data.password,
+    });
+
+    if (result.success) {
+      Alert.alert("Success", "Account created successfully!");
+      console.log("User info: ", result.data);
+      router.push('/auth/registerProfile');
+    } else {
+      Alert.alert("Error", "Failed to create account.");
+    }
+  };
+
+  interface RegisteredUserResponse {
+    success: boolean; 
+    data?: {id: string, email: string, username: string}; // this might be an issue
+    error?: any;
+  }
+  
+  // asysnc function that does the api call
+  const registerUser = async (data: any): Promise<RegisteredUserResponse> => {
+    try {
+      const response = await axiosInstance.post(API_ENDPOINTS.REGISTER, data);
+      if (response.status === 201) {
+
+        console.log("User created successfully:", response.data);
+        return {
+          success: true,
+          data: {
+            id: response.data.id,
+            email: response.data.email,
+            username: response.data.username,
+          },
+        };
+      } else {
+        return { success: false, error: "Unexpected response status." };
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      
+      // return error if it's an instance of Error
+      if (error instanceof Error){
+        return {success: false, error: error.message}
+      } else {
+        return { success: false, error: "Failed to create account." }; //this should not be needed
+      }
+    }
   };
 
   return (

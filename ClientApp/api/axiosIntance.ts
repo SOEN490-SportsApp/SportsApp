@@ -6,20 +6,18 @@
  * - Helper functions: Manage the access and refresh tokens in AsyncStorage used by the interceptors
  * - Request interceptor: Adds the Authorization header with the access token
  * - Response interceptor to handle 401 Unauthorized errors by refreshing the access token
- *  
- * 
  */
 
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { showAlert, ALERT_MESSAGES } from './alertUtils';
+import { showAlert, ALERT_MESSAGES } from '../utils/api/errorHandlers';
+import { API_ENDPOINTS } from '@/utils/api/endpoints';
 
 
 // Axios configuration options
 // *********************************
 const config: AxiosRequestConfig = {
-  //TODO change this to the server URL
-  baseURL: 'http://localhost:8000/',
+  baseURL: 'https://api-dev.sportahub.app/api/',
   timeout: 5000,
   headers: {
     'Content-Type': 'application/json',
@@ -30,22 +28,24 @@ const config: AxiosRequestConfig = {
 // Helper functions for token management
 // *************************************
 
-// getAccessToken function to retrieve the access token from AsyncStorage
+// getter functions to get the tokens from AsyncStorage
+// 1- getAccessToken function to retrieve the access token from AsyncStorage
 const getAccessToken = async (): Promise<string | null> => {
   return await AsyncStorage.getItem('access_token');
 };
 
-// setAccessToken function to store the access token in AsyncStorage
+// 2- setAccessToken function to store the access token in AsyncStorage
 const setAccessToken = async (token: string) => {
   await AsyncStorage.setItem('access_token', token);
 };
 
-// getRefreshToken function to retrieve the refresh token from AsyncStorage
+// 3- getRefreshToken function to retrieve the refresh token from AsyncStorage
 const getRefreshToken = async (): Promise<string | null> => {
   return await AsyncStorage.getItem('refresh_token');
 };
 
-// refreshAccessToken function to get a new access token using the refresh token
+// setter function that will potentially request a new access token using the refresh token
+// 1- refreshAccessToken function to get a new access token using the refresh token
 const refreshAccessToken = async (): Promise<string | null> => {
   // Get the refresh token from AsyncStorage
   const refreshToken = await getRefreshToken();
@@ -61,7 +61,7 @@ const refreshAccessToken = async (): Promise<string | null> => {
     if (payload.exp > now) {
       try {
         // Attempt to refresh the access token
-        const response = await axiosInstance.post('/token/refresh/', { refresh: refreshToken });
+        const response = await axiosInstance.post(API_ENDPOINTS.REFRESH_TOKEN, { refreshToken: refreshToken });
         const newAccessToken = response.data.access;
         await setAccessToken(newAccessToken);
         return newAccessToken;
@@ -126,7 +126,7 @@ axiosInstance.interceptors.response.use(
     }
 
     // Handle 401 Unauthorized for token refresh failure
-    if (error.response.status === 401 && originalRequest.url === `${config.baseURL}token/refresh/`) {
+    if (error.response.status === 401 && originalRequest.url === `${config.baseURL}${API_ENDPOINTS.REFRESH_TOKEN}`) {
       return Promise.reject(error);
     }
 
