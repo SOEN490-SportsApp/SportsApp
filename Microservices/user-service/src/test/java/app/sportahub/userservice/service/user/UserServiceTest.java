@@ -361,5 +361,4 @@ public class UserServiceTest {
         verify(userRepository, times(1)).findUserById("1");
         verify(userRepository, never()).save(any(User.class));
     }
-
 }
