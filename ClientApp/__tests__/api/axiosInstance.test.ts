@@ -7,15 +7,17 @@ import axiosInstance from '../../api/axiosIntance';
 import MockAdapter from 'axios-mock-adapter'; //used to mock the axios instance
 import AsyncStorage from "@react-native-async-storage/async-storage/jest/async-storage-mock"; //mock AsyncStorage for token storage mocking
 import { showAlert } from '../../utils/api/errorHandlers'; // Import showAlert function for testing
+import { API_ENDPOINTS } from '@/utils/api/endpoints';
 
-jest.mock('../../api/alertUtils'); // Mock showAlert for testing alert calls
+jest.mock('../../utils/api/errorHandlers'); // Mock showAlert for testing alert calls
 
 describe('axiosInstance', () => {
   let mock: MockAdapter;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     mock = new MockAdapter(axiosInstance); // Set up mock adapter on axiosInstance
     jest.clearAllMocks(); // Clear mocks before each test
+    await AsyncStorage.clear(); // Clear AsyncStorage before each test
   });
 
   afterEach(() => {
@@ -45,7 +47,7 @@ describe('axiosInstance', () => {
     mock.onGet('/test-endpoint').replyOnce(401, { code: 'token_not_valid' });
 
     // Mock the token refresh endpoint to return a new access token
-    mock.onPost('/token/refresh/').reply(200, {
+    mock.onPost(API_ENDPOINTS.REFRESH_TOKEN).reply(200, {
         access: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJleHAiOjI3MzA3NzkwMDB9.0uH6qCX4VP1becEdC66G89zHX2SswEc94bJuyMVqHUA'
     });
 
