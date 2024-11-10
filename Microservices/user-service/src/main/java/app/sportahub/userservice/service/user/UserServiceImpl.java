@@ -76,7 +76,6 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserDoesNotExistException(id));
     }
 
-
     @Override
     public Profile updateUserProfile(String id, ProfileRequest profileRequest) {
         User user = Optional.ofNullable(userRepository.findUserById(id))
@@ -122,5 +121,4 @@ public class UserServiceImpl implements UserService {
         log.info("UserServiceImpl::patchUserProfile: User with id:{} was updated", savedUser.getId());
         return savedUser.getProfile();
     }
-
 }
