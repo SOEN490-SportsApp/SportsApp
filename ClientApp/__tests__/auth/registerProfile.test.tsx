@@ -1,9 +1,8 @@
 import React from "react";
 import { Alert } from "react-native";
-import ProfilePreferenceForm from "@/app/auth/profilePreferenceForm";
+import RegisterProfilePage from "@/app/auth/registerProfile";
 import {
   render,
-  screen,
   fireEvent,
   waitFor,
 } from "@testing-library/react-native";
@@ -18,7 +17,7 @@ describe("profile preference form test", () => {
   });
 
   it("Shows error when fields are empty", async () => {
-    const { getByText } = render(<ProfilePreferenceForm />);
+    const { getByText } = render(<RegisterProfilePage />);
 
     fireEvent.press(getByText("Confirm"));
 
@@ -36,7 +35,7 @@ describe("profile preference form test", () => {
       getByTestId,
       debug,
       findAllByText,
-    } = render(<ProfilePreferenceForm />);
+    } = render(<RegisterProfilePage />);
 
     const firstName = getByPlaceholderText("First name");
     const lastName = getByPlaceholderText("Last name");

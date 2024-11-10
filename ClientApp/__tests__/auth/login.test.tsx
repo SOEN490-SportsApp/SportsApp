@@ -1,7 +1,7 @@
 import React from 'react';
 import { Alert } from 'react-native';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
-import LoginScreen from '../../app/auth/login';
+import LoginPage from '@/app/auth/login';
 import { useRouter } from 'expo-router';
 
 // mock router to prevent navigation errors in tests
@@ -23,7 +23,7 @@ describe('Login Screen', () => {
     });
 
     it('shows an error when required fields are empty', async () => {
-        const { getByText } = render(<LoginScreen />);
+        const { getByText } = render(<LoginPage />);
 
         fireEvent.press(getByText('Login'));
 
@@ -32,7 +32,7 @@ describe('Login Screen', () => {
     });
 
     it('calls login function when valid data is entered', async () => {
-        const { getByPlaceholderText, getByText } = render(<LoginScreen />);
+        const { getByPlaceholderText, getByText } = render(<LoginPage />);
 
         fireEvent.changeText(getByPlaceholderText('Email/username'), 'testuser@example.com');
         fireEvent.changeText(getByPlaceholderText('Password'), 'testPassword');
@@ -45,12 +45,12 @@ describe('Login Screen', () => {
     });
 
     it('navigates to registration page when "Register Now" is pressed', async () => {
-        const { getByText } = render(<LoginScreen />);
+        const { getByText } = render(<LoginPage />);
 
         fireEvent.press(getByText('Register Now'));
 
         await waitFor(() => {
-            expect(mockPush).toHaveBeenCalledWith('/auth/register');
+            expect(mockPush).toHaveBeenCalledWith('/auth/registerAccount');
         });
     });
 });

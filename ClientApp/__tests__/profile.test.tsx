@@ -1,10 +1,10 @@
 import React from 'react';
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import '@testing-library/jest-native/extend-expect';
 import axiosMockAdapter from 'axios-mock-adapter';
 import axiosInstance from '../api/axiosIntance';
-import ProfilePage from '../app/tabs/profile';
-import { calculateAge } from '../app/tabs/profile';
+import ProfilePage from '@/app/(tabs)/profile/index';
+import { calculateAge } from '@/app/(tabs)/profile/index';
 
 //TODO the Endpoint must be set to dynamic value /users/* or something else...
 

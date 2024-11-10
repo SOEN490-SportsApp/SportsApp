@@ -1,5 +1,5 @@
 // Validates a user is over 16
-const dateCheckGreaterThanSixteen = (date: Date) => {
+const isOlderThanSixteen = (date: Date) => {
     const currentDate = new Date();
     const ageDiff = currentDate.getFullYear() - date.getFullYear();
    
@@ -14,4 +14,4 @@ const dateCheckGreaterThanSixteen = (date: Date) => {
 
 }
 
-export default dateCheckGreaterThanSixteen;
+export default isOlderThanSixteen;

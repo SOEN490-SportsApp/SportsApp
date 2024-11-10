@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TextInput, Button } from 'react-native';
 
-const Add = () => {
+const Create = () => {
   return (
     <View className="flex-1 justify-center items-center px-5">
       <Text className="text-center mb-4 text-lg font-semibold text-black">Add Page</Text>
@@ -14,5 +14,5 @@ const Add = () => {
   );
 };
 
-export default Add;
+export default Create;
 

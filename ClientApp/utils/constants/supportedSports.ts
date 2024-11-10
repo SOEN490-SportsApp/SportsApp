@@ -1,4 +1,4 @@
-const sportsArray = [
+const supportedSports = [
   { label: "American Football", value: "Football" },
   { label: "Basketball", value: "Basketball" },
   { label: "Baseball", value: "Baseball" },
@@ -13,4 +13,4 @@ const sportsArray = [
   { label: "Other", value: "Other" },
 ];
 
-export default sportsArray;
+export default supportedSports;

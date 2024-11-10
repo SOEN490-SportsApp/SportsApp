@@ -1,10 +1,9 @@
 import React from 'react';
 import { Alert } from 'react-native';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
-import Register from '../../app/auth/register';
-import { getRole } from '@testing-library/react-native/build/helpers/accessibility';
+import RegisterAccountPage from '@/app/auth/registerAccount';
 
-describe('Register Screen', () => {
+describe('Register Account Screen', () => {
 
     beforeEach(() => {
         jest.spyOn(Alert, 'alert').mockClear();
@@ -15,7 +14,7 @@ describe('Register Screen', () => {
     });
 
     it('shows an error when required fields are empty', async () => {
-        const { getByText } = render(<Register />);
+        const { getByText } = render(<RegisterAccountPage />);
 
         fireEvent.press(getByText('Sign Up'));
 
@@ -28,7 +27,7 @@ describe('Register Screen', () => {
     });
 
     it('shows an alert when terms not accepted', async () => {
-        const { getByPlaceholderText, getByText } = render(<Register />);
+        const { getByPlaceholderText, getByText } = render(<RegisterAccountPage />);
 
         fireEvent.changeText(getByPlaceholderText('Username'), 'testUser');
         fireEvent.changeText(getByPlaceholderText('Email'), 'testuser@example.com');
@@ -42,7 +41,7 @@ describe('Register Screen', () => {
     });
 
     it('shows an alert when passwords do not match', async () => {
-        const { getByPlaceholderText, getByText } = render(<Register />);
+        const { getByPlaceholderText, getByText } = render(<RegisterAccountPage />);
 
         fireEvent.changeText(getByPlaceholderText('Username'), 'testUser');
         fireEvent.changeText(getByPlaceholderText('Email'), 'testuser@example.com');

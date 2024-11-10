@@ -6,19 +6,18 @@ import { useRouter } from "expo-router";
 import ConfirmButton from "@/components/ConfirmButton";
 import AuthenticationDivider from "@/components/AuthenticationDivider";
 
-interface LoginFormData {
+interface LoginPageFormData {
   email: string;
   password: string;
 }
 
-const LoginScreen: React.FC = () => {
-  const { control, handleSubmit, formState: { errors } } = useForm<LoginFormData>();
+const LoginPage: React.FC = () => {
+  const { control, handleSubmit, formState: { errors } } = useForm<LoginPageFormData>();
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
 
-  const onSubmit = (data: LoginFormData) => {
-    console.log("Login data:", data);
-    router.push('/tabs');
+  const onSubmit = (data: LoginPageFormData) => {
+    router.push('/(tabs)/home');
   };
 
   return (
@@ -104,7 +103,7 @@ const LoginScreen: React.FC = () => {
           icon={<MaterialCommunityIcons name="login" size={25} color="#fff"  />}
           text="Login"
           onPress={handleSubmit(onSubmit)}
-          iconDirection ={null}
+          iconPlacement ={null}
         />
 
         <AuthenticationDivider text="Or" />
@@ -133,7 +132,7 @@ const LoginScreen: React.FC = () => {
       </View>
 
       {/* Register Link */}
-      <TouchableOpacity onPress={() => router.push('/auth/register')}>
+      <TouchableOpacity onPress={() => router.push('/auth/registerAccount')}>
         <Text className="text-center text-gray-600 mt-8">
           Is this your first time?{" "}
           <Text className="font-bold color-[#0C9E04]">Register Now</Text>
@@ -143,4 +142,4 @@ const LoginScreen: React.FC = () => {
   );
 };
 
-export default LoginScreen;
+export default LoginPage;
