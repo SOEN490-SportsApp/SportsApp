@@ -15,46 +15,46 @@ export default function TabLayout() {
           height: 100,
         },
         tabBarLabelStyle: {
-          marginTop: -5,  
+          marginTop: -5,
           fontSize: 12,
-          padding: 5,     
+          padding: 5,
           textAlign: 'center',
         },
       }}
     >
       {/* Home Tab */}
       <Tabs.Screen
-        name="home"
+        name="home/index"
         options={{
           title: 'Home',
           headerShown: false,
           tabBarIcon: ({ color }) => <FontAwesome size={24} name="home" color={color} style={{ marginBottom: -5 }} />,
         }}
       />
-      
+
       {/* Profile Tab */}
       <Tabs.Screen
-        name="profile"
+        name="profile/index"
         options={{
           title: 'Profile',
           tabBarIcon: ({ color }) => <FontAwesome size={24} name="user" color={color} style={{ marginBottom: -5 }} />,
         }}
       />
-      
-      {/* Plus Tab  */}
+
+      {/* Add Tab  */}
       <Tabs.Screen
-        name="add"
+        name="create/index"
         options={{
           title: 'Add',
           tabBarIcon: ({ color }) => (
             <FontAwesome size={24} name="plus-circle" color={color} style={{ marginBottom: -5 }} />
-          ), 
+          ),
         }}
       />
-      
+
       {/* Settings Tab */}
       <Tabs.Screen
-        name="settings"
+        name="settings/index"
         options={{
           title: 'Settings',
           tabBarIcon: ({ color }) => <FontAwesome size={24} name="cog" color={color} style={{ marginBottom: -5 }} />,

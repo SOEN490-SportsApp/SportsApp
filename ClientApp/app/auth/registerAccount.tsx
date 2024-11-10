@@ -6,9 +6,9 @@ import Checkbox from 'expo-checkbox';
 import { useRouter } from "expo-router";
 import ConfirmButton from "@/components/ConfirmButton";
 import AuthenticationDivider from "@/components/AuthenticationDivider";
-import { IconDirection } from "@/components/ConfirmButton";
+import { IconPlacement } from '@/utils/constants/enums';
 
-interface RegisterFormData {
+interface RegisterAccountPageFormData {
   username: string;
   email: string;
   password: string;
@@ -17,13 +17,13 @@ interface RegisterFormData {
 }
 
 
-const Register: React.FC = () => {
-  const { control, handleSubmit, formState: { errors }, watch, setValue } = useForm<RegisterFormData>();
+const RegisterAccountPage: React.FC = () => {
+  const { control, handleSubmit, formState: { errors }, watch, setValue } = useForm<RegisterAccountPageFormData>();
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const onSubmit = (data: RegisterFormData) => {
+  const onSubmit = (data: RegisterAccountPageFormData) => {
     if (!data.agreeToTerms) {
       Alert.alert("", "You must agree to the terms to continue.");
       return;
@@ -32,7 +32,7 @@ const Register: React.FC = () => {
       Alert.alert("Oh oh!", "Passwords do not match.");
       return;
     }
-    router.push('/auth/profilePreferenceForm');
+    router.push('/auth/registerProfile');
   };
 
   return (
@@ -171,12 +171,12 @@ const Register: React.FC = () => {
 
         <View className="h-16" />
 
-        {/* Register Button */}
+        {/* Confirm Button */}
         <ConfirmButton
           icon={<MaterialCommunityIcons name="login" size={25} color="#fff" />}
           text="Sign Up"
           onPress={handleSubmit(onSubmit)}
-          iconDirection={IconDirection.left}
+          iconPlacement={IconPlacement.left}
         />
 
         <AuthenticationDivider text="Or"/>
@@ -194,4 +194,4 @@ const Register: React.FC = () => {
   );
 };
 
-export default Register;
+export default RegisterAccountPage;

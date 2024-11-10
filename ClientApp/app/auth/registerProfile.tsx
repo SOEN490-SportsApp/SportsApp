@@ -1,26 +1,24 @@
 import React, { useState } from "react";
 import { useRouter } from "expo-router";
 import ConfirmButton from "@/components/ConfirmButton";
-import sportsArray from "@/util/sports/sportList";
+import supportedSports from "@/utils/constants/supportedSports";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useForm, Controller } from "react-hook-form";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Picker } from "@react-native-picker/picker";
-import { IconDirection } from "@/components/ConfirmButton";
-
+import { IconPlacement } from "@/utils/constants/enums";
+import isOlderThanSixteen from "@/utils/helpers/ageValidation";
 import {
   View,
   Text,
   TextInput,
   Modal,
-  Alert,
   Platform,
   ScrollView,
   TouchableOpacity,
 } from "react-native";
-import dateCheckGreaterThanSixteen from "@/util/profile/dateCheck";
 
-interface profilePreferenceFormData {
+interface RegisterProfilePageFormData {
   firstName: string;
   lastName: string;
   dob: Date;
@@ -31,7 +29,7 @@ interface profilePreferenceFormData {
   postalCode: string;
 }
 
-const ProfilePreferenceForm: React.FC = () => {
+const RegisterProfilePage: React.FC = () => {
   const genderObject = [
     { label: "Male", value: "Male" },
     { label: "Female", value: "Female" },
@@ -45,7 +43,7 @@ const ProfilePreferenceForm: React.FC = () => {
     formState: { errors },
     watch,
     setValue,
-  } = useForm<profilePreferenceFormData>();
+  } = useForm<RegisterProfilePageFormData>();
 
   const router = useRouter();
 
@@ -64,9 +62,9 @@ const ProfilePreferenceForm: React.FC = () => {
       setValue("dob", selectedDate);
     }
   };
-  const onSubmit = async (data: profilePreferenceFormData) => {
+  const onSubmit = async (data: RegisterProfilePageFormData) => {
     // Logic for api calls and routing
-    router.replace("/tabs/home")
+    router.replace("/(tabs)/home")
   };
   const currentPlatform = Platform.OS;
   return (
@@ -137,14 +135,13 @@ const ProfilePreferenceForm: React.FC = () => {
                   name="dob"
                   rules={{
                     required: "Date of birth is required",
-                    validate: { dateCheckGreaterThanSixteen },
+                    validate: { isOlderThanSixteen },
                   }}
                   render={({ field: { onChange, value } }) => (
                     <View className="flex flex-row">
                       <Text
-                        className={`${
-                          value ? "text-black" : "text-customGray"
-                        }`}
+                        className={`${value ? "text-black" : "text-customGray"
+                          }`}
                       >
                         {value ? value.toDateString() : "Select Date of Birth"}
                       </Text>
@@ -168,9 +165,9 @@ const ProfilePreferenceForm: React.FC = () => {
                                   display="default"
                                   onChange={(event, selectedDate) => {
                                     const currentDate = selectedDate || date;
-                                    setShowPicker(false); // Close modal
+                                    setShowPicker(false); 
                                     handleConfirmDate(currentDate);
-                                    onChange(currentDate); // Update the form field
+                                    onChange(currentDate); 
                                   }}
                                 />
                               </View>
@@ -184,9 +181,9 @@ const ProfilePreferenceForm: React.FC = () => {
                             display="default"
                             onChange={(event, selectedDate) => {
                               const currentDate = selectedDate || date;
-                              setShowPicker(false); // Close modal
+                              setShowPicker(false);
                               handleConfirmDate(currentDate);
-                              onChange(currentDate); // Update the form field
+                              onChange(currentDate);
                             }}
                           />
                         ))}
@@ -216,9 +213,8 @@ const ProfilePreferenceForm: React.FC = () => {
                   render={({ field: { onChange, onBlur, value } }) => (
                     <View>
                       <Text
-                        className={`${
-                          value ? "text-black" : "text-customGray"
-                        }`}
+                        className={`${value ? "text-black" : "text-customGray"
+                          }`}
                       >
                         {value ? value : "Gender"}
                       </Text>
@@ -355,7 +351,7 @@ const ProfilePreferenceForm: React.FC = () => {
                               }
                             }}
                           >
-                            {sportsArray.map((gender, index) => (
+                            {supportedSports.map((gender, index) => (
                               <Picker.Item
                                 key={index}
                                 label={gender.label}
@@ -415,7 +411,7 @@ const ProfilePreferenceForm: React.FC = () => {
                   style={{ marginLeft: 8 }}
                 />
               }
-              iconDirection={IconDirection.right}
+              iconPlacement={IconPlacement.right}
             />
           </View>
         </View>
@@ -424,4 +420,4 @@ const ProfilePreferenceForm: React.FC = () => {
   );
 };
 
-export default ProfilePreferenceForm;
+export default RegisterProfilePage;

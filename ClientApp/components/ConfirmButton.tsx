@@ -1,30 +1,27 @@
 import React from 'react';
 import { TouchableOpacity, Text, View } from 'react-native';
-
-export enum IconDirection {
-  left = "LEFT",
-  right = "RIGHT"
-}
+import { IconPlacement } from '@/utils/constants/enums';
+import themeColors from '@/utils/constants/colors';
 
 interface CustomButtonProps {
-  icon: React.ReactNode | null; 
-  text: string;          
+  icon: React.ReactNode | null;
+  text: string;
+  iconPlacement: IconPlacement | null;
   onPress: () => void;
-  iconDirection: IconDirection | null;
 }
 
-const ConfirmButton: React.FC<CustomButtonProps> = ({ icon, text, onPress, iconDirection }) => {
+const ConfirmButton: React.FC<CustomButtonProps> = ({ icon, text, onPress, iconPlacement }) => {
   return (
-    <TouchableOpacity 
-      className="p-5 rounded-3xl items-center mb-4 shadow-slate-500" 
-      onPress={onPress} 
-      style={{ backgroundColor: '#0C9E04' }}
+    <TouchableOpacity
+      className="p-5 rounded-3xl items-center mb-4 shadow-slate-500"
+      onPress={onPress}
+      style={{ backgroundColor: themeColors.button.primaryBackground }}
     >
       <View className="flex-row items-center">
-        {iconDirection === IconDirection.left && icon}
-        <Text className="font-bold ml-2" style={{fontSize: 20, color: '#fff'}}>{text}</Text>
-        {iconDirection === IconDirection.right && icon}
-        </View>
+        {iconPlacement === IconPlacement.left && icon}
+        <Text className="font-bold ml-2" style={{ fontSize: 20, color: '#fff' }}>{text}</Text>
+        {iconPlacement === IconPlacement.right && icon}
+      </View>
     </TouchableOpacity>
   );
 };

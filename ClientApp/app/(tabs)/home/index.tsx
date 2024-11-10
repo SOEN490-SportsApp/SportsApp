@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Icon } from 'react-native-elements';
-import { useRouter } from 'expo-router';
 
 interface FeedItem {
   id: string;
@@ -11,14 +10,12 @@ interface FeedItem {
 }
 
 const feedData: FeedItem[] = [
-  { id: '1', image: require('../../assets/images/feed1.jpg'), username: 'User1', time: '5 min ago' },
-  { id: '2', image: require('../../assets/images/feed2.jpg'), username: 'User2', time: '10 min ago' },
-  { id: '3', image: require('../../assets/images/feed3.jpg'), username: 'User3', time: '15 min ago' },
+  { id: '1', image: require('@/assets/images/feed1.jpg'), username: 'User1', time: '5 min ago' },
+  { id: '2', image: require('@/assets/images/feed2.jpg'), username: 'User2', time: '10 min ago' },
+  { id: '3', image: require('@/assets/images/feed3.jpg'), username: 'User3', time: '15 min ago' },
 ];
 
-const HomeScreen: React.FC = () => {
-  const router = useRouter();
-
+const HomePage: React.FC = () => {
   const renderPostActions = () => {
     return (
       <View style={styles.actionsContainer}>
@@ -135,5 +132,5 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeScreen;
+export default HomePage;
 

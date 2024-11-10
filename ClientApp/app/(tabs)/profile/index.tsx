@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, ActivityIndicator, SafeAreaView, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
-import axiosInstance from '../../api/axiosIntance';
+import axiosInstance from '@/api/axiosIntance';
 import CustomTabMenu from '@/components/CustomTabMenu';
 
 // Define the profile type
@@ -166,7 +166,7 @@ const ProfilePage: React.FC = () => {
                 <Image
                     className="w-20 h-20 rounded-full"
                     source={{ uri: profile.profile || 'https://example.com/profile-image.png' }}
-                    defaultSource={require('../../assets/images/Unknown.jpg')}
+                    defaultSource={require('@/assets/images/Unknown.jpg')}
                 />
                 <Text testID="firstName" className="text-2xl font-bold text-black mt-4">
                     {profile.firstName} {profile.lastName}
