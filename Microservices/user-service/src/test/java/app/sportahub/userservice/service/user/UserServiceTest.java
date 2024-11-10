@@ -1,10 +1,13 @@
 package app.sportahub.userservice.service.user;
 
+import app.sportahub.userservice.client.KeycloakApiClient;
 import app.sportahub.userservice.dto.request.user.PreferencesRequest;
+import app.sportahub.userservice.dto.request.user.keycloak.KeycloakRequest;
 import app.sportahub.userservice.exception.user.UserDoesNotExistException;
 import app.sportahub.userservice.exception.user.UserEmailAlreadyExistsException;
 import app.sportahub.userservice.exception.user.UserDoesNotExistException;
 import app.sportahub.userservice.exception.user.UsernameAlreadyExistsException;
+import app.sportahub.userservice.mapper.user.ProfileMapper;
 import app.sportahub.userservice.model.user.Preferences;
 import app.sportahub.userservice.model.user.Preferences;
 import app.sportahub.userservice.model.user.Profile;
@@ -28,6 +31,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import app.sportahub.userservice.exception.user.UserDoesNotExistException;
+import reactor.core.publisher.Mono;
 
 public class UserServiceTest {
 
@@ -36,6 +40,12 @@ public class UserServiceTest {
 
     @InjectMocks
     private UserServiceImpl userService;
+
+    @Mock
+    private ProfileMapper profileMapper;
+
+    @Mock
+    private KeycloakApiClient keycloakApiClient;
 
     @BeforeEach
     public void setUp() {
@@ -267,6 +277,8 @@ public class UserServiceTest {
 
         when(userRepository.findUserById(existingUser.getId())).thenReturn(existingUser);
         when(userRepository.save(any(User.class))).thenReturn(existingUser);
+        when(keycloakApiClient.updateUser(anyString(), any(KeycloakRequest.class)))
+                .thenReturn(Mono.empty());
         Profile updatedProfile = userService.updateUserProfile( existingUser.getId(), profileRequest);
 
         Assertions.assertNotNull(updatedProfile);
@@ -331,11 +343,13 @@ public class UserServiceTest {
         );
 
         User existingUser = new User("keycloak-123", "test@gmail.com", "testusername", existingProfile, null);
-
         when(userRepository.findUserById(existingUser.getId())).thenReturn(existingUser);
-
         existingUser.getProfile().setDateOfBirth(profileRequest.dateOfBirth());
-        when(userRepository.save(any(User.class))).thenReturn(existingUser);
+        when(userRepository.save(existingUser)).thenReturn(existingUser);
+        when(keycloakApiClient.updateUser(existingUser.getKeycloakId(), new KeycloakRequest(
+                existingUser.getProfile().getFirstName(),
+                existingUser.getProfile().getLastName()
+        ))).thenReturn(Mono.empty());
 
         Profile updatedProfile = userService.patchUserProfile(existingUser.getId(), profileRequest);
 
