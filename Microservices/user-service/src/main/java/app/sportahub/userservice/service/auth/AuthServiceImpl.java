@@ -75,12 +75,12 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findUserByEmailOrUsername(loginRequest.identifier(), loginRequest.identifier());
 
         TokenResponse tokenResponse = Mono.from(keycloakApiClient.login(loginRequest.identifier(), loginRequest.password())).map(jsonNode -> {
-                String accessToken = jsonNode.get("access_token").asText();
-                String refreshToken = jsonNode.get("refresh_token").asText();
-                return new TokenResponse(accessToken, refreshToken);
-            }).block();
+            String accessToken = jsonNode.get("access_token").asText();
+            String refreshToken = jsonNode.get("refresh_token").asText();
+            return new TokenResponse(accessToken, refreshToken);
+        }).block();
 
-        return new LoginResponse(user.getId(),tokenResponse);
+        return new LoginResponse(user.getId(), tokenResponse);
     }
 
     @Override
