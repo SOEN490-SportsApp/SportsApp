@@ -13,5 +13,5 @@ public interface UserService {
 
     Profile updateUserProfile(String id, ProfileRequest profileRequest);
 
-    Profile patchUserProfile(String id, ProfileRequest profileRequest) ;
+    Profile patchUserProfile(String id, ProfileRequest profileRequest);
 }

@@ -10,6 +10,8 @@ import app.sportahub.userservice.model.user.User;
 public interface AuthService {
 
     User registerUser(RegistrationRequest userRequest);
+
     LoginResponse loginUser(LoginRequest loginRequest);
+
     TokenResponse refreshToken(RefreshTokenRequest tokenRequest);
 }

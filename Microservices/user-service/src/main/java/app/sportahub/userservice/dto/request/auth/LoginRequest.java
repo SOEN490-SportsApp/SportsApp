@@ -5,5 +5,5 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotEmpty;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record LoginRequest(@NotEmpty String identifier , @NotEmpty String password) {
+public record LoginRequest(@NotEmpty String identifier, @NotEmpty String password) {
 }
