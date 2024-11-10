@@ -17,6 +17,96 @@ Sporta connects users who are passionate about playing sports, enabling them to 
 | Patrick MacEachen	| 40209790 | patrickmac3  | patrickmaceachen9@gmail.com |
 | Joud Babik | 40031039 | JRB958 | j_babik@live.concordia.ca
 
-### Getting Started with Sporta:  
+# Project Setup and Build Guide
 
-//todo
+This guide provides all the steps needed to set up, build, and run this project, including Docker containerization and Gradle configuration. It is important to note that this is the main setup for the backend. In order to setup the frontend, please consult the following [README.md](https://github.com/SOEN490-SportsApp/SportsApp/tree/chore/issue-137/read-me-setup-for-project/ClientApp#readme
+) to understand more about the Expo app.
+
+## Prerequisites
+
+Before starting, ensure you have the following installed:
+- **Git**: for cloning the repository.
+- **Docker**: for containerizing the application.
+- **Java Development Kit (JDK)**: version 21.
+- **Gradle**: or use the Gradle wrapper (`./gradlew`) included in the project.
+
+## Getting Started
+
+### 1. Clone the Repository
+
+First, clone the repository to your local machine:
+```bash
+git clone <repository-url>
+cd <repository-directory>
+```
+
+### 2. Build the Application with Gradle
+Use Gradle to build the project and run tests.
+
+### Build the project:
+```bash 
+./gradlew build
+```
+This command will compile the project, package it, and run unit tests.
+
+### 3. Docker Containerization
+This project uses a Dockerfile to package the application for containerized deployment.
+
+#### Dockerfile Overview
+The Dockerfile sets up the container with an OpenJDK base image, configures environment variables, copies the JAR file, and exposes port 8080.
+
+#### Steps to Build and Run the Docker Image
+##### Build the JAR file using Gradle:
+```bash
+./gradlew build
+```
+The generated JAR file will be located in `build/libs` as `project-name-0.0.1-SNAPSHOT.jar`.
+
+##### Build the Docker Image:
+```bash
+docker build --build-arg JAR_FILE=build/libs/project-name-0.0.1-SNAPSHOT.jar -t project-image .
+```
+##### Run the Docker Container:
+To run the container, map port 8080 and use an `.env` file to provide the environment variables:
+```bash
+docker run -p 8080:8080 --env-file .env project-image
+```
+Replace `.env` with the path to your environment variable file or set the variables directly in the command.
+
+#### Gradle Build and Dependency Configuration
+The `build.gradle` file specifies dependencies, configurations, and build tasks. Key sections include:
+
+### 4. Docker Compose Setup for Microservices
+This project relies on several microservices, each with its own Docker setup. All microservices depend on the services defined in a shared `docker-compose.yml` file, which includes services such as MongoDB, MySQL (for Keycloak), and Keycloak itself. These services must be running for the microservices to function properly.
+The `docker-compose.yml` file configures and manages the required services. You will need to ensure that the services are up and running before starting any microservice.
+
+#### How to Set it Up:
+1. Navigate to the directory of the microservice you want to run.
+
+2. Make sure the `docker-compose.yml` file is present and configured.
+
+3. Run the following command to start all the required services for that microservice:
+
+```bash
+docker-compose up --build
+```
+Once the services are up and running, the microservice will be able to interact with MongoDB, Keycloak, and other dependencies.
+
+### 5. Running Multiple Microservices
+The project consists of several microservices, each located in its respective folder under `Microservices/<service-name>`. The README assumes the backend is located at the root of the project directory, but since we have multiple microservices, each microservice has its own folder and configuration.
+
+To run a specific microservice, you need to follow the setup steps (including using Docker Compose) inside each microservice directory:
+1. Navigate to the corresponding microservice directory under `Microservices/`:
+```bash
+cd Microservices/<service-name>
+```
+
+2. Run Docker Compose for that microservice:
+```bash
+docker-compose up --build
+```
+
+This ensures that each microservice runs with its own set of services (like databases or authentication), and you can independently manage and deploy them as needed.
+
+#### Running the Application
+After building the project and Docker image, you can access the application at `http://localhost:8080`
