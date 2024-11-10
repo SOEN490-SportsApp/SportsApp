@@ -66,6 +66,7 @@ const ProfilePreferenceForm: React.FC = () => {
   };
   const onSubmit = async (data: profilePreferenceFormData) => {
     // Logic for api calls and routing
+    router.replace("/tabs/home")
   };
   const currentPlatform = Platform.OS;
   return (
