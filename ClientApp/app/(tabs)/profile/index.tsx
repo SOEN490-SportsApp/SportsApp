@@ -125,7 +125,7 @@ const ProfilePage: React.FC = () => {
     };
 
     useEffect(() => {
-        // fetchProfileData();
+        fetchProfileData();
     }, []);
 
     if (loading) {
