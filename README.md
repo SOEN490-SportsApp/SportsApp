@@ -17,8 +17,6 @@ Sporta connects users who are passionate about playing sports, enabling them to 
 | Patrick MacEachen	| 40209790 | patrickmac3  | patrickmaceachen9@gmail.com |
 | Joud Babik | 40031039 | JRB958 | j_babik@live.concordia.ca
 
-### Getting Started with Sporta:  
-
 # Project Setup and Build Guide
 
 This guide provides all the steps needed to set up, build, and run this project, including Docker containerization and Gradle configuration.
@@ -56,36 +54,6 @@ This project uses a Dockerfile to package the application for containerized depl
 #### Dockerfile Overview
 The Dockerfile sets up the container with an OpenJDK base image, configures environment variables, copies the JAR file, and exposes port 8080.
 
-```dockerfile
-# Dockerfile contents for reference
-
-FROM openjdk:21-alpine
-
-ARG JAR_FILE
-
-ENV SPRING_APPLICATION_NAME=$SPRING_APPLICATION_NAME \
-    SERVER_SERVLET_CONTEXT_PATH=$SERVER_SERVLET_CONTEXT_PATH \
-    LOGGING_LEVEL_APP_SPORTAHUB=$LOGGING_LEVEL_APP_SPORTAHUB \
-    LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB=$LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB \
-    KEYCLOAK_CLIENT_ID=$KEYCLOAK_CLIENT_ID \
-    KEYCLOAK_CLIENT_SECRET=$KEYCLOAK_CLIENT_SECRET \
-    KEYCLOAK_REDIRECT_URI=$KEYCLOAK_REDIRECT_URI \
-    KEYCLOAK_ISSUER_URI=$KEYCLOAK_ISSUER_URI \
-    KEYCLOAK_TOKEN_URI=$KEYCLOAK_TOKEN_URI \
-    KEYCLOAK_AUTHORIZATION_URI=$KEYCLOAK_AUTHORIZATION_URI \
-    KEYCLOAK_USER_INFO_URI=$KEYCLOAK_USER_INFO_URI \
-    KEYCLOAK_JWK_SET_URI=$KEYCLOAK_JWK_SET_URI \
-    JWT_ISSUER_URI=$JWT_ISSUER_URI \
-    KEYCLOAK_AUTH_SERVER_URL=$KEYCLOAK_AUTH_SERVER_URL \
-    KEYCLOAK_REALM=$KEYCLOAK_REALM \
-    MONGODB_URI=$MONGODB_URI
-
-COPY ${JAR_FILE} /app.jar
-
-EXPOSE 8080
-
-ENTRYPOINT ["java", "-jar", "/app.jar"]
-```
 #### Steps to Build and Run the Docker Image
 ##### Build the JAR file using Gradle:
 ```bash
@@ -106,61 +74,38 @@ Replace `.env` with the path to your environment variable file or set the variab
 
 #### Gradle Build and Dependency Configuration
 The `build.gradle` file specifies dependencies, configurations, and build tasks. Key sections include:
-```gradle
-plugins {
-    id 'java'
-    id 'org.springframework.boot' version '3.3.5'
-    id 'io.spring.dependency-management' version '1.1.6'
-    id 'idea'
-}
 
-group = 'app.sportahub'
-version = '0.0.1-SNAPSHOT'
+### 4. Docker Compose Setup for Microservices
+This project relies on several microservices, each with its own Docker setup. All microservices depend on the services defined in a shared `docker-compose.yml` file, which includes services such as MongoDB, MySQL (for Keycloak), and Keycloak itself. These services must be running for the microservices to function properly.
+The `docker-compose.yml` file configures and manages the required services. You will need to ensure that the services are up and running before starting any microservice.
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
-}
+#### How to Set it Up:
+1. Navigate to the directory of the microservice you want to run.
 
-repositories {
-    mavenCentral()
-}
+2. Make sure the `docker-compose.yml` file is present and configured.
 
-dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    implementation 'io.netty:netty-resolver-dns-native-macos:4.1.114.Final:osx-aarch_64'
-    implementation 'org.keycloak:keycloak-spring-boot-starter:24.0.4'
-    compileOnly 'org.projectlombok:lombok'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    annotationProcessor 'org.projectlombok:lombok'
-    testCompileOnly 'org.projectlombok:lombok'
-    testAnnotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'io.projectreactor:reactor-test'
-    testImplementation 'org.springframework.security:spring-security-test'
-    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
-    testImplementation 'org.testcontainers:junit-jupiter'
-    testImplementation 'org.testcontainers:mongodb'
-    testImplementation 'io.rest-assured:rest-assured:5.3.2'
-    testImplementation 'org.mockito:mockito-core:5.11.0'
-    testImplementation 'org.mockito:mockito-junit-jupiter:5.11.0'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
-    testImplementation 'com.github.dasniko:testcontainers-keycloak:2.1.2'
-    testImplementation 'org.testcontainers:testcontainers:1.16.3'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-}
+3. Run the following command to start all the required services for that microservice:
 
-tasks.named('test') {
-    useJUnitPlatform()
-}
+```bash
+docker-compose up --build
 ```
+Once the services are up and running, the microservice will be able to interact with MongoDB, Keycloak, and other dependencies.
+
+### 5. Running Multiple Microservices
+The project consists of several microservices, each located in its respective folder under `Microservices/<service-name>`. The README assumes the backend is located at the root of the project directory, but since we have multiple microservices, each microservice has its own folder and configuration.
+
+To run a specific microservice, you need to follow the setup steps (including using Docker Compose) inside each microservice directory:
+1. Navigate to the corresponding microservice directory under `Microservices/`:
+```bash
+cd Microservices/<service-name>
+```
+
+2. Run Docker Compose for that microservice:
+```bash
+docker-compose up --build
+```
+
+This ensures that each microservice runs with its own set of services (like databases or authentication), and you can independently manage and deploy them as needed.
 
 #### Running the Application
 After building the project and Docker image, you can access the application at `http://localhost:8080`
