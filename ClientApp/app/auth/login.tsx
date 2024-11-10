@@ -18,7 +18,7 @@ const LoginScreen: React.FC = () => {
 
   const onSubmit = (data: LoginFormData) => {
     console.log("Login data:", data);
-    router.push('/home/landingPage');
+    router.push('/tabs');
   };
 
   return (

@@ -15,9 +15,9 @@ export default function TabLayout() {
           height: 100,
         },
         tabBarLabelStyle: {
-          marginTop: -5,  // Adjust the margin to reduce the spacing between the text and icon
+          marginTop: -5,  
           fontSize: 12,
-          padding: 5,     // Reduce padding to make text closer to icon
+          padding: 5,     
           textAlign: 'center',
         },
       }}
@@ -28,25 +28,27 @@ export default function TabLayout() {
         options={{
           title: 'Home',
           headerShown: false,
-          tabBarIcon: ({ color }) => <FontAwesome size={24} name="home" color={color} style={{ marginBottom: -5 }} />,  // Reduce space between icon and text
+          tabBarIcon: ({ color }) => <FontAwesome size={24} name="home" color={color} style={{ marginBottom: -5 }} />,
         }}
       />
       
-      {/* Plus Tab */}
-      <Tabs.Screen
-        name="plus"
-        options={{
-          title: 'Add',
-          tabBarIcon: ({ color }) => <FontAwesome size={24} name="plus" color={color} style={{ marginBottom: -5 }} />, // Adjust icon margin
-        }}
-      />
-
       {/* Profile Tab */}
       <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ color }) => <FontAwesome size={24} name="user" color={color} style={{ marginBottom: -5 }} />, // Adjust icon margin
+          tabBarIcon: ({ color }) => <FontAwesome size={24} name="user" color={color} style={{ marginBottom: -5 }} />,
+        }}
+      />
+      
+      {/* Plus Tab  */}
+      <Tabs.Screen
+        name="add"
+        options={{
+          title: 'Add',
+          tabBarIcon: ({ color }) => (
+            <FontAwesome size={24} name="plus-circle" color={color} style={{ marginBottom: -5 }} />
+          ), 
         }}
       />
       
@@ -55,7 +57,7 @@ export default function TabLayout() {
         name="settings"
         options={{
           title: 'Settings',
-          tabBarIcon: ({ color }) => <FontAwesome size={24} name="cog" color={color} style={{ marginBottom: -5 }} />, // Adjust icon margin
+          tabBarIcon: ({ color }) => <FontAwesome size={24} name="cog" color={color} style={{ marginBottom: -5 }} />,
         }}
         listeners={{
           tabPress: (e) => {
@@ -67,6 +69,7 @@ export default function TabLayout() {
     </Tabs>
   );
 }
+
 
 
 
