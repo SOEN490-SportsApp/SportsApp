@@ -19,7 +19,8 @@ Sporta connects users who are passionate about playing sports, enabling them to 
 
 # Project Setup and Build Guide
 
-This guide provides all the steps needed to set up, build, and run this project, including Docker containerization and Gradle configuration.
+This guide provides all the steps needed to set up, build, and run this project, including Docker containerization and Gradle configuration. It is important to note that this is the main setup for the backend. In order to setup the frontend, please consult the following [README.md](https://github.com/SOEN490-SportsApp/SportsApp/tree/chore/issue-137/read-me-setup-for-project/ClientApp#readme
+) to understand more about the Expo app.
 
 ## Prerequisites
 
