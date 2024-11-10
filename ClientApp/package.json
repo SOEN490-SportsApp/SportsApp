@@ -35,27 +35,7 @@
       "node"
     ]
   },
-    "preset": "jest-expo",
-    "setupFilesAfterEnv": [
-      "<rootDir>/jestSetup.ts",
-      "@testing-library/jest-native/extend-expect"
-    ],
-    "moduleNameMapper": {
-      "^@react-native-async-storage/async-storage$": "<rootDir>/__mocks__/@react-native-async-storage/async-storage.ts"
-    },
-    "transform": {
-      "^.+\\.[tj]sx?$": "babel-jest"
-    },
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "jsx",
-      "json",
-      "node"
-    ]
-  },
-  "dependencies": {
+    "dependencies": {
     "@expo/config-plugins": "^8.0.10",
     "@expo/vector-icons": "^14.0.3",
     "@react-native-community/datetimepicker": "8.0.1",
@@ -64,7 +44,6 @@
     "@react-navigation/native-stack": "^6.11.0",
     "@testing-library/react": "^16.0.1",
     "expo": "~51.0.28",
-    "expo-checkbox": "~3.0.0",
     "expo-checkbox": "~3.0.0",
     "expo-constants": "~16.0.2",
     "expo-font": "~12.0.9",
