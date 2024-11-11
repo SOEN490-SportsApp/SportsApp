@@ -4,19 +4,34 @@ on:
   pull_request:
     branches: [ "*" ]
   push:
-    branches: 
+    branches:
       - main
       - dev
       - 'releases/**'
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./ClientApp
+
+      - name: Lint with ESLint
+        run: npm run lint
+        working-directory: ./ClientApp
+
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install depedencies
+
+      - name: Install dependencies
         run: npm install
         working-directory: ./ClientApp
-      - name: Run tests
+
+      - name: Run Jest Tests with Coverage
         run: npm run ci-test
         working-directory: ./ClientApp
