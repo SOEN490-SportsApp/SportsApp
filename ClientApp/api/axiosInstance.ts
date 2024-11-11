@@ -58,15 +58,14 @@ const refreshAccessToken = async (): Promise<string | null> => {
     // Decode the refresh token to get the expiration time
     const payload = JSON.parse(atob(refreshToken.split('.')[1]));
     const now = Math.ceil(Date.now() / 1000);
-    
+
     // Ensure the refresh token has not expired
-    if (payload.exp < now) {
+    if (payload.exp > now) {
       try {
         // Attempt to refresh the access token
         const response = await axiosInstance.post(API_ENDPOINTS.REFRESH_TOKEN, { refreshToken: refreshToken });
         const newAccessToken = response.data.access;
         await setAccessToken(newAccessToken);
-        console.log('============ AXIOS HAS REFRESHED THE TOKEN');
         return newAccessToken;
       } catch (error) {
         // Log the error for debugging purposes
@@ -134,7 +133,7 @@ axiosInstance.interceptors.response.use(
     }
 
     // Handle 401 Unauthorized due to expired or invalid token
-    if (error.response.status === 401) { 
+    if (error.response.status === 401 && error.response.data?.code === 'token_not_valid') { 
       const newAccessToken = await refreshAccessToken();
       if (newAccessToken) {
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
