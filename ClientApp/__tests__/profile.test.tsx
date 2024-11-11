@@ -2,7 +2,7 @@ import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import '@testing-library/jest-native/extend-expect';
 import axiosMockAdapter from 'axios-mock-adapter';
-import axiosInstance from '../api/axiosIntance';
+import axiosInstance from '../api/axiosInstance';
 import ProfilePage from '@/app/(tabs)/profile/index';
 import { calculateAge } from '@/app/(tabs)/profile/index';
 

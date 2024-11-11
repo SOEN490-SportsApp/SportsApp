@@ -7,7 +7,7 @@ import { useRouter } from "expo-router";
 import ConfirmButton from "@/components/ConfirmButton";
 import AuthenticationDivider from "@/components/AuthenticationDivider";
 import { IconPlacement } from '@/utils/constants/enums';
-import axiosInstance from "@/api/axiosIntance";
+import axiosInstance from "@/api/axiosInstance";
 import { API_ENDPOINTS } from "@/utils/api/endpoints";
 
 interface RegisterAccountPageFormData {

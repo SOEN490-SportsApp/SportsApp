@@ -2,6 +2,7 @@ import React from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Tabs } from 'expo-router';
 import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function TabLayout() {
   const router = useRouter();
@@ -61,8 +62,12 @@ export default function TabLayout() {
         }}
         listeners={{
           tabPress: (e) => {
-            e.preventDefault(); // Prevent default tab switch
-            router.push('/auth/login'); // Navigate to login page
+            e.preventDefault(); 
+            AsyncStorage.removeItem("access_token");
+            AsyncStorage.removeItem("refresh_token");
+            console.log(AsyncStorage.getItem("access_token"));
+            console.log(AsyncStorage.getItem("refresh_token"));
+            router.push('/auth/login'); 
           },
         }}
       />

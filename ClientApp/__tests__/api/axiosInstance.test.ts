@@ -3,7 +3,7 @@
  *  It uses the axios-mock-adapter library to mock the Axios instance and test different scenarios.
  */
 
-import axiosInstance from '../../api/axiosIntance';
+import axiosInstance from '../../api/axiosInstance';
 import MockAdapter from 'axios-mock-adapter'; //used to mock the axios instance
 import AsyncStorage from "@react-native-async-storage/async-storage/jest/async-storage-mock"; //mock AsyncStorage for token storage mocking
 import { showAlert } from '../../utils/api/errorHandlers'; // Import showAlert function for testing
