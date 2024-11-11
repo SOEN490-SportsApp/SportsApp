@@ -1,0 +1,37 @@
+name: Frontend CI/CD
+
+on:
+  pull_request:
+    branches: [ "*" ]
+  push:
+    branches:
+      - main
+      - dev
+      - 'releases/**'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./ClientApp
+
+      - name: Lint with ESLint
+        run: npm run lint
+        working-directory: ./ClientApp
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./ClientApp
+
+      - name: Run Jest Tests with Coverage
+        run: npm run ci-test
+        working-directory: ./ClientApp
