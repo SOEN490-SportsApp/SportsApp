@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, ActivityIndicator, SafeAreaView, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
-import axiosInstance from '@/api/axiosIntance';
+import axiosInstance from '@/api/axiosInstance';
 import CustomTabMenu from '@/components/CustomTabMenu';
 
 // Define the profile type
@@ -26,6 +26,7 @@ const screenHeight = Dimensions.get('window').height;
 const maxHeight = screenHeight * 0.5
 
 // Function to calculate age based on dateOfBirth
+// TODO
 export function calculateAge(dateOfBirth: string): number {
     const dob = new Date(dateOfBirth);
     const today = new Date();

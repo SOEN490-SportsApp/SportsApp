@@ -35,10 +35,13 @@ const getAccessToken = async (): Promise<string | null> => {
 };
 
 // 2- setAccessToken function to store the access token in AsyncStorage
-const setAccessToken = async (token: string) => {
+export const setAccessToken = async (token: string) => {
   await AsyncStorage.setItem('access_token', token);
 };
 
+export const setRefreshToken = async (token: string) => {
+  await AsyncStorage.setItem('refresh_token', token);
+}
 // 3- getRefreshToken function to retrieve the refresh token from AsyncStorage
 const getRefreshToken = async (): Promise<string | null> => {
   return await AsyncStorage.getItem('refresh_token');
@@ -49,21 +52,21 @@ const getRefreshToken = async (): Promise<string | null> => {
 const refreshAccessToken = async (): Promise<string | null> => {
   // Get the refresh token from AsyncStorage
   const refreshToken = await getRefreshToken();
-
   // Check if the refresh token exists
   if (refreshToken) {
 
     // Decode the refresh token to get the expiration time
     const payload = JSON.parse(atob(refreshToken.split('.')[1]));
     const now = Math.ceil(Date.now() / 1000);
-
+    
     // Ensure the refresh token has not expired
-    if (payload.exp > now) {
+    if (payload.exp < now) {
       try {
         // Attempt to refresh the access token
         const response = await axiosInstance.post(API_ENDPOINTS.REFRESH_TOKEN, { refreshToken: refreshToken });
         const newAccessToken = response.data.access;
         await setAccessToken(newAccessToken);
+        console.log('============ AXIOS HAS REFRESHED THE TOKEN');
         return newAccessToken;
       } catch (error) {
         // Log the error for debugging purposes
@@ -131,7 +134,7 @@ axiosInstance.interceptors.response.use(
     }
 
     // Handle 401 Unauthorized due to expired or invalid token
-    if (error.response.status === 401 && error.response.data?.code === 'token_not_valid') {
+    if (error.response.status === 401) { 
       const newAccessToken = await refreshAccessToken();
       if (newAccessToken) {
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
