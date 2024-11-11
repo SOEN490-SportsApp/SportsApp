@@ -27,8 +27,6 @@ const LoginPage: React.FC = () => {
     if (result.success) {
       await setAccessToken(result.response?.accessToken!);
       await setRefreshToken(result.response?.refreshToken!);
-      console.log(`From AsyncStorange --> Access Token: ${result.response?.accessToken}`);
-      console.log(`From AsyncStorange --> Refresh Token: ${result.response?.refreshToken}`); 
       router.push('/(tabs)/home');
     } else {
       Alert.alert("Error", "Failed to Login.");
@@ -47,8 +45,6 @@ const loginUser = async (data: LoginPageFormData): Promise<LoginResponse> => {
   try {
     const response = await axiosInstance.post(API_ENDPOINTS.LOGIN, data);
     if (response.status === 200) {
-
-      console.log("Logged in with:", response.data);
       return {
         success: true,
         response: {
