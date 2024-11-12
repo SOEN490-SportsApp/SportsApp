@@ -16,6 +16,7 @@ import {
   Platform,
   ScrollView,
   TouchableOpacity,
+  Alert
 } from "react-native";
 
 interface RegisterProfilePageFormData {
@@ -64,6 +65,9 @@ const RegisterProfilePage: React.FC = () => {
   };
   const onSubmit = async (data: RegisterProfilePageFormData) => {
     // Logic for api calls and routing
+    if(data){
+      Alert.alert("Successful creation")
+    }
     router.replace("/(tabs)/home")
   };
   const currentPlatform = Platform.OS;
@@ -200,6 +204,7 @@ const RegisterProfilePage: React.FC = () => {
             <View className="w-2/5">
               <View className="flex-row items-center bg-gray-100 rounded-3xl p-2 pl-4 min-h-16">
                 <MaterialCommunityIcons
+                  testID="TestGenderButton"
                   name="human-non-binary"
                   size={20}
                   color="#aaa"
@@ -229,6 +234,7 @@ const RegisterProfilePage: React.FC = () => {
                             <View className="bg-white p-6 rounded-lg w-80">
                               {/* Adjust width and padding */}
                               <Picker
+                              testID="genderPickerTest"
                                 selectedValue={selectedGender}
                                 onValueChange={(gender: string) => {
                                   onChange(gender);
@@ -317,6 +323,7 @@ const RegisterProfilePage: React.FC = () => {
           <View className="flex-row items-center bg-gray-100 rounded-3xl p-2 pl-4 min-h-16">
             <MaterialCommunityIcons
               name="menu-down"
+              testID="sportPickerButton"
               size={20}
               color="#aaa"
               onPress={() => setShowSportPicker(true)}
@@ -341,7 +348,8 @@ const RegisterProfilePage: React.FC = () => {
                       <View className="flex-1 justify-center items-center ">
                         <View className="bg-white p-6 rounded-lg w-80">
                           <Picker
-                            selectedValue={selectedGender}
+                          testID="sportPicker"
+                            selectedValue={sportPicked}
                             onValueChange={(sport: string) => {
                               onChange(sport);
                               setSportPicked(sport);
@@ -351,11 +359,11 @@ const RegisterProfilePage: React.FC = () => {
                               }
                             }}
                           >
-                            {supportedSports.map((gender, index) => (
+                            {supportedSports.map((sport, index) => (
                               <Picker.Item
                                 key={index}
-                                label={gender.label}
-                                value={gender.value}
+                                label={sport.label}
+                                value={sport.value}
                               />
                             ))}
                           </Picker>
@@ -390,7 +398,7 @@ const RegisterProfilePage: React.FC = () => {
                           }
                         }}
                         className={`rounded-3xl p-2 ${selectedLevel === select ? "border border-customGreen" : ""}`}>
-                        <Text> {select} </Text>
+                        <Text testID="rankingTest"> {select} </Text>
                       </TouchableOpacity>
                     ))}
                   </View>
