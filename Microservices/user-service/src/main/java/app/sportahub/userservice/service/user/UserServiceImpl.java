@@ -32,13 +32,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User createUser(UserRequest userRequest) {
-        Optional<User> optionalUserByEmail = Optional.ofNullable(userRepository.findUserByEmail(userRequest.email()));
+        Optional<User> optionalUserByEmail = userRepository.findUserByEmail(userRequest.email());
+
         if (optionalUserByEmail.isPresent()) {
             throw new UserEmailAlreadyExistsException(userRequest.email());
         }
 
-        Optional<User> optionalUserByUsername = Optional
-                .ofNullable(userRepository.findUserByUsername(userRequest.username()));
+        Optional<User> optionalUserByUsername = userRepository.findUserByUsername(userRequest.username());
         if (optionalUserByUsername.isPresent()) {
             throw new UsernameAlreadyExistsException(userRequest.username());
         }
@@ -72,14 +72,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserById(String id) {
-        return Optional.ofNullable(userRepository.findUserById(id))
-                .orElseThrow(() -> new UserDoesNotExistException(id));
+        return userRepository.findUserById(id).orElseThrow(() -> new UserDoesNotExistException(id));
     }
 
     @Override
     public Profile updateUserProfile(String id, ProfileRequest profileRequest) {
-        User user = Optional.ofNullable(userRepository.findUserById(id))
-                .orElseThrow(() -> new UserDoesNotExistException(id));
+        User user = userRepository.findUserById(id).orElseThrow(() -> new UserDoesNotExistException(id));
 
         user.setProfile(Profile.builder()
                 .withFirstName(profileRequest.firstName())
@@ -103,8 +101,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Profile patchUserProfile(String id, ProfileRequest profileRequest) {
-        User user = Optional.ofNullable(userRepository.findUserById(id))
-                .orElseThrow(() -> new UserDoesNotExistException(id));
+        User user = userRepository.findUserById(id).orElseThrow(() -> new UserDoesNotExistException(id));
         Profile profile = Optional.ofNullable(user.getProfile()).orElse(Profile.builder().build());
 
         profileMapper.updateProfileFromRequest(profileRequest, profile);
