@@ -2,36 +2,33 @@ package app.sportahub.userservice.service.user;
 
 import app.sportahub.userservice.client.KeycloakApiClient;
 import app.sportahub.userservice.dto.request.user.PreferencesRequest;
+import app.sportahub.userservice.dto.request.user.ProfileRequest;
+import app.sportahub.userservice.dto.request.user.UserRequest;
 import app.sportahub.userservice.dto.request.user.keycloak.KeycloakRequest;
 import app.sportahub.userservice.exception.user.UserDoesNotExistException;
 import app.sportahub.userservice.exception.user.UserEmailAlreadyExistsException;
-import app.sportahub.userservice.exception.user.UserDoesNotExistException;
 import app.sportahub.userservice.exception.user.UsernameAlreadyExistsException;
 import app.sportahub.userservice.mapper.user.ProfileMapper;
-import app.sportahub.userservice.model.user.Preferences;
 import app.sportahub.userservice.model.user.Preferences;
 import app.sportahub.userservice.model.user.Profile;
 import app.sportahub.userservice.model.user.User;
 import app.sportahub.userservice.repository.UserRepository;
-import app.sportahub.userservice.dto.request.user.UserRequest;
-import app.sportahub.userservice.dto.request.user.ProfileRequest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import reactor.core.publisher.Mono;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-
-import app.sportahub.userservice.exception.user.UserDoesNotExistException;
-import reactor.core.publisher.Mono;
 
 public class UserServiceTest {
 
@@ -77,8 +74,8 @@ public class UserServiceTest {
                 preferences
         );
 
-        when(userRepository.findUserByEmail(userRequest.email())).thenReturn(null);
-        when(userRepository.findUserByUsername(userRequest.username())).thenReturn(null);
+        when(userRepository.findUserByEmail(userRequest.email())).thenReturn(Optional.empty());
+        when(userRepository.findUserByUsername(userRequest.username())).thenReturn(Optional.empty());
 
         User savedUser = User.builder()
                 .withId("123")
@@ -140,7 +137,7 @@ public class UserServiceTest {
                 preferences
         );
 
-        User existingUser = new User();
+        Optional<User> existingUser = Optional.of(new User());
         when(userRepository.findUserByEmail(userRequest.email())).thenReturn(existingUser);
 
         UserEmailAlreadyExistsException exception = Assertions.assertThrows(UserEmailAlreadyExistsException.class,
@@ -176,8 +173,8 @@ public class UserServiceTest {
                 preferences
         );
 
-        when(userRepository.findUserByEmail(userRequest.email())).thenReturn(null);
-        User existingUser = new User();
+        when(userRepository.findUserByEmail(userRequest.email())).thenReturn(Optional.empty());
+        Optional<User> existingUser = Optional.of(new User());
         when(userRepository.findUserByUsername(userRequest.username())).thenReturn(existingUser);
 
         UsernameAlreadyExistsException exception = Assertions.assertThrows(UsernameAlreadyExistsException.class,
@@ -192,7 +189,7 @@ public class UserServiceTest {
     @Test
     public void getUserByIdShouldReturnUser() {
         String userId = "123";
-        User expectedUser = User.builder()
+        Optional<User> expectedUser = Optional.of(User.builder()
                 .withId(userId)
                 .withEmail("test@example.com")
                 .withUsername("testUser")
@@ -206,7 +203,7 @@ public class UserServiceTest {
                         .withSportsOfPreference(List.of("Basketball", "Soccer"))
                         .withRanking("100")
                         .build())
-                .build();
+                .build());
 
         when(userRepository.findUserById(userId)).thenReturn(expectedUser);
 
@@ -231,7 +228,7 @@ public class UserServiceTest {
     @Test
     public void getUserByIdShouldThrowUserDoesNotExistException() {
         String userId = "nonexistent";
-        when(userRepository.findUserById(userId)).thenReturn(null);
+        when(userRepository.findUserById(userId)).thenReturn(Optional.empty());
 
         UserDoesNotExistException exception = Assertions.assertThrows(
                 UserDoesNotExistException.class,
@@ -245,13 +242,13 @@ public class UserServiceTest {
 
     @Test
     public void updateUserProfileShouldReturnOK() {
-        User existingUser = User.builder()
+        Optional<User> existingUser = Optional.of(User.builder()
                 .withProfile(Profile.builder().build())
                 .withEmail("test@example.com")
                 .withUsername("testUser")
                 .withKeycloakId("keycloak-123")
                 .withPreferences(Preferences.builder().build())
-                .build();
+                .build());
         ProfileRequest profileRequest = new ProfileRequest(
                 "John",
                 "Doe",
@@ -263,7 +260,7 @@ public class UserServiceTest {
                 "A"
         );
 
-        existingUser.setProfile(Profile.builder()
+        existingUser.get().setProfile(Profile.builder()
                 .withFirstName(profileRequest.firstName())
                 .withLastName(profileRequest.lastName())
                 .withDateOfBirth(profileRequest.dateOfBirth())
@@ -275,11 +272,11 @@ public class UserServiceTest {
                 .build());
 
 
-        when(userRepository.findUserById(existingUser.getId())).thenReturn(existingUser);
-        when(userRepository.save(any(User.class))).thenReturn(existingUser);
+        when(userRepository.findUserById(existingUser.get().getId())).thenReturn(existingUser);
+        when(userRepository.save(any(User.class))).thenReturn(existingUser.get());
         when(keycloakApiClient.updateUser(anyString(), any(KeycloakRequest.class)))
                 .thenReturn(Mono.empty());
-        Profile updatedProfile = userService.updateUserProfile( existingUser.getId(), profileRequest);
+        Profile updatedProfile = userService.updateUserProfile(existingUser.get().getId(), profileRequest);
 
         Assertions.assertNotNull(updatedProfile);
         Assertions.assertEquals(updatedProfile.getFirstName(), profileRequest.firstName());
@@ -291,7 +288,7 @@ public class UserServiceTest {
         Assertions.assertEquals(updatedProfile.getPostalCode(), profileRequest.postalCode());
         Assertions.assertEquals(updatedProfile.getSportsOfPreference(), profileRequest.sportsOfPreference());
 
-        verify(userRepository, times(1)).findUserById(existingUser.getId());
+        verify(userRepository, times(1)).findUserById(existingUser.get().getId());
         verify(userRepository, times(1)).save(any(User.class));
 
     }
@@ -309,9 +306,9 @@ public class UserServiceTest {
                 "A"
         );
 
-        when(userRepository.findUserById("1")).thenReturn(null);
+        when(userRepository.findUserById("1")).thenReturn(Optional.empty());
         UserDoesNotExistException exception = Assertions.assertThrows(UserDoesNotExistException.class,
-                ()-> userService.updateUserProfile("1", profileRequest) );
+                () -> userService.updateUserProfile("1", profileRequest));
 
         Assertions.assertEquals("404 NOT_FOUND \"User with id:1does not exist.\"", exception.getMessage());
 
@@ -342,8 +339,9 @@ public class UserServiceTest {
                 null
         );
 
-        User existingUser = new User("keycloak-123", "test@gmail.com", "testusername", existingProfile, null);
-        when(userRepository.findUserById(existingUser.getId())).thenReturn(existingUser);
+        Optional<User> optionalExistingUser = Optional.of(new User("keycloak-123", "test@gmail.com", "testusername", existingProfile, null));
+        User existingUser = optionalExistingUser.get();
+        when(userRepository.findUserById(existingUser.getId())).thenReturn(optionalExistingUser);
         existingUser.getProfile().setDateOfBirth(profileRequest.dateOfBirth());
         when(userRepository.save(existingUser)).thenReturn(existingUser);
         when(keycloakApiClient.updateUser(existingUser.getKeycloakId(), new KeycloakRequest(
@@ -363,12 +361,12 @@ public class UserServiceTest {
 
     @Test
     public void patchUserProfileShouldThrowUserNotFound() {
-        ProfileRequest profileRequest = new ProfileRequest("John", null, null, null, null ,null , null, null);
+        ProfileRequest profileRequest = new ProfileRequest("John", null, null, null, null, null, null, null);
 
-        when(userRepository.findUserById("1")).thenReturn(null);
+        when(userRepository.findUserById("1")).thenReturn(Optional.empty());
 
         UserDoesNotExistException exception = Assertions.assertThrows(UserDoesNotExistException.class,
-                ()-> userService.patchUserProfile("1", profileRequest) );
+                () -> userService.patchUserProfile("1", profileRequest));
 
         Assertions.assertEquals("404 NOT_FOUND \"User with id:1does not exist.\"", exception.getMessage());
 

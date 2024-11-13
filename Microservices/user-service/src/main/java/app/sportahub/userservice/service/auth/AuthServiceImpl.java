@@ -7,6 +7,7 @@ import app.sportahub.userservice.dto.request.auth.RegistrationRequest;
 import app.sportahub.userservice.dto.request.user.keycloak.KeycloakRequest;
 import app.sportahub.userservice.dto.response.auth.LoginResponse;
 import app.sportahub.userservice.dto.response.auth.TokenResponse;
+import app.sportahub.userservice.exception.user.InvalidCredentialsException;
 import app.sportahub.userservice.exception.user.UserEmailAlreadyExistsException;
 import app.sportahub.userservice.exception.user.UsernameAlreadyExistsException;
 import app.sportahub.userservice.model.user.User;
@@ -34,13 +35,13 @@ public class AuthServiceImpl implements AuthService {
     @SneakyThrows
     @Override
     public User registerUser(RegistrationRequest userRequest) {
-        Optional<User> optionalUserByEmail = Optional.ofNullable(userRepository.findUserByEmail(userRequest.email()));
+        Optional<User> optionalUserByEmail = userRepository.findUserByEmail(userRequest.email());
+
         if (optionalUserByEmail.isPresent()) {
             throw new UserEmailAlreadyExistsException(userRequest.email());
         }
 
-        Optional<User> optionalUserByUsername = Optional
-                .ofNullable(userRepository.findUserByUsername(userRequest.username()));
+        Optional<User> optionalUserByUsername = userRepository.findUserByUsername(userRequest.username());
         if (optionalUserByUsername.isPresent()) {
             throw new UsernameAlreadyExistsException(userRequest.username());
         }
@@ -72,7 +73,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public LoginResponse loginUser(LoginRequest loginRequest) {
-        User user = userRepository.findUserByEmailOrUsername(loginRequest.identifier(), loginRequest.identifier());
+        User user = userRepository.findUserByEmail(loginRequest.identifier())
+                .or(() -> userRepository.findUserByUsername(loginRequest.identifier()))
+                .orElseThrow(InvalidCredentialsException::new);
 
         TokenResponse tokenResponse = Mono.from(keycloakApiClient.login(loginRequest.identifier(), loginRequest.password())).map(jsonNode -> {
             String accessToken = jsonNode.get("access_token").asText();

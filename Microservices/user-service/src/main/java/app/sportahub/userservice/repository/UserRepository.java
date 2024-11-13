@@ -4,14 +4,14 @@ import app.sportahub.userservice.model.user.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface UserRepository extends MongoRepository<User, String> {
 
-    User findUserById(String id);
+    Optional<User> findUserById(String id);
 
-    User findUserByEmail(String email);
+    Optional<User> findUserByEmail(String email);
 
-    User findUserByUsername(String username);
-
-    User findUserByEmailOrUsername(String email, String username);
+    Optional<User> findUserByUsername(String username);
 }

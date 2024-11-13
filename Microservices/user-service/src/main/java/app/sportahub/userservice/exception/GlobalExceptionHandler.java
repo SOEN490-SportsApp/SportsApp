@@ -1,5 +1,6 @@
 package app.sportahub.userservice.exception;
 
+import app.sportahub.userservice.exception.user.InvalidCredentialsException;
 import app.sportahub.userservice.exception.user.UserDoesNotExistException;
 import app.sportahub.userservice.exception.user.UserEmailAlreadyExistsException;
 import app.sportahub.userservice.exception.user.keycloak.KeycloakCommunicationException;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,8 +49,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(ex.getStatusCode()).body(response);
     }
 
-    @ExceptionHandler(KeycloakCommunicationException.class)
-    public ResponseEntity<Map<String, Object>> handleKeycloakCommunicationException(KeycloakCommunicationException ex) {
+    @ExceptionHandler({KeycloakCommunicationException.class, InvalidCredentialsException.class})
+    public ResponseEntity<Map<String, Object>> handleKeycloakAndLoginExceptions(ResponseStatusException ex) {
         Map<String, Object> response = new HashMap<>();
         response.put("error", ex.getReason());
         response.put("status", ex.getStatusCode().value());

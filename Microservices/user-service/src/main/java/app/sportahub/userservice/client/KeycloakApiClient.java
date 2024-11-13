@@ -411,16 +411,20 @@ public class KeycloakApiClient {
                             errorBody.get("errorMessage").asText() :
                             errorBody.has("error") ?
                                     errorBody.get("error").asText() : "Unknown error";
+                    String errorDescription = errorBody.has("error_description") ?
+                            errorBody.get("error_description").asText() : "No description";
 
-                    log.error("Error response from Keycloak: Status {}, Error: {}", response.statusCode(), errorMsg);
+                    String combinedError = String.format("%s: %s", errorMsg, errorDescription);
+
+                    log.error("Error response from Keycloak: Status {}, Error: {}",
+                            response.statusCode(), combinedError);
 
                     HttpStatus statusCode = HttpStatus.resolve(response.statusCode().value());
-
                     if (statusCode == null) {
                         statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
                     }
 
-                    return Mono.error(new KeycloakCommunicationException(statusCode, errorMsg));
+                    return Mono.error(new KeycloakCommunicationException(statusCode, combinedError));
                 });
     }
 }
