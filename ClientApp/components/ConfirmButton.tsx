@@ -1,7 +1,8 @@
 import React from 'react';
-import { TouchableOpacity, Text, View } from 'react-native';
+import { TouchableOpacity, Text, View, StyleSheet } from 'react-native';
 import { IconPlacement } from '@/utils/constants/enums';
 import themeColors from '@/utils/constants/colors';
+import { hs, vs, mhs } from '@/utils/helpers/uiScaler';
 
 interface CustomButtonProps {
   icon: React.ReactNode | null;
@@ -13,17 +14,42 @@ interface CustomButtonProps {
 const ConfirmButton: React.FC<CustomButtonProps> = ({ icon, text, onPress, iconPlacement }) => {
   return (
     <TouchableOpacity
-      className="p-5 rounded-3xl items-center mb-4 shadow-slate-500"
       onPress={onPress}
-      style={{ backgroundColor: themeColors.button.primaryBackground }}
+      style={styles.button}
     >
-      <View className="flex-row items-center">
+      <View style={styles.content}>
         {iconPlacement === IconPlacement.left && icon}
-        <Text className="font-bold ml-2" style={{ fontSize: 20, color: '#fff' }}>{text}</Text>
+        <Text style={styles.text}>{text}</Text>
         {iconPlacement === IconPlacement.right && icon}
       </View>
     </TouchableOpacity>
   );
 };
+
+const styles = StyleSheet.create({
+  button: {
+    backgroundColor: themeColors.button.primaryBackground,
+    height: vs(50),
+    borderRadius: mhs(25),
+    alignItems: 'center',
+    justifyContent: "center",
+    marginBottom: vs(16),
+    shadowColor: '#475569',
+    shadowOffset: { width: 0, height: vs(2) },
+    shadowOpacity: 0.25,
+    shadowRadius: hs(4),
+    minHeight: 40
+  },
+  content: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  text: {
+    fontWeight: 'bold',
+    fontSize: vs(18),
+    color: themeColors.text.light,
+    paddingLeft: 6
+  },
+});
 
 export default ConfirmButton;
