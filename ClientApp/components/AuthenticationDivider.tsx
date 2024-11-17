@@ -1,5 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { hs, vs, mhs } from '@/utils/helpers/uiScaler';
+import themeColors from '@/utils/constants/colors';
 
 interface AuthenticationDividerProps {
   text: string;
@@ -19,7 +21,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 2,
+    marginVertical: vs(2),
   },
   line: {
     flex: 1,
@@ -27,8 +29,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#ccc',
   },
   text: {
-    marginHorizontal: 10,
-    color: 'black',
+    marginHorizontal: hs(10),
+    color: themeColors.text.dark,
+    fontSize: mhs(14),
   },
 });
 
