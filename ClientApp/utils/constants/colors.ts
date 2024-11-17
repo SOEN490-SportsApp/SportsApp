@@ -10,8 +10,8 @@ const themeColors = {
     },
   
     text: {
-      primary: "#333333",      // Dark text for readability on light backgrounds
-      secondary: "#666666",    // Grey text for less emphasized text
+      dark: "#333333",      // Dark text for readability on light backgrounds
+      grey: "#666666",    // Grey text for less emphasized text
       light: "#FFFFFF",        // Light text for buttons or dark backgrounds
     },
   
@@ -19,6 +19,10 @@ const themeColors = {
       primaryBackground: "#0C9E04",   // Primary button background color
       secondaryBackground: "#0278A0", // Secondary button background color
       text: "#FFFFFF",               // Button text color
+    },
+
+    inputContainer: {
+      backgroundColor: "#F2F2F2",
     },
   
     success: "#28A745",         // Success messages or icons (green shade)
