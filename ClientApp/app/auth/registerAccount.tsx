@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Alert, TouchableOpacity } from "react-native";
+import { View, Text, TextInput, Alert, TouchableOpacity, StyleSheet } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Checkbox from 'expo-checkbox';
@@ -9,6 +9,8 @@ import AuthenticationDivider from "@/components/AuthenticationDivider";
 import { IconPlacement } from '@/utils/constants/enums';
 import axiosInstance from "@/api/axiosInstance";
 import { API_ENDPOINTS } from "@/utils/api/endpoints";
+import { hs, mhs, mvs, vs } from "@/utils/helpers/uiScaler";
+import themeColors from "@/utils/constants/colors";
 
 interface RegisterAccountPageFormData {
   username: string;
@@ -36,7 +38,6 @@ const RegisterAccountPage: React.FC = () => {
       return;
     }
 
-    // result is of type RegisteredUserResponse
     const result = await registerUser({
       email: data.email,
       username: data.username,
@@ -53,12 +54,11 @@ const RegisterAccountPage: React.FC = () => {
   };
 
   interface RegisteredUserResponse {
-    success: boolean; 
-    data?: {id: string, email: string, username: string}; // this might be an issue
+    success: boolean;
+    data?: { id: string, email: string, username: string };
     error?: any;
   }
-  
-  // asysnc function that does the api call
+
   const registerUser = async (data: any): Promise<RegisteredUserResponse> => {
     try {
       const response = await axiosInstance.post(API_ENDPOINTS.REGISTER, data);
@@ -78,10 +78,9 @@ const RegisterAccountPage: React.FC = () => {
       }
     } catch (error) {
       console.error("Registration error:", error);
-      
-      // return error if it's an instance of Error
-      if (error instanceof Error){
-        return {success: false, error: error.message}
+
+      if (error instanceof Error) {
+        return { success: false, error: error.message }
       } else {
         return { success: false, error: "Failed to create account." }; //this should not be needed
       }
@@ -89,22 +88,22 @@ const RegisterAccountPage: React.FC = () => {
   };
 
   return (
-    <View className="flex-1 justify-between p-5 bg-white pt-52 pr-12 pl-12 pb-8">
-      <View>
-        <Text className="text-3xl font-bold text-center mb-5">Create an Account</Text>
+    <View style={styles.container}>
+      <View style={styles.mainContent}>
+        <Text style={styles.title}>Create an Account</Text>
 
-        <View className="h-28" />
+        <View style={{height: vs(112)}} />
 
         {/* Username Field */}
-        <View className="flex-row items-center bg-gray-100 rounded-3xl p-2 pl-4 min-h-16">
-          <MaterialCommunityIcons name="account" size={20} color="#aaa" />
+        <View style={styles.inputContainer}>
+          <MaterialCommunityIcons name="account" size={mvs(20)} color="#aaa" />
           <Controller
             control={control}
             name="username"
             rules={{ required: "Username is required" }}
             render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
-                className="flex-1 ml-2 text-lg h-full"
+                style={styles.input}
                 placeholder="Username"
                 onBlur={onBlur}
                 onChangeText={onChange}
@@ -113,13 +112,13 @@ const RegisterAccountPage: React.FC = () => {
             )}
           />
         </View>
-        {errors.username && <Text className="text-red-500 text-xs mb-2">{errors.username.message}</Text>}
+        {errors.username && <Text style={styles.errorText}>{errors.username.message}</Text>}
 
-        <View className="h-4" />
+        <View style={styles.spacing} />
 
         {/* Email Field */}
-        <View className="flex-row items-center bg-gray-100 rounded-3xl p-2 pl-4 min-h-16">
-          <MaterialCommunityIcons name="email" size={20} color="#aaa" />
+        <View style={styles.inputContainer}>
+          <MaterialCommunityIcons name="email" size={mvs(20)} color="#aaa" />
           <Controller
             control={control}
             name="email"
@@ -129,7 +128,7 @@ const RegisterAccountPage: React.FC = () => {
             }}
             render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
-                className="flex-1 ml-2 text-lg h-full"
+                style={styles.input}
                 placeholder="Email"
                 onBlur={onBlur}
                 onChangeText={onChange}
@@ -140,31 +139,34 @@ const RegisterAccountPage: React.FC = () => {
             )}
           />
         </View>
-        {errors.email && <Text className="text-red-500 text-xs mb-2">{errors.email.message}</Text>}
+        {errors.email && <Text style={styles.errorText}>{errors.email.message}</Text>}
 
-        <View className="h-4" />
+        <View style={styles.spacing} />
 
         {/* Password Field */}
-        <View className="flex-row items-center bg-gray-100 rounded-3xl p-2 pl-4 min-h-16">
+        <View style={styles.inputContainer}>
           <MaterialCommunityIcons name="lock" size={20} color="#aaa" />
           <Controller
             control={control}
             name="password"
             rules={{ required: "Password is required", minLength: { value: 6, message: "Minimum 6 characters" } }}
             render={({ field: { onChange, onBlur, value } }) => (
-              <View className="flex-1">
+              <View style={styles.passwordContainer}>
                 <TextInput
-                  className="text-lg ml-2"
+                  style={styles.input}
                   placeholder="Password"
                   onBlur={onBlur}
                   onChangeText={onChange}
                   value={value}
                   secureTextEntry={!showPassword}
                 />
-                <TouchableOpacity onPress={() => { setShowPassword(prevState => !prevState) }} className="absolute right-2">
+                <TouchableOpacity
+                  onPress={() => setShowPassword(prevState => !prevState)}
+                  style={styles.eyeIcon}
+                >
                   <MaterialCommunityIcons
                     name={showPassword ? "eye" : "eye-off"}
-                    size={24}
+                    size={mvs(20)}
                     color="#aaa"
                   />
                 </TouchableOpacity>
@@ -172,31 +174,34 @@ const RegisterAccountPage: React.FC = () => {
             )}
           />
         </View>
-        {errors.password && <Text className="text-red-500 text-xs mb-2">{errors.password.message}</Text>}
+        {errors.password && <Text style={styles.errorText}>{errors.password.message}</Text>}
 
-        <View className="h-4" />
+        <View style={styles.spacing} />
 
-         {/* Confirm Password Field */}
-         <View className="flex-row items-center bg-gray-100 rounded-3xl p-2 pl-4 min-h-16">
-          <MaterialCommunityIcons name="lock" size={20} color="#aaa" />
+        {/* Confirm Password Field */}
+        <View style={styles.inputContainer}>
+          <MaterialCommunityIcons name="lock" size={mvs(20)} color="#aaa" />
           <Controller
             control={control}
             name="confirmPassword"
             rules={{ required: "Please confirm your password" }}
             render={({ field: { onChange, onBlur, value } }) => (
-              <View className="flex-1">
+              <View style={styles.passwordContainer}>
                 <TextInput
-                  className="text-lg ml-2"
+                  style={styles.input}
                   placeholder="Confirm Password"
                   onBlur={onBlur}
                   onChangeText={onChange}
                   value={value}
                   secureTextEntry={!showConfirmPassword}
                 />
-                <TouchableOpacity onPress={() => setShowConfirmPassword(prevState => !prevState)} className="absolute right-2">
+                <TouchableOpacity
+                  onPress={() => setShowPassword((prev) => !prev)}
+                  style={styles.eyeIcon}
+                >
                   <MaterialCommunityIcons
-                    name={showConfirmPassword ? "eye" : "eye-off"}
-                    size={24}
+                    name={showPassword ? "eye" : "eye-off"}
+                    size={mvs(20)}
                     color="#aaa"
                   />
                 </TouchableOpacity>
@@ -204,25 +209,27 @@ const RegisterAccountPage: React.FC = () => {
             )}
           />
         </View>
-        {errors.confirmPassword && <Text className="text-red-500 text-xs mb-2">{errors.confirmPassword.message}</Text>}
+        {errors.confirmPassword && <Text style={styles.errorText}>{errors.confirmPassword.message}</Text>}
 
-        <View className="h-2" />
+        <View style={{ height: vs(4) }} />
 
         {/* Terms and Conditions Checkbox */}
-        <View className="flex-row items-center mb-4">
+        <View style={styles.checkboxContainer}>
           <Checkbox
+            style={{height: mvs(15), width: mvs(15)}}
+
             testID="agreeToTermsCheckbox"
             value={watch("agreeToTerms")}
             onValueChange={(value) => setValue("agreeToTerms", value)}
           />
           {/* TODO: Are we going to have terms? If so we need to write them up. */}
-          <Text className="ml-2 text-gray-600 text-xs">
+          <Text style={styles.termsText}>
             By continuing you accept our{" "}
-            <Text className="text-blue-600 underline">Privacy Policy</Text> and <Text className="text-blue-600 underline">Terms of Use</Text>
+            <Text style={styles.linkText}>Privacy Policy</Text> and <Text style={styles.linkText}>Terms of Use</Text>
           </Text>
         </View>
 
-        <View className="h-16" />
+        <View style={{height: vs(60)}} />
 
         {/* Confirm Button */}
         <ConfirmButton
@@ -232,19 +239,106 @@ const RegisterAccountPage: React.FC = () => {
           iconPlacement={IconPlacement.left}
         />
 
-        <AuthenticationDivider text="Or"/>
+        <AuthenticationDivider text="Or" />
       </View>
 
       {/* Back to Login */}
-      <TouchableOpacity onPress={() => router.back()}>
-        <Text className="text-center text-gray-600">
-          Already have an account?{" "}
-          <Text className="font-bold" style={{ color: '#0C9E04' }}>Login</Text>
-        </Text>
-      </TouchableOpacity>
-
+      <View style={styles.loginContainer}>
+        <TouchableOpacity onPress={() => router.replace("/auth/login")}>
+          <Text style={styles.loginText}>
+            Already have an account?{" "}
+            <Text style={styles.loginNowText}>Login</Text>
+          </Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
 
 export default RegisterAccountPage;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    flexGrow: 1,
+    flexShrink: 0,
+    justifyContent: 'space-between',
+    backgroundColor: themeColors.background.light,
+    height: "100%",
+    minHeight: vs(700)
+  },
+  mainContent: {
+    flex: 1,
+    paddingTop: vs(120),
+    paddingHorizontal: hs(48),
+    paddingBottom: vs(32),
+  },
+  title: {
+    fontSize: mvs(28),
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: themeColors.inputContainer.backgroundColor,
+    borderRadius: 25,
+    padding: hs(8),
+    paddingLeft: hs(16),
+    height: vs(52),
+    minHeight: vs(48),
+  },
+  input: {
+    flex: 1,
+    marginLeft: hs(8),
+    fontSize: mhs(15),
+  },
+  passwordContainer: {
+    flex: 1,
+    flexGrow: 1,
+    flexShrink: 0,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  eyeIcon: {
+    position: "absolute",
+    right: hs(12),
+  },
+  errorText: {
+    color: themeColors.text.error,
+    fontSize: mhs(12),
+    marginBottom: vs(8),
+  },
+  spacing: {
+    height: mvs(8),
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: mvs(16),
+  },
+  termsText: {
+    marginLeft: hs(8),
+    color: themeColors.text.grey,
+    fontSize: mvs(10),
+  },
+  linkText: {
+    color: themeColors.text.link,
+    textDecorationLine: 'underline',
+  },
+  loginContainer: {
+    position: "absolute",
+    bottom: vs(12),
+    alignSelf: "center",
+  },
+  loginText: {
+    fontSize: mhs(12),
+    textAlign: "center",
+    color: themeColors.text.grey,
+  },
+  loginNowText: {
+    fontWeight: "bold",
+    color: themeColors.primary,
+  },
+
+});
