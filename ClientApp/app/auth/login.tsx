@@ -102,9 +102,7 @@ const LoginPage: React.FC = () => {
               )}
             />
           </View>
-          {errors.password && (
-            <Text style={styles.errorText}>{errors.password.message}</Text>
-          )}
+          {errors.password && (<Text style={styles.errorText}>{errors.password.message}</Text>)}
 
           <TouchableOpacity>
             <Text style={styles.forgotPasswordText}>
@@ -201,7 +199,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: themeColors.inputContainer.backgroundColor,
-    borderRadius: mhs(25),
+    borderRadius: 25,
     padding: hs(8),
     paddingLeft: hs(16),
     height: vs(52),
@@ -218,7 +216,7 @@ const styles = StyleSheet.create({
     fontSize: mhs(15),
   },
   errorText: {
-    color: "#ff3333",
+    color: themeColors.text.error,
     fontSize: mhs(12),
     marginBottom: vs(8),
   },
@@ -231,7 +229,7 @@ const styles = StyleSheet.create({
   },
   forgotPasswordText: {
     textAlign: "center",
-    color: "blue",
+    color: themeColors.text.link,
     textDecorationLine: "underline",
     marginTop: vs(6),
   },
@@ -263,10 +261,10 @@ const styles = StyleSheet.create({
   registerText: {
     fontSize: mhs(12),
     textAlign: "center",
-    color: "#666666",
+    color: themeColors.text.grey,
   },
   registerNowText: {
     fontWeight: "bold",
-    color: "#0C9E04",
+    color: themeColors.primary,
   },
 });

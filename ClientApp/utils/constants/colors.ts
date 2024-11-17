@@ -13,6 +13,8 @@ const themeColors = {
       dark: "#333333",      // Dark text for readability on light backgrounds
       grey: "#666666",    // Grey text for less emphasized text
       light: "#FFFFFF",        // Light text for buttons or dark backgrounds
+      error: "#ff3333",
+      link: "blue",
     },
   
     button: {
