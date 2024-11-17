@@ -13,12 +13,14 @@ jest.setTimeout(15000);
 
 describe('Login Screen', () => {
     const mockPush = jest.fn();
+    const mockReplace = jest.fn();
 
     beforeEach(() => {
         jest.spyOn(Alert, 'alert').mockClear();
         jest.clearAllMocks();
         (useRouter as jest.Mock).mockReturnValue({
             push: mockPush,
+            replace: mockReplace,
         });
     });
 
@@ -50,7 +52,7 @@ describe('Login Screen', () => {
         fireEvent.press(getByText('Register Now'));
 
         await waitFor(() => {
-            expect(mockPush).toHaveBeenCalledWith('/auth/registerAccount');
+            expect(mockReplace).toHaveBeenCalledWith('/auth/registerAccount');
         });
     });
 });
