@@ -6,7 +6,7 @@
 import axiosInstance from '../../api/axiosInstance';
 import MockAdapter from 'axios-mock-adapter'; //used to mock the axios instance
 import AsyncStorage from "@react-native-async-storage/async-storage/jest/async-storage-mock"; //mock AsyncStorage for token storage mocking
-import { showAlert } from '../../utils/api/errorHandlers'; // Import showAlert function for testing
+import { consoleError } from '../../utils/api/errorHandlers'; // Import showAlert function for testing
 import { API_ENDPOINTS } from '@/utils/api/endpoints';
 
 jest.mock('../../utils/api/errorHandlers'); // Mock showAlert for testing alert calls
@@ -25,49 +25,50 @@ describe('axiosInstance', () => {
   });
 
   it('should add Authorization header if access token is available', async () => {
-    await AsyncStorage.setItem('access_token', 'testAccessToken');
+    await AsyncStorage.setItem('accessToken', 'testAccessToken');
     mock.onGet('/test-endpoint').reply(200, { data: 'response data' }); // Mock a successful response
 
     const response = await axiosInstance.get('/test-endpoint'); // Make a request to the mock endpoint
     
     expect(response.data).toEqual({ data: 'response data' }); // Check if the response data is correct
-    expect(mock.history.get?.[0]?.headers?.Authorization).toBe('Bearer testAccessToken'); // Check if the Authorization header is set correctly
+    expect(mock.history.get[0].headers?.Authorization).toBe('Bearer testAccessToken'); // Check if the Authorization header is set correctly
   });
 
-  it('should handle 401 Unauthorized and refresh token', async () => {
-    // Set up an expired access token and a valid refresh token in AsyncStorage
-    
-    // Store an expired access token in AsyncStorage (expired on November 3rd, 2024)
-    await AsyncStorage.setItem('access_token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJleHAiOjE3MzA2Nzg5Nzd9.n1eJF7SKuP7MtofH8JsytaNMHbBnE6zt1UkbMCxblOU');
+  it('should handle 401 Unauthorized, refresh the token, and retry the request', async () => {
+    // Set up the initial expired access token and valid refresh token in AsyncStorage
+    const expiredAccessToken ='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNjcwNjc4MDAwLCJleHAiOjE2NzA2NzgwMDB9.INVALID';
+    const validRefreshToken ='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNjcwNjc4MDAwLCJleHAiOjI3MzA3NzkwMDB9.VALID';
 
-    // Store a refresh token with a future expiry date (expires on July 14, 2056)
-    await AsyncStorage.setItem('refresh_token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJleHAiOjI3MzA3NzkwMDB9.0uH6qCX4VP1becEdC66G89zHX2SswEc94bJuyMVqHUA');
+    await AsyncStorage.setItem('accessToken', expiredAccessToken);
+    await AsyncStorage.setItem('refreshToken', validRefreshToken);
 
-    // Mock the first GET request to return a 401 Unauthorized error
-    mock.onGet('/test-endpoint').replyOnce(401, { code: 'token_not_valid' });
+    // Mock the API call to return a 401 Unauthorized
+    mock.onGet('/test-endpoint').replyOnce(401, { message: 'Token expired' });
 
     // Mock the token refresh endpoint to return a new access token
+    const newAccessToken ='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNjcwNjc4MDAwLCJleHAiOjM3MzA3NzkwMDB9.NEW';
+    
     mock.onPost(API_ENDPOINTS.REFRESH_TOKEN).reply(200, {
-        access: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJleHAiOjI3MzA3NzkwMDB9.0uH6qCX4VP1becEdC66G89zHX2SswEc94bJuyMVqHUA'
+      accessToken: newAccessToken,
+      refreshToken: validRefreshToken,
     });
 
-    // Mock a successful response for the retried GET request after the token refresh
-    mock.onGet('/test-endpoint').reply(200, { data: 'refreshed data' });
+    // Mock the retried API call after refreshing the token to return success
+    mock.onGet('/test-endpoint').replyOnce(200, { data: 'Refreshed Data' });
 
-    // Make the initial request, which will trigger a 401, then refresh the token, and finally retry with the new token.
+    // Make the API call
     const response = await axiosInstance.get('/test-endpoint');
-    
-    // Check that the response data is as expected
-    expect(response.data).toEqual({ data: 'refreshed data' }); 
-    
-    // Verify that the new access token has been stored in AsyncStorage
-    expect(await AsyncStorage.getItem('access_token')).toBe(
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJleHAiOjI3MzA3NzkwMDB9.0uH6qCX4VP1becEdC66G89zHX2SswEc94bJuyMVqHUA'
-    );
 
-    // Verify that the Authorization header in the retried request contains the new access token
-    expect(mock.history.get?.[1]?.headers?.Authorization).toBe('Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJleHAiOjI3MzA3NzkwMDB9.0uH6qCX4VP1becEdC66G89zHX2SswEc94bJuyMVqHUA');
-});
+    // Assertions
+    expect(response.data).toEqual({ data: 'Refreshed Data' });
+
+    // Check if the new access token was stored
+    const storedAccessToken = await AsyncStorage.getItem('accessToken');
+    expect(storedAccessToken).toBe(newAccessToken);
+
+    // Verify the Authorization header of the retried request contains the new access token
+    expect(mock.history.get[1].headers?.Authorization).toBe(`Bearer ${newAccessToken}`);
+  });
 
 
   it('should show alert for network error', async () => {
@@ -76,9 +77,9 @@ describe('axiosInstance', () => {
 
     await axiosInstance.get('/test-endpoint').catch(() => {});
 
-    expect(showAlert).toHaveBeenCalledWith(
+    expect(consoleError).toHaveBeenCalledWith(
       'Network Error',
-      'Please check your connection or server status.'
+      'Please check your internet connection or server status.'
     );
   });
 
@@ -88,9 +89,9 @@ describe('axiosInstance', () => {
 
     await axiosInstance.get('/test-endpoint').catch(() => {});
 
-    expect(showAlert).toHaveBeenCalledWith(
-      'Error',
-      'Requested resource not found.'
+    expect(consoleError).toHaveBeenCalledWith(
+      'Resource Not Found',
+      'The requested resource was not found on the server.' , 404
     );
   });
 
@@ -100,9 +101,43 @@ describe('axiosInstance', () => {
 
     await axiosInstance.get('/test-endpoint').catch(() => {});
 
-    expect(showAlert).toHaveBeenCalledWith(
-      'Server Error',
-      'Something went wrong. Please try again later.'
+    expect(consoleError).toHaveBeenCalledWith(
+      'Internal Server Error',
+      'An error occurred on the server. Please try again later.', 500
+    );
+  });
+
+  it('should show alert for 409 Conflict', async () => {
+    // Mock a 409 Internal Server Error
+    mock.onGet('/test-endpoint').reply(409);
+
+    await axiosInstance.get('/test-endpoint').catch(() => {});
+
+    expect(consoleError).toHaveBeenCalledWith(
+      'Conflict',
+      'The request could not be completed due to a conflict with the current state of the resource.', 409
+    );
+  });
+  it('should show alert for 503 Server Error', async () => {
+    // Mock a 503 Internal Server Error
+    mock.onGet('/test-endpoint').reply(503);
+
+    await axiosInstance.get('/test-endpoint').catch(() => {});
+
+    expect(consoleError).toHaveBeenCalledWith(
+      'Service Unavailable',
+      'The server is currently unavailable. Please try again later.', 503
+    );
+  });
+  it('should show alert for 530 Server Error', async () => {
+    // Mock a 503 Internal Server Error
+    mock.onGet('/test-endpoint').reply(530);
+
+    await axiosInstance.get('/test-endpoint').catch(() => {});
+
+    expect(consoleError).toHaveBeenCalledWith(
+      'Service Unreachable',
+      'The server is currently unreachable due to DNS issues. Please try again later.'
     );
   });
 });

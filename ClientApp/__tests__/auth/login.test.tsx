@@ -3,6 +3,7 @@ import { Alert } from 'react-native';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
 import LoginPage from '@/app/auth/login';
 import { useRouter } from 'expo-router';
+import { AuthProvider } from '@/utils/context/AuthContext';
 
 // mock router to prevent navigation errors in tests
 jest.mock('expo-router', () => ({
@@ -25,7 +26,11 @@ describe('Login Screen', () => {
     });
 
     it('shows an error when required fields are empty', async () => {
-        const { getByText } = render(<LoginPage />);
+        const { getByText } = render(
+        <AuthProvider>
+           <LoginPage /> 
+        </AuthProvider>
+        );
 
         fireEvent.press(getByText('Login'));
 
@@ -34,7 +39,11 @@ describe('Login Screen', () => {
     });
 
     it('calls login function when valid data is entered', async () => {
-        const { getByPlaceholderText, getByText } = render(<LoginPage />);
+        const { getByPlaceholderText, getByText } = render(
+            <AuthProvider>
+               <LoginPage /> 
+            </AuthProvider>
+            );
 
         fireEvent.changeText(getByPlaceholderText('Email/username'), 'testuser@example.com');
         fireEvent.changeText(getByPlaceholderText('Password'), 'testPassword');
@@ -47,7 +56,11 @@ describe('Login Screen', () => {
     });
 
     it('navigates to registration page when "Register Now" is pressed', async () => {
-        const { getByText } = render(<LoginPage />);
+        const { getByText } = render(
+            <AuthProvider>
+               <LoginPage /> 
+            </AuthProvider>
+            );
 
         fireEvent.press(getByText('Register Now'));
 
