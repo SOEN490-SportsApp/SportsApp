@@ -92,7 +92,7 @@ const RegisterAccountPage: React.FC = () => {
       <View style={styles.mainContent}>
         <Text style={styles.title}>Create an Account</Text>
 
-        <View style={{height: vs(112)}} />
+        <View style={{height: mvs(80)}} />
 
         {/* Username Field */}
         <View style={styles.inputContainer}>
