@@ -28,41 +28,37 @@ const RegisterAccountPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const onSubmit = async (data: RegisterAccountPageFormData) => {
-    if (!data.agreeToTerms) {
-      Alert.alert("", "You must agree to the terms to continue.");
-      return;
-    }
-    if (data.password !== data.confirmPassword) {
-      Alert.alert("Oh oh!", "Passwords do not match.");
-      return;
-    }
+  interface RegisteredUserResponse {
+    success: boolean; 
+    data?: {id: string, email: string, username: string}; // this might be an issue
+    error?: string;
+  }
 
-    const result = await registerUser({
+  const onSubmit = async (data: RegisterAccountPageFormData) => {
+    if (!data.agreeToTerms) {Alert.alert("", "You must agree to the terms to continue."); return;}
+    if (data.password !== data.confirmPassword) {Alert.alert("Oh oh!", "Passwords do not match.");return;}
+
+
+    // make the registration api call
+    const registrationResult = await registerUser({
       email: data.email,
       username: data.username,
       password: data.password,
     });
 
-    if (result.success) {
+    if (registrationResult.success) {
       Alert.alert("Success", "Account created successfully!");
-      console.log("User info: ", result.data);
+      console.log("User info: ", registrationResult.data);
       router.push('/auth/registerProfile');
     } else {
       Alert.alert("Error", "Failed to create account.");
     }
   };
 
-  interface RegisteredUserResponse {
-    success: boolean;
-    data?: { id: string, email: string, username: string };
-    error?: any;
-  }
-
   const registerUser = async (data: any): Promise<RegisteredUserResponse> => {
     try {
       const response = await axiosInstance.post(API_ENDPOINTS.REGISTER, data);
-      if (response.status === 201) {
+      if (response.status === 201 || response.status === 200) {
 
         console.log("User created successfully:", response.data);
         return {
@@ -72,18 +68,20 @@ const RegisterAccountPage: React.FC = () => {
             email: response.data.email,
             username: response.data.username,
           },
+          error: "No Error!",
         };
       } else {
-        return { success: false, error: "Unexpected response status." };
+        return { success: false, error: response.data.error || "Failed to create account." };
       }
     } catch (error) {
       console.error("Registration error:", error);
 
       if (error instanceof Error) {
         return { success: false, error: error.message }
-      } else {
-        return { success: false, error: "Failed to create account." }; //this should not be needed
-      }
+      } 
+      
+      return { success: false, error: "Failed to create account." }; //this should not be needed
+      
     }
   };
 
