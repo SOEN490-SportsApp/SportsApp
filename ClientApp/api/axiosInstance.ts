@@ -10,7 +10,7 @@
 
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { showAlert, ALERT_MESSAGES } from '../utils/api/errorHandlers';
+import { consoleError, ALERT_MESSAGES } from '../utils/api/errorHandlers';
 import { API_ENDPOINTS } from '@/utils/api/endpoints';
 
 
@@ -29,71 +29,46 @@ const config: AxiosRequestConfig = {
 // *************************************
 
 // getter functions to get the tokens from AsyncStorage
-// 1- getAccessToken function to retrieve the access token from AsyncStorage
-const getAccessToken = async (): Promise<string | null> => {
-  return await AsyncStorage.getItem('access_token');
-};
+export const getAccessToken = async (): Promise<string | null> => await AsyncStorage.getItem('accessToken');
+export const getRefreshToken = async (): Promise<string | null> => await AsyncStorage.getItem('refreshToken');
 
-// 2- setAccessToken function to store the access token in AsyncStorage
-export const setAccessToken = async (token: string) => {
-  await AsyncStorage.setItem('access_token', token);
-};
-
-export const setRefreshToken = async (token: string) => {
-  await AsyncStorage.setItem('refresh_token', token);
-}
-// 3- getRefreshToken function to retrieve the refresh token from AsyncStorage
-const getRefreshToken = async (): Promise<string | null> => {
-  return await AsyncStorage.getItem('refresh_token');
-};
+// setter functions to store the tokens in AsyncStorage
+export const setAccessToken = async (token: string): Promise<void> => await AsyncStorage.setItem('accessToken', token);
+export const setRefreshToken = async (token: string) => {await AsyncStorage.setItem('refresh_token', token);}
 
 // setter function that will potentially request a new access token using the refresh token
-// 1- refreshAccessToken function to get a new access token using the refresh token
 const refreshAccessToken = async (): Promise<string | null> => {
-  // Get the refresh token from AsyncStorage
   const refreshToken = await getRefreshToken();
-  // Check if the refresh token exists
-  if (refreshToken) {
 
-    // Decode the refresh token to get the expiration time
-    const payload = JSON.parse(atob(refreshToken.split('.')[1]));
-    const now = Math.ceil(Date.now() / 1000);
+  // if the refreshToken is not found (logged out manually by user) return null
+  if (!refreshToken) return null;
 
-    // Ensure the refresh token has not expired
-    if (payload.exp > now) {
-      try {
-        // Attempt to refresh the access token
-        const response = await axiosInstance.post(API_ENDPOINTS.REFRESH_TOKEN, { refreshToken: refreshToken });
-        const newAccessToken = response.data.access;
-        await setAccessToken(newAccessToken);
-        return newAccessToken;
-      } catch (error) {
-        // Log the error for debugging purposes
-        if (axios.isAxiosError(error)) {
-          // Network error (no response from server)
-          if (!error.response) {
-            console.error('Network error occurred during token refresh:', error.message);
-          } 
-          // Server error (e.g., 500)
-          else if (error.response.status >= 500) {
-            console.error('Server error occurred during token refresh:', error.response.status);
-          } 
-          // Other client-side errors (e.g., 400 Bad Request)
-          else {
-            console.error('Failed to refresh access token due to client error:', error.response.status, error.response.data);
-          }
-        } else {
-          console.error('Unexpected error occurred during token refresh:', error);
-        }
-        return null;
-      }
-    } else {
-      console.log('Refresh token has expired');
-    }
-  } else {
-    console.log('No refresh token available');
+  //TODO make this isTokenExpired function to check if the token is expired
+  // Decode and check expiration of refresh token
+  const payload = JSON.parse(atob(refreshToken.split('.')[1]));
+  const now = Math.ceil(Date.now() / 1000);
+
+  // if refresh token is expired return null
+  // TODO this should follow up with a ui message to the user to log in again log the user out 
+  // only after figuring out how to logout the user without dependencies
+  if (payload.exp <= now) return null;
+
+  // request a new access token using the refresh token
+  try {
+    const response = await axiosInstance.post(API_ENDPOINTS.REFRESH_TOKEN, { refreshToken });
+    const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response.data;
+    
+    if(newAccessToken && newRefreshToken){
+      console.log(`[${new Date().toLocaleTimeString()}] (axiosInstance refreshAccessToken) Recieved new tokens`);
+    }    
+    
+    setAccessToken(newAccessToken); // Update access token in AsyncStorage
+    setRefreshToken(newRefreshToken); // Update refresh token in storage      
+    return newAccessToken;
+  } catch (error) {
+    console.error('Failed to refresh access token:', error);
+    return null;
   }
-  return null;
 };
 
 
@@ -114,47 +89,64 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response Interceptor for Error Handling
-// ****************************************
 axiosInstance.interceptors.response.use(
   (response: AxiosResponse) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // Network error or server down
     if (!error.response) {
-      showAlert(ALERT_MESSAGES.networkError.title, ALERT_MESSAGES.networkError.message);
-      return Promise.reject(error);
-    }
-
-    // Handle 401 Unauthorized for token refresh failure
-    if (error.response.status === 401 && originalRequest.url === `${config.baseURL}${API_ENDPOINTS.REFRESH_TOKEN}`) {
-      return Promise.reject(error);
-    }
-
-    // Handle 401 Unauthorized due to expired or invalid token
-    if (error.response.status === 401 && error.response.data?.code === 'token_not_valid') { 
-      const newAccessToken = await refreshAccessToken();
-      if (newAccessToken) {
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-        return axiosInstance(originalRequest);  // Retry the original request with new token
-      } else {
-        showAlert(ALERT_MESSAGES.sessionExpired.title, ALERT_MESSAGES.sessionExpired.message);
+      // Network error or no response
+      consoleError(ALERT_MESSAGES.networkError.title, ALERT_MESSAGES.networkError.message);
+    } else {
+      const { status } = error.response;
+      
+      // Specific handling for common HTTP errors, including status code in the message
+      switch (status) {
+        case 400:
+          consoleError(ALERT_MESSAGES.badRequest.title, ALERT_MESSAGES.badRequest.message, status);
+          break;
+        case 401:
+          const newAccessToken = await refreshAccessToken();
+          if (newAccessToken) {
+            originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+            return axiosInstance(originalRequest); // Retry original request
+          } else {
+            consoleError(ALERT_MESSAGES.sessionExpired.title, ALERT_MESSAGES.sessionExpired.message, status);
+            
+            // Logout user
+            // TODO find a way to remove the user id and the authentication status from the context without dependencies
+            await AsyncStorage.removeItem('refreshToken');
+            await AsyncStorage.removeItem('accessToken');
+            console.log(`[${new Date().toLocaleTimeString()}] (axiosInstance) Logout successful`);
+          }
+          break;
+        case 403:
+          consoleError(ALERT_MESSAGES.forbidden.title, ALERT_MESSAGES.forbidden.message, status);
+          break;
+        case 404:
+          consoleError(ALERT_MESSAGES.notFound.title, ALERT_MESSAGES.notFound.message, status);
+          break;
+        case 409:
+          consoleError(ALERT_MESSAGES.conflict.title, ALERT_MESSAGES.conflict.message, status);
+          break;
+        case 500:
+          consoleError(ALERT_MESSAGES.serverError.title, ALERT_MESSAGES.serverError.message, status);
+          break;
+        case 503:
+          consoleError(ALERT_MESSAGES.serviceUnavailable.title, ALERT_MESSAGES.serviceUnavailable.message, status);
+          break;
+        case 530:
+          consoleError(ALERT_MESSAGES.originDnsError.title, ALERT_MESSAGES.originDnsError.message);
+          break;
+        default:
+          // Fallback for any other status code
+          consoleError(ALERT_MESSAGES.defaultError.title, ALERT_MESSAGES.defaultError.message, status);
+          break;
       }
-    }
-
-    // Handle 404 Not Found
-    if (error.response.status === 404) {
-      showAlert(ALERT_MESSAGES.notFound.title, ALERT_MESSAGES.notFound.message);
-    }
-
-    // Handle 500+ Server Errors
-    else if (error.response.status >= 500) {
-      showAlert(ALERT_MESSAGES.serverError.title, ALERT_MESSAGES.serverError.message);
     }
 
     return Promise.reject(error);
   }
-);
+);  
 
 export default axiosInstance;
