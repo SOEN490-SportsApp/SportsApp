@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Alert} from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -8,6 +8,8 @@ import AuthenticationDivider from "@/components/AuthenticationDivider";
 import themeColors from "@/utils/constants/colors";
 import { IconPlacement } from "@/utils/constants/enums";
 import { hs, vs, mvs, mhs } from "@/utils/helpers/uiScaler";
+import { useAuth } from "../../utils/context/AuthContext"; // Import useAuth hook
+
 
 interface LoginPageFormData {
   identifier: string;
@@ -22,10 +24,15 @@ const LoginPage: React.FC = () => {
   } = useForm<LoginPageFormData>();
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+  const { login } = useAuth(); // Use login from AuthContext
 
-  const onSubmit = (data: LoginPageFormData) => {
-    router.push("/(tabs)/home");
-  };
+  const onSubmit = async (data: LoginPageFormData) => {
+    const result = await login(data.identifier, data.password);
+    if (result.success) {
+      router.push('/(tabs)/home'); // Navigate upon successful login
+    } else {
+      Alert.alert("Error", result.error || "Failed to Login.");
+    }  };
 
   return (
     <View style={styles.container}>

@@ -8,34 +8,69 @@
 
 import { Alert } from 'react-native';
 
-//wrapper function for showing alerts
-export const showAlert = (title: string, message: string) => {
+// Wrapper function for logging errors with specific codes and messages to the console
+export const consoleError = (title: string, message: string, code?: number) => {
+  const alertTitle = code ? `${title} ${code}` : title;
+  const alertMessage = code ? `${message}` : message;
+  
+  // Log the error details only in development mode
   if (__DEV__) {
-    // allow showing logs in development mode only
-    console.log(`ALERT: ${title} - ${message}`);
+    console.error(`ERROR: ${alertTitle} - ${alertMessage}`);
   }
-  Alert.alert(title, message);
 };
 
-// Alert messages for different scenarios
+// Centralized messages for various HTTP status codes
 export const ALERT_MESSAGES = {
+  // Common client-side errors
+  badRequest: {
+    title: 'Bad Request',
+    message: 'The server could not understand your request. Please check and try again.',
+  },
+  unauthorized: {
+    title: 'Unauthorized Access',
+    message: 'You are not authorized to access this resource. Please log in.',
+  },
+  forbidden: {
+    title: 'Forbidden',
+    message: 'You do not have permission to view this resource.',
+  },
+  notFound: {
+    title: 'Resource Not Found',
+    message: 'The requested resource was not found on the server.',
+  },
+  conflict: {
+    title: 'Conflict',
+    message: 'The request could not be completed due to a conflict with the current state of the resource.',
+  },
+  
+  // Server-side errors
+  serverError: {
+    title: 'Internal Server Error',
+    message: 'An error occurred on the server. Please try again later.',
+  },
+  serviceUnavailable: {
+    title: 'Service Unavailable',
+    message: 'The server is currently unavailable. Please try again later.',
+  },
+
+  // Custom cases for token or session issues
   networkError: {
     title: 'Network Error',
-    message: 'Please check your connection or server status.',
+    message: 'Please check your internet connection or server status.',
   },
-  // for 401 unauthorized status code.
   sessionExpired: {
     title: 'Session Expired',
-    message: 'Please log in again.',
+    message: 'Your session has expired. Please log in again to continue.',
   },
-  // For 500+ server errors, indicating an issue on the server side.
-  serverError: {
-    title: 'Server Error',
-    message: 'Something went wrong. Please try again later.',
+
+  originDnsError: {
+    title: 'Service Unreachable',
+    message: 'The server is currently unreachable due to DNS issues. Please try again later.',
   },
-  // For 404 Not Found.
-  notFound: {
+  
+  // Fallback for any other status code
+  defaultError: {
     title: 'Error',
-    message: 'Requested resource not found.',
+    message: 'An unexpected error occurred. Please try again later.',
   },
 };

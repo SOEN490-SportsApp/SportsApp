@@ -3,10 +3,11 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Tabs } from 'expo-router';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuth } from '@/utils/context/AuthContext';
 
 export default function TabLayout() {
   const router = useRouter();
-
+  const { logout } = useAuth();
   return (
     <Tabs
       screenOptions={{
@@ -63,11 +64,9 @@ export default function TabLayout() {
         listeners={{
           tabPress: (e) => {
             e.preventDefault(); 
-            AsyncStorage.removeItem("access_token");
-            AsyncStorage.removeItem("refresh_token");
-            console.log(AsyncStorage.getItem("access_token"));
-            console.log(AsyncStorage.getItem("refresh_token"));
-            router.push('/auth/login'); 
+            // FIXME this should be the logout button later 
+            logout();
+            // -------
           },
         }}
       />
