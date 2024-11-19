@@ -3,7 +3,9 @@ package app.sportahub.userservice.exception;
 import app.sportahub.userservice.exception.user.InvalidCredentialsException;
 import app.sportahub.userservice.exception.user.UserDoesNotExistException;
 import app.sportahub.userservice.exception.user.UserEmailAlreadyExistsException;
+import app.sportahub.userservice.exception.user.badge.BadgeNotFoundException;
 import app.sportahub.userservice.exception.user.keycloak.KeycloakCommunicationException;
+import app.sportahub.userservice.exception.user.badge.UserAlreadyAssignedBadgeByThisGiverException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -63,5 +65,21 @@ public class GlobalExceptionHandler {
         response.put("error", "An unexpected error occurred: " + ex.getMessage());
         response.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    }
+
+    @ExceptionHandler(UserAlreadyAssignedBadgeByThisGiverException.class)
+    public ResponseEntity<Map<String, Object>> handleUserAlreadyAssignedBadgeByThisGiverException(UserAlreadyAssignedBadgeByThisGiverException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("error", ex.getMessage());
+        response.put("status", HttpStatus.BAD_REQUEST.value());
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(BadgeNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleBadgeNotFoundException(BadgeNotFoundException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("error", ex.getMessage());
+        response.put("status", HttpStatus.NOT_FOUND.value());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 }
