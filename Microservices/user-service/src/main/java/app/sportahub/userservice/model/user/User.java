@@ -26,6 +26,9 @@ public class User extends BaseEntity {
     @NotBlank(message = "Username must be provided")
     private String username;
 
-    private Profile profile;
-    private Preferences preferences;
+    @Builder.Default
+    private Profile profile = Profile.builder().build();
+
+    @Builder.Default
+    private Preferences preferences = Preferences.builder().build();
 }
