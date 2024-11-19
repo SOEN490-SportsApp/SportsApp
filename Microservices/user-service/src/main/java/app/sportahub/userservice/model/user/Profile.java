@@ -22,7 +22,6 @@ public class Profile {
     private String gender;
     private String postalCode;
     private String phoneNumber;
-    private List<SportLevel> sportsOfPreference;
     private String ranking;
 
     @Builder.Default
