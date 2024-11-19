@@ -34,7 +34,7 @@ export const getRefreshToken = async (): Promise<string | null> => await AsyncSt
 
 // setter functions to store the tokens in AsyncStorage
 export const setAccessToken = async (token: string): Promise<void> => await AsyncStorage.setItem('accessToken', token);
-export const setRefreshToken = async (token: string) => {await AsyncStorage.setItem('refresh_token', token);}
+export const setRefreshToken = async (token: string) => {await AsyncStorage.setItem('refreshToken', token);}
 
 // setter function that will potentially request a new access token using the refresh token
 const refreshAccessToken = async (): Promise<string | null> => {
