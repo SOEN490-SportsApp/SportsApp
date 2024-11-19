@@ -3,10 +3,9 @@ package app.sportahub.userservice.model.user;
 import app.sportahub.userservice.model.BaseEntity;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@SuperBuilder(setterPrefix = "with")
+@Builder(setterPrefix = "with")
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor

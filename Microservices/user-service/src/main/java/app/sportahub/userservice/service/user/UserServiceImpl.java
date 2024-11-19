@@ -6,6 +6,8 @@ import app.sportahub.userservice.dto.request.user.UserRequest;
 import app.sportahub.userservice.dto.request.user.keycloak.KeycloakRequest;
 import app.sportahub.userservice.dto.response.user.ProfileResponse;
 import app.sportahub.userservice.dto.response.user.UserResponse;
+import app.sportahub.userservice.dto.response.user.badge.BadgeResponse;
+import app.sportahub.userservice.dto.response.user.badge.BadgeWithCountResponse;
 import app.sportahub.userservice.exception.user.UserDoesNotExistException;
 import app.sportahub.userservice.exception.user.UserEmailAlreadyExistsException;
 import app.sportahub.userservice.exception.user.UsernameAlreadyExistsException;
@@ -13,8 +15,8 @@ import app.sportahub.userservice.exception.user.badge.BadgeNotFoundException;
 import app.sportahub.userservice.exception.user.badge.UserAlreadyAssignedBadgeByThisGiverException;
 import app.sportahub.userservice.mapper.user.ProfileMapper;
 import app.sportahub.userservice.mapper.user.UserMapper;
-import app.sportahub.userservice.model.user.Profile;
-import app.sportahub.userservice.model.user.User;
+import app.sportahub.userservice.model.user.*;
+import app.sportahub.userservice.repository.BadgeRepository;
 import app.sportahub.userservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +35,7 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final BadgeRepository badgeRepository;
     private final KeycloakApiClient keycloakApiClient;
     private final UserMapper userMapper;
     private final ProfileMapper profileMapper;
@@ -111,5 +114,44 @@ public class UserServiceImpl implements UserService {
         }
         log.info("UserServiceImpl::patchUserProfile: User with id:{} was updated", savedUser.getId());
         return profileMapper.profileToProfileResponse(savedUser.getProfile());
+    }
+
+    @Override
+    public User assignBadge(String userId, String badgeId, String giverId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserDoesNotExistException(userId));
+        Profile profile = Optional.ofNullable(user.getProfile()).orElse(Profile.builder().build());
+
+        if (profile.getBadges().stream().anyMatch(b -> b.getBadgeId().equals(badgeId) && b.getGiverId().equals(giverId))) {
+            throw new UserAlreadyAssignedBadgeByThisGiverException();
+        }
+
+        UserBadge newBadge = UserBadge.builder()
+                .badgeId(badgeId)
+                .giverId(giverId)
+                .build();
+        profile.getBadges().add(newBadge);
+        return userRepository.save(user);
+    }
+
+    @Override
+    public List<BadgeWithCountResponse> getUserBadges(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserDoesNotExistException(userId));
+        Profile profile = Optional.ofNullable(user.getProfile()).orElse(Profile.builder().build());
+
+        return profile.getBadges().stream()
+                .collect(Collectors.groupingBy(
+                        UserBadge::getBadgeId,
+                        Collectors.collectingAndThen(Collectors.counting(), Long::intValue)))
+                .entrySet().stream()
+                .map(entry -> {
+                    Badge badge = badgeRepository.findById(entry.getKey()).orElseThrow(() ->
+                            new BadgeNotFoundException(entry.getKey()));
+                    return new BadgeWithCountResponse(
+                            new BadgeResponse(badge.getName(), badge.getDescription(), badge.getIconUrl()),
+                            entry.getValue());
+                })
+                .toList();
     }
 }
