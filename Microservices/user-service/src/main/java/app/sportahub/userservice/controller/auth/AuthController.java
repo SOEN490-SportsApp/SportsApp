@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -46,13 +48,13 @@ public class AuthController {
         return authService.refreshToken(tokenRequest);
     }
 
-    @PutMapping("/send-verification-email")
+    @PutMapping("/resend-verification-email")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "send verification email",
-            description = "Sends a verification email to the specified user. This email contains a link or token that the user must use to confirm their email address and complete the registration."
+    @Operation(summary = "resend verification email",
+            description = "random description"
     )
-    public void sendVerificationEmail(@RequestBody SendVerificationEmailRequest sendVerificationEmailRequest) {
-        authService.sendVerificationEmail(sendVerificationEmailRequest.email());
+    public void resendVerificationEmail(@RequestBody Map<String, Object> payload) {
+        authService.sendVerificationEmail(payload.get("email").toString());
     }
 }
 
