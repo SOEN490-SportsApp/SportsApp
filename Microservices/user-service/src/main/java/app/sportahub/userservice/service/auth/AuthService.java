@@ -7,6 +7,8 @@ import app.sportahub.userservice.dto.response.auth.LoginResponse;
 import app.sportahub.userservice.dto.response.auth.TokenResponse;
 import app.sportahub.userservice.dto.response.user.UserResponse;
 
+import org.springframework.http.ResponseEntity;
+
 public interface AuthService {
 
     UserResponse registerUser(RegistrationRequest userRequest);
