@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -43,6 +45,15 @@ public class AuthController {
             description = "Generates a new access token using the provided refresh token.")
     public TokenResponse refreshToken(@RequestBody RefreshTokenRequest tokenRequest) {
         return authService.refreshToken(tokenRequest);
+    }
+
+    @PutMapping("/resend-verification-email")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "resend verification email",
+            description = "random description"
+    )
+    public void resendVerificationEmail(@RequestBody Map<String, Object> payload) {
+        authService.sendVerificationEmail(payload.get("email").toString());
     }
 }
 
