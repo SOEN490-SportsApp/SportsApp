@@ -14,6 +14,7 @@ import app.sportahub.userservice.exception.user.UsernameAlreadyExistsException;
 import app.sportahub.userservice.mapper.user.UserMapper;
 import app.sportahub.userservice.model.user.User;
 import app.sportahub.userservice.repository.UserRepository;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -88,11 +89,18 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public TokenResponse refreshToken(RefreshTokenRequest tokenRequest) {
-
         return Mono.from(keycloakApiClient.refreshToken(tokenRequest.refreshToken())).map(jsonNode -> {
             String refreshToken = jsonNode.get("refresh_token").asText();
             String accessToken = jsonNode.get("access_token").asText();
             return new TokenResponse(accessToken, refreshToken);
         }).block();
+    }
+
+    @Override
+    public void sendVerificationEmail(String email) {
+        User user = userRepository.findUserByEmail(email).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        JsonNode response = keycloakApiClient.sendVerificationEmail(user.getKeycloakId()).block();
+        log.info("AuthServiceImpl::sendVerificationEmail: {}", response);
+//        return ResponseEntity.ok().build();
     }
 }
