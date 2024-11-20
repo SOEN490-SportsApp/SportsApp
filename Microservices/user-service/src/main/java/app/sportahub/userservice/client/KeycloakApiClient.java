@@ -341,6 +341,39 @@ public class KeycloakApiClient {
     }
 
     /**
+     * Sends a verification email to the specified user in Keycloak.
+     *
+     * <p>This method sends a PUT request to the Keycloak admin endpoint to trigger a verification email
+     * for the user identified by the given {@code userId}. The request includes an authorization header
+     * with a valid access token to authenticate the operation. If the email is sent successfully, the
+     * method returns a {@code Mono<Void>} indicating success. If the operation fails, it throws a
+     * {@code KeycloakCommunicationException} with the status code and error message.
+     *
+     * @param userId the ID of the user to whom the verification email will be sent
+     * @return a {@code Mono<Void>} indicating the completion of the operation if successful,
+     * or emits an error if the operation fails
+     * @throws KeycloakCommunicationException if the operation fails due to an error response from Keycloak
+     */
+    public Mono<JsonNode> sendVerificationEmail(String userId ) {
+        String path = String.format("/admin/realms/%s/users/%s/send-verify-email", keycloakConfig.getRealm(), userId);
+        String emailUrl = UriComponentsBuilder.fromHttpUrl(keycloakConfig.getAuthServerUrl())
+                .path(path)
+                .toUriString();
+
+        return webClient.put()
+                .uri(emailUrl)
+                .header("Authorization", "Bearer " + getAccessToken())
+                .exchangeToMono(response -> {
+                    if(response.statusCode().is2xxSuccessful()) {
+                        return Mono.empty();
+                    } else {
+                        return handleErrorResponse(response).then(Mono.empty());
+                    }
+                });
+    }
+
+
+    /**
      * Retrieves an access token using client credentials.
      * Caches the token and reuses it until it expires.
      *
@@ -427,4 +460,5 @@ public class KeycloakApiClient {
                     return Mono.error(new KeycloakCommunicationException(statusCode, combinedError));
                 });
     }
+
 }
