@@ -2,7 +2,6 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.3.5'
 	id 'io.spring.dependency-management' version '1.1.6'
-	id 'idea'
 }
 
 group = 'app.sportahub'
@@ -18,8 +17,6 @@ configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
-	integrationTestImplementation.extendsFrom(testImplementation)
-	integrationTestRuntimeOnly.extendsFrom(testRuntimeOnly)
 }
 
 repositories {
@@ -27,60 +24,18 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter'
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'com.resend:resend-java:3.1.0'
-	implementation 'org.springframework.kafka:spring-kafka:3.3.0'
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	annotationProcessor 'org.projectlombok:lombok'
-	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-	testCompileOnly 'org.projectlombok:lombok'
-	testAnnotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.boot:spring-boot-testcontainers'
 	testImplementation 'org.testcontainers:junit-jupiter'
 	testImplementation 'org.testcontainers:mongodb'
-	testImplementation 'io.rest-assured:rest-assured:5.3.2'
-	testImplementation 'org.mockito:mockito-core:5.11.0'
-	testImplementation 'org.mockito:mockito-junit-jupiter:5.11.0'
-	testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
-	testImplementation 'org.testcontainers:kafka'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
-}
-
-sourceSets {
-	integrationTest {
-		java {
-			srcDir file('src/integrationTest/java')
-			compileClasspath += project.configurations.testCompileClasspath + main.output + test.output
-			runtimeClasspath += project.configurations.testRuntimeClasspath + main.output + test.output
-		}
-		resources {
-			srcDir file('src/integrationTest/resources')
-		}
-	}
-}
-tasks.register('integrationTest', Test) {
-	description = "Runs the integration tests."
-	group = "verification"
-	testClassesDirs = sourceSets.integrationTest.output.classesDirs
-	classpath = sourceSets.integrationTest.runtimeClasspath
-	useJUnitPlatform()
-	shouldRunAfter(tasks.named('test'))
-}
-check.dependsOn(tasks.named('integrationTest'))
-idea {
-	module {
-		sourceDirs += file('src/integrationTest/java')
-		resourceDirs += file('src/integrationTest/resources')
-		testSources.from(file('src/integrationTest/java'))
-		testResources.from(file('src/integrationTest/resources'))
-	}
 }
