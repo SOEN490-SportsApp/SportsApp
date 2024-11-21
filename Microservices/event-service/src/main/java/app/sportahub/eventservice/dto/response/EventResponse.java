@@ -1,5 +1,6 @@
 package app.sportahub.eventservice.dto.response;
 
+import app.sportahub.eventservice.model.event.Event;
 import app.sportahub.eventservice.model.event.Location;
 import app.sportahub.eventservice.model.event.Participant;
 import app.sportahub.eventservice.model.event.Team;
@@ -12,4 +13,22 @@ public record EventResponse(String id, String eventName, String eventType, Strin
                             LocalDate date, String duration, List<Participant> participants, String createdBy,
                             List<Team> teams, String cutOffTime, String description, Boolean isPrivate,
                             List<String> whitelistedUsers) {
+
+    public static EventResponse from(Event event) {
+        return new EventResponse(
+                event.getId(),
+                event.getEventName(),
+                event.getEventType(),
+                event.getSportType(),
+                event.getLocation(),
+                event.getDate(),
+                event.getDuration(),
+                event.getParticipants(),
+                event.getCreatedBy(),
+                event.getTeams(),
+                event.getCutOffTime(),
+                event.getDescription(),
+                event.getIsPrivate(),
+                event.getWhitelistedUsers());
+    }
 }

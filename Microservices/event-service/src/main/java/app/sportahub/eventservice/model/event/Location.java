@@ -15,8 +15,10 @@ public class Location {
     @NotBlank(message = "Location name must be provided")
     private String name;
 
+    @NotBlank(message = "Street number must be provided")
     private String streetNumber;
 
+    @NotBlank(message = "Street name must be provided")
     private String streetName;
 
     @NotBlank(message = "City must be provided")
