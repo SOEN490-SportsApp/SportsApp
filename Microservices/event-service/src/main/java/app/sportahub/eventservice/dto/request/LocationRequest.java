@@ -8,10 +8,10 @@ import jakarta.validation.constraints.NotBlank;
 public record LocationRequest(@NotBlank(message = "Location name must be provided")
                               String name,
 
-                              @Nullable
+                              @NotBlank(message = "Street number must be provided")
                               String streetNumber,
 
-                              @Nullable
+                              @NotBlank(message = "Street name must be provided")
                               String streetName,
 
                               @NotBlank(message = "City must be provided")
@@ -27,7 +27,7 @@ public record LocationRequest(@NotBlank(message = "Location name must be provide
                               String postalCode,
 
                               @Nullable
-                              String addressLine2,
+                              String adressLine2,
 
                               @Nullable
                               String phoneNumber,
