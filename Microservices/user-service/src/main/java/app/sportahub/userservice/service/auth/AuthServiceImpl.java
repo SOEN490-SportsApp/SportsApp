@@ -100,7 +100,6 @@ public class AuthServiceImpl implements AuthService {
     public void sendVerificationEmail(String email) {
         User user = userRepository.findUserByEmail(email).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         JsonNode response = keycloakApiClient.sendVerificationEmail(user.getKeycloakId()).block();
-        log.info("AuthServiceImpl::sendVerificationEmail: {}", response);
-//        return ResponseEntity.ok().build();
+        log.info("AuthServiceImpl::sendVerificationEmail: verification email sent to {}", email);
     }
 }
