@@ -1,7 +1,6 @@
 package app.sportahub.eventservice.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -9,7 +8,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record EventRequest(
+public record EventRequest(@NotBlank String id,
+
                            @NotBlank(message = "Event name must be provided")
                            String eventName,
 
@@ -22,19 +22,19 @@ public record EventRequest(
                            @NotNull
                            LocationRequest location,
 
-                           @NotNull(message = "Date must be provided")
+                           @NotBlank(message = "Date must be provided")
                            LocalDate date,
 
                            @NotBlank(message = "Duration must be provided")
                            String duration,
 
-                           @Nullable
+                           @NotNull
                            List<ParticipantRequest> participants,
 
                            @NotBlank(message = "Valid id of the user who created the event must be provided")
                            String createdBy,
 
-                           @Nullable
+                           @NotNull
                            List<TeamRequest> teams,
 
                            @NotBlank(message = "Cut of time must be provided")
@@ -43,7 +43,6 @@ public record EventRequest(
                            @NotBlank(message = "Description must be provided")
                            String description,
 
-                           @Nullable
                            List<String> whitelistedUsers){
 
 }
