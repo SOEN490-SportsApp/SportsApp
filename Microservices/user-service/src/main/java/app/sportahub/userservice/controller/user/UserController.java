@@ -33,7 +33,6 @@ public class UserController {
             description = "Fetches a user by their unique identifier.")
     public UserResponse getUserById(@PathVariable String id) {
         return userService.getUserById(id);
-        return userService.getUserById(id);
     }
 
     @PostMapping
@@ -42,13 +41,11 @@ public class UserController {
             description = "Creates a new user resource to the database based on the provided user details.")
     public UserResponse createUser(@Valid @RequestBody UserRequest userRequest) {
         return userService.createUser(userRequest);
-        return userService.createUser(userRequest);
     }
 
     @PutMapping("/{id}/profile")
     @ResponseStatus(HttpStatus.OK)
     public ProfileResponse updateProfile(@PathVariable String id, @Valid @RequestBody ProfileRequest profileRequest) {
-        return userService.updateUserProfile(id, profileRequest);
         return userService.updateUserProfile(id, profileRequest);
     }
 
@@ -56,21 +53,5 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public ProfileResponse patchProfile(@PathVariable String id, @Valid @RequestBody ProfileRequest profileRequest) {
         return userService.patchUserProfile(id, profileRequest);
-    }
-
-    @PostMapping("/{userId}/badge")
-    @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "Assign a badge to a user",
-            description = "Allows a user to assign a badge to another user and returns details of the assigned badge.")
-    public UserResponse assignBadge(@PathVariable String userId, @RequestParam String giverId, @RequestParam String badgeId) {
-        return UserResponse.from(userService.assignBadge(userId, badgeId, giverId));
-    }
-
-    @GetMapping("/{userId}/badge")
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Retrieve badges assigned to a user",
-            description = "Retrieves all badges assigned to a user along with the count of each badge type.")
-    public List<BadgeWithCountResponse> getUserBadges(@PathVariable String userId) {
-        return userService.getUserBadges(userId);
     }
 }
