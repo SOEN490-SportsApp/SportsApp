@@ -7,9 +7,11 @@ import app.sportahub.userservice.dto.request.auth.RegistrationRequest;
 import app.sportahub.userservice.dto.request.user.keycloak.KeycloakRequest;
 import app.sportahub.userservice.dto.response.auth.LoginResponse;
 import app.sportahub.userservice.dto.response.auth.TokenResponse;
+import app.sportahub.userservice.dto.response.user.UserResponse;
 import app.sportahub.userservice.exception.user.InvalidCredentialsException;
 import app.sportahub.userservice.exception.user.UserEmailAlreadyExistsException;
 import app.sportahub.userservice.exception.user.UsernameAlreadyExistsException;
+import app.sportahub.userservice.mapper.user.UserMapper;
 import app.sportahub.userservice.model.user.User;
 import app.sportahub.userservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +24,6 @@ import reactor.core.publisher.Mono;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -31,20 +32,19 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final KeycloakApiClient keycloakApiClient;
+    private final UserMapper userMapper;
 
     @SneakyThrows
     @Override
-    public User registerUser(RegistrationRequest userRequest) {
-        Optional<User> optionalUserByEmail = userRepository.findUserByEmail(userRequest.email());
-
-        if (optionalUserByEmail.isPresent()) {
-            throw new UserEmailAlreadyExistsException(userRequest.email());
-        }
-
-        Optional<User> optionalUserByUsername = userRepository.findUserByUsername(userRequest.username());
-        if (optionalUserByUsername.isPresent()) {
-            throw new UsernameAlreadyExistsException(userRequest.username());
-        }
+    public UserResponse registerUser(RegistrationRequest userRequest) {
+        userRepository.findUserByEmail(userRequest.email())
+                .ifPresent(user -> {
+                    throw new UserEmailAlreadyExistsException(userRequest.email());
+                });
+        userRepository.findUserByUsername(userRequest.username())
+                .ifPresent(user -> {
+                    throw new UsernameAlreadyExistsException(userRequest.username());
+                });
 
         KeycloakRequest keycloakRequest = new KeycloakRequest(
                 userRequest.email(), userRequest.username(), userRequest.password());
@@ -60,15 +60,15 @@ public class AuthServiceImpl implements AuthService {
                 })
                 .block();
 
-
-        return userRepository.save(
-                User.builder()
-                        .withCreatedAt(Timestamp.valueOf(LocalDateTime.now()))
-                        .withUpdatedAt(Timestamp.valueOf(LocalDateTime.now()))
-                        .withKeycloakId(keycloakId)
-                        .withEmail(userRequest.email())
-                        .withUsername(userRequest.username())
-                        .build());
+        return userMapper.userToUserResponse(
+                userRepository.save(
+                        User.builder()
+                                .withCreatedAt(Timestamp.valueOf(LocalDateTime.now()))
+                                .withUpdatedAt(Timestamp.valueOf(LocalDateTime.now()))
+                                .withKeycloakId(keycloakId)
+                                .withEmail(userRequest.email())
+                                .withUsername(userRequest.username())
+                                .build()));
     }
 
     @Override

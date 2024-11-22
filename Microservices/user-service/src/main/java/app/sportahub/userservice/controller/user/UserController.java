@@ -25,7 +25,7 @@ public class UserController {
     @Operation(summary = "Retrieve user by ID",
             description = "Fetches a user by their unique identifier.")
     public UserResponse getUserById(@PathVariable String id) {
-        return UserResponse.from(userService.getUserById(id));
+        return userService.getUserById(id);
     }
 
     @PostMapping
@@ -33,18 +33,18 @@ public class UserController {
     @Operation(summary = "Do not use this to register a user! Create a new user",
             description = "Creates a new user resource to the database based on the provided user details.")
     public UserResponse createUser(@Valid @RequestBody UserRequest userRequest) {
-        return UserResponse.from(userService.createUser(userRequest));
+        return userService.createUser(userRequest);
     }
 
     @PutMapping("/{id}/profile")
     @ResponseStatus(HttpStatus.OK)
     public ProfileResponse updateProfile(@PathVariable String id, @Valid @RequestBody ProfileRequest profileRequest) {
-        return ProfileResponse.from(userService.updateUserProfile(id, profileRequest));
+        return userService.updateUserProfile(id, profileRequest);
     }
 
     @PatchMapping("/{id}/profile")
     @ResponseStatus(HttpStatus.OK)
     public ProfileResponse patchProfile(@PathVariable String id, @Valid @RequestBody ProfileRequest profileRequest) {
-        return ProfileResponse.from(userService.patchUserProfile(id, profileRequest));
+        return userService.patchUserProfile(id, profileRequest);
     }
 }
