@@ -75,6 +75,10 @@ sourceSets {
     }
 }
 
+processResources {
+    exclude("keycloak-themes")
+}
+
 tasks.register('integrationTest', Test) {
     description = "Runs the integration tests."
     group = "verification"
