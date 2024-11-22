@@ -16,10 +16,8 @@ import app.sportahub.userservice.exception.user.UsernameAlreadyExistsException;
 import app.sportahub.userservice.exception.user.badge.UserAlreadyAssignedBadgeByThisGiverException;
 import app.sportahub.userservice.mapper.user.ProfileMapper;
 import app.sportahub.userservice.mapper.user.UserMapper;
-import app.sportahub.userservice.model.user.Preferences;
-import app.sportahub.userservice.model.user.Profile;
-import app.sportahub.userservice.model.user.SportLevel;
-import app.sportahub.userservice.model.user.User;
+import app.sportahub.userservice.model.user.*;
+import app.sportahub.userservice.repository.BadgeRepository;
 import app.sportahub.userservice.repository.UserRepository;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,6 +46,9 @@ public class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private BadgeRepository badgeRepository;
 
     @Mock
     private KeycloakApiClient keycloakApiClient;
