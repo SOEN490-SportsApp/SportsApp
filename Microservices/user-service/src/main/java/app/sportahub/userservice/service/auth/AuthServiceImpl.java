@@ -8,10 +8,12 @@ import app.sportahub.userservice.dto.request.user.keycloak.KeycloakRequest;
 import app.sportahub.userservice.dto.response.auth.LoginResponse;
 import app.sportahub.userservice.dto.response.auth.TokenResponse;
 import app.sportahub.userservice.dto.response.user.UserResponse;
+import app.sportahub.userservice.dto.response.user.UserResponse;
 import app.sportahub.userservice.exception.user.InvalidCredentialsException;
 import app.sportahub.userservice.exception.user.UserDoesNotExistException;
 import app.sportahub.userservice.exception.user.UserEmailAlreadyExistsException;
 import app.sportahub.userservice.exception.user.UsernameAlreadyExistsException;
+import app.sportahub.userservice.mapper.user.UserMapper;
 import app.sportahub.userservice.mapper.user.UserMapper;
 import app.sportahub.userservice.model.user.User;
 import app.sportahub.userservice.repository.UserRepository;
@@ -47,6 +49,15 @@ public class AuthServiceImpl implements AuthService {
                 .ifPresent(user -> {
                     throw new UsernameAlreadyExistsException(userRequest.username());
                 });
+    public UserResponse registerUser(RegistrationRequest userRequest) {
+        userRepository.findUserByEmail(userRequest.email())
+                .ifPresent(user -> {
+                    throw new UserEmailAlreadyExistsException(userRequest.email());
+                });
+        userRepository.findUserByUsername(userRequest.username())
+                .ifPresent(user -> {
+                    throw new UsernameAlreadyExistsException(userRequest.username());
+                });
 
         KeycloakRequest keycloakRequest = new KeycloakRequest(
                 userRequest.email(), userRequest.username(), userRequest.password());
@@ -62,21 +73,15 @@ public class AuthServiceImpl implements AuthService {
                 })
                 .block();
 
-        User user = userRepository.save(
-                User.builder()
-                        .withCreatedAt(Timestamp.valueOf(LocalDateTime.now()))
-                        .withUpdatedAt(Timestamp.valueOf(LocalDateTime.now()))
-                        .withKeycloakId(keycloakId)
-                        .withEmail(userRequest.email())
-                        .withUsername(userRequest.username())
-                        .build());
-
-        log.info("AuthServiceImpl::registerUser: User with id:{} successfully registered", user.getId());
-
-        keycloakApiClient.sendVerificationEmail(user.getKeycloakId()).block();
-        log.info("AuthServiceImpl::registerUser: Verification email sent to {} for user with keycloak id:{}",
-                user.getEmail(), user.getKeycloakId());
-        return userMapper.userToUserResponse(user);
+        return userMapper.userToUserResponse(
+                userRepository.save(
+                        User.builder()
+                                .withCreatedAt(Timestamp.valueOf(LocalDateTime.now()))
+                                .withUpdatedAt(Timestamp.valueOf(LocalDateTime.now()))
+                                .withKeycloakId(keycloakId)
+                                .withEmail(userRequest.email())
+                                .withUsername(userRequest.username())
+                                .build()));
     }
 
     @Override
