@@ -21,8 +21,10 @@ import app.sportahub.userservice.exception.user.UsernameAlreadyExistsException;
 import app.sportahub.userservice.exception.user.badge.UserAlreadyAssignedBadgeByThisGiverException;
 import app.sportahub.userservice.mapper.user.ProfileMapper;
 import app.sportahub.userservice.mapper.user.UserMapper;
-import app.sportahub.userservice.model.user.*;
-import app.sportahub.userservice.repository.BadgeRepository;
+import app.sportahub.userservice.model.user.Preferences;
+import app.sportahub.userservice.model.user.Profile;
+import app.sportahub.userservice.model.user.SportLevel;
+import app.sportahub.userservice.model.user.User;
 import app.sportahub.userservice.repository.UserRepository;
 import org.bson.types.ObjectId;
 import org.bson.types.ObjectId;
@@ -60,10 +62,10 @@ public class UserServiceTest {
     private UserRepository userRepository;
 
     @Mock
-    private BadgeRepository badgeRepository;
+    private KeycloakApiClient keycloakApiClient;
 
     @Mock
-    private KeycloakApiClient keycloakApiClient;
+    private final MongoConfig.TimestampToDateConverter converter = new MongoConfig.TimestampToDateConverter();
 
     private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
     private final ProfileMapper profileMapper = Mappers.getMapper(ProfileMapper.class);
@@ -73,10 +75,10 @@ public class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        userService = new UserServiceImpl(userRepository, badgeRepository,
-                keycloakApiClient, userMapper, profileMapper);
+        userService = new UserServiceImpl(userRepository, keycloakApiClient, userMapper, profileMapper);
     }
 
+    private UserRequest getUserRequest() {
     private UserRequest getUserRequest() {
         ProfileRequest profileRequest = new ProfileRequest(
                 "John",
@@ -85,6 +87,8 @@ public class UserServiceTest {
                 "M",
                 "12345",
                 "123-456-7890",
+                List.of(new SportLevelRequest("Basketball", "Intermediate"),
+                        new SportLevelRequest("Soccer", "Beginner")),
                 List.of(new SportLevelRequest("Basketball", "Intermediate"),
                         new SportLevelRequest("Soccer", "Beginner")),
                 "A"
@@ -100,6 +104,13 @@ public class UserServiceTest {
                 profileRequest,
                 preferences
         );
+        return userRequest;
+    }
+
+    @Test
+    public void createUserShouldReturnSuccessfulCreation() {
+        // Arrange
+        UserRequest userRequest = getUserRequest();
         return userRequest;
     }
 
@@ -130,8 +141,18 @@ public class UserServiceTest {
 
         // Act
         UserResponse result = userService.createUser(userRequest);
+        UserResponse result = userService.createUser(userRequest);
 
         // Assert
+        assertNotNull(result);
+        assertEquals("123", result.id());
+        assertEquals(userRequest.email(), result.email());
+        assertEquals(userRequest.username(), result.username());
+        assertEquals(userRequest.profile().firstName(), result.profile().firstName());
+        assertEquals(userRequest.profile().lastName(), result.profile().lastName());
+        assertEquals(userRequest.profile().dateOfBirth(), result.profile().dateOfBirth());
+        assertEquals(userRequest.profile().phoneNumber(), result.profile().phoneNumber());
+        assertEquals(userRequest.profile().ranking(), result.profile().ranking());
         assertNotNull(result);
         assertEquals("123", result.id());
         assertEquals(userRequest.email(), result.email());
@@ -159,7 +180,27 @@ public class UserServiceTest {
 
         // Mock
         when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.of(existingUser));
+        // Arrange
+        UserRequest userRequest = getUserRequest();
+        User existingUser = User.builder()
+                .withKeycloakId("keycloak-123")
+                .withEmail(userRequest.email())
+                .withUsername(userRequest.username())
+                .build();
 
+        // Mock
+        when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.of(existingUser));
+
+        // Act & Assert
+        UserEmailAlreadyExistsException exception = assertThrows(
+                UserEmailAlreadyExistsException.class,
+                () -> userService.createUser(userRequest)
+        );
+
+        assertEquals(
+                "409 CONFLICT \"User with this email:test@example.com already exists.\"",
+                exception.getMessage()
+        );
         // Act & Assert
         UserEmailAlreadyExistsException exception = assertThrows(
                 UserEmailAlreadyExistsException.class,
@@ -172,6 +213,7 @@ public class UserServiceTest {
         );
 
         // Verify interactions
+        // Verify interactions
         verify(userRepository, times(1)).findUserByEmail(userRequest.email());
         verify(userRepository, never()).findUserByUsername(anyString());
         verify(userRepository, never()).save(any(User.class));
@@ -180,13 +222,16 @@ public class UserServiceTest {
     @Test
     public void createUserShouldThrowUsernameAlreadyExists() {
         UserRequest userRequest = getUserRequest();
+        UserRequest userRequest = getUserRequest();
 
         when(userRepository.findUserByEmail(userRequest.email())).thenReturn(Optional.empty());
         Optional<User> existingUser = Optional.of(new User());
         when(userRepository.findUserByUsername(userRequest.username())).thenReturn(existingUser);
 
         UsernameAlreadyExistsException exception = assertThrows(UsernameAlreadyExistsException.class,
+        UsernameAlreadyExistsException exception = assertThrows(UsernameAlreadyExistsException.class,
                 () -> userService.createUser(userRequest));
+        assertEquals("409 CONFLICT \"User with this username:testUser already exists.\"", exception.getMessage());
         assertEquals("409 CONFLICT \"User with this username:testUser already exists.\"", exception.getMessage());
 
         verify(userRepository, times(1)).findUserByEmail(userRequest.email());
@@ -211,14 +256,33 @@ public class UserServiceTest {
                         .withSportsOfPreference(
                                 List.of(new SportLevel("Basketball", "Intermediate"),
                                         new SportLevel("Soccer", "Beginner")))
+                        .withSportsOfPreference(
+                                List.of(new SportLevel("Basketball", "Intermediate"),
+                                        new SportLevel("Soccer", "Beginner")))
                         .withRanking("100")
                         .build())
                 .build());
 
         when(userRepository.findUserById(any())).thenReturn(expectedUser);
+        when(userRepository.findUserById(any())).thenReturn(expectedUser);
 
         UserResponse result = userService.getUserById(userId);
+        UserResponse result = userService.getUserById(userId);
 
+        assertNotNull(result);
+        assertEquals(userId, result.id());
+        assertEquals("test@example.com", result.email());
+        assertEquals("testUser", result.username());
+        assertEquals("John", result.profile().firstName());
+        assertEquals("Doe", result.profile().lastName());
+        assertEquals(LocalDate.of(1990, 1, 1), result.profile().dateOfBirth());
+        assertEquals("Male", result.profile().gender());
+        assertEquals("12345", result.profile().postalCode());
+        assertEquals("1234567890", result.profile().phoneNumber());
+        assertEquals(List.of(new SportLevelResponse("Basketball", "Intermediate"),
+                        new SportLevelResponse("Soccer", "Beginner")),
+                result.profile().sportsOfPreference());
+        assertEquals("100", result.profile().ranking());
         assertNotNull(result);
         assertEquals(userId, result.id());
         assertEquals("test@example.com", result.email());
@@ -240,12 +304,18 @@ public class UserServiceTest {
     @Test
     public void getUserByIdShouldThrowUserDoesNotExistException() {
         String userId = new ObjectId().toHexString();
+        String userId = new ObjectId().toHexString();
 
+        UserDoesNotExistException exception = assertThrows(
         UserDoesNotExistException exception = assertThrows(
                 UserDoesNotExistException.class,
                 () -> userService.getUserById(userId)
         );
 
+        assertEquals(
+                "404 NOT_FOUND \"User with id:" + userId + "does not exist.\"",
+                exception.getMessage()
+        );
         assertEquals(
                 "404 NOT_FOUND \"User with id:" + userId + "does not exist.\"",
                 exception.getMessage()
@@ -270,6 +340,8 @@ public class UserServiceTest {
                 "123-456-7890",
                 List.of(new SportLevelRequest("Basketball", "Intermediate"),
                         new SportLevelRequest("Soccer", "Beginner")),
+                List.of(new SportLevelRequest("Basketball", "Intermediate"),
+                        new SportLevelRequest("Soccer", "Beginner")),
                 "A"
         );
 
@@ -285,6 +357,10 @@ public class UserServiceTest {
                         .stream().map(sportLevelRequest ->
                                 new SportLevel(sportLevelRequest.name(), sportLevelRequest.ranking()))
                         .toList())
+                .withSportsOfPreference(profileRequest.sportsOfPreference()
+                        .stream().map(sportLevelRequest ->
+                                new SportLevel(sportLevelRequest.name(), sportLevelRequest.ranking()))
+                        .toList())
                 .build());
 
 
@@ -295,6 +371,21 @@ public class UserServiceTest {
 
         ProfileResponse updatedProfile = userService.updateUserProfile(existingUser.get().getId(), profileRequest);
 
+        ProfileResponse updatedProfile = userService.updateUserProfile(existingUser.get().getId(), profileRequest);
+
+        assertNotNull(updatedProfile);
+        assertEquals(updatedProfile.firstName(), profileRequest.firstName());
+        assertEquals(updatedProfile.lastName(), profileRequest.lastName());
+        assertEquals(updatedProfile.dateOfBirth(), profileRequest.dateOfBirth());
+        assertEquals(updatedProfile.phoneNumber(), profileRequest.phoneNumber());
+        assertEquals(updatedProfile.ranking(), profileRequest.ranking());
+        assertEquals(updatedProfile.gender(), profileRequest.gender());
+        assertEquals(updatedProfile.postalCode(), profileRequest.postalCode());
+        assertEquals(updatedProfile.sportsOfPreference(), profileRequest.sportsOfPreference()
+                .stream()
+                .map(sportLevelRequest -> new SportLevelResponse(
+                        sportLevelRequest.name(), sportLevelRequest.ranking()))
+                .toList());
         assertNotNull(updatedProfile);
         assertEquals(updatedProfile.firstName(), profileRequest.firstName());
         assertEquals(updatedProfile.lastName(), profileRequest.lastName());
@@ -324,13 +415,17 @@ public class UserServiceTest {
                 "123-456-7890",
                 List.of(new SportLevelRequest("Basketball", "Intermediate"),
                         new SportLevelRequest("Soccer", "Beginner")),
+                List.of(new SportLevelRequest("Basketball", "Intermediate"),
+                        new SportLevelRequest("Soccer", "Beginner")),
                 "A"
         );
 
         when(userRepository.findUserById("1")).thenReturn(Optional.empty());
         UserDoesNotExistException exception = assertThrows(UserDoesNotExistException.class,
+        UserDoesNotExistException exception = assertThrows(UserDoesNotExistException.class,
                 () -> userService.updateUserProfile("1", profileRequest));
 
+        assertEquals("404 NOT_FOUND \"User with id:1does not exist.\"", exception.getMessage());
         assertEquals("404 NOT_FOUND \"User with id:1does not exist.\"", exception.getMessage());
 
         verify(userRepository, times(1)).findUserById("1");
@@ -346,10 +441,9 @@ public class UserServiceTest {
                 "M",
                 "12345",
                 "123-456-7890",
-                "A",
                 List.of(new SportLevel("Basketball", "Intermediate"),
                         new SportLevel("Soccer", "Beginner")),
-                List.of()
+                "A"
         );
         ProfileRequest profileRequest = new ProfileRequest(
                 null,
@@ -369,7 +463,10 @@ public class UserServiceTest {
         when(userRepository.save(existingUser)).thenReturn(existingUser);
 
         ProfileResponse updatedProfile = userService.patchUserProfile(existingUser.getId(), profileRequest);
+        ProfileResponse updatedProfile = userService.patchUserProfile(existingUser.getId(), profileRequest);
 
+        assertNotNull(updatedProfile);
+        assertEquals(updatedProfile.dateOfBirth(), profileRequest.dateOfBirth());
         assertNotNull(updatedProfile);
         assertEquals(updatedProfile.dateOfBirth(), profileRequest.dateOfBirth());
 
@@ -385,8 +482,10 @@ public class UserServiceTest {
         when(userRepository.findUserById("1")).thenReturn(Optional.empty());
 
         UserDoesNotExistException exception = assertThrows(UserDoesNotExistException.class,
+        UserDoesNotExistException exception = assertThrows(UserDoesNotExistException.class,
                 () -> userService.patchUserProfile("1", profileRequest));
 
+        assertEquals("404 NOT_FOUND \"User with id:1does not exist.\"", exception.getMessage());
         assertEquals("404 NOT_FOUND \"User with id:1does not exist.\"", exception.getMessage());
 
         verify(userRepository, times(1)).findUserById("1");
