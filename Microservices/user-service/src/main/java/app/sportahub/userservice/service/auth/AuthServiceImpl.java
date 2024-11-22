@@ -8,6 +8,7 @@ import app.sportahub.userservice.dto.request.user.keycloak.KeycloakRequest;
 import app.sportahub.userservice.dto.response.auth.LoginResponse;
 import app.sportahub.userservice.dto.response.auth.TokenResponse;
 import app.sportahub.userservice.dto.response.user.UserResponse;
+import app.sportahub.userservice.dto.response.user.UserResponse;
 import app.sportahub.userservice.exception.user.InvalidCredentialsException;
 import app.sportahub.userservice.exception.user.UserDoesNotExistException;
 import app.sportahub.userservice.exception.user.UserEmailAlreadyExistsException;
@@ -35,6 +36,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final KeycloakApiClient keycloakApiClient;
+    private final UserMapper userMapper;
     private final UserMapper userMapper;
 
     @SneakyThrows
@@ -72,21 +74,15 @@ public class AuthServiceImpl implements AuthService {
                 })
                 .block();
 
-        User user = userRepository.save(
-                User.builder()
-                        .withCreatedAt(Timestamp.valueOf(LocalDateTime.now()))
-                        .withUpdatedAt(Timestamp.valueOf(LocalDateTime.now()))
-                        .withKeycloakId(keycloakId)
-                        .withEmail(userRequest.email())
-                        .withUsername(userRequest.username())
-                        .build());
-
-        log.info("AuthServiceImpl::registerUser: User with id:{} successfully registered", user.getId());
-
-        keycloakApiClient.sendVerificationEmail(user.getKeycloakId()).block();
-        log.info("AuthServiceImpl::registerUser: Verification email sent to {} for user with keycloak id:{}",
-                user.getEmail(), user.getKeycloakId());
-        return userMapper.userToUserResponse(user);
+        return userMapper.userToUserResponse(
+                userRepository.save(
+                        User.builder()
+                                .withCreatedAt(Timestamp.valueOf(LocalDateTime.now()))
+                                .withUpdatedAt(Timestamp.valueOf(LocalDateTime.now()))
+                                .withKeycloakId(keycloakId)
+                                .withEmail(userRequest.email())
+                                .withUsername(userRequest.username())
+                                .build()));
     }
 
     @Override

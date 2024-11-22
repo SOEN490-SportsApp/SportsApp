@@ -55,20 +55,4 @@ public class UserController {
     public ProfileResponse patchProfile(@PathVariable String id, @Valid @RequestBody ProfileRequest profileRequest) {
         return userService.patchUserProfile(id, profileRequest);
     }
-
-    @PostMapping("/{userId}/badge")
-    @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "Assign a badge to a user",
-            description = "Allows a user to assign a badge to another user and returns details of the assigned badge.")
-    public UserResponse assignBadge(@PathVariable String userId, @RequestParam String giverId, @RequestParam String badgeId) {
-        return userService.assignBadge(userId, badgeId, giverId);
-    }
-
-    @GetMapping("/{userId}/badge")
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Retrieve badges assigned to a user",
-            description = "Retrieves all badges assigned to a user along with the count of each badge type.")
-    public List<BadgeWithCountResponse> getUserBadges(@PathVariable String userId) {
-        return userService.getUserBadges(userId);
-    }
 }
