@@ -20,7 +20,7 @@ public class Profile {
     private String gender;
     private String postalCode;
     private String phoneNumber;
-    private List<String> sportsOfPreference;
+    private List<SportLevel> sportsOfPreference;
     private String ranking;
     
 }
