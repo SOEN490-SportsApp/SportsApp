@@ -26,7 +26,7 @@ public class AuthController {
     @Operation(summary = "Register a new user",
             description = "Creates a new user account based on the provided registration details.")
     public UserResponse registerUser(@RequestBody RegistrationRequest registrationRequest) {
-        return UserResponse.from(authService.registerUser(registrationRequest));
+        return authService.registerUser(registrationRequest);
     }
 
     @PostMapping("/login")
