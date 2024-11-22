@@ -13,12 +13,11 @@ import app.sportahub.userservice.dto.response.user.UserResponse;
 import app.sportahub.userservice.exception.user.UserDoesNotExistException;
 import app.sportahub.userservice.exception.user.UserEmailAlreadyExistsException;
 import app.sportahub.userservice.exception.user.UsernameAlreadyExistsException;
+import app.sportahub.userservice.exception.user.badge.UserAlreadyAssignedBadgeByThisGiverException;
 import app.sportahub.userservice.mapper.user.ProfileMapper;
 import app.sportahub.userservice.mapper.user.UserMapper;
-import app.sportahub.userservice.model.user.Preferences;
-import app.sportahub.userservice.model.user.Profile;
-import app.sportahub.userservice.model.user.SportLevel;
-import app.sportahub.userservice.model.user.User;
+import app.sportahub.userservice.model.user.*;
+import app.sportahub.userservice.repository.BadgeRepository;
 import app.sportahub.userservice.repository.UserRepository;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,6 +32,7 @@ import reactor.core.publisher.Mono;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,6 +46,9 @@ public class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private BadgeRepository badgeRepository;
 
     @Mock
     private KeycloakApiClient keycloakApiClient;
@@ -377,5 +380,63 @@ public class UserServiceTest {
 
         verify(userRepository, times(1)).findUserById("1");
         verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    void assignBadge_Successfully() {
+        User user = new User();
+        Profile profile = new Profile();
+        profile.setBadges(new ArrayList<>());
+        user.setProfile(profile);
+
+        when(userRepository.findById("user1")).thenReturn(Optional.of(user));
+        when(userRepository.save(any(User.class))).thenReturn(user);
+
+        assertDoesNotThrow(() -> userService.assignBadge("user1", "badge1", "giver1"));
+    }
+
+    @Test
+    void assignBadge_ThrowsUserDoesNotExist() {
+        when(userRepository.findById("user1")).thenReturn(Optional.empty());
+        assertThrows(UserDoesNotExistException.class, () -> userService.assignBadge("user1", "badge1", "giver1"));
+    }
+
+    @Test
+    void assignBadge_ThrowsAlreadyAssigned() {
+        User user = new User();
+        Profile profile = new Profile();
+        ArrayList<UserBadge> badges = new ArrayList<>();
+        badges.add(new UserBadge("badge1", "giver1"));
+        profile.setBadges(badges);
+        user.setProfile(profile);
+
+        when(userRepository.findById("user1")).thenReturn(Optional.of(user));
+        assertThrows(UserAlreadyAssignedBadgeByThisGiverException.class, () -> userService.assignBadge("user1", "badge1", "giver1"));
+    }
+
+    @Test
+    void getUserBadges_ReturnsData() {
+        User user = new User();
+        Profile profile = new Profile();
+        ArrayList<UserBadge> badges = new ArrayList<>();
+        badges.add(new UserBadge("badge1", "giver1"));
+        profile.setBadges(badges);
+        user.setProfile(profile);
+
+        Badge badge = new Badge();
+        badge.setName("Achievement");
+        badge.setDescription("Awarded for special achievement");
+        badge.setIconUrl("url_to_icon");
+
+        when(userRepository.findById("user1")).thenReturn(Optional.of(user));
+        when(badgeRepository.findById("badge1")).thenReturn(Optional.of(badge));
+
+        assertFalse(userService.getUserBadges("user1").isEmpty());
+    }
+
+    @Test
+    void getUserBadges_UserNotFound() {
+        when(userRepository.findById("user1")).thenReturn(Optional.empty());
+        assertThrows(UserDoesNotExistException.class, () -> userService.getUserBadges("user1"));
     }
 }
