@@ -2,11 +2,16 @@ package app.sportahub.userservice.service.user;
 
 import app.sportahub.userservice.client.KeycloakApiClient;
 import app.sportahub.userservice.config.MongoConfig;
+import app.sportahub.userservice.config.MongoConfig;
 import app.sportahub.userservice.dto.request.user.PreferencesRequest;
 import app.sportahub.userservice.dto.request.user.ProfileRequest;
 import app.sportahub.userservice.dto.request.user.SportLevelRequest;
+import app.sportahub.userservice.dto.request.user.SportLevelRequest;
 import app.sportahub.userservice.dto.request.user.UserRequest;
 import app.sportahub.userservice.dto.request.user.keycloak.KeycloakRequest;
+import app.sportahub.userservice.dto.response.user.ProfileResponse;
+import app.sportahub.userservice.dto.response.user.SportLevelResponse;
+import app.sportahub.userservice.dto.response.user.UserResponse;
 import app.sportahub.userservice.dto.response.user.ProfileResponse;
 import app.sportahub.userservice.dto.response.user.SportLevelResponse;
 import app.sportahub.userservice.dto.response.user.UserResponse;
@@ -16,16 +21,22 @@ import app.sportahub.userservice.exception.user.UsernameAlreadyExistsException;
 import app.sportahub.userservice.exception.user.badge.UserAlreadyAssignedBadgeByThisGiverException;
 import app.sportahub.userservice.mapper.user.ProfileMapper;
 import app.sportahub.userservice.mapper.user.UserMapper;
-import app.sportahub.userservice.model.user.*;
-import app.sportahub.userservice.repository.BadgeRepository;
+import app.sportahub.userservice.model.user.Preferences;
+import app.sportahub.userservice.model.user.Profile;
+import app.sportahub.userservice.model.user.SportLevel;
+import app.sportahub.userservice.model.user.User;
 import app.sportahub.userservice.repository.UserRepository;
+import org.bson.types.ObjectId;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 
@@ -37,9 +48,12 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+
+@ExtendWith(MockitoExtension.class)
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -48,10 +62,10 @@ public class UserServiceTest {
     private UserRepository userRepository;
 
     @Mock
-    private BadgeRepository badgeRepository;
+    private KeycloakApiClient keycloakApiClient;
 
     @Mock
-    private KeycloakApiClient keycloakApiClient;
+    private final MongoConfig.TimestampToDateConverter converter = new MongoConfig.TimestampToDateConverter();
 
     private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
     private final ProfileMapper profileMapper = Mappers.getMapper(ProfileMapper.class);
@@ -61,8 +75,7 @@ public class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        userService = new UserServiceImpl(userRepository, badgeRepository,
-                keycloakApiClient, userMapper, profileMapper);
+        userService = new UserServiceImpl(userRepository, keycloakApiClient, userMapper, profileMapper);
     }
 
     private UserRequest getUserRequest() {
@@ -334,10 +347,9 @@ public class UserServiceTest {
                 "M",
                 "12345",
                 "123-456-7890",
-                "A",
                 List.of(new SportLevel("Basketball", "Intermediate"),
                         new SportLevel("Soccer", "Beginner")),
-                List.of()
+                "A"
         );
         ProfileRequest profileRequest = new ProfileRequest(
                 null,
