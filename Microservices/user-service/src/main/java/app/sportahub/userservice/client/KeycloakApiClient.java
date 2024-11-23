@@ -372,7 +372,6 @@ public class KeycloakApiClient {
                 });
     }
 
-
     /**
      * Retrieves an access token using client credentials.
      * Caches the token and reuses it until it expires.
@@ -460,5 +459,4 @@ public class KeycloakApiClient {
                     return Mono.error(new KeycloakCommunicationException(statusCode, combinedError));
                 });
     }
-
 }
