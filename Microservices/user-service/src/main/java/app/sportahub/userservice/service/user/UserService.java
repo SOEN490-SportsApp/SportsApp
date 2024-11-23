@@ -19,7 +19,7 @@ public interface UserService {
 
     ProfileResponse patchUserProfile(String id, ProfileRequest profileRequest);
 
-    User assignBadge(String userId, String badgeId, String giverId);
+    UserResponse assignBadge(String userId, String badgeId, String giverId);
 
     List<BadgeWithCountResponse> getUserBadges(String userId);
 }
