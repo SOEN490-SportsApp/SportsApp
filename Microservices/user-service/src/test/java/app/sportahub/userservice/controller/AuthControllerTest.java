@@ -127,7 +127,4 @@ public class AuthControllerTest {
                 .andExpect(status().isInternalServerError())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.error").value("An unexpected error occurred: Unexpected error occurred")); // Updated to match actual response
     }
-
-
-
 }
