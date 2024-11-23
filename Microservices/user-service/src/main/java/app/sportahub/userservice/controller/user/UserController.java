@@ -60,7 +60,7 @@ public class UserController {
     @Operation(summary = "Assign a badge to a user",
             description = "Allows a user to assign a badge to another user and returns details of the assigned badge.")
     public UserResponse assignBadge(@PathVariable String userId, @RequestParam String giverId, @RequestParam String badgeId) {
-        return UserResponse.from(userService.assignBadge(userId, badgeId, giverId));
+        return userService.assignBadge(userId, badgeId, giverId);
     }
 
     @GetMapping("/{userId}/badge")

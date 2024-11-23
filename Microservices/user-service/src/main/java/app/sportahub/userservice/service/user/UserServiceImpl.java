@@ -117,7 +117,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User assignBadge(String userId, String badgeId, String giverId) {
+    public UserResponse assignBadge(String userId, String badgeId, String giverId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserDoesNotExistException(userId));
         Profile profile = Optional.ofNullable(user.getProfile()).orElse(Profile.builder().build());
@@ -131,7 +131,7 @@ public class UserServiceImpl implements UserService {
                 .giverId(giverId)
                 .build();
         profile.getBadges().add(newBadge);
-        return userRepository.save(user);
+        return userMapper.userToUserResponse(userRepository.save(user));
     }
 
     @Override
