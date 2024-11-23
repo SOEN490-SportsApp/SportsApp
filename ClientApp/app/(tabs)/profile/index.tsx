@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Image, ActivityIndicator, SafeAreaView, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import axiosInstance from '@/services/axiosInstance';
 import CustomTabMenu from '@/components/CustomTabMenu';
+import { useRouter } from 'expo-router';
 
 // Define the profile type
 interface Profile {
@@ -94,6 +95,8 @@ const AboutTab: React.FC<{ profile: Profile }> = ({ profile }) => (
 );
 
 const ProfilePage: React.FC = () => {
+    const router = useRouter();
+
     const [profile, setProfile] = useState<Profile>({
         firstName: 'Placeholder',
         lastName: 'Placeholder',
@@ -155,7 +158,7 @@ const ProfilePage: React.FC = () => {
             <View className="flex-row justify-center items-center p-4 relative">
                 <Text className="text-2xl font-bold text-black">Profile</Text>
                 <TouchableOpacity 
-                    onPress={() => console.log("Edit Profile Pressed")} 
+                    onPress={() => router.push('/(settings)/settingsPage')} 
                     className="absolute right-4" // Position Edit button in top-right
                 >
                     <Text className="text-blue-600 font-semibold">Edit</Text>
