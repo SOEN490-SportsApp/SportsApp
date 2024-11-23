@@ -53,9 +53,6 @@ public class UserServiceTest {
     @Mock
     private KeycloakApiClient keycloakApiClient;
 
-    @Mock
-    private final MongoConfig.TimestampToDateConverter converter = new MongoConfig.TimestampToDateConverter();
-
     private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
     private final ProfileMapper profileMapper = Mappers.getMapper(ProfileMapper.class);
 
@@ -64,7 +61,8 @@ public class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        userService = new UserServiceImpl(userRepository, keycloakApiClient, userMapper, profileMapper);
+        userService = new UserServiceImpl(userRepository, badgeRepository,
+                keycloakApiClient, userMapper, profileMapper);
     }
 
     private UserRequest getUserRequest() {
@@ -336,9 +334,10 @@ public class UserServiceTest {
                 "M",
                 "12345",
                 "123-456-7890",
+                "A",
                 List.of(new SportLevel("Basketball", "Intermediate"),
                         new SportLevel("Soccer", "Beginner")),
-                "A"
+                List.of()
         );
         ProfileRequest profileRequest = new ProfileRequest(
                 null,
