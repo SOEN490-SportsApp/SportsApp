@@ -50,8 +50,8 @@ public class AuthController {
 
     @PutMapping("/send-verification-email")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "resend verification email",
-            description = "random description"
+    @Operation(summary = "send verification email",
+            description = "Sends a verification email to the specified user. This email contains a link or token that the user must use to confirm their email address and complete the registration."
     )
     public void sendVerificationEmail(@RequestBody Map<String, Object> payload) {
         authService.sendVerificationEmail(payload.get("email").toString());
