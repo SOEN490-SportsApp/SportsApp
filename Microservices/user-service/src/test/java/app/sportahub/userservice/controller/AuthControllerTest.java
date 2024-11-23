@@ -25,6 +25,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
@@ -97,4 +100,36 @@ public class AuthControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.error").value("User with id:" + sendVerificationEmailRequest.email() + "does not exist."));
     }
+
+    @SneakyThrows
+    @Test
+    public void shouldSendVerificationEmailSuccessfully() {
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("email", "test@example.com");
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/auth/send-verification-email")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(payload)))
+                .andExpect(status().isOk());
+    }
+
+    @SneakyThrows
+    @Test
+    public void shouldReturnInternalServerErrorOnUnexpectedException() {
+        String email = "test@example.com";
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("email", email);
+
+        doThrow(new RuntimeException("Unexpected error occurred"))
+                .when(authService).sendVerificationEmail(email);
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/auth/send-verification-email")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(payload)))
+                .andExpect(status().isInternalServerError())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.error").value("An unexpected error occurred: Unexpected error occurred")); // Updated to match actual response
+    }
+
+
+
 }
