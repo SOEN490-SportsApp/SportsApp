@@ -55,6 +55,7 @@ public class UserController {
     public ProfileResponse patchProfile(@PathVariable String id, @Valid @RequestBody ProfileRequest profileRequest) {
         return userService.patchUserProfile(id, profileRequest);
     }
+
     @PostMapping("/{userId}/badge")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Assign a badge to a user",
