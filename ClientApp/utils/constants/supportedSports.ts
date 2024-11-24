@@ -1,16 +1,16 @@
 const supportedSports = [
-  { label: "American Football", value: "Football" },
-  { label: "Basketball", value: "Basketball" },
-  { label: "Baseball", value: "Baseball" },
-  { label: "Ice Hockey", value: "Hockey" },
-  { label: "Soccer", value: "Soccer" },
-  { label: "Golf", value: "Golf" },
-  { label: "Tennis", value: "Tennis" },
-  { label: "Mixed Martial Arts", value: "Mixed Martial Arts" },
-  { label: "Boxing", value: "Boxing" },
-  { label: "Cycling", value: "Cycling" },
-  { label: "Rugby", value: "Rugby" },
-  { label: "Other", value: "Other" },
+  { id: 1, name: "Football", icon: "football", },
+  { id: 2, name: "Basketball", icon: "basketball",},
+  { id: 3, name: "Baseball", icon: "baseball-bat" },
+  { id: 4, name: "Hockey", icon: "hockey-sticks" },
+  { id: 5, name: "Soccer", icon: "soccer" },
+  { id: 6, name: "Golf", icon: "golf-tee" },
+  { id: 7, name: "Tennis", icon: "tennis" },
+  { id: 8, name: "Hiking", icon: "hiking" },
+  { id: 9, name: "Boxing", icon: "boxing-glove" },
+  { id: 10, name: "Cycling", icon: "bike" },
+  { id: 11, name: "Rugby", icon: "rugby" },
+  { id: 12, name: "Ping-Pong", icon: "table-tennis" },
 ];
 
 export default supportedSports;

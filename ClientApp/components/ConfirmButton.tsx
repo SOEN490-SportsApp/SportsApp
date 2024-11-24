@@ -14,6 +14,7 @@ interface CustomButtonProps {
 const ConfirmButton: React.FC<CustomButtonProps> = ({ icon, text, onPress, iconPlacement }) => {
   return (
     <TouchableOpacity
+    testID="confirmButton"
       onPress={onPress}
       style={styles.button}
     >
