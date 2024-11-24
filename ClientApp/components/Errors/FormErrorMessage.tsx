@@ -11,7 +11,7 @@ const FormErrorMessage: React.FC<ErrorMessageProps> = ({ error }) => {
 
   return (
     <View className="flex-col">
-      <Text className="pl-4 text-red-500 text-xs">{error.message}</Text>
+      <Text style={{paddingLeft: 16, fontSize:12, color:'red'}}>{error.message}</Text>
     </View>
   );
 };

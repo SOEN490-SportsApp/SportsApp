@@ -6,14 +6,15 @@ import { useForm, Controller } from "react-hook-form";
 import { Picker } from "@react-native-picker/picker";
 import { IconPlacement } from "@/utils/constants/enums";
 import { UPDATE_PROFILE_ENDPOINT } from "@/utils/api/endpoints";
-import { View, Text, TextInput, Modal, ScrollView, Alert, TouchableOpacity,StyleSheet} from "react-native";
+import { View, Text, TextInput, Modal, ScrollView, Alert, TouchableOpacity,StyleSheet, TouchableWithoutFeedback, Button} from "react-native";
 import FormErrorMessage from "@/components/Errors/FormErrorMessage";
 import RegisterProfileSports from "@/components/RegisterProfile/RegisterProfileSports";
 import { useAuth } from "@/utils/context/AuthContext";
 import axiosInstance from "@/api/axiosInstance";
-import { isOlderThanSixteen, isValidDate, formatBirthday} from "@/utils/helpers/ageHelpers";
-import { mvs, mhs, vs, hs } from "@/utils/helpers/uiScaler";
-
+import { isOlderThanSixteen, isValidDate, formatBirthday, formatBirthdateToLocalDate} from "@/utils/helpers/ageHelpers";
+import { mvs,hs } from "@/utils/helpers/uiScaler";
+import Toast from 'react-native-toast-message';
+import themeColors from "@/utils/constants/colors";
 
 
 type SelectedSport = { name: string; ranking: string };
@@ -52,7 +53,7 @@ const formatPhoneNumber = (value: string) => {
 
 const RegisterProfilePage: React.FC = () => {
   const router = useRouter();
-  const {getRegistrationUserId} = useAuth()
+  const { getRegistrationUserId } = useAuth()
   const {
     control,
     handleSubmit,
@@ -68,9 +69,6 @@ const RegisterProfilePage: React.FC = () => {
     const fetchUserId = async () => {
       const userId = await getRegistrationUserId()
       setRegistrationUserId(userId);
-      if (registrationUserId) {
-        console.log("Stored User ID:", registrationUserId);
-      }
     };
     fetchUserId();
   }, []);
@@ -80,6 +78,23 @@ const RegisterProfilePage: React.FC = () => {
     { label: "Female", value: "Female" },
     { label: "Other", value: "Other" },
   ];
+
+  const showToast = (status: string) => {
+    if(status === 'success'){
+    Toast.show({
+      type: 'success',
+      text1: 'Success!',
+      text2: 'Profile created successfully',
+    });
+  }
+  if(status === 'error'){
+    Toast.show({
+      type: 'error',
+      text1: 'Error!',
+      text2: 'Error creating profile',
+    });
+  }
+  };
 
   const nextStep = async (currentStep: number) => {
     if (currentStep === 1) {
@@ -109,20 +124,9 @@ const RegisterProfilePage: React.FC = () => {
     }
   };
 
-  const validatePhoneNumber = (data: RegisterProfilePageFormData) => {
-    if (data.phoneNumber.length === 10) {
-      let newNumber = [
-        data.phoneNumber.slice(0, 3),
-        data.phoneNumber.slice(3, 6),
-        data.phoneNumber.slice(6, 10),
-      ];
-      data.phoneNumber = newNumber.join("-");
-      console.log(data.phoneNumber);
-    }
-  };
 
   const onSubmit = async (data: RegisterProfilePageFormData) => {
-    console.log(data)
+    if(data){
     const registrationResult = await registerProfile({
       firstName: data.firstName,
       lastName: data.lastName,
@@ -130,16 +134,18 @@ const RegisterProfilePage: React.FC = () => {
       gender: data.gender,
       phoneNumber: data.phoneNumber,
       postalCode: data.postalCode,
-      supportedSports: data.selectedSports
+      sportsOfPreference: data.selectedSports
     });
-    if (data) {
-      validatePhoneNumber(data);
-      console.log(data);
-      Alert.alert("Successful creation");
-    }
-    router.replace("/(tabs)/home");
+    if (registrationResult.success) {
+      showToast('success')
+      Alert.alert("Success", "Profile was created successfully");
+      router.replace("/(tabs)/home");
+    }else{
+      showToast('error')
+      console.log(registrationResult.error);
+    } 
+  }
   };
-
   const registerProfile = async (data: any): Promise<RegisteredUserResponse> => {
     if (!registrationUserId) {
       console.error('Registration user ID is not defined');
@@ -148,12 +154,9 @@ const RegisterProfilePage: React.FC = () => {
         error: 'Registration user ID is missing',
       };
     }
-  
-    const updateProfileURL = UPDATE_PROFILE_ENDPOINT(registrationUserId);
-  
+    data.dateOfBirth = formatBirthdateToLocalDate(data.dateOfBirth)
     try {
-      const response = await axiosInstance.patch(updateProfileURL, data);
-  
+      const response = await axiosInstance.patch(UPDATE_PROFILE_ENDPOINT(registrationUserId), data);
       if (response && (response.status === 201 || response.status === 200)) {
         return {
           success: true,
@@ -226,30 +229,30 @@ const RegisterProfilePage: React.FC = () => {
                   )}
                 </View>
                 <View>
-                <View style={styles.inputContainer}>
-                  <MaterialCommunityIcons
-                    name="account"
-                    size={mvs(20)}
-                    color="#aaa"
-                  />
-                  <Controller
-                    control={control}
-                    name="lastName"
-                    rules={{ required: "Last name is required" }}
-                    render={({ field: { onChange, onBlur, value } }) => (
-                      <TextInput
-                        placeholder={"Last name"}
-                        onBlur={onBlur}
-                        onChangeText={onChange}
-                        value={value}
-                      />
-                    )}
-                  />
+                  <View style={styles.inputContainer}>
+                    <MaterialCommunityIcons
+                      name="account"
+                      size={mvs(20)}
+                      color="#aaa"
+                    />
+                    <Controller
+                      control={control}
+                      name="lastName"
+                      rules={{ required: "Last name is required" }}
+                      render={({ field: { onChange, onBlur, value } }) => (
+                        <TextInput
+                          placeholder={"Last name"}
+                          onBlur={onBlur}
+                          onChangeText={onChange}
+                          value={value}
+                        />
+                      )}
+                    />
+                  </View>
+                  {errors.lastName && (
+                    <FormErrorMessage error={errors.lastName} />
+                  )}
                 </View>
-                {errors.lastName && (
-                  <FormErrorMessage error={errors.lastName} />
-                )}
-</View>
                 <View
                   style={[styles.flexRowDirection, styles.birthDateContainer]}
                 >
@@ -275,7 +278,7 @@ const RegisterProfilePage: React.FC = () => {
                           <View style={styles.flexRowDirection}>
                             <TextInput
                               placeholder="yyyy/mm/dd"
-                              style={{marginLeft:4}}
+                              style={{ marginLeft: 4 }}
                               onBlur={onBlur}
                               onChangeText={(text: string) => {
                                 const formattedText = formatBirthday(text);
@@ -328,14 +331,12 @@ const RegisterProfilePage: React.FC = () => {
                                 >
                                   <View style={styles.genderModalContainer}>
                                     <View style={styles.genderModalPicker}>
-                                      {/* Adjust width and padding */}
                                       <Picker
                                         testID="genderPickerTest"
                                         selectedValue={selectedGender}
                                         onValueChange={(gender: string) => {
                                           onChange(gender);
                                           setSelectedGender(gender);
-                                          setShowGenderPicker(false);
                                         }}
                                       >
                                         {genderObject.map((gender, index) => (
@@ -346,6 +347,36 @@ const RegisterProfilePage: React.FC = () => {
                                           />
                                         ))}
                                       </Picker>
+                                      <View
+                                        style={{
+                                          display: "flex",
+                                          flexDirection: "row",
+                                          justifyContent: "center",
+                                        }}
+                                      >
+                                        <TouchableOpacity
+                                          style={{
+                                            alignItems: "center",
+                                            backgroundColor:
+                                              themeColors.button
+                                                .primaryBackground,
+                                            paddingHorizontal: 12,
+                                            borderRadius: 24,
+                                            width: "50%",
+                                            paddingVertical: 8,
+                                          }}
+                                          onPress={() => {
+                                            if (selectedGender === "") {
+                                              onChange("Male");
+                                            }
+                                            setShowGenderPicker(false);
+                                          }}
+                                        >
+                                          <Text style={{ color: "white" }}>
+                                            Select
+                                          </Text>
+                                        </TouchableOpacity>
+                                      </View>
                                     </View>
                                   </View>
                                 </Modal>
@@ -395,41 +426,40 @@ const RegisterProfilePage: React.FC = () => {
                   )}
                 </View>
                 <View>
-                <View style={styles.inputContainer}>
-                  <MaterialCommunityIcons
-                    name="map"
-                    size={mvs(20)}
-                    color="#aaa"
-                  />
-                  <Controller
-                    control={control}
-                    name="postalCode"
-                    rules={{
-                      required: "Postal code is required",
-                      pattern: {
-                        value:
-                          /^([A-Za-z]\d[A-Za-z] \d[A-Za-z]\d|[A-Za-z]\d[A-Za-z]\d[A-Za-z]\d)$/,
-                        message: "Enter valid format eg. A1A 1A1",
-                      },
-                    }}
-                    render={({ field: { onChange, onBlur, value } }) => (
-                      <TextInput
-                        placeholder="Postal code"
-                        onBlur={onBlur}
-                        onChangeText={onChange}
-                        value={value ? value : ""}
-                      />
-                    )}
-                  />
-                </View>
-                {errors.postalCode && (
-                  <FormErrorMessage error={errors.postalCode} />
-                 
-                )}
+                  <View style={styles.inputContainer}>
+                    <MaterialCommunityIcons
+                      name="map"
+                      size={mvs(20)}
+                      color="#aaa"
+                    />
+                    <Controller
+                      control={control}
+                      name="postalCode"
+                      rules={{
+                        required: "Postal code is required",
+                        pattern: {
+                          value:
+                            /^([A-Za-z]\d[A-Za-z] \d[A-Za-z]\d|[A-Za-z]\d[A-Za-z]\d[A-Za-z]\d)$/,
+                          message: "Enter valid format eg. A1A 1A1",
+                        },
+                      }}
+                      render={({ field: { onChange, onBlur, value } }) => (
+                        <TextInput
+                          placeholder="Postal code"
+                          onBlur={onBlur}
+                          onChangeText={onChange}
+                          value={value ? value : ""}
+                        />
+                      )}
+                    />
+                  </View>
+                  {errors.postalCode && (
+                    <FormErrorMessage error={errors.postalCode} />
+                  )}
                 </View>
               </View>
             </ScrollView>
-            <View style={{ bottom: 0, marginTop:4}}>
+            <View style={{ bottom: 0, marginTop: 4 }}>
               <ConfirmButton
                 text="Continue"
                 onPress={() => {
@@ -459,6 +489,7 @@ const RegisterProfilePage: React.FC = () => {
                       setCurrentStep(1);
                     }}
                   >
+                    <Toast />
                     <MaterialCommunityIcons
                       name="arrow-left-thin"
                       testID="backArrow"
@@ -528,6 +559,7 @@ const RegisterProfilePage: React.FC = () => {
 const styles = StyleSheet.create({
   scrollViewContainer: {
     flex: 1,
+    flexGrow: 1
   },
   imageContainer: {
     flexDirection: "row",

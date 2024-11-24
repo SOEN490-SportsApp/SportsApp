@@ -1,7 +1,6 @@
 // Validates a user is over 16
 export const isOlderThanSixteen = (dob: string) => {
   const date = new Date(dob.replaceAll('/', '-'))
-  console.log(date)
   const currentDate = new Date();
   const ageDiff = currentDate.getFullYear() - date.getFullYear();
 
@@ -15,10 +14,9 @@ export const isOlderThanSixteen = (dob: string) => {
   return isOldEnough || "Must be at least 16 years old";
 };
 
+// Validates user format and proper dates
 export const isValidDate = (date: string) => {
-  console.log(date)
   const parts = date.split("/");
-  console.log(parts)
   if (parts.length === 3) {
     const year = parseInt(parts[0], 10);
     const month = parseInt(parts[1], 10);
@@ -40,6 +38,7 @@ export const isValidDate = (date: string) => {
   return "Enter a valid date";
 };
 
+// Formats date of birth into yyyy/mm/dd
 export const formatBirthday = (text: string) => {
   let cleaned = text.replace(/\D/g, "");
   if (cleaned.length <= 4) {
@@ -51,3 +50,14 @@ export const formatBirthday = (text: string) => {
   }
   return `${cleaned.slice(0, 4)}/${cleaned.slice(4, 6)}/${cleaned.slice(6, 8)}`;
 };
+
+// Prepares from yyyy/mm/dd -> LocalDate for backend
+export const formatBirthdateToLocalDate = (text: string) => {
+  let newDate = new Date();
+  const year = parseInt(text.slice(0, 4));
+  const month = parseInt(text.slice(5, 7));
+  const day = parseInt(text.slice(8, 10));
+  newDate.setFullYear(year, month, day);
+
+  return newDate;
+}
