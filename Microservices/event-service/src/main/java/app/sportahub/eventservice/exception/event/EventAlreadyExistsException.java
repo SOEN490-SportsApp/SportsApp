@@ -7,7 +7,7 @@ import org.springframework.web.server.ResponseStatusException;
 @ResponseStatus(code = HttpStatus.CONFLICT, reason = "Event with this id already exists.")
 public class EventAlreadyExistsException extends ResponseStatusException {
 
-    public EventAlreadyExistsException(String id) {
-        super(HttpStatus.CONFLICT, "Event with this id: " + id + " already exists.");
+    public EventAlreadyExistsException(String eventName) {
+        super(HttpStatus.CONFLICT, "Event with this id: " + eventName + " already exists.");
     }
 }
