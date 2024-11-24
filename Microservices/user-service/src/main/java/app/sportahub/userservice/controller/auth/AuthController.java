@@ -3,6 +3,7 @@ package app.sportahub.userservice.controller.auth;
 import app.sportahub.userservice.dto.request.auth.LoginRequest;
 import app.sportahub.userservice.dto.request.auth.RefreshTokenRequest;
 import app.sportahub.userservice.dto.request.auth.RegistrationRequest;
+import app.sportahub.userservice.dto.request.auth.SendVerificationEmailRequest;
 import app.sportahub.userservice.dto.response.auth.LoginResponse;
 import app.sportahub.userservice.dto.response.auth.TokenResponse;
 import app.sportahub.userservice.dto.response.user.UserResponse;
@@ -12,8 +13,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -52,8 +51,8 @@ public class AuthController {
     @Operation(summary = "send verification email",
             description = "Sends a verification email to the specified user. This email contains a link or token that the user must use to confirm their email address and complete the registration."
     )
-    public void sendVerificationEmail(@RequestBody Map<String, Object> payload) {
-        authService.sendVerificationEmail(payload.get("email").toString());
+    public void sendVerificationEmail(@RequestBody SendVerificationEmailRequest sendVerificationEmailRequest) {
+        authService.sendVerificationEmail(sendVerificationEmailRequest.email());
     }
 }
 
