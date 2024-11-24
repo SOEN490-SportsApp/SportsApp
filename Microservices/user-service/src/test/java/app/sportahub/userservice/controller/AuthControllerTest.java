@@ -8,6 +8,7 @@ import app.sportahub.userservice.dto.response.auth.LoginResponse;
 import app.sportahub.userservice.dto.response.auth.TokenResponse;
 import app.sportahub.userservice.exception.user.UserDoesNotExistException;
 import app.sportahub.userservice.service.auth.AuthServiceImpl;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,9 +20,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
@@ -44,12 +45,13 @@ public class AuthControllerTest {
     private LoginRequest validLoginRequest;
     private LoginResponse loginResponse;
     private SendVerificationEmailRequest sendVerificationEmailRequest;
+
     @SneakyThrows
     @BeforeEach
     public void setUp() {
         validLoginRequest = new LoginRequest("danDuguay", "mypassword");
         sendVerificationEmailRequest = new SendVerificationEmailRequest("test@gmail.com");
-        TokenResponse tokenResponse = new TokenResponse("accessTokenResponse", "refreshTokenResponse");
+        TokenResponse tokenResponse = new TokenResponse("accessTokenResponse", "refreshTokenResponse", false);
         loginResponse = new LoginResponse("userIDResponse", tokenResponse);
 
         when(authService.loginUser(any())).thenReturn(loginResponse);
@@ -67,7 +69,8 @@ public class AuthControllerTest {
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.userID").value(loginResponse.userID()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.tokenResponse.accessToken").value(loginResponse.tokenResponse().accessToken()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.tokenResponse.refreshToken").value(loginResponse.tokenResponse().refreshToken()));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.tokenResponse.refreshToken").value(loginResponse.tokenResponse().refreshToken()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.tokenResponse.emailVerified").value(loginResponse.tokenResponse().emailVerified()));
     }
 
     @SneakyThrows
