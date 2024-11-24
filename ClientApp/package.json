@@ -42,6 +42,12 @@
       "text",
       "clover"
     ],
+    "coverageReporters": [
+      "json",
+      "lcov",
+      "text",
+      "clover"
+    ],
     "coverageThreshold": {
       "global": {
         "branches": 0,
