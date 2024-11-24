@@ -355,6 +355,7 @@ const RegisterProfilePage: React.FC = () => {
                                         }}
                                       >
                                         <TouchableOpacity
+                                        testID="genderPickerSubmit"
                                           style={{
                                             alignItems: "center",
                                             backgroundColor:
