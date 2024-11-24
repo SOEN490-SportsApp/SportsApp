@@ -23,7 +23,7 @@ public class EventController {
     @Operation(summary = "Retrieve event by ID",
     description = "Fetches an event by their unique identifier.")
     public EventResponse getEventById(@PathVariable String id) {
-        return EventResponse.from(eventService.getEventById(id));
+        return eventService.getEventById(id);
     }
 
     @PostMapping
@@ -31,6 +31,6 @@ public class EventController {
     @Operation(summary = "Creates a new event",
     description = "Creates a new event resource to the database based on the provided event details.")
     public EventResponse createEvent(@Valid @RequestBody EventRequest eventRequest) {
-        return EventResponse.from(eventService.createEvent(eventRequest));
+        return eventService.createEvent(eventRequest);
     }
 }

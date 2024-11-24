@@ -1,12 +1,12 @@
 package app.sportahub.eventservice.service.event;
 
 import app.sportahub.eventservice.dto.request.EventRequest;
-import app.sportahub.eventservice.model.event.Event;
+import app.sportahub.eventservice.dto.response.EventResponse;
 
 public interface EventService {
 
-    Event getEventById(String id);
+    EventResponse getEventById(String id);
 
-    Event createEvent(EventRequest eventRequest);
+    EventResponse createEvent(EventRequest eventRequest);
 
 }
