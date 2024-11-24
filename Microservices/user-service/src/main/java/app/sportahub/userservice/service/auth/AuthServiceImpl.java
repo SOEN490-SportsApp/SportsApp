@@ -63,24 +63,21 @@ public class AuthServiceImpl implements AuthService {
                 })
                 .block();
 
-        return userMapper.userToUserResponse(
-                userRepository.save(
-                        User.builder()
-                                .withCreatedAt(Timestamp.valueOf(LocalDateTime.now()))
-                                .withUpdatedAt(Timestamp.valueOf(LocalDateTime.now()))
-                                .withKeycloakId(keycloakId)
-                                .withEmail(userRequest.email())
-                                .withUsername(userRequest.username())
-                                .build()));
-        return userMapper.userToUserResponse(
-                userRepository.save(
-                        User.builder()
-                                .withCreatedAt(Timestamp.valueOf(LocalDateTime.now()))
-                                .withUpdatedAt(Timestamp.valueOf(LocalDateTime.now()))
-                                .withKeycloakId(keycloakId)
-                                .withEmail(userRequest.email())
-                                .withUsername(userRequest.username())
-                                .build()));
+        User user = userRepository.save(
+                User.builder()
+                        .withCreatedAt(Timestamp.valueOf(LocalDateTime.now()))
+                        .withUpdatedAt(Timestamp.valueOf(LocalDateTime.now()))
+                        .withKeycloakId(keycloakId)
+                        .withEmail(userRequest.email())
+                        .withUsername(userRequest.username())
+                        .build());
+
+        log.info("AuthServiceImpl::registerUser: User with id:{} successfully registered", user.getKeycloakId());
+
+        keycloakApiClient.sendVerificationEmail(user.getKeycloakId()).block();
+        log.info("AuthServiceImpl::registerUser: Verification email sent to {} for user with keycloak id:{}",
+                user.getEmail(), user.getKeycloakId());
+        return userMapper.userToUserResponse(user);
     }
 
     @Override
