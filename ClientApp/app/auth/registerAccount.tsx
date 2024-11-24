@@ -194,7 +194,7 @@ const RegisterAccountPage: React.FC = () => {
                   secureTextEntry={!showConfirmPassword}
                 />
                 <TouchableOpacity
-                  onPress={() => setShowPassword((prev) => !prev)}
+                  onPress={() => setShowConfirmPassword((prev) => !prev)}
                   style={styles.eyeIcon}
                 >
                   <MaterialCommunityIcons
