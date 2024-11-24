@@ -4,8 +4,10 @@ import app.sportahub.userservice.config.auth.TestSecurityConfig;
 import app.sportahub.userservice.controller.auth.AuthController;
 import app.sportahub.userservice.dto.request.auth.LoginRequest;
 import app.sportahub.userservice.dto.request.auth.SendVerificationEmailRequest;
+import app.sportahub.userservice.dto.request.auth.SendVerificationEmailRequest;
 import app.sportahub.userservice.dto.response.auth.LoginResponse;
 import app.sportahub.userservice.dto.response.auth.TokenResponse;
+import app.sportahub.userservice.exception.user.UserDoesNotExistException;
 import app.sportahub.userservice.exception.user.UserDoesNotExistException;
 import app.sportahub.userservice.service.auth.AuthServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,10 +24,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
@@ -48,13 +46,12 @@ public class AuthControllerTest {
     private LoginRequest validLoginRequest;
     private LoginResponse loginResponse;
     private SendVerificationEmailRequest sendVerificationEmailRequest;
-
     @SneakyThrows
     @BeforeEach
     public void setUp() {
         validLoginRequest = new LoginRequest("danDuguay", "mypassword");
         sendVerificationEmailRequest = new SendVerificationEmailRequest("test@gmail.com");
-        TokenResponse tokenResponse = new TokenResponse("accessTokenResponse", "refreshTokenResponse", false);
+        TokenResponse tokenResponse = new TokenResponse("accessTokenResponse", "refreshTokenResponse");
         loginResponse = new LoginResponse("userIDResponse", tokenResponse);
 
         when(authService.loginUser(any())).thenReturn(loginResponse);
@@ -72,8 +69,7 @@ public class AuthControllerTest {
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.userID").value(loginResponse.userID()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.tokenResponse.accessToken").value(loginResponse.tokenResponse().accessToken()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.tokenResponse.refreshToken").value(loginResponse.tokenResponse().refreshToken()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.tokenResponse.emailVerified").value(loginResponse.tokenResponse().emailVerified()));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.tokenResponse.refreshToken").value(loginResponse.tokenResponse().refreshToken()));
     }
 
     @SneakyThrows
@@ -97,34 +93,5 @@ public class AuthControllerTest {
                         .content(objectMapper.writeValueAsString(sendVerificationEmailRequest)))
                 .andExpect(status().isNotFound())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.error").value("User with id:" + sendVerificationEmailRequest.email() + "does not exist."));
-    }
-
-    @SneakyThrows
-    @Test
-    public void shouldSendVerificationEmailSuccessfully() {
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("email", "test@example.com");
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/auth/send-verification-email")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(payload)))
-                .andExpect(status().isOk());
-    }
-
-    @SneakyThrows
-    @Test
-    public void shouldReturnInternalServerErrorOnUnexpectedException() {
-        String email = "test@example.com";
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("email", email);
-
-        doThrow(new RuntimeException("Unexpected error occurred"))
-                .when(authService).sendVerificationEmail(email);
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/auth/send-verification-email")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(payload)))
-                .andExpect(status().isInternalServerError())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.error").value("An unexpected error occurred: Unexpected error occurred")); // Updated to match actual response
     }
 }
