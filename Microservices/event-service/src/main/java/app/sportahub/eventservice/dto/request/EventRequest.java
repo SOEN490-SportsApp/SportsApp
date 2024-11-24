@@ -25,7 +25,7 @@ public record EventRequest(
                            @NotNull(message = "Date must be provided")
                            LocalDate date,
 
-                           @NotBlank(message = "Duration must be provided")
+                           @Nullable
                            String duration,
 
                            @Nullable
