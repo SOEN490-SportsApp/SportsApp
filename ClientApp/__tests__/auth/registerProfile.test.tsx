@@ -74,11 +74,13 @@ describe("profile preference form test", () => {
     
     // Select an option
     fireEvent.press(genderPicker);
+    fireEvent.press(getByTestId("genderPickerSubmit"))
     
     await waitFor(() => {
-      expect(genderText).toHaveTextContent("Gender");
+      expect(genderText).toHaveTextContent("Male");
     });
   });
+
     
   it('should allow selecting a ranking and confirm', async () => {
     const { getByText} = render(<RegisterProfileSports onChange={mockOnChange} />);
