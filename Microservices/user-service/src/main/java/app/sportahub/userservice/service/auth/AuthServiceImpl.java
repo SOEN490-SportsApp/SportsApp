@@ -15,6 +15,7 @@ import app.sportahub.userservice.exception.user.UsernameAlreadyExistsException;
 import app.sportahub.userservice.mapper.user.UserMapper;
 import app.sportahub.userservice.model.user.User;
 import app.sportahub.userservice.repository.UserRepository;
+import app.sportahub.userservice.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -87,7 +88,8 @@ public class AuthServiceImpl implements AuthService {
         TokenResponse tokenResponse = Mono.from(keycloakApiClient.login(loginRequest.identifier(), loginRequest.password())).map(jsonNode -> {
             String accessToken = jsonNode.get("access_token").asText();
             String refreshToken = jsonNode.get("refresh_token").asText();
-            return new TokenResponse(accessToken, refreshToken);
+            boolean emailVerified = JwtUtils.getClaim(accessToken, "email_verified").asBoolean();
+            return new TokenResponse(accessToken, refreshToken, emailVerified);
         }).block();
 
         return new LoginResponse(user.getId(), tokenResponse);
@@ -98,7 +100,8 @@ public class AuthServiceImpl implements AuthService {
         return Mono.from(keycloakApiClient.refreshToken(tokenRequest.refreshToken())).map(jsonNode -> {
             String refreshToken = jsonNode.get("refresh_token").asText();
             String accessToken = jsonNode.get("access_token").asText();
-            return new TokenResponse(accessToken, refreshToken);
+            boolean emailVerified = JwtUtils.getClaim(accessToken, "email_verified").asBoolean();
+            return new TokenResponse(accessToken, refreshToken, emailVerified);
         }).block();
     }
 
