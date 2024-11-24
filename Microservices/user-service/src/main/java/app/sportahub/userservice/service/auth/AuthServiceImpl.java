@@ -9,6 +9,7 @@ import app.sportahub.userservice.dto.response.auth.LoginResponse;
 import app.sportahub.userservice.dto.response.auth.TokenResponse;
 import app.sportahub.userservice.dto.response.user.UserResponse;
 import app.sportahub.userservice.exception.user.InvalidCredentialsException;
+import app.sportahub.userservice.exception.user.UserDoesNotExistException;
 import app.sportahub.userservice.exception.user.UserEmailAlreadyExistsException;
 import app.sportahub.userservice.exception.user.UsernameAlreadyExistsException;
 import app.sportahub.userservice.mapper.user.UserMapper;
@@ -98,8 +99,8 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void sendVerificationEmail(String email) {
-        User user = userRepository.findUserByEmail(email).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-        JsonNode response = keycloakApiClient.sendVerificationEmail(user.getKeycloakId()).block();
+        User user = userRepository.findUserByEmail(email).orElseThrow(() -> new UserDoesNotExistException(email));
+        keycloakApiClient.sendVerificationEmail(user.getKeycloakId()).block();
         log.info("AuthServiceImpl::sendVerificationEmail: verification email sent to {}", email);
     }
 }
