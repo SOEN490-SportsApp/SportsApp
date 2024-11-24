@@ -125,10 +125,6 @@ const LoginPage: React.FC = () => {
             onPress={handleSubmit(onSubmit)}
             iconPlacement={IconPlacement.left}
           />
-            <TouchableOpacity className="border" onPress={() => router.push('/auth/registerProfile')}>
-        <Text>Nic</Text>
-      </TouchableOpacity>
-
           <AuthenticationDivider text="Or" />
 
           <View style={styles.socialButtonsContainer}>
