@@ -71,7 +71,7 @@ public class AuthServiceImpl implements AuthService {
                         .withUsername(userRequest.username())
                         .build());
 
-        log.info("AuthServiceImpl::registerUser: User with id:{} successfully registered", user.getKeycloakId());
+        log.info("AuthServiceImpl::registerUser: User with id:{} successfully registered", user.getId());
 
         keycloakApiClient.sendVerificationEmail(user.getKeycloakId()).block();
         log.info("AuthServiceImpl::registerUser: Verification email sent to {} for user with keycloak id:{}",
