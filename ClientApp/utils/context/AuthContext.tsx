@@ -12,6 +12,8 @@ interface AuthContextData {
   logout: () => void;
   isAuthenticated: boolean;
   refreshAccessToken: () => Promise<string | null>;
+  setRegistrationUserId: (userId: string) => Promise<void>
+  getRegistrationUserId: () => Promise<string|null>
 }
 
 const AuthContext = createContext<AuthContextData | undefined>(undefined);
@@ -23,6 +25,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const router = useRouter();
 
   // Retrieve refresh token from SecureStore
+  const getRegistrationUserId = async (): Promise<string | null> => await AsyncStorage.getItem('registrationUserId')
+  const setRegistrationUserId = async (userId: string): Promise<void> => await AsyncStorage.setItem('registrationUserId', userId);
   const getRefreshToken = async (): Promise<string | null> => await AsyncStorage.getItem('refreshToken');
   const getAccessToken = async (): Promise<string | null> => await AsyncStorage.getItem('accessToken');
   const setAccessToken = async (token: string): Promise<void> => await AsyncStorage.setItem('accessToken', token);
@@ -165,7 +169,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   return (
-    <AuthContext.Provider value={{ userID, login, logout, isAuthenticated, refreshAccessToken }}>
+    <AuthContext.Provider value={{ userID, login, logout, isAuthenticated, refreshAccessToken, setRegistrationUserId, getRegistrationUserId }}>
       {children}
     </AuthContext.Provider>
   );

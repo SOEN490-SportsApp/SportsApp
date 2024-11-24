@@ -11,6 +11,7 @@ import axiosInstance from "@/api/axiosInstance";
 import { API_ENDPOINTS } from "@/utils/api/endpoints";
 import { hs, mhs, mvs, vs } from "@/utils/helpers/uiScaler";
 import themeColors from "@/utils/constants/colors";
+import { useAuth } from "@/utils/context/AuthContext";
 
 interface RegisterAccountPageFormData {
   username: string;
@@ -23,6 +24,7 @@ interface RegisterAccountPageFormData {
 // const [userINFO, setUserINFO] = useState({id: 0, email: "", username: ""});
 
 const RegisterAccountPage: React.FC = () => {
+  const {setRegistrationUserId} = useAuth()
   const { control, handleSubmit, formState: { errors }, watch, setValue } = useForm<RegisterAccountPageFormData>();
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
@@ -47,6 +49,9 @@ const RegisterAccountPage: React.FC = () => {
     });
 
     if (registrationResult.success) {
+      const userId = registrationResult.data?.id
+      if(userId)
+      {await setRegistrationUserId(userId)}
       Alert.alert("Success", "Account created successfully!");
       console.log("User info: ", registrationResult.data);
       router.push('/auth/registerProfile');
@@ -59,7 +64,6 @@ const RegisterAccountPage: React.FC = () => {
     try {
       const response = await axiosInstance.post(API_ENDPOINTS.REGISTER, data);
       if (response.status === 201 || response.status === 200) {
-
         console.log("User created successfully:", response.data);
         return {
           success: true,
