@@ -1,9 +1,8 @@
-import React, { useState, useEffect} from "react";
+import React, { useState} from "react";
 import supportedSports from "@/utils/constants/supportedSports";
 import { View, Text, TouchableOpacity, FlatList, Modal,Dimensions, StyleSheet, TouchableWithoutFeedback } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Picker } from "@react-native-picker/picker";
-import { mvs, mhs, vs, hs } from "@/utils/helpers/uiScaler";
+import { vs,  } from "@/utils/helpers/uiScaler";
 
 interface sportSelection {
   onChange: (SelectedSport: { name: string; ranking: string }[]) => void;
@@ -102,54 +101,92 @@ const RegisterProfileSports: React.FC<sportSelection> = ({ onChange }) => {
         animationType="slide"
         onRequestClose={() => setModalVisible(false)}
       >
-      <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
-        <View style={styles.modalView} >
-          <View style={styles.modalSection}>
-            <Text style={styles.modalMessage}>
-              Select your skill level in {currentSport?.name}
-            </Text>
-            <View style={styles.skillSelectionSection}>
-              <TouchableOpacity
-                onPress={() => setRanking("Beginner")}
-                style={ranking === 'Beginner' ? styles.beginnerLevelSelected: styles.normalOption}
-              >
-                <Text
-                  style={ranking === 'Beginner' ? styles.beginnerLevelSelectedText: styles.normalOptionText}
+        <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
+          <View style={styles.modalView}>
+            <View style={styles.modalSection}>
+              <Text style={styles.modalMessage}>
+                Select your skill level in {currentSport?.name}
+              </Text>
+              <View style={styles.skillSelectionSection}>
+                <TouchableOpacity
+                  onPress={() => setRanking("Beginner")}
+                  style={
+                    ranking === "Beginner"
+                      ? styles.beginnerLevelSelected
+                      : styles.normalOption
+                  }
                 >
-                  Beginner
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => setRanking("Intermediate")}
-                style={ranking === 'Intermediate' ? styles.intermediateLevelSelected: styles.normalOption}
-              >
-                <Text
-                  style={ranking === 'Intermediate' ? styles.intermediateLevelSelectedText : styles.normalOptionText}
+                  <Text
+                    style={
+                      ranking === "Beginner"
+                        ? styles.beginnerLevelSelectedText
+                        : styles.normalOptionText
+                    }
+                  >
+                    Beginner
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => setRanking("Intermediate")}
+                  style={
+                    ranking === "Intermediate"
+                      ? styles.intermediateLevelSelected
+                      : styles.normalOption
+                  }
                 >
-                  Intermediate
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => setRanking("Advanced")}
-                style={ranking === 'Advanced' ? styles.advancedLevelSelected: styles.normalOption}
-              >
-                <Text
-                  style={ranking === 'Advanced' ? styles.advancedLevelSelectedText : styles.normalOptionText}
+                  <Text
+                    style={
+                      ranking === "Intermediate"
+                        ? styles.intermediateLevelSelectedText
+                        : styles.normalOptionText
+                    }
+                  >
+                    Intermediate
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => setRanking("Advanced")}
+                  style={
+                    ranking === "Advanced"
+                      ? styles.advancedLevelSelected
+                      : styles.normalOption
+                  }
                 >
-                  Advanced
-                </Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.selectSkillButtonContainer}>
-              <TouchableOpacity onPress={removePick} style={[styles.baseSelectNRemoveButton, styles.selectSkillsButtons, {backgroundColor: 'white',borderColor: '#aaa'}]}>
-                <Text style={{color:'#aaa'}}>Remove</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={handleConfirm} style={[styles.baseSelectNRemoveButton, styles.selectSkillsButtons,  {backgroundColor: '#0C9E04',  borderColor: '#d3d3d3'}]}>
-                <Text style={{color: 'white' }}>Select</Text>
-              </TouchableOpacity>
+                  <Text
+                    style={
+                      ranking === "Advanced"
+                        ? styles.advancedLevelSelectedText
+                        : styles.normalOptionText
+                    }
+                  >
+                    Advanced
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.selectSkillButtonContainer}>
+                <TouchableOpacity
+                  onPress={removePick}
+                  style={[
+                    styles.baseSelectNRemoveButton,
+                    styles.selectSkillsButtons,
+                    { backgroundColor: "white", borderColor: "#aaa" },
+                  ]}
+                >
+                  <Text style={{ color: "#aaa" }}>Remove</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleConfirm}
+                  style={[
+                    styles.baseSelectNRemoveButton,
+                    styles.selectSkillsButtons,
+                    { backgroundColor: "#0C9E04", borderColor: "#d3d3d3" },
+                  ]}
+                >
+                  <Text style={{ color: "white" }}>Select</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
-        </View>
         </TouchableWithoutFeedback>
       </Modal>
     </>
