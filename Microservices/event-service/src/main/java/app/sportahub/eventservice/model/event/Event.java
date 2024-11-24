@@ -31,11 +31,9 @@ public class Event extends BaseEntity {
     @NotNull
     private Location location;
 
-
     @NotEmpty(message = "Date must be provided")
     private LocalDate date;
 
-    @NotBlank(message = "Duration must be provided")
     private String duration;
 
     @Builder.Default
