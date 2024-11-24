@@ -26,7 +26,7 @@ public record ProfileRequest(@Nullable
                              String phoneNumber,
 
                              @Nullable
-                             List<String> sportsOfPreference,
+                             List<SportLevelRequest> sportsOfPreference,
 
                              @Nullable
                              String ranking) {
