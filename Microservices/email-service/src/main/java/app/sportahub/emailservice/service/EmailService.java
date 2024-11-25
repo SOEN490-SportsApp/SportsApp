@@ -1,7 +1,7 @@
 package app.sportahub.emailservice.service;
 
-import app.sportahub.emailservice.dto.request.EmailRequest;
+import app.sportahub.emailservice.dto.request.EmailRequestDTO;
 
 public interface EmailService {
-    void sendEmail(EmailRequest emailRequest);
+    void sendEmail(EmailRequestDTO emailRequest);
 }
