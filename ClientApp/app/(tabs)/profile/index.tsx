@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, ActivityIndicator, SafeAreaView, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
-import axiosInstance from '@/api/axiosInstance';
+import axiosInstance from '@/services/axiosInstance';
 import CustomTabMenu from '@/components/CustomTabMenu';
 
 // Define the profile type

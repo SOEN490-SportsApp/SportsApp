@@ -8,7 +8,7 @@ import AuthenticationDivider from "@/components/AuthenticationDivider";
 import themeColors from "@/utils/constants/colors";
 import { IconPlacement } from "@/utils/constants/enums";
 import { hs, vs, mvs, mhs } from "@/utils/helpers/uiScaler";
-import { useAuth } from "../../utils/context/AuthContext"; // Import useAuth hook
+import { loginUser } from "@/services/authService";
 
 
 interface LoginPageFormData {
@@ -17,23 +17,20 @@ interface LoginPageFormData {
 }
 
 const LoginPage: React.FC = () => {
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LoginPageFormData>();
+  const { control, handleSubmit, formState: { errors } } = useForm<LoginPageFormData>();
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-  const { login } = useAuth(); // Use login from AuthContext
 
   const onSubmit = async (data: LoginPageFormData) => {
-    const result = await login(data.identifier, data.password);
-    if (result.success) {
-      router.push('/(tabs)/home'); // Navigate upon successful login
-    } else {
-      Alert.alert("Error", result.error || "Failed to Login.");
-    }  };
-
+    try {
+      await loginUser(data.identifier, data.password);
+      Alert.alert('Success', 'Logged in successfully');
+      router.push('/(tabs)/home');
+    } catch (error: any) {
+      Alert.alert('Error', error.message);
+    }
+  };
+  
   return (
     <View style={styles.container}>
       <View style={styles.mainContent}>
