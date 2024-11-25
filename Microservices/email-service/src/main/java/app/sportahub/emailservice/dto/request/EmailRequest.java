@@ -5,13 +5,11 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.Map;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class EmailRequestDTO {
+public class EmailRequest {
     private String recipientEmailAddress;
     private String senderEmailAddress;
     private String subject;
