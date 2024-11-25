@@ -6,20 +6,15 @@
  * It uses the constants defined in ALERT_MESSAGES to show the alert and allow for easy centralized changes.
  */
 
-import { Alert } from 'react-native';
-
-// Wrapper function for logging errors with specific codes and messages to the console
 export const consoleError = (title: string, message: string, code?: number) => {
   const alertTitle = code ? `${title} ${code}` : title;
   const alertMessage = code ? `${message}` : message;
   
-  // Log the error details only in development mode
   if (__DEV__) {
     console.error(`ERROR: ${alertTitle} - ${alertMessage}`);
   }
 };
 
-// Centralized messages for various HTTP status codes
 export const ALERT_MESSAGES = {
   // Common client-side errors
   badRequest: {
