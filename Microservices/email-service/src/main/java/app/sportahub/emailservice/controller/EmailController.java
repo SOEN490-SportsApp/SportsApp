@@ -1,6 +1,6 @@
 package app.sportahub.emailservice.controller;
 
-import app.sportahub.emailservice.dto.request.EmailRequest;
+import app.sportahub.emailservice.dto.request.EmailRequestDTO;
 import app.sportahub.emailservice.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/email")
+@RequestMapping("/api/emails")
 @RequiredArgsConstructor
 public class EmailController {
 
@@ -16,7 +16,7 @@ public class EmailController {
 
     @PostMapping("/send")
     @ResponseStatus(HttpStatus.OK)
-    public void sendEmail(@RequestBody EmailRequest emailRequest) {
+    public void sendEmail(@RequestBody EmailRequestDTO emailRequest) {
         emailService.sendEmail(emailRequest);
     }
 }
