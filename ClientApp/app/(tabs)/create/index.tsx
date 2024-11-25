@@ -1,4 +1,4 @@
-import axiosInstance from '@/api/axiosInstance';
+import axiosInstance from '@/services/axiosInstance';
 import React from 'react';
 import { View, Text, TextInput, Button } from 'react-native';
 const handleSubmit = async () => {{
