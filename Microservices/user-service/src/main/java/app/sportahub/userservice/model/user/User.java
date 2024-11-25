@@ -7,8 +7,8 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@EqualsAndHashCode(callSuper = false)
-@SuperBuilder(setterPrefix = "with")
+@EqualsAndHashCode(callSuper = true)
+@SuperBuilder(toBuilder = true, setterPrefix = "with")
 @Document("user")
 @AllArgsConstructor
 @NoArgsConstructor
@@ -26,6 +26,9 @@ public class User extends BaseEntity {
     @NotBlank(message = "Username must be provided")
     private String username;
 
-    private Profile profile;
-    private Preferences preferences;
+    @Builder.Default
+    private Profile profile = Profile.builder().build();
+
+    @Builder.Default
+    private Preferences preferences = Preferences.builder().build();
 }

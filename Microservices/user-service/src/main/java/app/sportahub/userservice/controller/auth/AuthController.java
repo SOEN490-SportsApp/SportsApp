@@ -3,6 +3,7 @@ package app.sportahub.userservice.controller.auth;
 import app.sportahub.userservice.dto.request.auth.LoginRequest;
 import app.sportahub.userservice.dto.request.auth.RefreshTokenRequest;
 import app.sportahub.userservice.dto.request.auth.RegistrationRequest;
+import app.sportahub.userservice.dto.request.auth.SendVerificationEmailRequest;
 import app.sportahub.userservice.dto.response.auth.LoginResponse;
 import app.sportahub.userservice.dto.response.auth.TokenResponse;
 import app.sportahub.userservice.dto.response.user.UserResponse;
@@ -26,7 +27,7 @@ public class AuthController {
     @Operation(summary = "Register a new user",
             description = "Creates a new user account based on the provided registration details.")
     public UserResponse registerUser(@RequestBody RegistrationRequest registrationRequest) {
-        return UserResponse.from(authService.registerUser(registrationRequest));
+        return authService.registerUser(registrationRequest);
     }
 
     @PostMapping("/login")
@@ -43,6 +44,15 @@ public class AuthController {
             description = "Generates a new access token using the provided refresh token.")
     public TokenResponse refreshToken(@RequestBody RefreshTokenRequest tokenRequest) {
         return authService.refreshToken(tokenRequest);
+    }
+
+    @PutMapping("/send-verification-email")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "send verification email",
+            description = "Sends a verification email to the specified user. This email contains a link or token that the user must use to confirm their email address and complete the registration."
+    )
+    public void sendVerificationEmail(@RequestBody SendVerificationEmailRequest sendVerificationEmailRequest) {
+        authService.sendVerificationEmail(sendVerificationEmailRequest.email());
     }
 }
 
