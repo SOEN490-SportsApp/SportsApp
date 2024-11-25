@@ -1,13 +1,19 @@
 import React from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Tabs } from 'expo-router';
-import { useRouter } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useAuth } from '@/utils/context/AuthContext';
+import { router, Tabs } from 'expo-router';
+import { logoutUser } from '@/services/authService';
+
+async function handleLogout() {
+  try {
+    await logoutUser();
+    console.log("Redirecting to login...");
+    router.replace('/auth/login');
+  } catch (error) {
+    console.error("Logout error:", error);
+  }
+}
 
 export default function TabLayout() {
-  const router = useRouter();
-  const { logout } = useAuth();
   return (
     <Tabs
       screenOptions={{
@@ -65,7 +71,7 @@ export default function TabLayout() {
           tabPress: (e) => {
             e.preventDefault(); 
             // FIXME this should be the logout button later 
-            logout();
+            handleLogout();
             // -------
           },
         }}

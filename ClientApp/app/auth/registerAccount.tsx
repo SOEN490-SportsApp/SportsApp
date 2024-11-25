@@ -7,7 +7,7 @@ import { useRouter } from "expo-router";
 import ConfirmButton from "@/components/ConfirmButton";
 import AuthenticationDivider from "@/components/AuthenticationDivider";
 import { IconPlacement } from '@/utils/constants/enums';
-import axiosInstance from "@/api/axiosInstance";
+import axiosInstance from "@/services/axiosInstance";
 import { API_ENDPOINTS } from "@/utils/api/endpoints";
 import { hs, mhs, mvs, vs } from "@/utils/helpers/uiScaler";
 import themeColors from "@/utils/constants/colors";
@@ -21,8 +21,6 @@ interface RegisterAccountPageFormData {
   agreeToTerms: boolean;
 }
 
-// const [userINFO, setUserINFO] = useState({id: 0, email: "", username: ""});
-
 const RegisterAccountPage: React.FC = () => {
   const {setRegistrationUserId} = useAuth()
   const { control, handleSubmit, formState: { errors }, watch, setValue } = useForm<RegisterAccountPageFormData>();
@@ -32,7 +30,7 @@ const RegisterAccountPage: React.FC = () => {
 
   interface RegisteredUserResponse {
     success: boolean; 
-    data?: {id: string, email: string, username: string}; // this might be an issue
+    data?: {id: string, email: string, username: string};
     error?: string;
   }
 
