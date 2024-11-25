@@ -1,11 +1,11 @@
 package app.sportahub.emailservice.service;
 
-import app.sportahub.emailservice.config.ResendConfig;
-import app.sportahub.emailservice.dto.request.EmailRequestDTO;
+import app.sportahub.emailservice.dto.request.EmailRequest;
 import app.sportahub.emailservice.event.EmailSentEvent;
 import com.resend.*;
 import com.resend.services.emails.model.CreateEmailOptions;
 import com.resend.services.emails.model.CreateEmailResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -13,24 +13,22 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class EmailServiceImpl implements EmailService {
 
     private final Resend resend;
 
-    public EmailServiceImpl(ResendConfig config) {
-        this.resend = new Resend(config.getApiKey());
-    }
 
     @KafkaListener(topics = "email-sent")
     public void listen(EmailSentEvent emailSentEvent) {
         try{
             log.info("Received email sent: {}", emailSentEvent);
-            EmailRequestDTO emailRequestDTO = new EmailRequestDTO();
-            emailRequestDTO.setRecipientEmailAddress(emailSentEvent.getRecipientEmailAddress());
-            emailRequestDTO.setSenderEmailAddress(emailSentEvent.getSenderEmailAddress());
-            emailRequestDTO.setSubject(emailSentEvent.getSubject());
-            emailRequestDTO.setBody(emailSentEvent.getBody());
-            sendEmail(emailRequestDTO);
+            EmailRequest emailRequest = new EmailRequest();
+            emailRequest.setRecipientEmailAddress(emailSentEvent.getRecipientEmailAddress());
+            emailRequest.setSenderEmailAddress(emailSentEvent.getSenderEmailAddress());
+            emailRequest.setSubject(emailSentEvent.getSubject());
+            emailRequest.setBody(emailSentEvent.getBody());
+            sendEmail(emailRequest);
         }
         catch (Exception e) {
 
@@ -39,7 +37,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     @SneakyThrows
-    public void sendEmail(EmailRequestDTO emailRequest) {
+    public void sendEmail(EmailRequest emailRequest) {
         log.info("EmailServiceImpl::sendEmail: Attempting to send email to {}", emailRequest.getRecipientEmailAddress());
 
         String from = emailRequest.getSenderEmailAddress();
