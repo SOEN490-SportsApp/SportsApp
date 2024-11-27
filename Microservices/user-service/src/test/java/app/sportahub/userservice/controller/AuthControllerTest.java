@@ -3,9 +3,12 @@ package app.sportahub.userservice.controller;
 import app.sportahub.userservice.config.auth.TestSecurityConfig;
 import app.sportahub.userservice.controller.auth.AuthController;
 import app.sportahub.userservice.dto.request.auth.LoginRequest;
+import app.sportahub.userservice.dto.request.auth.SendVerificationEmailRequest;
 import app.sportahub.userservice.dto.response.auth.LoginResponse;
 import app.sportahub.userservice.dto.response.auth.TokenResponse;
+import app.sportahub.userservice.exception.user.UserDoesNotExistException;
 import app.sportahub.userservice.service.auth.AuthServiceImpl;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,11 +20,11 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -41,13 +44,14 @@ public class AuthControllerTest {
 
     private LoginRequest validLoginRequest;
     private LoginResponse loginResponse;
+    private SendVerificationEmailRequest sendVerificationEmailRequest;
 
     @SneakyThrows
     @BeforeEach
     public void setUp() {
         validLoginRequest = new LoginRequest("danDuguay", "mypassword");
-
-        TokenResponse tokenResponse = new TokenResponse("accessTokenResponse", "refreshTokenResponse");
+        sendVerificationEmailRequest = new SendVerificationEmailRequest("test@gmail.com");
+        TokenResponse tokenResponse = new TokenResponse("accessTokenResponse", "refreshTokenResponse", false);
         loginResponse = new LoginResponse("userIDResponse", tokenResponse);
 
         when(authService.loginUser(any())).thenReturn(loginResponse);
@@ -65,6 +69,30 @@ public class AuthControllerTest {
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.userID").value(loginResponse.userID()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.tokenResponse.accessToken").value(loginResponse.tokenResponse().accessToken()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.tokenResponse.refreshToken").value(loginResponse.tokenResponse().refreshToken()));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.tokenResponse.refreshToken").value(loginResponse.tokenResponse().refreshToken()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.tokenResponse.emailVerified").value(loginResponse.tokenResponse().emailVerified()));
+    }
+
+    @SneakyThrows
+    @Test
+    public void shouldSendVerificationEmailSuccessfully() {
+        mockMvc.perform(MockMvcRequestBuilders.put("/auth/send-verification-email")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(sendVerificationEmailRequest)))
+                .andExpect(status().isOk());
+    }
+
+    @SneakyThrows
+    @Test
+    public void shouldReturnInternalServerErrorOnUnexpectedException() {
+
+        doThrow(new UserDoesNotExistException(sendVerificationEmailRequest.email()))
+                .when(authService).sendVerificationEmail(sendVerificationEmailRequest.email());
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/auth/send-verification-email")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(sendVerificationEmailRequest)))
+                .andExpect(status().isNotFound())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.error").value("User with id:" + sendVerificationEmailRequest.email() + "does not exist."));
     }
 }
