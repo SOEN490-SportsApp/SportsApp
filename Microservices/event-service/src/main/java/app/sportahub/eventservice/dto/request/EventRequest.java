@@ -39,11 +39,14 @@ public record EventRequest(
         @Nullable
         List<TeamRequest> teams,
 
-        @NotBlank(message = "Cut of time must be provided")
+        @NotBlank(message = "Cut off time must be provided")
         String cutOffTime,
 
         @NotBlank(message = "Description must be provided")
         String description,
+
+        @NotNull(message = "Privacy setting must be provided")
+        Boolean isPrivate,
 
         @Nullable
         List<String> whitelistedUsers,

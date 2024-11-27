@@ -47,7 +47,7 @@ public class Event extends BaseEntity {
     @Builder.Default
     private List<Team> teams = new ArrayList<>();
 
-    @NotBlank(message = "Cut of time must be provided")
+    @NotBlank(message = "Cut off time must be provided")
     private String cutOffTime;
 
     @NotBlank(message = "Description must be provided")
