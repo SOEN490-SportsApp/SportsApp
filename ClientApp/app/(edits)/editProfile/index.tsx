@@ -20,7 +20,7 @@ const EditProfile = () => {
 
   const fetchProfileData = async () => {
     try {
-      const response = await axiosInstance.get(`/user/2`); // Fetch profile data from the API
+      const response = await axiosInstance.get(`/user/userID`); // Fetch profile data from the API
       setProfile(response.data); // Set the fetched data into state
     } catch (error) {
       console.error("Failed to fetch profile data:", error);
@@ -34,7 +34,7 @@ const EditProfile = () => {
   const handleSaveProfile = async () => {
     setLoading(true);
     try {
-      const response = await axiosInstance.patch(`/user/2/profile`, { 
+      const response = await axiosInstance.patch(`/user/userID/profile`, { 
         name: profile.name,
         username: profile.username,
         email: profile.email,
