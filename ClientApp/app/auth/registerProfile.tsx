@@ -13,7 +13,6 @@ import { useAuth } from "@/utils/context/AuthContext";
 import axiosInstance from "@/api/axiosInstance";
 import { isOlderThanSixteen, isValidDate, formatBirthday, formatBirthdateToLocalDate} from "@/utils/helpers/ageHelpers";
 import { mvs,hs } from "@/utils/helpers/uiScaler";
-import Toast from 'react-native-toast-message';
 import themeColors from "@/utils/constants/colors";
 
 
@@ -79,23 +78,6 @@ const RegisterProfilePage: React.FC = () => {
     { label: "Other", value: "Other" },
   ];
 
-  const showToast = (status: string) => {
-    if(status === 'success'){
-    Toast.show({
-      type: 'success',
-      text1: 'Success!',
-      text2: 'Profile created successfully',
-    });
-  }
-  if(status === 'error'){
-    Toast.show({
-      type: 'error',
-      text1: 'Error!',
-      text2: 'Error creating profile',
-    });
-  }
-  };
-
   const nextStep = async (currentStep: number) => {
     if (currentStep === 1) {
       const isValid = await trigger([
@@ -136,12 +118,12 @@ const RegisterProfilePage: React.FC = () => {
       postalCode: data.postalCode,
       sportsOfPreference: data.selectedSports
     });
+
     if (registrationResult.success) {
-      showToast('success')
       Alert.alert("Success", "Profile was created successfully");
       router.replace("/(tabs)/home");
     }else{
-      showToast('error')
+      Alert.alert('Error', 'Error occured creating profile')
       console.log(registrationResult.error);
     } 
   }
@@ -490,7 +472,6 @@ const RegisterProfilePage: React.FC = () => {
                       setCurrentStep(1);
                     }}
                   >
-                    <Toast />
                     <MaterialCommunityIcons
                       name="arrow-left-thin"
                       testID="backArrow"
