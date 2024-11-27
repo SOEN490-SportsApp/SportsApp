@@ -23,7 +23,7 @@ public record LocationRequest(@NotBlank(message = "Location name must be provide
                               @NotBlank(message = "Country must be provided")
                               String country,
 
-                              @NotBlank(message = "Postal code must be provided")
+                              @Nullable
                               String postalCode,
 
                               @Nullable

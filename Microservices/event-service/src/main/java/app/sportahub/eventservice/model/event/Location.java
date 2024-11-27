@@ -16,7 +16,6 @@ public class Location {
     private String name;
 
     private String streetNumber;
-
     private String streetName;
 
     @NotBlank(message = "City must be provided")
@@ -28,9 +27,8 @@ public class Location {
     @NotBlank(message = "Country must be provided")
     private String country;
 
-    @NotBlank(message = "Postal code must be provided")
-    private String postalCode;
 
+    private String postalCode;
     private String addressLine2;
     private String phoneNumber;
     private String latitude;
