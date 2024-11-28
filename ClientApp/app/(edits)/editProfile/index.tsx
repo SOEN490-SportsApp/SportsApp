@@ -30,7 +30,7 @@ const EditProfile : React.FC = () => {
 
   const fetchProfileData = async () => {
     try {
-      const response = await axiosInstance.get<Profile>('/users/2'); // Fetch profile data from the API
+      const response = await axiosInstance.get<Profile>('/users/2/profile'); // Fetch profile data from the API
       setProfile({
         name: response.data.name,
         username: response.data.username,
@@ -51,7 +51,7 @@ const EditProfile : React.FC = () => {
   const handleSaveProfile = async () => {
     setLoading(true);
     try {
-      const response = await axiosInstance.patch(`/users/2`, { 
+      const response = await axiosInstance.patch('/users/2/profile', { 
         name: profile.name,
         username: profile.username,
         email: profile.email,
