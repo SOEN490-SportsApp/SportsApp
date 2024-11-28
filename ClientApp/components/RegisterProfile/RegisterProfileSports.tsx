@@ -2,7 +2,7 @@ import React, { useState} from "react";
 import supportedSports from "@/utils/constants/supportedSports";
 import { View, Text, TouchableOpacity, FlatList, Modal,Dimensions, StyleSheet, TouchableWithoutFeedback } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { vs,  } from "@/utils/helpers/uiScaler";
+import { vs,hs, mvs, mhs  } from "@/utils/helpers/uiScaler";
 
 interface sportSelection {
   onChange: (SelectedSport: { name: string; ranking: string }[]) => void;
@@ -245,72 +245,72 @@ const IconButton = ({
 const screenHeight = Dimensions.get("window").height;
 const styles = StyleSheet.create({
   modalMessage: {
-    fontSize: 20,
+    fontSize: vs(20),
     fontWeight: "bold",
     textAlign: "center",
-    paddingBottom: 16,
+    paddingBottom: vs(16),
   },
   normalOption: {
     borderWidth: 1,
     borderColor: "#aaa",
     borderRadius: 8, 
-    padding: 12, 
+    padding: vs(12), 
   },
   normalOptionText :{
     color: "#aaa", 
-    fontSize: 20, 
+    fontSize: vs(20), 
     textAlign: "center"
   },
   beginnerLevelSelected: {
     backgroundColor: "green",
     borderRadius: 8,
-    padding: 12,
+    padding: vs(12),
     borderWidth: 1,
     borderColor: "#d3d3d3",
   },
   beginnerLevelSelectedText: {
     color: "white",
-    fontSize: 20,
+    fontSize: vs(20),
     textAlign: "center",
   },
   intermediateLevelSelected: {
     backgroundColor: "#ffa700",
     borderRadius: 8, 
-    padding: 12,
+    padding: vs(12),
     borderWidth: 1,
     borderColor: "#d3d3d3",
   },
   intermediateLevelSelectedText: {
     color: "white",
-    fontSize: 20,
+    fontSize: vs(20),
     textAlign: "center",
   },
   advancedLevelSelected: {
     backgroundColor: "red",
     borderRadius: 8, 
-    padding: 12, 
+    padding: vs(12), 
     borderWidth: 1, 
     borderColor: "#d3d3d3",
   },
   advancedLevelSelectedText: {
     color: "white",
-    fontSize: 20,
+    fontSize: vs(20),
     textAlign: "center",
   },
   custompicker: {
     borderRadius: 8,
-    padding: 12, 
+    padding: vs(12), 
     borderWidth: 1, 
     borderColor: "#d3d3d3",
   },
   baseSelectNRemoveButton : {
-    paddingHorizontal: 28, 
-    paddingVertical:12
+    paddingHorizontal: hs(28), 
+    paddingVertical: vs(12)
   },
   selectSkillsButtons : { 
       display: 'flex',   
       justifyContent: 'center',    
-      paddingHorizontal: 36, 
+      paddingHorizontal: hs(36), 
       borderWidth: 1,   
       borderRadius: 24, 
   },
@@ -318,8 +318,8 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'column',    
     justifyContent: 'center',    
-    gap: 16, 
-    marginBottom: 32,
+    gap: vs(16), 
+    marginBottom: vs(32),
   },
   modalView : {
     flex: 1,
@@ -329,14 +329,14 @@ const styles = StyleSheet.create({
   },
   modalSection :{
     backgroundColor: "white",
-    padding: 30,
+    padding: vs(30),
     borderRadius: 10,
     width: "80%",
   },
   mainSelectionView : {
     flex: 1,
     maxHeight: screenHeight * 0.95,
-    marginTop: 2,
+    marginTop: vs(2),
     justifyContent: "center",
   },
   iconContainer : {
@@ -351,13 +351,13 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-    elevation: 5,
+    elevation: vs(5),
     borderRadius: 24, 
   },
   selectSkillButtonContainer: {   
      flexDirection: 'row',   
       justifyContent: 'center',    
-      gap: 16,
+      gap: vs(16),
     },
 
 

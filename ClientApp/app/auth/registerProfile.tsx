@@ -12,7 +12,7 @@ import RegisterProfileSports from "@/components/RegisterProfile/RegisterProfileS
 import { useAuth } from "@/utils/context/AuthContext";
 import axiosInstance from "@/api/axiosInstance";
 import { isOlderThanSixteen, isValidDate, formatBirthday, formatBirthdateToLocalDate} from "@/utils/helpers/ageHelpers";
-import { mvs,hs } from "@/utils/helpers/uiScaler";
+import { mvs,vs, hs, mhs } from "@/utils/helpers/uiScaler";
 import themeColors from "@/utils/constants/colors";
 
 
@@ -545,30 +545,30 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     flexDirection: "row",
-    minHeight: 128,
+    minHeight: vs(128),
     justifyContent: "center",
   },
   imageHolder: {
     display: "flex",
     flexDirection: "column",
     borderWidth: 1,
-    marginTop: 16,
-    marginBottom: 32,
-    borderRadius: 9999,
+    marginTop: vs(16),
+    marginBottom: vs(32),
+    borderRadius: vs(9999),
     borderColor: "#D1D5DB",
-    padding: 32,
+    padding: vs(32),
   },
   imageText: {
-    marginLeft: 16,
-    fontSize: 12,
+    marginLeft: vs(16),
+    fontSize: vs(12),
   },
   inputParentContainer: {
     flex: 1,
-    gap: 16,
+    gap: vs(16),
   },
   birthDateContainer: {
     justifyContent: "space-around",
-    gap: 16,
+    gap: vs(16),
   },
   birthDateInput: {
     width: "60%",
@@ -591,51 +591,51 @@ const styles = StyleSheet.create({
   },
   genderModalPicker: {
     backgroundColor: "#ffffff",
-    padding: 24,
-    borderRadius: 12,
-    width: 320,
+    padding: vs(24),
+    borderRadius: vs(12),
+    width: vs(320),
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#f3f4f6",
     borderRadius: 24,
-    padding: 8,
-    paddingLeft: 16,
-    minHeight: 64,
+    padding: vs(8),
+    paddingLeft: hs(16),
+    minHeight: vs(64),
   },
   stepTwoContainer: {
-    marginBottom: 16,
+    marginBottom: vs(16),
   },
   SportSelectionDialoguecontainer: {
     flexDirection: "column",
-    marginLeft: 16,
+    marginLeft: hs(16),
   },
   sportSelectionTitleWrapper: {
     justifyContent: "center",
   },
   sportSelectionTitleText: {
-    fontSize: 24,
+    fontSize: vs(24),
     fontWeight: "bold",
   },
   sportSelectionSubtitleWrapper: {
     justifyContent: "center",
     color: "#A0A0A0",
-    marginBottom: 16,
+    marginBottom: vs(16),
   },
   multiSportContainer: {
     flex: 1,
-    gap: 32,
+    gap: vs(32),
   },
   selectedSportsErrorContainer: {
     flexDirection: "column",
   },
   selectedSportsError: {
     textAlign: "center",
-    marginBottom: 32,
+    marginBottom: mvs(32),
     color: "#EF4444",
-    fontSize: hs(16),
-    paddingLeft: 16,
+    fontSize: mvs(16),
+    paddingLeft: hs(16),
   },
 });
 
