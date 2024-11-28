@@ -2,8 +2,8 @@ import React, { useState} from "react";
 import supportedSports from "@/utils/constants/supportedSports";
 import { View, Text, TouchableOpacity, FlatList, Modal,Dimensions, StyleSheet, TouchableWithoutFeedback } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { vs,hs, mvs, mhs  } from "@/utils/helpers/uiScaler";
-
+import { vs,hs,} from "@/utils/helpers/uiScaler";
+import themeColors from "@/utils/constants/colors";
 interface sportSelection {
   onChange: (SelectedSport: { name: string; ranking: string }[]) => void;
 }
@@ -69,7 +69,7 @@ const RegisterProfileSports: React.FC<sportSelection> = ({ onChange }) => {
     if (selectedSport) {
       return selectedSport.ranking || '';
     }
-    return '#aaa';
+    return themeColors.sportIcons.lightGrey;
   };
 
   const renderItem = ({item}: { item: { id: number; name: string; icon: string }; }) => (
@@ -92,7 +92,7 @@ const RegisterProfileSports: React.FC<sportSelection> = ({ onChange }) => {
           renderItem={renderItem}
           keyExtractor={(item) => item.id.toString()}
           numColumns={3}
-          ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
+          ItemSeparatorComponent={() => <View style={{ height: vs(12) }} />}
         />
       </View>
       <Modal
@@ -169,20 +169,20 @@ const RegisterProfileSports: React.FC<sportSelection> = ({ onChange }) => {
                   style={[
                     styles.baseSelectNRemoveButton,
                     styles.selectSkillsButtons,
-                    { backgroundColor: "white", borderColor: "#aaa" },
+                    { backgroundColor: themeColors.background.light, borderColor: themeColors.text.grey },
                   ]}
                 >
-                  <Text style={{ color: "#aaa" }}>Remove</Text>
+                  <Text style={{ color: themeColors.text.grey }}>Remove</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={handleConfirm}
                   style={[
                     styles.baseSelectNRemoveButton,
                     styles.selectSkillsButtons,
-                    { backgroundColor: "#0C9E04", borderColor: "#d3d3d3" },
+                    styles.selectSkillsSectionButton
                   ]}
                 >
-                  <Text style={{ color: "white" }}>Select</Text>
+                  <Text style={{ color: themeColors.text.light }}>Select</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -212,29 +212,29 @@ const IconButton = ({
   const rankingColour = (rank: string) => {
     switch (rank) {
       case 'Advanced':
-        return 'red';
+        return themeColors.error;
       case 'Intermediate':
-        return '#ffa700';
+        return themeColors.sportIcons.intermediate;
       case 'Beginner':
-        return 'green';
+        return themeColors.sportIcons.beginner;
       default:
-        return '#aaa';
+        return themeColors.text.grey;
     }
   };
 
   return (
     <View style={styles.iconContainer}>
       <TouchableOpacity onPress={onPress}>
-        <View style={[styles.iconImageContainer, {backgroundColor: `${isSelected ? rankingColour(sportRank): 'white'}`,borderColor: `${isSelected ? rankingColour(sportRank): '#aaa'}`,}]}>
+        <View style={[styles.iconImageContainer, {backgroundColor: `${isSelected ? rankingColour(sportRank): themeColors.text.light}`,borderColor: `${isSelected ? rankingColour(sportRank): themeColors.text.light}`,}]}>
           <MaterialCommunityIcons
             name={icon as unknown as any}
             size={50}
-            color={`${isSelected ? "#fff" : "#aaa"}`}
+            color={`${isSelected ? "#fff" : themeColors.sportIcons.lightGrey}`}
           />
         </View>
       </TouchableOpacity>
       <View>
-        <Text style={{ color: `${isSelected ? rankingColour(sportRank): '#aaa'}`}}>
+        <Text style={{ color: `${isSelected ? rankingColour(sportRank): themeColors.sportIcons.lightGrey}`}}>
           {name}
         </Text>
       </View>
@@ -252,48 +252,48 @@ const styles = StyleSheet.create({
   },
   normalOption: {
     borderWidth: 1,
-    borderColor: "#aaa",
+    borderColor: themeColors.sportIcons.lightGrey,
     borderRadius: 8, 
     padding: vs(12), 
   },
   normalOptionText :{
-    color: "#aaa", 
+    color: themeColors.sportIcons.lightGrey, 
     fontSize: vs(20), 
     textAlign: "center"
   },
   beginnerLevelSelected: {
-    backgroundColor: "green",
+    backgroundColor: themeColors.sportIcons.beginner,
     borderRadius: 8,
     padding: vs(12),
     borderWidth: 1,
-    borderColor: "#d3d3d3",
+    borderColor: themeColors.border.dark,
   },
   beginnerLevelSelectedText: {
-    color: "white",
+    color: themeColors.text.light,
     fontSize: vs(20),
     textAlign: "center",
   },
   intermediateLevelSelected: {
-    backgroundColor: "#ffa700",
+    backgroundColor: themeColors.sportIcons.intermediate,
     borderRadius: 8, 
     padding: vs(12),
     borderWidth: 1,
-    borderColor: "#d3d3d3",
+    borderColor: themeColors.border.dark,
   },
   intermediateLevelSelectedText: {
-    color: "white",
+    color: themeColors.text.light,
     fontSize: vs(20),
     textAlign: "center",
   },
   advancedLevelSelected: {
-    backgroundColor: "red",
+    backgroundColor: themeColors.sportIcons.advanced,
     borderRadius: 8, 
     padding: vs(12), 
     borderWidth: 1, 
-    borderColor: "#d3d3d3",
+    borderColor: themeColors.border.dark,
   },
   advancedLevelSelectedText: {
-    color: "white",
+    color: themeColors.text.light,
     fontSize: vs(20),
     textAlign: "center",
   },
@@ -301,7 +301,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: vs(12), 
     borderWidth: 1, 
-    borderColor: "#d3d3d3",
+    borderColor: themeColors.border.dark,
   },
   baseSelectNRemoveButton : {
     paddingHorizontal: hs(28), 
@@ -328,7 +328,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.5)",
   },
   modalSection :{
-    backgroundColor: "white",
+    backgroundColor: themeColors.text.light,
     padding: vs(30),
     borderRadius: 10,
     width: "80%",
@@ -342,7 +342,7 @@ const styles = StyleSheet.create({
   iconContainer : {
     flex: 1,    
     alignItems: 'center',    
-    backgroundColor: 'white',
+    backgroundColor: themeColors.background.light,
   },
   iconImageContainer : {
     borderWidth: 1,
@@ -359,7 +359,10 @@ const styles = StyleSheet.create({
       justifyContent: 'center',    
       gap: vs(16),
     },
-
+  selectSkillsSectionButton: {
+    backgroundColor : themeColors.button.primaryBackground,
+    borderColor: themeColors.border.dark
+  }
 
 });
 export default RegisterProfileSports;

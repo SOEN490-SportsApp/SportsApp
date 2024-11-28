@@ -297,7 +297,7 @@ const RegisterProfilePage: React.FC = () => {
                             <View>
                               <Text
                                 className={`${
-                                  value ? "text-black" : "text-customGray"
+                                  value ? themeColors.text.dark : themeColors.text.lightGrey 
                                 }`}
                               >
                                 {value ? value : "Gender"}
@@ -343,10 +343,10 @@ const RegisterProfilePage: React.FC = () => {
                                             backgroundColor:
                                               themeColors.button
                                                 .primaryBackground,
-                                            paddingHorizontal: 12,
+                                            paddingHorizontal: vs(12),
                                             borderRadius: 24,
                                             width: "50%",
-                                            paddingVertical: 8,
+                                            paddingVertical: hs(8),
                                           }}
                                           onPress={() => {
                                             if (selectedGender === "") {
@@ -355,7 +355,7 @@ const RegisterProfilePage: React.FC = () => {
                                             setShowGenderPicker(false);
                                           }}
                                         >
-                                          <Text style={{ color: "white" }}>
+                                          <Text style={{ color: themeColors.background.light }}>
                                             Select
                                           </Text>
                                         </TouchableOpacity>
@@ -442,7 +442,7 @@ const RegisterProfilePage: React.FC = () => {
                 </View>
               </View>
             </ScrollView>
-            <View style={{ bottom: 0, marginTop: 4 }}>
+            <View style={{ bottom: 0, marginTop: vs(4) }}>
               <ConfirmButton
                 text="Continue"
                 onPress={() => {
@@ -523,7 +523,7 @@ const RegisterProfilePage: React.FC = () => {
                     <MaterialCommunityIcons
                       name="arrow-right"
                       size={25}
-                      color="#fff"
+                      color= {themeColors.background.light}
                       style={{ marginLeft: 8 }}
                     />
                   }
@@ -555,7 +555,7 @@ const styles = StyleSheet.create({
     marginTop: vs(16),
     marginBottom: vs(32),
     borderRadius: vs(9999),
-    borderColor: "#D1D5DB",
+    borderColor: themeColors.text.grey,
     padding: vs(32),
   },
   imageText: {
@@ -590,7 +590,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   genderModalPicker: {
-    backgroundColor: "#ffffff",
+    backgroundColor: themeColors.background.light,
     padding: vs(24),
     borderRadius: vs(12),
     width: vs(320),
@@ -598,7 +598,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#f3f4f6",
+    backgroundColor: themeColors.background.lightGrey,
     borderRadius: 24,
     padding: vs(8),
     paddingLeft: hs(16),
@@ -620,7 +620,7 @@ const styles = StyleSheet.create({
   },
   sportSelectionSubtitleWrapper: {
     justifyContent: "center",
-    color: "#A0A0A0",
+    color: themeColors.text.grey,
     marginBottom: vs(16),
   },
   multiSportContainer: {
@@ -633,7 +633,7 @@ const styles = StyleSheet.create({
   selectedSportsError: {
     textAlign: "center",
     marginBottom: mvs(32),
-    color: "#EF4444",
+    color: themeColors.error,
     fontSize: mvs(16),
     paddingLeft: hs(16),
   },

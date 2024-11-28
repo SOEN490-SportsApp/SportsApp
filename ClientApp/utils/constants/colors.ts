@@ -15,6 +15,7 @@ const themeColors = {
       light: "#FFFFFF",        // Light text for buttons or dark backgrounds
       error: "#ff3333",
       link: "blue",
+      lightGrey: "#aaa"     // Icon light grey used for text
     },
   
     button: {
@@ -35,6 +36,13 @@ const themeColors = {
       light: "#E0E0E0",         // Light border color for outlines or dividers
       dark: "#CCCCCC",          // Darker border for higher emphasis
     },
+
+    sportIcons :{
+      beginner: 'green',         // Plain green for beginner sport choices
+      intermediate: '#ffa700',   // Yellow designed for icons when intermediate is selected
+      advanced:"#DC3545" ,      // Red colour for advanced
+      lightGrey: '#aaa'         // Used for shading the background of the icons that arent used and undertext
+    }
   };
   
   export default themeColors;
