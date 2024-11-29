@@ -16,19 +16,19 @@ const settingsPage: React.FC = () => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* Notification Settings */}
-      <TouchableOpacity style={styles.option} onPress={() => router.push('/(settings)/notificationsPage')}>
+      <TouchableOpacity style={styles.option} onPress={() => router.push('/(tabs)/profile/(settings)/notificationsPage')}>
         <Ionicons name="notifications-outline" size={24} color="black" style={styles.icon} />
         <Text style={styles.text}>Notification Settings</Text>
       </TouchableOpacity>
 
       {/* Language Option */}
-      <TouchableOpacity style={styles.option} onPress={() => router.push('/(settings)/languagePage')}>
+      <TouchableOpacity style={styles.option} onPress={() => router.push('/(tabs)/profile/(settings)/languagePage')}>
         <Ionicons name="language-outline" size={24} color="black" style={styles.icon} />
         <Text style={styles.text}>Language</Text>
       </TouchableOpacity>
 
       {/* Help */}
-      <TouchableOpacity style={styles.option} onPress={() => router.push('/(settings)/helpPage')}>
+      <TouchableOpacity style={styles.option} onPress={() => router.push('/profile/(settings)/helpPage')}>
         <Ionicons name="help-circle-outline" size={24} color="black" style={styles.icon} />
         <Text style={styles.text}>Help</Text>
       </TouchableOpacity>
