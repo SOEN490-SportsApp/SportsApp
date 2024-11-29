@@ -158,7 +158,7 @@ const ProfilePage: React.FC = () => {
             <View className="flex-row justify-center items-center p-4 relative">
                 <Text className="text-2xl font-bold text-black">Profile</Text>
                 <TouchableOpacity 
-                    onPress={() => router.push('/(settings)/settingsPage')} 
+                    onPress={() => router.push('/(tabs)/profile/(settings)/settingsPage')} 
                     className="absolute right-4" // Position Edit button in top-right
                 >
                     <Text className="text-blue-600 font-semibold">Edit</Text>
