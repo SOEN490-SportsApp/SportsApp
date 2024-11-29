@@ -41,9 +41,10 @@ export default function TabLayout() {
 
       {/* Profile Tab */}
       <Tabs.Screen
-        name="profile/index"
+        name="profile"
         options={{
           title: 'Profile',
+          headerShown: false,
           tabBarIcon: ({ color }) => <FontAwesome size={24} name="user" color={color} style={{ marginBottom: -5 }} />,
         }}
       />
