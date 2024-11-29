@@ -114,13 +114,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = async (identifier: string, password: string): Promise<{ success: boolean; data:{identifier: string}, error?: string }> => {
     const accessToken = await getAccessToken();
     const refreshToken = await getRefreshToken();
+    console.log("Checkpoint 1")
     if( !accessToken && !refreshToken){
       console.log(`[${new Date().toLocaleTimeString()}] (AuthContext login) before login No tokens were stored , which is good!`);
       console.log(`[${new Date().toLocaleTimeString()}] (AuthContext login) before login userID is: `, userID, ` isAuthenticated is: `, isAuthenticated);
     }
     try {
       const response = await axiosInstance.post(API_ENDPOINTS.LOGIN, { identifier, password });
-      
+      console.log("=================> RESPONSE: ", response);
       if (response.status === 200) {
         const { userID, tokenResponse: { accessToken, refreshToken } } = response.data;
         // Reset logoutRequested to false when logging in
