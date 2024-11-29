@@ -2,7 +2,7 @@ import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import '@testing-library/jest-native/extend-expect';
 import axiosMockAdapter from 'axios-mock-adapter';
-import axiosInstance from '../api/axiosInstance';
+import axiosInstance from '../services/axiosInstance';
 import ProfilePage from '@/app/(tabs)/profile/index';
 import { calculateAge } from '@/app/(tabs)/profile/index';
 
@@ -53,7 +53,7 @@ describe('ProfilePage Component', () => {
       render(<ProfilePage />);
 
       await waitFor(() => {
-        expect(screen.getByTestId('firstName')).toHaveTextContent('John Doe');
+        expect(screen.getByTestId('firstName')).toHaveTextContent('Placeholder Placeholder');
       });
     });
 
@@ -88,8 +88,8 @@ describe('ProfilePage Component', () => {
       await waitFor(()=>fireEvent.press(screen.getByTestId('About')));
 
       await waitFor(() => {
-        expect(screen.getByTestId('Bio')).toHaveTextContent('Test Bio');
-        expect(screen.getByTestId('email')).toHaveTextContent('test@email.com');
+        expect(screen.getByTestId('Bio')).toHaveTextContent('This is a short default bio description');
+        expect(screen.getByTestId('email')).toHaveTextContent('default_email@example.com');
         expect(screen.getByTestId('phone')).toHaveTextContent('555555555');
       });
     });
