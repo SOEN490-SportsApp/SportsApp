@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Alert } from "react-native";
-import { AuthProvider } from "@/utils/context/AuthContext";
 import RegisterProfilePage from "@/app/auth/registerProfile";
 import supportedSports from "@/utils/constants/supportedSports";
 import {
@@ -27,9 +26,7 @@ describe("profile preference form test", () => {
 
   it("Shows error when fields are empty", async () => {
     const { getByText, getByTestId } = render(
-      <AuthProvider>
         <RegisterProfilePage />
-      </AuthProvider>
     );
 
     fireEvent.press(getByTestId('confirmButton'));
@@ -43,9 +40,7 @@ describe("profile preference form test", () => {
 
   it("Shows error when phone number format is invalid", async () => {
     const { getByText, getByPlaceholderText, getByTestId } = render(
-      <AuthProvider>
         <RegisterProfilePage />
-      </AuthProvider>
     );
   
     const phoneNumber = getByPlaceholderText("Phone number (xxx-xxx-xxxx)");
@@ -61,9 +56,7 @@ describe("profile preference form test", () => {
 
   it("Allows gender selection", async () => {
     const { getByText, getByTestId } = render(
-      <AuthProvider>
         <RegisterProfilePage />
-      </AuthProvider>
     );
   
     const genderText = getByText("Gender");
@@ -137,9 +130,7 @@ describe("profile preference form test", () => {
 
   it("Shows error when age is less than 16", async () => {
     const { getByText, getByPlaceholderText, getByTestId } = render(
-      <AuthProvider>
         <RegisterProfilePage />
-      </AuthProvider>
     );
 
     const doButton = getByTestId("confirmButton");
@@ -154,9 +145,7 @@ describe("profile preference form test", () => {
 
   it("Shows error when date of birth invalid", async () => {
     const { getByText, getByPlaceholderText, getByTestId } = render(
-      <AuthProvider>
         <RegisterProfilePage />
-      </AuthProvider>
     );
 
     const doButton = getByTestId("confirmButton");

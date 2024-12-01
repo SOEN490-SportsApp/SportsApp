@@ -2,7 +2,6 @@ import React from 'react';
 import { Alert } from 'react-native';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
 import RegisterAccountPage from '@/app/auth/registerAccount';
-import { AuthProvider } from '@/utils/context/AuthContext';
 
 describe('Register Account Screen', () => {
 
@@ -16,9 +15,7 @@ describe('Register Account Screen', () => {
 
     it('shows an error when required fields are empty', async () => {
         const { getByText } = render(
-            <AuthProvider>
                 <RegisterAccountPage />
-            </AuthProvider>   
     );
 
         fireEvent.press(getByText('Sign Up'));
