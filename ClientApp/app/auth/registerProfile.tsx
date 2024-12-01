@@ -6,13 +6,12 @@ import { useForm, Controller } from "react-hook-form";
 import { Picker } from "@react-native-picker/picker";
 import { IconPlacement } from "@/utils/constants/enums";
 import { UPDATE_PROFILE_ENDPOINT } from "@/utils/api/endpoints";
-import { View, Text, TextInput, Modal, ScrollView, Alert, TouchableOpacity,StyleSheet, TouchableWithoutFeedback, Button} from "react-native";
+import { View, Text, TextInput, Modal, ScrollView, Alert, TouchableOpacity,StyleSheet} from "react-native";
 import FormErrorMessage from "@/components/Errors/FormErrorMessage";
 import RegisterProfileSports from "@/components/RegisterProfile/RegisterProfileSports";
-import { useAuth } from "@/utils/context/AuthContext";
-import axiosInstance from "@/api/axiosInstance";
+import axiosInstance from "@/services/axiosInstance";
 import { isOlderThanSixteen, isValidDate, formatBirthday, formatBirthdateToLocalDate} from "@/utils/helpers/ageHelpers";
-import { mvs,vs, hs, mhs } from "@/utils/helpers/uiScaler";
+import { mvs,vs, hs} from "@/utils/helpers/uiScaler";
 import themeColors from "@/utils/constants/colors";
 
 
@@ -52,7 +51,7 @@ const formatPhoneNumber = (value: string) => {
 
 const RegisterProfilePage: React.FC = () => {
   const router = useRouter();
-  const { getRegistrationUserId } = useAuth()
+  // const { getRegistrationUserId } = useAuth()
   const {
     control,
     handleSubmit,
@@ -66,7 +65,8 @@ const RegisterProfilePage: React.FC = () => {
 
   useEffect(() => {
     const fetchUserId = async () => {
-      const userId = await getRegistrationUserId()
+      // const userId = await getRegistrationUserId()
+      const userId = "";
       setRegistrationUserId(userId);
     };
     fetchUserId();
