@@ -19,7 +19,8 @@ axiosInstance.interceptors.request.use(
     async (config) => {
         try {
             // skip requests that don't need authorization
-            if (config.url?.includes(API_ENDPOINTS.LOGIN) || config.url?.includes(API_ENDPOINTS.REFRESH_TOKEN)) {
+            const AUTH_ENDPOINTS = [API_ENDPOINTS.LOGIN, API_ENDPOINTS.REFRESH_TOKEN, API_ENDPOINTS.REGISTER];
+            if (AUTH_ENDPOINTS.some(endpoint => config.url?.includes(endpoint))) {
                 return config;
             }
 
@@ -55,7 +56,7 @@ axiosInstance.interceptors.response.use(
                 try {
                     await refreshAccessToken();
                     const headers = await getAuthHeaders();
-                    const retryConfig = {...error.config, headers: { ...error.config?.headers, ...headers }};
+                    const retryConfig = { ...error.config, headers: { ...error.config?.headers, ...headers } };
                     return axiosInstance.request(retryConfig);
                 } catch (refreshError) {
                     await logoutUser();
@@ -70,6 +71,7 @@ axiosInstance.interceptors.response.use(
                 break;
             case 409:
                 consoleError(ALERT_MESSAGES.conflict.title, ALERT_MESSAGES.conflict.message, status);
+                // I think we should display the error messages coming from backend here.
                 break;
             case 500:
                 consoleError(ALERT_MESSAGES.serverError.title, ALERT_MESSAGES.serverError.message, status);
@@ -77,7 +79,7 @@ axiosInstance.interceptors.response.use(
             case 503:
                 consoleError(ALERT_MESSAGES.serviceUnavailable.title, ALERT_MESSAGES.serviceUnavailable.message, status);
                 break;
-            default:     
+            default:
                 consoleError(ALERT_MESSAGES.defaultError.title, ALERT_MESSAGES.defaultError.message, status);
                 break;
         }
