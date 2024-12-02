@@ -1,5 +1,6 @@
 package app.sportahub.eventservice.model.event;
 
+import app.sportahub.eventservice.enums.SkillLevelEnum;
 import app.sportahub.eventservice.model.BaseEntity;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -9,6 +10,7 @@ import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 @EqualsAndHashCode(callSuper=false)
@@ -45,7 +47,7 @@ public class Event extends BaseEntity {
     @Builder.Default
     private List<Team> teams = new ArrayList<>();
 
-    @NotBlank(message = "Cut of time must be provided")
+    @NotBlank(message = "Cut off time must be provided")
     private String cutOffTime;
 
     @NotBlank(message = "Description must be provided")
@@ -56,4 +58,7 @@ public class Event extends BaseEntity {
 
     @Builder.Default
     private List<String> whitelistedUsers = new ArrayList<>();
+
+    @Builder.Default
+    private EnumSet<SkillLevelEnum> requiredSkillLevel = EnumSet.allOf(SkillLevelEnum.class);
 }
