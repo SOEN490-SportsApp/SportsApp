@@ -5,7 +5,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useForm, Controller } from "react-hook-form";
 import { Picker } from "@react-native-picker/picker";
 import { IconPlacement } from "@/utils/constants/enums";
-import { UPDATE_PROFILE_ENDPOINT } from "@/utils/api/endpoints";
+import { API_ENDPOINTS } from "@/utils/api/endpoints";
 import { View, Text, TextInput, Modal, ScrollView, Alert, TouchableOpacity,StyleSheet} from "react-native";
 import FormErrorMessage from "@/components/Errors/FormErrorMessage";
 import RegisterProfileSports from "@/components/RegisterProfile/RegisterProfileSports";
@@ -138,7 +138,7 @@ const RegisterProfilePage: React.FC = () => {
     }
     data.dateOfBirth = formatBirthdateToLocalDate(data.dateOfBirth)
     try {
-      const response = await axiosInstance.patch(UPDATE_PROFILE_ENDPOINT(registrationUserId), data);
+      const response = await axiosInstance.patch(API_ENDPOINTS.UPDATE_PROFILE.replace('{userId}', registrationUserId), data);
       if (response && (response.status === 201 || response.status === 200)) {
         return {
           success: true,

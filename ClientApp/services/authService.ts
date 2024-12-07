@@ -6,8 +6,6 @@ export async function loginUser(identifier: string, password: string) {
   try {
     const response = await axiosInstance.post(API_ENDPOINTS.LOGIN, { identifier, password });
     const { userID, tokenResponse: { accessToken, refreshToken } } = response.data;
-    console.log("============= ACCESS TOKEN ==>" , accessToken)
-    console.log("============= REFRESH TOKEN ==>" , refreshToken)
     await saveTokens(accessToken, refreshToken);
     startTokenRefresh();
     return response.data;
