@@ -1,13 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, ScrollView, StyleSheet, SafeAreaView, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity,Dimensions, Image, ScrollView, StyleSheet, SafeAreaView, ActivityIndicator } from 'react-native';
 import axiosInstance from '@/api/axiosInstance';
 import { useRouter } from 'expo-router';
 import { AxiosError } from 'axios';
 
-const EditProfile = () => {
+interface Profile {
+  name: string; 
+  username: string;
+  email: string;
+  phone: string;
+  gender: string;
+  dob: string; 
+}
+
+const EditProfile : React.FC = () => {
   const router = useRouter();
 
-  const [profile, setProfile] = useState({
+  const [profile, setProfile] = useState<Profile>({
     name: "",
     username: "",
     email: "",
@@ -16,12 +25,20 @@ const EditProfile = () => {
     dob: "",
   });
 
-  const [loading, setLoading] = useState(false);
+
+ const [loading, setLoading] = useState(false);
 
   const fetchProfileData = async () => {
     try {
-      const response = await axiosInstance.get(`/user/2`); // Fetch profile data from the API
-      setProfile(response.data); // Set the fetched data into state
+      const response = await axiosInstance.get<Profile>('/users/2/profile'); // Fetch profile data from the API
+      setProfile({
+        name: response.data.name,
+        username: response.data.username,
+        email: response.data.email,
+        phone: response.data.phone,
+        gender: response.data.gender,
+        dob: response.data.dob,
+      }); 
     } catch (error) {
       console.error("Failed to fetch profile data:", error);
     }
@@ -34,7 +51,7 @@ const EditProfile = () => {
   const handleSaveProfile = async () => {
     setLoading(true);
     try {
-      const response = await axiosInstance.patch(`/user/2/profile`, { 
+      const response = await axiosInstance.patch('/users/2/profile', { 
         name: profile.name,
         username: profile.username,
         email: profile.email,
