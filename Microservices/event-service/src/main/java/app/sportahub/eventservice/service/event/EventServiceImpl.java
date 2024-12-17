@@ -93,4 +93,19 @@ public class EventServiceImpl implements EventService {
 
         return eventMapper.eventToEventResponse(savedEvent);
     }
+
+    /**
+     * Deletes an event from the database using the event id
+     * @param id The id of the event to be deleted
+     * @throws EventDoesNotExistException if there is no event associated with the provided id
+     */
+    @Override
+    public void deleteEvent(String id) {
+
+        Event evt = eventRepository.findEventById(id).orElseThrow(() -> new EventDoesNotExistException(id));
+        eventRepository.delete(evt);
+        log.info("deleteEvent: Event with id: {} was successfully deleted", id);
+
+
+    }
 }
