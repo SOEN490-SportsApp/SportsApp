@@ -5,11 +5,16 @@ import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.model.event.Event;
 import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring", builder = @Builder(disableBuilder = true))
 public interface EventMapper {
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "creationDate", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     Event eventRequestToEvent(EventRequest eventRequest);
 
+    @Mapping(target = "locationResponse", source = "location")
     EventResponse eventToEventResponse(Event event);
 }

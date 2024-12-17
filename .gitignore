@@ -1,4 +1,5 @@
 .expo/
+.idea/
 .vscode/
 # macOS
 .DS_Store
