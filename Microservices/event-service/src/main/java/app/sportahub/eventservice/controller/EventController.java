@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/event")
@@ -54,5 +55,12 @@ public class EventController {
     )
     public EventResponse patchEvent(@PathVariable String id, @RequestBody EventRequest eventRequest) {
         return eventService.patchEvent(id, eventRequest);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Deletes an event", description = "Deletes an event from the database based on the provided event ID.")
+    public void deleteEvent(@PathVariable String id) {
+        eventService.deleteEvent(id);
     }
 }

@@ -15,4 +15,6 @@ public interface EventService {
 
     EventResponse patchEvent(String id, EventRequest eventRequest);
 
+    void deleteEvent(String id);
+
 }
