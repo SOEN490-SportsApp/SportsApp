@@ -33,4 +33,11 @@ public class EventController {
     public EventResponse createEvent(@Valid @RequestBody EventRequest eventRequest) {
         return eventService.createEvent(eventRequest);
     }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Deletes an event", description = "Deletes an event from the database based on the provided event ID.")
+    public void deleteEvent(@PathVariable String id) {
+        eventService.deleteEvent(id);
+    }
 }
