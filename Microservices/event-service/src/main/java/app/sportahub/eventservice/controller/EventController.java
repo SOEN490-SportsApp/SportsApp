@@ -4,11 +4,13 @@ import app.sportahub.eventservice.dto.request.EventRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.service.event.EventService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import io.swagger.v3.oas.annotations.tags.Tag;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/event")
@@ -32,5 +34,17 @@ public class EventController {
     description = "Creates a new event resource to the database based on the provided event details.")
     public EventResponse createEvent(@Valid @RequestBody EventRequest eventRequest) {
         return eventService.createEvent(eventRequest);
+    }
+
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public EventResponse updateEvent(@PathVariable String id, @Valid @RequestBody EventRequest eventRequest) {
+        return eventService.updateEvent(id, eventRequest);
+    }
+
+    @PatchMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public EventResponse patchEvent(@PathVariable String id, @RequestBody EventRequest eventRequest) {
+        return eventService.patchEvent(id, eventRequest);
     }
 }
