@@ -45,4 +45,34 @@ public class EventServiceImpl implements EventService {
         log.info("EventServiceImpl::createEvent: Event with id: {} was successfully created", savedEvent.getId());
         return eventMapper.eventToEventResponse(savedEvent);
     }
+
+    @Override
+    public EventResponse updateEvent(String id, EventRequest eventRequest) {
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new EventDoesNotExistException(id));
+
+        Event updatedEvent = eventMapper.eventRequestToEvent(eventRequest)
+                .toBuilder()
+                .withId(id)
+                .withUpdatedAt(Timestamp.valueOf(LocalDateTime.now())).build();
+
+        Event savedEvent = eventRepository.save(updatedEvent);
+        log.info("EventServiceImpl::updateEvent: Event with id:{} was updated", savedEvent.getId());
+
+        return eventMapper.eventToEventResponse(savedEvent);
+    }
+
+    @Override
+    public EventResponse patchEvent(String id, EventRequest eventRequest) {
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new EventDoesNotExistException(id));
+
+        eventMapper.patchEventFromRequest(eventRequest, event);
+        event.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));
+
+        Event savedEvent = eventRepository.save(event);
+        log.info("EventServiceImpl::patchEvent: Event with id:{} was patched", savedEvent.getId());
+
+        return eventMapper.eventToEventResponse(savedEvent);
+    }
 }

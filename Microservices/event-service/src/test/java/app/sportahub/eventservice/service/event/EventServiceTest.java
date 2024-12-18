@@ -219,4 +219,99 @@ public class EventServiceTest {
                 "404 NOT_FOUND \"Event with id: " + testId + " does not exist.\"", exception.getMessage()
         );
     }
+
+    @Test
+    public void updateEventShouldReturnUpdatedEvent() {
+        String testId = "123";
+        EventRequest eventRequest = getEventRequest();
+
+        Event existingEvent = eventMapper.eventRequestToEvent(eventRequest)
+                .toBuilder()
+                .withId(testId)
+                .build();
+
+        Event updatedEvent = existingEvent.toBuilder()
+                .withUpdatedAt(Timestamp.valueOf(LocalDateTime.now()))
+                .build();
+
+        when(eventRepository.findById(testId)).thenReturn(Optional.of(existingEvent));
+        when(eventRepository.save(any(Event.class))).thenReturn(updatedEvent);
+
+        EventResponse result = eventService.updateEvent(testId, eventRequest);
+
+        assertNotNull(result);
+        assertEquals(testId, result.id());
+        assertEquals(eventRequest.eventName(), result.eventName());
+        assertEquals(eventRequest.sportType(), result.sportType());
+        assertEquals(eventRequest.location().name(), result.locationResponse().name());
+        assertEquals(eventRequest.location().city(), result.locationResponse().city());
+        assertEquals(eventRequest.location().province(), result.locationResponse().province());
+        assertEquals(eventRequest.location().country(), result.locationResponse().country());
+        assertEquals(eventRequest.date(), result.date());
+
+        verify(eventRepository, times(1)).findById(testId);
+        verify(eventRepository, times(1)).save(any(Event.class));
+    }
+
+    @Test
+    public void updateEventShouldThrowEventDoesNotExistException() {
+        String testId = "123";
+        EventRequest eventRequest = getEventRequest();
+
+        when(eventRepository.findById(testId)).thenReturn(Optional.empty());
+
+        EventDoesNotExistException exception = assertThrows(
+                EventDoesNotExistException.class, () -> eventService.updateEvent(testId, eventRequest)
+        );
+
+        assertEquals("404 NOT_FOUND \"Event with id: 123 does not exist.\"", exception.getMessage());
+        verify(eventRepository, times(1)).findById(testId);
+        verify(eventRepository, never()).save(any(Event.class));
+    }
+
+    @Test
+    public void patchEventShouldReturnPatchedEvent() {
+        String testId = "123";
+        EventRequest eventRequest = getEventRequest();
+
+        Event existingEvent = eventMapper.eventRequestToEvent(eventRequest)
+                .toBuilder()
+                .withId(testId)
+                .build();
+
+        when(eventRepository.findById(testId)).thenReturn(Optional.of(existingEvent));
+        when(eventRepository.save(any(Event.class))).thenReturn(existingEvent);
+
+        EventResponse result = eventService.patchEvent(testId, eventRequest);
+
+        assertNotNull(result);
+        assertEquals(testId, result.id());
+        assertEquals(eventRequest.eventName(), result.eventName());
+        assertEquals(eventRequest.sportType(), result.sportType());
+        assertEquals(eventRequest.location().name(), result.locationResponse().name());
+        assertEquals(eventRequest.location().city(), result.locationResponse().city());
+        assertEquals(eventRequest.location().province(), result.locationResponse().province());
+        assertEquals(eventRequest.location().country(), result.locationResponse().country());
+        assertEquals(eventRequest.date(), result.date());
+
+        verify(eventRepository, times(1)).findById(testId);
+        verify(eventRepository, times(1)).save(any(Event.class));
+    }
+
+    @Test
+    public void patchEventShouldThrowEventDoesNotExistException() {
+        String testId = "123";
+        EventRequest eventRequest = getEventRequest();
+
+        when(eventRepository.findById(testId)).thenReturn(Optional.empty());
+
+        EventDoesNotExistException exception = assertThrows(
+                EventDoesNotExistException.class, () -> eventService.patchEvent(testId, eventRequest)
+        );
+
+        assertEquals("404 NOT_FOUND \"Event with id: 123 does not exist.\"", exception.getMessage());
+
+        verify(eventRepository, times(1)).findById(testId);
+        verify(eventRepository, never()).save(any(Event.class));
+    }
 }

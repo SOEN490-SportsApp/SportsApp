@@ -3,9 +3,7 @@ package app.sportahub.eventservice.mapper.event;
 import app.sportahub.eventservice.dto.request.EventRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.model.event.Event;
-import org.mapstruct.Builder;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.*;
 
 @Mapper(componentModel = "spring", builder = @Builder(disableBuilder = true))
 public interface EventMapper {
@@ -17,4 +15,7 @@ public interface EventMapper {
 
     @Mapping(target = "locationResponse", source = "location")
     EventResponse eventToEventResponse(Event event);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void patchEventFromRequest(EventRequest eventRequest, @MappingTarget Event event);
 }
