@@ -314,4 +314,26 @@ public class EventServiceTest {
         verify(eventRepository, times(1)).findById(testId);
         verify(eventRepository, never()).save(any(Event.class));
     }
+
+
+    @Test
+    public void deleteEventWhenSuccess() {
+        Event eventMock = mock(Event.class);
+        when(eventRepository.findEventById(anyString())).thenReturn(Optional.of(eventMock));
+        eventService.deleteEvent("abc123");
+        verify(eventRepository, times(1)
+                .description("eventRepository.delete must only be called once and must be called with the Event initially fetched."))
+                .delete(eq(eventMock));
+
+
+    }
+
+    @Test
+    public void deleteEventWhenNotFound() {
+        assertThrows(EventDoesNotExistException.class, () -> eventService.deleteEvent("wrong id"));
+        verify(eventRepository, times(
+                0
+        )).delete(any());
+
+    }
 }
