@@ -10,7 +10,7 @@ const initialState: UserState = {
     firstName: "",
     lastName: "",
     dateOfBirth: undefined,
-    gender: "",
+    gender: undefined,
     postalCode: "",
     phoneNumber: "",
     sportsOfPreference: [], 
