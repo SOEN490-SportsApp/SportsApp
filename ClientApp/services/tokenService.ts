@@ -41,8 +41,6 @@ export async function refreshAccessToken() {
         const response = await axiosInstance.post(API_ENDPOINTS.REFRESH_TOKEN, { refreshToken });
         const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response.data;
         await saveTokens(newAccessToken, newRefreshToken);
-        console.log("===> REFRESHED AT ====> ", Date.now())
-        console.log("================== NEW REFRESH TOKEN ===>", newRefreshToken);
         return newAccessToken;
     } catch (error) {
         console.error('Failed to refresh access token:', error);

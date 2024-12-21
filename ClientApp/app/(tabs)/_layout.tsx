@@ -1,12 +1,11 @@
 import React from 'react';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router, Tabs } from 'expo-router';
 import { logoutUser } from '@/services/authService';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 async function handleLogout() {
   try {
     await logoutUser();
-    console.log("Redirecting to login...");
     router.replace('/auth/login');
   } catch (error) {
     console.error("Logout error:", error);
