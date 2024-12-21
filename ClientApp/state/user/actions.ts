@@ -2,6 +2,7 @@ import { useDispatch } from 'react-redux';
 import { setUser } from '@/state/user/userSlice';
 import { UserState } from '@/types';
 import { getUserById } from '@/state/user/api';
+import { RootState } from '@/state/store';
 
 /**
  * Custom hook to fetch user data by ID and update the Redux store.
@@ -21,3 +22,5 @@ export const useUpdateUserToStore = () => {
 
   return updateUserToStore;
 };
+
+export const selectUser = (state: RootState): UserState => state.user;

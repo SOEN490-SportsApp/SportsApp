@@ -9,8 +9,8 @@ import themeColors from "@/utils/constants/colors";
 import { IconPlacement } from "@/utils/constants/enums";
 import { hs, vs, mvs, mhs } from "@/utils/helpers/uiScaler";
 import { loginUser } from "@/services/authService";
-import { useUpdateUserToStore } from '@/state/user/actions';
-
+import { useUpdateUserToStore, selectUser } from '@/state/user/actions';
+import { useSelector } from "react-redux";
 
 interface LoginPageFormData {
   identifier: string;
@@ -20,13 +20,14 @@ interface LoginPageFormData {
 const LoginPage: React.FC = () => {
   const router = useRouter();
   const updateUserToStore = useUpdateUserToStore();
+  const user = useSelector(selectUser);
   const { control, handleSubmit, formState: { errors } } = useForm<LoginPageFormData>();
   const [showPassword, setShowPassword] = useState(false);
 
   const onSubmit = async (data: LoginPageFormData) => {
     try {
       const res = await loginUser(data.identifier, data.password);
-      await updateUserToStore(res.id);
+      await updateUserToStore(res.userID);
       router.push('/(tabs)/home');
     } catch (error: any) {
       Alert.alert('Error', error.message);
