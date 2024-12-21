@@ -1,21 +1,19 @@
-import React, { useState, useEffect } from "react";
-import { useRouter } from "expo-router";
-import ConfirmButton from "@/components/ConfirmButton";
+import React, { useState } from "react";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useForm, Controller } from "react-hook-form";
 import { Picker } from "@react-native-picker/picker";
 import { IconPlacement } from "@/utils/constants/enums";
-import { API_ENDPOINTS } from "@/utils/api/endpoints";
 import { View, Text, TextInput, Modal, ScrollView, Alert, TouchableOpacity,StyleSheet} from "react-native";
+import { isOlderThanSixteen, isValidDate, formatBirthday, formatPhoneNumber} from "@/utils/helpers/registerProfileHelpers";
+import { mvs,vs, hs} from "@/utils/helpers/uiScaler";
+import { Profile, SportPreference } from "@/types";
+import { useUpdateUserToStore } from '@/state/user/actions';
+import { registerProfile } from "@/utils/api/profileApiClient";
+import themeColors from "@/utils/constants/colors";
+import ConfirmButton from "@/components/ConfirmButton";
 import FormErrorMessage from "@/components/Errors/FormErrorMessage";
 import RegisterProfileSports from "@/components/RegisterProfile/RegisterProfileSports";
-import axiosInstance from "@/services/axiosInstance";
-import { isOlderThanSixteen, isValidDate, formatBirthday, formatBirthdateToLocalDate} from "@/utils/helpers/ageHelpers";
-import { mvs,vs, hs} from "@/utils/helpers/uiScaler";
-import themeColors from "@/utils/constants/colors";
-
-
-type SelectedSport = { name: string; ranking: string };
 
 interface RegisterProfilePageFormData {
   firstName: string;
@@ -23,60 +21,20 @@ interface RegisterProfilePageFormData {
   dob: string;
   gender: string;
   phoneNumber: string;
-  selectedSports: SelectedSport[];
+  selectedSports: SportPreference[];
   ranking: string;
   postalCode: string;
 }
 
-interface RegisteredUserResponse {
-  success: boolean; 
-  data?: {id: string, email: string, username: string} | null; 
-  error?: string;
-}
-
-
-const formatPhoneNumber = (value: string) => {
-  const cleanValue = value.replace(/\D/g, ''); 
-  const match = cleanValue.match(/^(\d{0,3})(\d{0,3})(\d{0,4})$/);
-
-  if (!match) return cleanValue;
-
-  const formatted = [
-    match[1],
-    match[2] && match[2].length > 0 ? '-' + match[2] : '',
-    match[3] && match[3].length > 0 ? '-' + match[3] : '',
-  ].join('');
-  return formatted;
-};
-
 const RegisterProfilePage: React.FC = () => {
   const router = useRouter();
-  // const { getRegistrationUserId } = useAuth()
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-    trigger,
-  } = useForm<RegisterProfilePageFormData>();
-  const [registrationUserId, setRegistrationUserId] = useState<string | null>("")
+  const updateUserToStore = useUpdateUserToStore();
+  const { userID } = useLocalSearchParams();
+  const {control, handleSubmit, formState: { errors }, trigger} = useForm<RegisterProfilePageFormData>();
   const [currentStep, setCurrentStep] = useState(1);
   const [showGenderPicker, setShowGenderPicker] = useState(false);
   const [selectedGender, setSelectedGender] = useState("");
-
-  useEffect(() => {
-    const fetchUserId = async () => {
-      // const userId = await getRegistrationUserId()
-      const userId = "";
-      setRegistrationUserId(userId);
-    };
-    fetchUserId();
-  }, []);
-
-  const genderObject = [
-    { label: "Male", value: "Male" },
-    { label: "Female", value: "Female" },
-    { label: "Other", value: "Other" },
-  ];
+  const genders = ["Male", "Female", "Other"];
 
   const nextStep = async (currentStep: number) => {
     if (currentStep === 1) {
@@ -106,62 +64,25 @@ const RegisterProfilePage: React.FC = () => {
     }
   };
 
-
   const onSubmit = async (data: RegisterProfilePageFormData) => {
-    if(data){
-    const registrationResult = await registerProfile({
-      firstName: data.firstName,
-      lastName: data.lastName,
-      dateOfBirth: data.dob,
-      gender: data.gender,
-      phoneNumber: data.phoneNumber,
-      postalCode: data.postalCode,
-      sportsOfPreference: data.selectedSports
-    });
-
-    if (registrationResult.success) {
-      Alert.alert("Success", "Profile was created successfully");
+    try{
+      const profile: Profile = {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        dateOfBirth: data.dob,
+        gender: data.gender,
+        phoneNumber: data.phoneNumber,
+        postalCode: data.postalCode,
+        sportsOfPreference: data.selectedSports,
+        ranking: "Test Ranking",
+      };
+      await registerProfile(profile, userID as string);
+      await updateUserToStore(userID as string);
       router.replace("/(tabs)/home");
-    }else{
-      Alert.alert('Error', 'Error occured creating profile')
-      console.log(registrationResult.error);
-    } 
-  }
-  };
-  const registerProfile = async (data: any): Promise<RegisteredUserResponse> => {
-    if (!registrationUserId) {
-      console.error('Registration user ID is not defined');
-      return {
-        success: false,
-        error: 'Registration user ID is missing',
-      };
+    } catch (error: any){
+      Alert.alert('Error', 'Error occured creating profile');
+      throw new Error(`Error regestering profile: ${error}`);
     }
-    data.dateOfBirth = formatBirthdateToLocalDate(data.dateOfBirth)
-    try {
-      const response = await axiosInstance.patch(API_ENDPOINTS.UPDATE_PROFILE.replace('{userId}', registrationUserId), data);
-      if (response && (response.status === 201 || response.status === 200)) {
-        return {
-          success: true,
-          data: {
-            id: response.data.id,
-            email: response.data.email,
-            username: response.data.username,
-          },
-          error: "No Error!",
-        };
-      }
-    } catch (e: any) {
-      console.error('Error updating profile:', e);
-      return {
-        success: false,
-        error: e.message || 'An unknown error occurred',
-      };
-    }
-  
-    return {
-      success: false,
-      error: 'Failed to update profile',
-    };
   };
 
   return (
@@ -266,7 +187,7 @@ const RegisterProfilePage: React.FC = () => {
                                 const formattedText = formatBirthday(text);
                                 onChange(formattedText);
                               }}
-                              value={value || ""}
+                              value={value ? value.toString() : ""}
                               maxLength={10}
                               keyboardType="number-pad"
                             />
@@ -293,7 +214,7 @@ const RegisterProfilePage: React.FC = () => {
                           control={control}
                           name="gender"
                           rules={{ required: "Gender is required" }}
-                          render={({ field: { onChange, onBlur, value } }) => (
+                          render={({ field: { onChange, value } }) => (
                             <View>
                               <Text
                                 className={`${
@@ -321,11 +242,11 @@ const RegisterProfilePage: React.FC = () => {
                                           setSelectedGender(gender);
                                         }}
                                       >
-                                        {genderObject.map((gender, index) => (
+                                        {Object.values(genders).map((gender, index) => (
                                           <Picker.Item
                                             key={index}
-                                            label={gender.label}
-                                            value={gender.value}
+                                            label={gender}
+                                            value={gender}
                                           />
                                         ))}
                                       </Picker>
@@ -538,6 +459,8 @@ const RegisterProfilePage: React.FC = () => {
   );
 };
 
+export default RegisterProfilePage;
+
 const styles = StyleSheet.create({
   scrollViewContainer: {
     flex: 1,
@@ -638,8 +561,3 @@ const styles = StyleSheet.create({
     paddingLeft: hs(16),
   },
 });
-
-
-
-
-export default RegisterProfilePage;

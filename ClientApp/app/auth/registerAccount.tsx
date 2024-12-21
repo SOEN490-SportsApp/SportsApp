@@ -2,14 +2,14 @@ import React, { useState } from "react";
 import { View, Text, TextInput, Alert, TouchableOpacity, StyleSheet } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import Checkbox from 'expo-checkbox';
 import { useRouter } from "expo-router";
+import { IconPlacement } from '@/utils/constants/enums';
+import { hs, mhs, mvs, vs } from "@/utils/helpers/uiScaler";
+import { loginUser, registerUser } from "@/services/authService";
+import { useUpdateUserToStore } from '@/state/user/actions';
 import ConfirmButton from "@/components/ConfirmButton";
 import AuthenticationDivider from "@/components/AuthenticationDivider";
-import { IconPlacement } from '@/utils/constants/enums';
-import axiosInstance from "@/services/axiosInstance";
-import { API_ENDPOINTS } from "@/utils/api/endpoints";
-import { hs, mhs, mvs, vs } from "@/utils/helpers/uiScaler";
+import Checkbox from 'expo-checkbox';
 import themeColors from "@/utils/constants/colors";
 
 interface RegisterAccountPageFormData {
@@ -21,67 +21,22 @@ interface RegisterAccountPageFormData {
 }
 
 const RegisterAccountPage: React.FC = () => {
-  const { control, handleSubmit, formState: { errors }, watch, setValue } = useForm<RegisterAccountPageFormData>();
   const router = useRouter();
+  const updateUserToStore = useUpdateUserToStore();
+  const { control, handleSubmit, formState: { errors }, watch, setValue } = useForm<RegisterAccountPageFormData>();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  interface RegisteredUserResponse {
-    success: boolean; 
-    data?: {id: string, email: string, username: string};
-    error?: string;
-  }
-
   const onSubmit = async (data: RegisterAccountPageFormData) => {
-    if (!data.agreeToTerms) {Alert.alert("", "You must agree to the terms to continue."); return;}
-    if (data.password !== data.confirmPassword) {Alert.alert("Oh oh!", "Passwords do not match.");return;}
-
-
-    // make the registration api call
-    const registrationResult = await registerUser({
-      email: data.email,
-      username: data.username,
-      password: data.password,
-    });
-
-    if (registrationResult.success) {
-      const userId = registrationResult.data?.id
-      if(userId)
-      // {await setRegistrationUserId(userId)}
-      Alert.alert("Success", "Account created successfully!");
-      console.log("User info: ", registrationResult.data);
-      router.push('/auth/registerProfile');
-    } else {
+    if (data.password !== data.confirmPassword) return Alert.alert("Oh oh!", "Passwords do not match.");
+    if (!data.agreeToTerms) return Alert.alert("", "You must agree to the terms to continue.");
+    try{
+      await registerUser(data.email, data.username, data.password);
+      const response = await loginUser(data.username, data.password);
+      router.push({pathname: '/auth/registerProfile', params: { userID: response.userID }});
+    } catch (error: any){
       Alert.alert("Error", "Failed to create account.");
-    }
-  };
-
-  const registerUser = async (data: any): Promise<RegisteredUserResponse> => {
-    try {
-      const response = await axiosInstance.post(API_ENDPOINTS.REGISTER, data);
-      if (response.status === 201 || response.status === 200) {
-        console.log("User created successfully:", response.data);
-        return {
-          success: true,
-          data: {
-            id: response.data.id,
-            email: response.data.email,
-            username: response.data.username,
-          },
-          error: "No Error!",
-        };
-      } else {
-        return { success: false, error: response.data.error || "Failed to create account." };
-      }
-    } catch (error) {
-      console.error("Registration error:", error);
-
-      if (error instanceof Error) {
-        return { success: false, error: error.message }
-      } 
-      
-      return { success: false, error: "Failed to create account." }; //this should not be needed
-      
+      console.error(`Failed to create account: ${error}. ${error.message}`);
     }
   };
 
