@@ -71,7 +71,6 @@ axiosInstance.interceptors.response.use(
                 break;
             case 409:
                 consoleError(ALERT_MESSAGES.conflict.title, ALERT_MESSAGES.conflict.message, status);
-                // I think we should display the error messages coming from backend here.
                 break;
             case 500:
                 consoleError(ALERT_MESSAGES.serverError.title, ALERT_MESSAGES.serverError.message, status);
