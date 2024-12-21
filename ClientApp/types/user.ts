@@ -6,7 +6,7 @@ export interface SportPreference {
   export interface Profile {
     firstName: string;
     lastName: string;
-    dateOfBirth?: Date;
+    dateOfBirth?: string;
     gender?: string;
     postalCode?: string;
     phoneNumber?: string;
