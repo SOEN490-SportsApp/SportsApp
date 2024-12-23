@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 import java.time.LocalDate;
 import java.util.EnumSet;
@@ -29,6 +30,10 @@ public record EventRequest(
 
         @Nullable
         String duration,
+
+        @NotNull
+        @Positive(message = "Maximum number of participants must be greater than 0")
+        Integer maxParticipants,
 
         @Nullable
         List<ParticipantRequest> participants,
