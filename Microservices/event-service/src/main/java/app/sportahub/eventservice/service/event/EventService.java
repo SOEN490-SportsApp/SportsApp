@@ -9,4 +9,6 @@ public interface EventService {
 
     EventResponse createEvent(EventRequest eventRequest);
 
+    void deleteEvent(String id);
+
 }
