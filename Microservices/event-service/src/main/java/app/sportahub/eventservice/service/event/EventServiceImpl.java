@@ -105,7 +105,5 @@ public class EventServiceImpl implements EventService {
         Event evt = eventRepository.findEventById(id).orElseThrow(() -> new EventDoesNotExistException(id));
         eventRepository.delete(evt);
         log.info("deleteEvent: Event with id: {} was successfully deleted", id);
-
-
     }
 }
