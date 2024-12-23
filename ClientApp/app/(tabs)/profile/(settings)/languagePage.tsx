@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import themeColors from "@/utils/constants/colors";
+import { hs, vs, mvs, mhs } from "@/utils/helpers/uiScaler";
 
 const languagePage: React.FC = () => {
   const [selectedLanguage, setSelectedLanguage] = useState<string>('English');
@@ -24,8 +26,8 @@ const languagePage: React.FC = () => {
         >
           <Ionicons
             name="checkmark-circle"
-            size={24}
-            color={selectedLanguage === 'English' ? '#0C9E04' : '#E0E0E0'}
+            size={mvs(24)}
+            color={selectedLanguage === 'English' ? themeColors.primary : themeColors.border.light}
             style={styles.icon}
           />
           <Text style={styles.text}>English</Text>
@@ -41,8 +43,8 @@ const languagePage: React.FC = () => {
         >
           <Ionicons
             name="checkmark-circle"
-            size={24}
-            color={selectedLanguage === 'French' ? '#0C9E04' : '#E0E0E0'}
+            size={mvs(24)}
+            color={selectedLanguage === 'French' ? themeColors.primary : themeColors.border.light}
             style={styles.icon}
           />
           <Text style={styles.text}>Français</Text>
@@ -55,40 +57,40 @@ const languagePage: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
-    paddingHorizontal: 16,
-    paddingTop: 16,
+    backgroundColor: themeColors.background.light,
+    paddingHorizontal: hs(16),
+    paddingTop: vs(16),
   },
   header: {
-    fontSize: 20,
+    fontSize: mhs(20),
     fontWeight: 'bold',
-    color: 'black',
-    marginBottom: 16,
+    color: themeColors.text.dark,
+    marginBottom: vs(16),
   },
   optionsContainer: {
-    marginTop: 16,
+    marginTop: vs(16),
   },
   option: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    padding: 16,
-    marginBottom: 12,
-    borderRadius: 8,
+    padding: hs(16),
+    marginBottom: vs(12),
+    borderRadius: mhs(8),
     borderWidth: 1,
-    borderColor: '#E0E0E0',
-    backgroundColor: '#F9F9F9',
+    borderColor: themeColors.border.light,
+    backgroundColor: themeColors.background.lightGrey,
   },
   selectedOption: {
-    borderColor: '#0C9E04',
-    backgroundColor: '#E8F5E9',
+    borderColor: themeColors.primary,
+    backgroundColor: themeColors.success,
   },
   icon: {
-    marginRight: 16,
+    marginRight: hs(16),
   },
   text: {
-    fontSize: 16,
-    color: 'black',
+    fontSize: mhs(16),
+    color: themeColors.text.dark,
   },
 });
 
