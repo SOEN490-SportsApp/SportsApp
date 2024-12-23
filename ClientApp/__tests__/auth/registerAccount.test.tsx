@@ -2,6 +2,8 @@ import React from 'react';
 import { Alert } from 'react-native';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
 import RegisterAccountPage from '@/app/auth/registerAccount';
+import { Provider } from 'react-redux';
+import { store } from '@/state/store';
 
 describe('Register Account Screen', () => {
 
@@ -15,8 +17,10 @@ describe('Register Account Screen', () => {
 
     it('shows an error when required fields are empty', async () => {
         const { getByText } = render(
+            <Provider store={store}>
                 <RegisterAccountPage />
-    );
+            </Provider>
+        );
 
         fireEvent.press(getByText('Sign Up'));
 

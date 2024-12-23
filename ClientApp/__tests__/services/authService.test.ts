@@ -1,16 +1,24 @@
-import { loginUser, logoutUser } from "@/services/authService";
 import axiosInstance from "@/services/axiosInstance";
 import { clearTokens, saveTokens, startTokenRefresh, stopTokenRefresh } from "@/services/tokenService";
+import { loginUser, logoutUser } from "@/services/authService";
+import { useDispatch } from 'react-redux';
+import { clearUser } from "@/state/user/userSlice";
+
 
 jest.mock('@/services/axiosInstance', () => ({
     post: jest.fn(),
 }));
+
 jest.mock('@/services/tokenService', () => ({
     clearTokens: jest.fn(),
     stopTokenRefresh: jest.fn(),
     saveTokens: jest.fn(),
     startTokenRefresh: jest.fn(),
 }));
+
+jest.mock('react-redux', () => ({
+    useDispatch: jest.fn(),
+  }));
 
 describe('Auth Service Tests', () => {
     afterEach(() => {
@@ -44,6 +52,8 @@ describe('Auth Service Tests', () => {
     });
 
     it('should clear tokens and stop refresh timer on logout', async () => {
+        const mockDispatch = jest.fn();
+        (useDispatch as unknown as jest.Mock).mockReturnValue(mockDispatch);
         (clearTokens as jest.Mock).mockResolvedValueOnce(true); // Simulate successful clear
         (stopTokenRefresh as jest.Mock).mockResolvedValueOnce(null); // Simulate successful stop
 
@@ -51,5 +61,6 @@ describe('Auth Service Tests', () => {
 
         expect(clearTokens).toHaveBeenCalledTimes(1);
         expect(stopTokenRefresh).toHaveBeenCalledTimes(1);
+        expect(mockDispatch).toHaveBeenCalledWith(clearUser());
     });
 });

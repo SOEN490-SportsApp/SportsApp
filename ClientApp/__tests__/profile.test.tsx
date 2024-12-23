@@ -5,6 +5,8 @@ import axiosMockAdapter from 'axios-mock-adapter';
 import axiosInstance from '../services/axiosInstance';
 import ProfilePage from '@/app/(tabs)/profile/index';
 import { calculateAge } from '@/app/(tabs)/profile/index';
+import { Provider } from 'react-redux';
+import { store } from '@/state/store';
 
 //TODO the Endpoint must be set to dynamic value /users/* or something else...
 
@@ -13,7 +15,7 @@ import { calculateAge } from '@/app/(tabs)/profile/index';
 const mock = new axiosMockAdapter(axiosInstance);
 
 describe('ProfilePage Component', () => {
-  
+
   const mockUserData = {
     firstName: 'John',
     lastName: 'Doe',
@@ -31,7 +33,7 @@ describe('ProfilePage Component', () => {
     dateCreated: new Date('2024-08-13'),
     updatedAt: new Date('2024-08-13'),
   };
-  
+
   const expectedAge = calculateAge(mockUserData.dateOfBirth);
 
   afterEach(() => {
@@ -41,8 +43,12 @@ describe('ProfilePage Component', () => {
   describe('Initial Loading State', () => {
     it('displays loading indicator initially', async () => {
       mock.onGet('/users/2').reply(200, mockUserData);
-      render(<ProfilePage />);
-      
+      render(
+        <Provider store={store}>
+          <ProfilePage />
+        </Provider>
+      );
+
       await waitFor(() => expect(screen.queryByTestId('loading')).toBeNull());
     });
   });
@@ -50,7 +56,11 @@ describe('ProfilePage Component', () => {
   describe('User Profile Data Rendering', () => {
     it('renders user profile data with first and last name', async () => {
       mock.onGet('/users/2').reply(200, mockUserData);
-      render(<ProfilePage />);
+      render(
+        <Provider store={store}>
+          <ProfilePage />
+        </Provider>
+      );
 
       await waitFor(() => {
         expect(screen.getByTestId('firstName')).toHaveTextContent('Placeholder Placeholder');
@@ -61,18 +71,22 @@ describe('ProfilePage Component', () => {
       mock.onGet('/users/2').reply(200, mockUserData);
 
       render(<ProfilePage />);
-        // Wait for loading to complete before proceeding
-        await waitFor(() => expect(screen.queryByTestId('loading')).toBeNull());
-        await waitFor(() => fireEvent.press(screen.getByTestId('About'))); // Navigate to About tab
-      
-      await waitFor(() => {expect(screen.getByTestId('Age')).toHaveTextContent(`Age: ${expectedAge}`);});
+      // Wait for loading to complete before proceeding
+      await waitFor(() => expect(screen.queryByTestId('loading')).toBeNull());
+      await waitFor(() => fireEvent.press(screen.getByTestId('About'))); // Navigate to About tab
+
+      await waitFor(() => { expect(screen.getByTestId('Age')).toHaveTextContent(`Age: ${expectedAge}`); });
     });
   });
 
   describe('Tab Navigation', () => {
     beforeEach(async () => {
       mock.onGet('/users/2').reply(200, mockUserData);
-      render(<ProfilePage />);
+      render(
+        <Provider store={store}>
+          <ProfilePage />
+        </Provider>
+      );
       await waitFor(() => expect(screen.queryByTestId('loading')).toBeNull());
     });
 
@@ -85,7 +99,7 @@ describe('ProfilePage Component', () => {
     });
 
     it('navigates to the About tab and displays user information', async () => {
-      await waitFor(()=>fireEvent.press(screen.getByTestId('About')));
+      await waitFor(() => fireEvent.press(screen.getByTestId('About')));
 
       await waitFor(() => {
         expect(screen.getByTestId('Bio')).toHaveTextContent('This is a short default bio description');
