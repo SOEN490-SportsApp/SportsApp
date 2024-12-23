@@ -3,6 +3,7 @@ plugins {
     id 'org.springframework.boot' version '3.3.5'
     id 'io.spring.dependency-management' version '1.1.6'
     id 'idea'
+    id "org.sonarqube" version "6.0.1.5171"
 }
 
 group = 'app.sportahub'
@@ -93,5 +94,13 @@ idea {
         resourceDirs += file('src/integrationTest/resources')
         testSources.from(file('src/integrationTest/java'))
         testResources.from(file('src/integrationTest/resources'))
+    }
+}
+
+sonar {
+    properties {
+        property "sonar.projectKey", "Sporta_SportsApp_UserMicroService"
+        property "sonar.organization", "soen490-sportsapp"
+        property "sonar.host.url", "https://sonarcloud.io"
     }
 }
