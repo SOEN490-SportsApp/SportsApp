@@ -1,88 +1,98 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useAuth } from '@/utils/context/AuthContext';
 import { useRouter } from 'expo-router';
+import themeColors from "@/utils/constants/colors";
+import { hs, vs, mvs, mhs } from "@/utils/helpers/uiScaler";
 
 const settingsPage: React.FC = () => {
-  const { logout } = useAuth();
-
   const handleLogout = () => {
-    logout();
+    router.replace('/auth/login');
   };
 
   const router = useRouter();
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {/* Notification Settings */}
-      <TouchableOpacity style={styles.option} onPress={() => router.push('/(tabs)/profile/(settings)/notificationsPage')}>
-        <Ionicons name="notifications-outline" size={24} color="black" style={styles.icon} />
-        <Text style={styles.text}>Notification Settings</Text>
-      </TouchableOpacity>
+    <View style={styles.container}>
+      {/* Scrollable Content */}
+      <ScrollView contentContainerStyle={styles.content}>
+        {/* Notification Settings */}
+        <TouchableOpacity style={styles.option} onPress={() => router.push('/(tabs)/profile/(settings)/notificationsPage')}>
+          <Ionicons name="notifications-outline" size={mvs(24)} color="black" style={styles.icon} />
+          <Text style={styles.text}>Notification Settings</Text>
+        </TouchableOpacity>
 
-      {/* Language Option */}
-      <TouchableOpacity style={styles.option} onPress={() => router.push('/(tabs)/profile/(settings)/languagePage')}>
-        <Ionicons name="language-outline" size={24} color="black" style={styles.icon} />
-        <Text style={styles.text}>Language</Text>
-      </TouchableOpacity>
+        {/* Language Option */}
+        <TouchableOpacity style={styles.option} onPress={() => router.push('/(tabs)/profile/(settings)/languagePage')}>
+          <Ionicons name="language-outline" size={mvs(24)} color="black" style={styles.icon} />
+          <Text style={styles.text}>Language</Text>
+        </TouchableOpacity>
 
-      {/* Help */}
-      <TouchableOpacity style={styles.option} onPress={() => router.push('/profile/(settings)/helpPage')}>
-        <Ionicons name="help-circle-outline" size={24} color="black" style={styles.icon} />
-        <Text style={styles.text}>Help</Text>
-      </TouchableOpacity>
+        {/* Help */}
+        <TouchableOpacity style={styles.option} onPress={() => router.push('/profile/(settings)/helpPage')}>
+          <Ionicons name="help-circle-outline" size={mvs(24)} color="black" style={styles.icon} />
+          <Text style={styles.text}>Help</Text>
+        </TouchableOpacity>
+      </ScrollView>
 
-      {/* Logout Button */}
+      {/* Fixed Logout Button */}
       <View style={styles.footer}>
         <TouchableOpacity style={styles.logout} onPress={handleLogout}>
           <Text style={styles.logoutText}>Log Out</Text>
         </TouchableOpacity>
       </View>
-    </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
-    backgroundColor: 'white',
-    paddingHorizontal: 16,
+    flex: 1,
+    backgroundColor: themeColors.background.light,
+  },
+  content: {
+    paddingHorizontal: hs(16),
+    paddingBottom: vs(80), // Space for the fixed footer
   },
   option: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 16,
+    paddingVertical: vs(16),
     borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
+    borderBottomColor: themeColors.border.light,
   },
   icon: {
-    marginRight: 16,
+    marginRight: hs(16),
   },
   text: {
-    fontSize: 16,
-    color: '#000',
+    fontSize: mhs(16),
+    color: themeColors.text.dark,
   },
   footer: {
-    marginTop: 'auto',
-    paddingVertical: 20,
-    alignItems: 'center', // Centering the button horizontally
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+    backgroundColor: themeColors.background.light,
+    paddingVertical: vs(20),
+    alignItems: 'center',
+    borderTopWidth: 1,
+    borderTopColor: themeColors.border.light,
   },
   logout: {
-    width: '80%', // Adjust width for better alignment
-    backgroundColor: '#FF3B30',
-    paddingVertical: 12,
-    borderRadius: 25,
+    width: '80%',
+    backgroundColor: themeColors.primary,
+    paddingVertical: vs(12),
+    borderRadius: mhs(25),
     alignItems: 'center',
-    elevation: 5, // Adds shadow for a modern look (on Android)
-    shadowColor: '#000', // Shadow properties for iOS
+    elevation: 5,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 3,
   },
   logoutText: {
-    color: 'white',
-    fontSize: 16,
+    color: themeColors.text.light,
+    fontSize: mhs(16),
     fontWeight: 'bold',
     textTransform: 'uppercase',
   },
