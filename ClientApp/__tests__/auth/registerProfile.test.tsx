@@ -1,16 +1,12 @@
-import React, { useState } from "react";
+import React from "react";
 import { Alert } from "react-native";
 import RegisterProfilePage from "@/app/auth/registerProfile";
 import supportedSports from "@/utils/constants/supportedSports";
-import {
-  render,
-  fireEvent,
-  waitFor,
-  act,
-  renderHook
-} from "@testing-library/react-native";
+import { render, fireEvent, waitFor } from "@testing-library/react-native";
 import MultiSelectDropdown from "@/components/RegisterProfile/RegisterProfileSports";
 import RegisterProfileSports from "@/components/RegisterProfile/RegisterProfileSports";
+import { Provider } from "react-redux";
+import { store } from "@/state/store";
 
 describe("profile preference form test", () => {
   let mockOnChange: jest.Mock;
@@ -26,7 +22,9 @@ describe("profile preference form test", () => {
 
   it("Shows error when fields are empty", async () => {
     const { getByText, getByTestId } = render(
+      <Provider store={store}>
         <RegisterProfilePage />
+      </Provider>
     );
 
     fireEvent.press(getByTestId('confirmButton'));
@@ -40,15 +38,17 @@ describe("profile preference form test", () => {
 
   it("Shows error when phone number format is invalid", async () => {
     const { getByText, getByPlaceholderText, getByTestId } = render(
+      <Provider store={store}>
         <RegisterProfilePage />
+      </Provider>
     );
-  
+
     const phoneNumber = getByPlaceholderText("Phone number (xxx-xxx-xxxx)");
     const doButton = getByTestId("confirmButton");
-  
+
     fireEvent.changeText(phoneNumber, "123-45-678");
     fireEvent.press(doButton);
-  
+
     await waitFor(() => {
       expect(getByText("Enter valid format xxx-xxx-xxxx")).toBeTruthy();
     });
@@ -56,27 +56,33 @@ describe("profile preference form test", () => {
 
   it("Allows gender selection", async () => {
     const { getByText, getByTestId } = render(
+      <Provider store={store}>
         <RegisterProfilePage />
+      </Provider>
     );
-  
+
     const genderText = getByText("Gender");
-  
+
     // Simulate opening gender picker
     fireEvent.press(genderText);
     const genderPicker = await waitFor(() => getByTestId("genderPickerTest"));
-    
+
     // Select an option
     fireEvent.press(genderPicker);
     fireEvent.press(getByTestId("genderPickerSubmit"))
-    
+
     await waitFor(() => {
       expect(genderText).toHaveTextContent("Male");
     });
   });
 
-    
+
   it('should allow selecting a ranking and confirm', async () => {
-    const { getByText} = render(<RegisterProfileSports onChange={mockOnChange} />);
+    const { getByText } = render(
+      <Provider store={store}>
+        <RegisterProfileSports onChange={mockOnChange} />
+      </Provider>
+    );
     fireEvent.press(getByText(supportedSports[0].name));
 
     await waitFor(() => getByText(`Select your skill level in ${supportedSports[0].name}`));
@@ -89,8 +95,8 @@ describe("profile preference form test", () => {
       { name: supportedSports[0].name, ranking: 'Intermediate' }
     ]);
   });
-  
-  
+
+
   // it("shows no errors when fields are properly inputted", async() => {
   //   const { getByText, getByTestId, getByPlaceholderText } = render(
   //     <AuthProvider>
@@ -104,10 +110,10 @@ describe("profile preference form test", () => {
   //   const dob = getByPlaceholderText('yyyy/mm/dd')
   //   const postalCode = getByPlaceholderText("")
   //   fireEvent.press(genderText); // This triggers the modal to open
-  
+
   //   // Wait for the picker to appear in the modal
   //   const genderPicker = await waitFor(() => getByTestId("genderPickerTest"));
-    
+
   //   // Now interact with the gender picker and select an option
   //   act(() => {
   //     fireEvent.press(genderText); // This triggers the modal to open
@@ -130,7 +136,9 @@ describe("profile preference form test", () => {
 
   it("Shows error when age is less than 16", async () => {
     const { getByText, getByPlaceholderText, getByTestId } = render(
+      <Provider store={store}>
         <RegisterProfilePage />
+      </Provider>
     );
 
     const doButton = getByTestId("confirmButton");
@@ -145,7 +153,9 @@ describe("profile preference form test", () => {
 
   it("Shows error when date of birth invalid", async () => {
     const { getByText, getByPlaceholderText, getByTestId } = render(
+      <Provider store={store}>
         <RegisterProfilePage />
+      </Provider>
     );
 
     const doButton = getByTestId("confirmButton");
