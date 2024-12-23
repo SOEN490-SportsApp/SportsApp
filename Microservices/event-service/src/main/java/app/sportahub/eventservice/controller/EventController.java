@@ -36,12 +36,22 @@ public class EventController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
+    @Operation(
+            summary = "Update an existing event",
+            description = "Replaces all fields of the specified event. Any field not included in the request body" +
+                    " will be reset to default or null."
+    )
     public EventResponse updateEvent(@PathVariable String id, @Valid @RequestBody EventRequest eventRequest) {
         return eventService.updateEvent(id, eventRequest);
     }
 
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
+    @Operation(
+            summary = "Partially update an existing event",
+            description = "Updates only the specified fields of the given event. Fields not included in the request" +
+                    " body remain unchanged."
+    )
     public EventResponse patchEvent(@PathVariable String id, @RequestBody EventRequest eventRequest) {
         return eventService.patchEvent(id, eventRequest);
     }

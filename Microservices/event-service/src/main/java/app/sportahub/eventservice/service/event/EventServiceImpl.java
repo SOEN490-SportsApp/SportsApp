@@ -46,6 +46,15 @@ public class EventServiceImpl implements EventService {
         return eventMapper.eventToEventResponse(savedEvent);
     }
 
+    /**
+     * Updates an existing event with the specified ID. This method performs a full update,
+     * replacing all fields of the event with those provided in the {@link EventRequest}.
+     *
+     * @param id           the unique identifier of the event to update
+     * @param eventRequest the new data to update the event with
+     * @return an {@link EventResponse} object representing the updated event
+     * @throws EventDoesNotExistException if no event with the specified ID is found
+     */
     @Override
     public EventResponse updateEvent(String id, EventRequest eventRequest) {
         Event event = eventRepository.findById(id)
@@ -62,6 +71,15 @@ public class EventServiceImpl implements EventService {
         return eventMapper.eventToEventResponse(savedEvent);
     }
 
+    /**
+     * Partially updates an existing event with the specified ID. This method updates only
+     * the fields provided in the {@link EventRequest}, leaving all other fields unchanged.
+     *
+     * @param id           the unique identifier of the event to patch
+     * @param eventRequest the partial data to update the event with
+     * @return an {@link EventResponse} object representing the patched event
+     * @throws EventDoesNotExistException if no event with the specified ID is found
+     */
     @Override
     public EventResponse patchEvent(String id, EventRequest eventRequest) {
         Event event = eventRepository.findById(id)
