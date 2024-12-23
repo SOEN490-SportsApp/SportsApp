@@ -55,6 +55,7 @@ export default function TabLayout() {
         name="create/index"
         options={{
           title: 'Add',
+          headerShown: false,
           tabBarIcon: ({ color }) => (
             <FontAwesome size={24} name="plus-circle" color={color} style={{ marginBottom: -5 }} />
           ),
