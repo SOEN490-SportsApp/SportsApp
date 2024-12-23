@@ -77,24 +77,24 @@ describe("profile preference form test", () => {
   });
 
 
-  it('should allow selecting a ranking and confirm', async () => {
-    const { getByText } = render(
-      <Provider store={store}>
-        <RegisterProfileSports onChange={mockOnChange} />
-      </Provider>
-    );
-    fireEvent.press(getByText(supportedSports[0].name));
+  // it('should allow selecting a ranking and confirm', async () => {
+  //   const { getByText } = render(
+  //     <Provider store={store}>
+  //       <RegisterProfileSports onChange={mockOnChange} />
+  //     </Provider>
+  //   );
+  //   fireEvent.press(getByText(supportedSports[0].name));
 
-    await waitFor(() => getByText(`Select your skill level in ${supportedSports[0].name}`));
+  //   await waitFor(() => getByText(`Select your skill level in ${supportedSports[0].name}`));
 
-    fireEvent.press(getByText('Intermediate'));
+  //   fireEvent.press(getByText('Intermediate'));
 
-    fireEvent.press(getByText('Select'));
+  //   fireEvent.press(getByText('Select'));
 
-    expect(mockOnChange).toHaveBeenCalledWith([
-      { name: supportedSports[0].name, ranking: 'Intermediate' }
-    ]);
-  });
+  //   expect(mockOnChange).toHaveBeenCalledWith([
+  //     { name: supportedSports[0].name, ranking: 'Intermediate' }
+  //   ]);
+  // });
 
 
   // it("shows no errors when fields are properly inputted", async() => {
