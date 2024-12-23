@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Switch, StyleSheet } from 'react-native';
+import themeColors from "@/utils/constants/colors";
+import { hs, vs, mvs, mhs } from "@/utils/helpers/uiScaler";
 
 const notificationsPage: React.FC = () => {
   const [isMuted, setIsMuted] = useState(false);
@@ -12,11 +14,11 @@ const notificationsPage: React.FC = () => {
     <View style={styles.container}>
       <Text style={styles.header}>Notifications</Text>
       <View style={styles.option}>
-        <Text style={styles.text}>mute all</Text>
+        <Text style={styles.text}>Mute All</Text>
         <Switch
-          trackColor={{ false: '#E0E0E0', true: '#0C9E04' }}
-          thumbColor={isMuted ? '#FFFFFF' : '#FFFFFF'}
-          ios_backgroundColor="#E0E0E0"
+          trackColor={{ false: themeColors.border.light, true: themeColors.primary }}
+          thumbColor={isMuted ? themeColors.text.light : themeColors.text.light}
+          ios_backgroundColor={themeColors.border.light}
           onValueChange={toggleMute}
           value={isMuted}
         />
@@ -28,27 +30,27 @@ const notificationsPage: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
-    paddingHorizontal: 16,
-    paddingTop: 16,
+    backgroundColor: themeColors.background.light,
+    paddingHorizontal: hs(16),
+    paddingTop: vs(16),
   },
   header: {
-    fontSize: 20,
+    fontSize: mhs(20),
     fontWeight: 'bold',
-    color: 'black',
-    marginBottom: 16,
+    color: themeColors.text.dark,
+    marginBottom: vs(16),
   },
   option: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#F9F9F9',
-    padding: 16,
-    borderRadius: 8,
+    backgroundColor: themeColors.background.lightGrey,
+    padding: hs(16),
+    borderRadius: mhs(8),
   },
   text: {
-    fontSize: 16,
-    color: 'black',
+    fontSize: mhs(16),
+    color: themeColors.text.dark,
   },
 });
 
