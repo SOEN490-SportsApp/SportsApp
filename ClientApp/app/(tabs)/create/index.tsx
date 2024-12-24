@@ -15,6 +15,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import themeColors from '@/utils/constants/colors';
 import { hs, vs, mhs, mvs } from '@/utils/helpers/uiScaler';
 import { useRouter } from 'expo-router';
+import ConfirmButton from '@/components/ConfirmButton';
 
 const sports = ['Soccer', 'Basketball', 'Tennis', 'Swimming', 'Running', 'Football', 'Rugby'];
 
@@ -100,13 +101,35 @@ const Create = () => {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={styles.label}>Event Type</Text>
         <View style={styles.radioGroup}>
-          <TouchableOpacity onPress={() => setEventType('public')} style={styles.radioButton}>
-            <Text style={[styles.radioText, eventType === 'public' && styles.selectedText]}>
+          <TouchableOpacity
+            onPress={() => setEventType('public')}
+            style={[
+              styles.radioButton,
+              eventType === 'public' && styles.radioButtonSelected,
+            ]}
+          >
+            <Text
+              style={[
+                styles.radioText,
+                eventType === 'public' && styles.selectedText,
+              ]}
+            >
               Public
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setEventType('private')} style={styles.radioButton}>
-            <Text style={[styles.radioText, eventType === 'private' && styles.selectedText]}>
+          <TouchableOpacity
+            onPress={() => setEventType('private')}
+            style={[
+              styles.radioButton,
+              eventType === 'private' && styles.radioButtonSelected,
+            ]}
+          >
+            <Text
+              style={[
+                styles.radioText,
+                eventType === 'private' && styles.selectedText,
+              ]}
+            >
               Private
             </Text>
           </TouchableOpacity>
@@ -212,7 +235,9 @@ const Create = () => {
         />
       </ScrollView>
       <View style={styles.footer}>
-        <Button title="Create Event" onPress={handleCreateEvent} color={themeColors.primary} />
+        <ConfirmButton
+          text="CREATE EVENT"
+          onPress={handleCreateEvent} icon={undefined} iconPlacement={null}          />
       </View>
     </View>
   );
@@ -262,22 +287,30 @@ const styles = StyleSheet.create({
   },
   radioGroup: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    gap: hs(30),
     marginBottom: vs(16),
   },
   radioButton: {
-    padding: hs(8),
+    paddingVertical: vs(8),
+    paddingHorizontal: hs(20),
+    borderRadius: mhs(25),
     borderWidth: 1,
-    borderRadius: mhs(8),
     borderColor: themeColors.border.light,
+    backgroundColor: themeColors.background.lightGrey,
+  },
+  radioButtonSelected: {
+    backgroundColor: themeColors.primary,
+    borderColor: themeColors.primary,
   },
   radioText: {
     fontSize: mhs(14),
     color: themeColors.text.dark,
+    textAlign: 'center',
   },
   selectedText: {
+    color: themeColors.text.light,
     fontWeight: 'bold',
-    color: themeColors.primary,
   },
   footer: {
     padding: hs(16),
