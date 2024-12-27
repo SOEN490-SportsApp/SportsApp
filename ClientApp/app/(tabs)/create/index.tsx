@@ -3,61 +3,85 @@ import {
   View,
   Text,
   TextInput,
-  Button,
-  StyleSheet,
   TouchableOpacity,
   ScrollView,
+  StyleSheet,
+  Switch,
   Modal,
   FlatList,
   StatusBar,
+  Alert
 } from 'react-native';
+import { useForm, Controller, useWatch } from 'react-hook-form';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import themeColors from '@/utils/constants/colors';
-import { hs, vs, mhs, mvs } from '@/utils/helpers/uiScaler';
 import { useRouter } from 'expo-router';
 import ConfirmButton from '@/components/ConfirmButton';
+import { IconPlacement } from '@/utils/constants/enums';
+import themeColors from '@/utils/constants/colors';
+import { hs, vs, mhs, mvs } from '@/utils/helpers/uiScaler';
+import { createEvent } from '@/services/eventService';
 
 const sports = ['Soccer', 'Basketball', 'Tennis', 'Swimming', 'Running', 'Football', 'Rugby'];
 
 const Create = () => {
-  const [eventType, setEventType] = useState('public');
-  const [sportType, setSportType] = useState('');
+  const { control, handleSubmit, formState: { errors }, setValue } = useForm<EventFormData>();
+  const router = useRouter();
   const [isSportTypeModalVisible, setSportTypeModalVisible] = useState(false);
-  const [minParticipants, setMinParticipants] = useState('');
-  const [maxParticipants, setMaxParticipants] = useState('');
-  const [eventAddress, setEventAddress] = useState('');
   const [eventDate, setEventDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [startTime, setStartTime] = useState(new Date());
-  const [endTime, setEndTime] = useState(new Date());
-  const [showStartTimePicker, setShowStartTimePicker] = useState(false);
-  const [showEndTimePicker, setShowEndTimePicker] = useState(false);
-  const [eventFee, setEventFee] = useState('');
-  const [eventDescription, setEventDescription] = useState('');
 
-  const router = useRouter();
+  const createdBy = '67302d306f52646e079d1483';
 
-  const handleCreateEvent = async () => {
-    const eventDetails = {
-      eventType,
-      sportType,
-      participants: { min: minParticipants, max: maxParticipants },
-      eventAddress,
-      eventDate,
-      startTime,
-      endTime,
-      eventFee,
-      eventDescription,
+  interface EventFormData {
+    eventName: string;
+    eventType: string;
+    sportType: string;
+    locationName: string;
+    city: string;
+    province: string;
+    country: string;
+    cutOffTime: string;
+    description: string;
+    isPrivate: boolean;
+  }
+
+  interface EventRequest {
+    eventName: string;
+    eventType: string;
+    sportType: string;
+    location: {
+      name: string;
+      city: string;
+      province: string;
+      country: string;
+    };
+    date: string;
+    createdBy: string;
+    cutOffTime: string;
+    description: string;
+    isPrivate: boolean;
+  }
+
+  const onSubmit = async (data: EventFormData) => {
+    const eventRequest: EventRequest = {
+      ...data,
+      location: {
+        name: data.locationName,
+        city: data.city,
+        province: data.province,
+        country: data.country,
+      },
+      date: eventDate.toISOString().split('T')[0],
+      createdBy,
     };
 
-    console.log('Event Details:', eventDetails);
-
-    // Placeholder for API request
-    // Replace this with your actual API endpoint
-    // const response = await axiosInstance.post('/events/create', eventDetails);
-    // console.log('API Response:', response);
-
-    router.replace('/(tabs)/home');
+    try {
+      await createEvent(eventRequest);
+      Alert.alert('Success', 'Event created successfully');
+      router.replace('/(tabs)/home');
+    } catch (error: any) {
+      Alert.alert('Error', error.message);
+    }
   };
 
   const renderSportTypeModal = () => (
@@ -77,7 +101,7 @@ const Create = () => {
               <TouchableOpacity
                 style={styles.modalItem}
                 onPress={() => {
-                  setSportType(item);
+                  setValue('sportType', item);
                   setSportTypeModalVisible(false);
                 }}
               >
@@ -88,46 +112,67 @@ const Create = () => {
             style={styles.scrollableList}
           />
           <View style={styles.closeButtonContainer}>
-            <Button title="Close" onPress={() => setSportTypeModalVisible(false)} />
+            <TouchableOpacity onPress={() => setSportTypeModalVisible(false)} style={styles.modalCloseButton}>
+              <Text style={styles.modalCloseButtonText}>Close</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
     </Modal>
   );
 
+  const watch = useWatch({ control });
+
   return (
     <View style={[styles.container, { paddingTop: StatusBar.currentHeight || vs(24) }]}>
       <Text style={styles.header}>Create Event</Text>
       <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Text style={styles.label}>Event Name</Text>
+        <Controller
+          control={control}
+          name="eventName"
+          rules={{ required: "Event Name is required" }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              placeholder="Enter Event Name"
+              style={styles.input}
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+            />
+          )}
+        />
+        {errors.eventName && typeof errors.eventName.message === 'string' && <Text style={styles.errorText}>{errors.eventName.message}</Text>}
+
         <Text style={styles.label}>Event Type</Text>
         <View style={styles.radioGroup}>
           <TouchableOpacity
-            onPress={() => setEventType('public')}
+            onPress={() => setValue('eventType', 'public')}
             style={[
               styles.radioButton,
-              eventType === 'public' && styles.radioButtonSelected,
+              useWatch({ control, name: 'eventType' }) === 'public' ? styles.radioButtonSelected : null,
             ]}
           >
             <Text
               style={[
                 styles.radioText,
-                eventType === 'public' && styles.selectedText,
+                useWatch({ control, name: 'eventType' }) === 'public' && styles.selectedText,
               ]}
             >
               Public
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => setEventType('private')}
+            onPress={() => setValue('eventType', 'private')}
             style={[
               styles.radioButton,
-              eventType === 'private' && styles.radioButtonSelected,
+              useWatch({ control, name: 'eventType' }) === 'private' && styles.radioButtonSelected,
             ]}
           >
             <Text
               style={[
                 styles.radioText,
-                eventType === 'private' && styles.selectedText,
+                useWatch({ control, name: 'eventType' }) === 'private' && styles.selectedText,
               ]}
             >
               Private
@@ -137,35 +182,75 @@ const Create = () => {
 
         <Text style={styles.label}>Sport Type</Text>
         <TouchableOpacity style={styles.input} onPress={() => setSportTypeModalVisible(true)}>
-          <Text>{sportType || 'Select a Sport'}</Text>
+          <Text>{watch.sportType || 'Select a Sport'}</Text>
         </TouchableOpacity>
         {renderSportTypeModal()}
+        {errors.sportType && typeof errors.sportType.message === 'string' && <Text style={styles.errorText}>{errors.sportType.message}</Text>}
 
-        <Text style={styles.label}>Number of Participants</Text>
-        <View style={styles.row}>
-          <TextInput
-            placeholder="Min"
-            value={minParticipants}
-            onChangeText={setMinParticipants}
-            keyboardType="numeric"
-            style={[styles.input, styles.halfInput]}
-          />
-          <TextInput
-            placeholder="Max"
-            value={maxParticipants}
-            onChangeText={setMaxParticipants}
-            keyboardType="numeric"
-            style={[styles.input, styles.halfInput]}
-          />
-        </View>
-
-        <Text style={styles.label}>Event Address</Text>
-        <TextInput
-          placeholder="Enter Address"
-          value={eventAddress}
-          onChangeText={setEventAddress}
-          style={styles.input}
+        <Text style={styles.label}>Location</Text>
+        <Controller
+          control={control}
+          name="locationName"
+          rules={{ required: "Location Name is required" }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              placeholder="Location Name"
+              style={styles.input}
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+            />
+          )}
         />
+        {errors.locationName && typeof errors.locationName.message === 'string' && <Text style={styles.errorText}>{errors.locationName.message}</Text>}
+
+        <Controller
+          control={control}
+          name="city"
+          rules={{ required: "City is required" }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              placeholder="City"
+              style={styles.input}
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+            />
+          )}
+        />
+        {errors.city && typeof errors.city.message === 'string' && <Text style={styles.errorText}>{errors.city.message}</Text>}
+
+        <Controller
+          control={control}
+          name="province"
+          rules={{ required: "Province is required" }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              placeholder="Province"
+              style={styles.input}
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+            />
+          )}
+        />
+        {errors.province && typeof errors.province.message === 'string' && <Text style={styles.errorText}>{errors.province.message}</Text>}
+
+        <Controller
+          control={control}
+          name="country"
+          rules={{ required: "Country is required" }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              placeholder="Country"
+              style={styles.input}
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+            />
+          )}
+        />
+        {errors.country && typeof errors.country.message === 'string' && <Text style={styles.errorText}>{errors.country.message}</Text>}
 
         <Text style={styles.label}>Event Date</Text>
         <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.input}>
@@ -183,61 +268,67 @@ const Create = () => {
           />
         )}
 
-        <Text style={styles.label}>Event Start Time</Text>
-        <TouchableOpacity onPress={() => setShowStartTimePicker(true)} style={styles.input}>
-          <Text>{startTime.toLocaleTimeString()}</Text>
-        </TouchableOpacity>
-        {showStartTimePicker && (
-          <DateTimePicker
-            value={startTime}
-            mode="time"
-            display="default"
-            onChange={(event, selectedTime) => {
-              setShowStartTimePicker(false);
-              if (selectedTime) setStartTime(selectedTime);
-            }}
-          />
+        <Text style={styles.label}>Cut Off Time</Text>
+        <Controller
+          control={control}
+          name="cutOffTime"
+          rules={{ required: "Cut Off Time is required" }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              placeholder="Cut Off Time"
+              style={styles.input}
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+            />
+          )}
+        />
+        {errors.cutOffTime && typeof errors.cutOffTime.message === 'string' && (
+          <Text style={styles.errorText}>{errors.cutOffTime.message}</Text>
         )}
 
-        <Text style={styles.label}>Event End Time</Text>
-        <TouchableOpacity onPress={() => setShowEndTimePicker(true)} style={styles.input}>
-          <Text>{endTime.toLocaleTimeString()}</Text>
-        </TouchableOpacity>
-        {showEndTimePicker && (
-          <DateTimePicker
-            value={endTime}
-            mode="time"
-            display="default"
-            onChange={(event, selectedTime) => {
-              setShowEndTimePicker(false);
-              if (selectedTime) setEndTime(selectedTime);
-            }}
-          />
+        <Text style={styles.label}>Description</Text>
+        <Controller
+          control={control}
+          name="description"
+          rules={{ required: "Description is required" }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              placeholder="Enter Description"
+              style={[styles.input, styles.textArea]}
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+              multiline
+              numberOfLines={4}
+            />
+          )}
+        />
+        {errors.description && typeof errors.description.message === 'string' && (
+          <Text style={styles.errorText}>{errors.description.message}</Text>
         )}
 
-        <Text style={styles.label}>Event Fee</Text>
-        <TextInput
-          placeholder="Enter Fee"
-          value={eventFee}
-          onChangeText={setEventFee}
-          keyboardType="numeric"
-          style={styles.input}
-        />
-
-        <Text style={styles.label}>Event Description</Text>
-        <TextInput
-          placeholder="Enter Description"
-          value={eventDescription}
-          onChangeText={setEventDescription}
-          multiline
-          numberOfLines={4}
-          style={[styles.input, styles.textArea]}
-        />
+        <View style={styles.switchContainer}>
+          <Text style={styles.label}>Private Event</Text>
+          <Controller
+            control={control}
+            name="isPrivate"
+            render={({ field: { onChange, value } }) => (
+              <Switch
+                value={value}
+                onValueChange={onChange}
+              />
+            )}
+          />
+        </View>
       </ScrollView>
       <View style={styles.footer}>
         <ConfirmButton
           text="CREATE EVENT"
-          onPress={handleCreateEvent} icon={undefined} iconPlacement={null}          />
+          onPress={handleSubmit(onSubmit)}
+          icon={null}
+          iconPlacement={IconPlacement.left}
+        />
       </View>
     </View>
   );
@@ -258,7 +349,6 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: hs(16),
-    paddingBottom: vs(20),
   },
   label: {
     fontSize: mhs(16),
@@ -277,13 +367,6 @@ const styles = StyleSheet.create({
   textArea: {
     height: vs(100),
     textAlignVertical: 'top',
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  halfInput: {
-    width: '48%',
   },
   radioGroup: {
     flexDirection: 'row',
@@ -311,6 +394,12 @@ const styles = StyleSheet.create({
   selectedText: {
     color: themeColors.text.light,
     fontWeight: 'bold',
+  },
+  switchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: vs(16),
   },
   footer: {
     padding: hs(16),
@@ -349,6 +438,22 @@ const styles = StyleSheet.create({
   },
   closeButtonContainer: {
     marginTop: vs(16),
+  },
+  modalCloseButton: {
+    paddingVertical: vs(8),
+    paddingHorizontal: hs(20),
+    borderRadius: mhs(25),
+    backgroundColor: themeColors.primary,
+  },
+  modalCloseButtonText: {
+    color: themeColors.text.light,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  errorText: {
+    color: themeColors.text.error,
+    fontSize: mhs(12),
+    marginBottom: vs(8),
   },
 });
 
