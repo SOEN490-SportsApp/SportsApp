@@ -8,10 +8,7 @@ import app.sportahub.userservice.dto.request.user.keycloak.KeycloakRequest;
 import app.sportahub.userservice.dto.response.auth.LoginResponse;
 import app.sportahub.userservice.dto.response.auth.TokenResponse;
 import app.sportahub.userservice.dto.response.user.UserResponse;
-import app.sportahub.userservice.exception.user.InvalidCredentialsException;
-import app.sportahub.userservice.exception.user.UserDoesNotExistException;
-import app.sportahub.userservice.exception.user.UserEmailAlreadyExistsException;
-import app.sportahub.userservice.exception.user.UsernameAlreadyExistsException;
+import app.sportahub.userservice.exception.user.*;
 import app.sportahub.userservice.mapper.user.UserMapper;
 import app.sportahub.userservice.model.user.User;
 import app.sportahub.userservice.repository.UserRepository;
@@ -110,5 +107,12 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findUserByEmail(email).orElseThrow(() -> new UserDoesNotExistException(email));
         keycloakApiClient.sendVerificationEmail(user.getKeycloakId()).block();
         log.info("AuthServiceImpl::sendVerificationEmail: verification email sent to {}", email);
+    }
+
+    @Override
+    public void sendPasswordResetEmail(String email){
+        User user  = userRepository.findUserByEmail(email).orElseThrow(() -> new UserWithEmailDoesNotExistException(email));
+        keycloakApiClient.sendPasswordResetEmail(user.getKeycloakId()).block();
+        log.info("AuthServiceImpl::sendPasswordResetEmail: password reset email sent to {}", email);
     }
 }
