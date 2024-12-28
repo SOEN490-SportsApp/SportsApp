@@ -16,4 +16,6 @@ public interface AuthService {
     TokenResponse refreshToken(RefreshTokenRequest tokenRequest);
 
     void sendVerificationEmail(String userId);
+
+    void sendPasswordResetEmail(String email);
 }
