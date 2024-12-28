@@ -3,10 +3,12 @@ package app.sportahub.userservice.controller;
 import app.sportahub.userservice.config.auth.TestSecurityConfig;
 import app.sportahub.userservice.controller.auth.AuthController;
 import app.sportahub.userservice.dto.request.auth.LoginRequest;
+import app.sportahub.userservice.dto.request.auth.SendPasswordResetEmailRequest;
 import app.sportahub.userservice.dto.request.auth.SendVerificationEmailRequest;
 import app.sportahub.userservice.dto.response.auth.LoginResponse;
 import app.sportahub.userservice.dto.response.auth.TokenResponse;
 import app.sportahub.userservice.exception.user.UserDoesNotExistException;
+import app.sportahub.userservice.exception.user.UserWithEmailDoesNotExistException;
 import app.sportahub.userservice.service.auth.AuthServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
@@ -26,6 +28,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ActiveProfiles("user-service.test")
@@ -45,6 +48,7 @@ public class AuthControllerTest {
     private LoginRequest validLoginRequest;
     private LoginResponse loginResponse;
     private SendVerificationEmailRequest sendVerificationEmailRequest;
+    private SendPasswordResetEmailRequest sendPasswordResetEmailRequest;
 
     @SneakyThrows
     @BeforeEach
@@ -53,6 +57,7 @@ public class AuthControllerTest {
         sendVerificationEmailRequest = new SendVerificationEmailRequest("test@gmail.com");
         TokenResponse tokenResponse = new TokenResponse("accessTokenResponse", "refreshTokenResponse", false);
         loginResponse = new LoginResponse("userIDResponse", tokenResponse);
+        sendPasswordResetEmailRequest = new SendPasswordResetEmailRequest("test@gmail.com");
 
         when(authService.loginUser(any())).thenReturn(loginResponse);
     }
@@ -94,5 +99,65 @@ public class AuthControllerTest {
                         .content(objectMapper.writeValueAsString(sendVerificationEmailRequest)))
                 .andExpect(status().isNotFound())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.error").value("User with id:" + sendVerificationEmailRequest.email() + "does not exist."));
+    }
+    @SneakyThrows
+    @Test
+    public void shouldSendPasswordResetEmailSuccessfully() {
+        mockMvc.perform(MockMvcRequestBuilders.put("/auth/reset-password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(sendPasswordResetEmailRequest)))
+                .andExpect(status().isOk());
+    }
+
+    @SneakyThrows
+    @Test
+    public void shouldReturnNotFoundForNonExistentUser() {
+        SendPasswordResetEmailRequest nonexistentEmailRequest = new SendPasswordResetEmailRequest("nonexistent@gmail.com");
+
+        doThrow(new UserWithEmailDoesNotExistException(nonexistentEmailRequest.email()))
+                .when(authService).sendPasswordResetEmail(nonexistentEmailRequest.email());
+        mockMvc.perform(MockMvcRequestBuilders.put("/auth/reset-password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(nonexistentEmailRequest)))
+                .andExpect(status().isNotFound())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.error")
+                        .value("User with email: nonexistent@gmail.com does not exist."));
+    }
+
+    @SneakyThrows
+    @Test
+    public void shouldReturnBadRequestForInvalidEmailFormat() {
+        SendPasswordResetEmailRequest invalidEmailRequest = new SendPasswordResetEmailRequest("invalid-email");
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/auth/reset-password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidEmailRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.errors.email")
+                        .value("must be a well-formed email address"));
+    }
+
+    @SneakyThrows
+    @Test
+    public void shouldReturnBadRequestForEmptyEmail() {
+        SendPasswordResetEmailRequest emptyEmailRequest = new SendPasswordResetEmailRequest("");
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/auth/reset-password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(emptyEmailRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.errors.email")
+                        .value("must not be empty"));
+    }
+
+    @SneakyThrows
+    @Test
+    public void shouldSendPasswordResetEmailForCaseInsensitiveEmail() {
+        SendPasswordResetEmailRequest caseInsensitiveRequest = new SendPasswordResetEmailRequest("Test@GMAIL.com");
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/auth/reset-password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(caseInsensitiveRequest)))
+                .andExpect(status().isOk());
     }
 }
