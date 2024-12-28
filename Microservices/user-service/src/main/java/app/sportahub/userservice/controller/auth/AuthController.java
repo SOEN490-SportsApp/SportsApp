@@ -1,9 +1,6 @@
 package app.sportahub.userservice.controller.auth;
 
-import app.sportahub.userservice.dto.request.auth.LoginRequest;
-import app.sportahub.userservice.dto.request.auth.RefreshTokenRequest;
-import app.sportahub.userservice.dto.request.auth.RegistrationRequest;
-import app.sportahub.userservice.dto.request.auth.SendVerificationEmailRequest;
+import app.sportahub.userservice.dto.request.auth.*;
 import app.sportahub.userservice.dto.response.auth.LoginResponse;
 import app.sportahub.userservice.dto.response.auth.TokenResponse;
 import app.sportahub.userservice.dto.response.user.UserResponse;
@@ -53,6 +50,14 @@ public class AuthController {
     )
     public void sendVerificationEmail(@RequestBody SendVerificationEmailRequest sendVerificationEmailRequest) {
         authService.sendVerificationEmail(sendVerificationEmailRequest.email());
+    }
+
+    @PutMapping("/reset-password")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Send password reset email",
+               description = "Sends an email to the specified user containing a temporary token to be used to update the password.")
+    public void sendPasswordResetEmail(@RequestBody SendPasswordResetEmailRequest sendPasswordResetEmail){
+        authService.sendPasswordResetEmail(sendPasswordResetEmail.email());
     }
 }
 
