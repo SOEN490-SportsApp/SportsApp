@@ -459,4 +459,26 @@ public class KeycloakApiClient {
                     return Mono.error(new KeycloakCommunicationException(statusCode, combinedError));
                 });
     }
+
+    public Mono<Void> sendPasswordResetEmail(String email) {
+        String emailUrl = UriComponentsBuilder.fromHttpUrl(keycloakConfig.getAuthServerUrl())
+                .path("/admin/realms/{realm}/users/{email}/execute-actions-email")
+                .queryParam("lifespan", 900)
+                .buildAndExpand(keycloakConfig.getRealm(), email)
+                .toUriString();
+
+        String[] actions = {"UPDATE_PASSWORD"};
+        return webClient.put()
+                .uri(emailUrl)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + getAccessToken())
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .bodyValue(actions)
+                .exchangeToMono(response -> {
+                    if (response.statusCode().is2xxSuccessful()) {
+                        return Mono.empty();
+                    } else {
+                        return handleErrorResponse(response).then(Mono.empty());
+                    }
+                });
+    }
 }
