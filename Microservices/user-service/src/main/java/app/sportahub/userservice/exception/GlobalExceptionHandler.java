@@ -3,6 +3,7 @@ package app.sportahub.userservice.exception;
 import app.sportahub.userservice.exception.user.InvalidCredentialsException;
 import app.sportahub.userservice.exception.user.UserDoesNotExistException;
 import app.sportahub.userservice.exception.user.UserEmailAlreadyExistsException;
+import app.sportahub.userservice.exception.user.UserWithEmailDoesNotExistException;
 import app.sportahub.userservice.exception.user.badge.BadgeNotFoundException;
 import app.sportahub.userservice.exception.user.keycloak.KeycloakCommunicationException;
 import app.sportahub.userservice.exception.user.badge.UserAlreadyAssignedBadgeByThisGiverException;
@@ -37,6 +38,14 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserDoesNotExistException.class)
     public ResponseEntity<Map<String, Object>> handleUserDoesNotExistException(UserDoesNotExistException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("error", ex.getReason());
+        response.put("status", ex.getStatusCode().value());
+        return ResponseEntity.status(ex.getStatusCode()).body(response);
+    }
+
+    @ExceptionHandler(UserWithEmailDoesNotExistException.class)
+    public ResponseEntity<Map<String, Object>> handleUserDoesNotExistException(UserWithEmailDoesNotExistException ex) {
         Map<String, Object> response = new HashMap<>();
         response.put("error", ex.getReason());
         response.put("status", ex.getStatusCode().value());
