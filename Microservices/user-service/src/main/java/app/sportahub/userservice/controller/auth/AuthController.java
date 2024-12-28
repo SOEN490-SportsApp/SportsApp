@@ -7,6 +7,7 @@ import app.sportahub.userservice.dto.response.user.UserResponse;
 import app.sportahub.userservice.service.auth.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -56,7 +57,7 @@ public class AuthController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Send password reset email",
                description = "Sends an email to the specified user containing a temporary token to be used to update the password.")
-    public void sendPasswordResetEmail(@RequestBody SendPasswordResetEmailRequest sendPasswordResetEmail){
+    public void sendPasswordResetEmail(@Valid @RequestBody SendPasswordResetEmailRequest sendPasswordResetEmail){
         authService.sendPasswordResetEmail(sendPasswordResetEmail.email());
     }
 }
