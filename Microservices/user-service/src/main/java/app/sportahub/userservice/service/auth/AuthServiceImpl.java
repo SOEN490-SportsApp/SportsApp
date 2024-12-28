@@ -111,7 +111,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void sendPasswordResetEmail(String email){
-        User user  = userRepository.findUserByEmail(email).orElseThrow(() -> new UserWithEmailDoesNotExistException(email));
+        User user  = userRepository.findUserByEmail(email.toLowerCase()).orElseThrow(() -> new UserWithEmailDoesNotExistException(email.toLowerCase()));
         keycloakApiClient.sendPasswordResetEmail(user.getKeycloakId()).block();
         log.info("AuthServiceImpl::sendPasswordResetEmail: password reset email sent to {}", email);
     }
