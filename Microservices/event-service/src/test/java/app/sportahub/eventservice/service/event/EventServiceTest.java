@@ -9,8 +9,10 @@ import app.sportahub.eventservice.enums.SkillLevelEnum;
 import app.sportahub.eventservice.exception.event.EventAlreadyExistsException;
 import app.sportahub.eventservice.exception.event.EventDoesNotExistException;
 import app.sportahub.eventservice.exception.event.EventFullException;
+import app.sportahub.eventservice.exception.event.UserAlreadyParticipantException;
 import app.sportahub.eventservice.mapper.event.EventMapper;
 import app.sportahub.eventservice.model.event.Event;
+import app.sportahub.eventservice.model.event.participant.Participant;
 import app.sportahub.eventservice.model.event.participant.ParticipantAttendStatus;
 import app.sportahub.eventservice.repository.EventRepository;
 import org.bson.types.ObjectId;
@@ -66,7 +68,7 @@ public class EventServiceTest {
 
         ParticipantRequest participantRequest = new ParticipantRequest(
                 "validUserId",
-                ParticipantAttendStatus.JOINED, LocalDate.of(2024, 1,1)
+                ParticipantAttendStatus.JOINED, LocalDate.of(2024, 1, 1)
         );
 
         TeamRequest teamRequest = new TeamRequest(
@@ -87,7 +89,7 @@ public class EventServiceTest {
                 "testEventType",
                 "testSportType",
                 locationRequest,
-                LocalDate.of(2024,1,1),
+                LocalDate.of(2024, 1, 1),
                 "testDuration",
                 32,
                 participantRequests,
@@ -390,5 +392,29 @@ public class EventServiceTest {
 
         // Act & Assert
         assertThrows(EventFullException.class, () -> eventService.joinEvent(testId, testUserId));
+    }
+
+    @Test
+    public void joinEventWhenUserIsAlreadyParticipatingShouldThrowUserAlreadyParticipantException() {
+        // Arrange
+        String testId = "123";
+        String testUserId = "validUserId";
+        EventRequest eventRequest = getEventRequest();
+        Event fullEvent = eventMapper.eventRequestToEvent(eventRequest)
+                .toBuilder()
+                .withId(testId)
+                .withParticipants(List.of(Participant.builder()
+                        .withJoinedOn(LocalDate.from(LocalDateTime.now()))
+                        .withUserId(testUserId)
+                        .withAttendStatus(ParticipantAttendStatus.JOINED)
+                        .build()))
+                .withMaxParticipants(10)
+                .build();
+
+        // Mock
+        when(eventRepository.findById(testId)).thenReturn(Optional.of(fullEvent));
+
+        // Act & Assert
+        assertThrows(UserAlreadyParticipantException.class, () -> eventService.joinEvent(testId, testUserId));
     }
 }
