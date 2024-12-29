@@ -350,6 +350,8 @@ public class EventServiceTest {
         Event event = Event.builder()
                 .withId(testId)
                 .withMaxParticipants(20)
+                .withCutOffTime(LocalDateTime.now().plusYears(1).toString())
+                .withIsPrivate(false)
                 .build();
 
         // Mock
@@ -381,6 +383,7 @@ public class EventServiceTest {
         Event fullEvent = eventMapper.eventRequestToEvent(eventRequest)
                 .toBuilder()
                 .withId(testId)
+                .withCutOffTime(LocalDateTime.now().plusYears(1).toString())
                 .withMaxParticipants(0)
                 .build();
 
@@ -400,6 +403,7 @@ public class EventServiceTest {
         Event fullEvent = eventMapper.eventRequestToEvent(eventRequest)
                 .toBuilder()
                 .withId(testId)
+                .withCutOffTime(LocalDateTime.now().plusYears(1).toString())
                 .withParticipants(List.of(Participant.builder()
                         .withJoinedOn(LocalDate.from(LocalDateTime.now()))
                         .withUserId(testUserId)
@@ -425,6 +429,7 @@ public class EventServiceTest {
                 .toBuilder()
                 .withId(testId)
                 .withIsPrivate(true)
+                .withCutOffTime(LocalDateTime.now().plusYears(1).toString())
                 .withWhitelistedUsers(List.of("whitelistedUserId1", "whitelistedUserId2"))
                 .withParticipants(new ArrayList<>())
                 .withMaxParticipants(10)
@@ -462,4 +467,26 @@ public class EventServiceTest {
         assertThrows(UserIsNotEventWhitelistedException.class, () -> eventService.joinEvent(testId, testUserId));
     }
 
+    @Test
+    public void joinEventWhenCutoffTimeHasPassedShouldThrowEventRegistrationClosedException() {
+        // Arrange
+        String testId = "123";
+        String testUserId = "validUserId";
+        EventRequest eventRequest = getEventRequest();
+        LocalDateTime cutoffTime = LocalDateTime.now().minusHours(1);
+
+        Event eventWithCutoffPassed = eventMapper.eventRequestToEvent(eventRequest)
+                .toBuilder()
+                .withId(testId)
+                .withCutOffTime(cutoffTime.toString())
+                .withParticipants(new ArrayList<>())
+                .withMaxParticipants(10)
+                .build();
+
+        // Mock
+        when(eventRepository.findById(testId)).thenReturn(Optional.of(eventWithCutoffPassed));
+
+        // Act & Assert
+        assertThrows(EventRegistrationClosedException.class, () -> eventService.joinEvent(testId, testUserId));
+    }
 }
