@@ -7,6 +7,9 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true, setterPrefix = "with")
 @Document("user")
@@ -31,4 +34,7 @@ public class User extends BaseEntity {
 
     @Builder.Default
     private Preferences preferences = Preferences.builder().build();
+
+    @Builder.Default
+    private List<Friend> friendList = new ArrayList<>();
 }
