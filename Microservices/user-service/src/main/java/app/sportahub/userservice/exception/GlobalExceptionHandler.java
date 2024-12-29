@@ -3,6 +3,7 @@ package app.sportahub.userservice.exception;
 import app.sportahub.userservice.exception.user.InvalidCredentialsException;
 import app.sportahub.userservice.exception.user.UserDoesNotExistException;
 import app.sportahub.userservice.exception.user.UserEmailAlreadyExistsException;
+import app.sportahub.userservice.exception.user.UserSentFriendRequestToSelfException;
 import app.sportahub.userservice.exception.user.UserWithEmailDoesNotExistException;
 import app.sportahub.userservice.exception.user.badge.BadgeNotFoundException;
 import app.sportahub.userservice.exception.user.keycloak.KeycloakCommunicationException;
@@ -90,5 +91,13 @@ public class GlobalExceptionHandler {
         response.put("error", ex.getMessage());
         response.put("status", HttpStatus.NOT_FOUND.value());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
+    @ExceptionHandler(UserSentFriendRequestToSelfException.class)
+    public ResponseEntity<Map<String, Object>> handleUserSentFriendRequestToSelfException(UserSentFriendRequestToSelfException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("error", ex.getMessage());
+        response.put("status", HttpStatus.BAD_REQUEST.value());
+        return ResponseEntity.badRequest().body(response);
     }
 }
