@@ -1,5 +1,6 @@
 package app.sportahub.eventservice.dto.request;
 
+import app.sportahub.eventservice.model.event.participant.ParticipantAttendStatus;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotBlank;
 
@@ -10,7 +11,7 @@ public record ParticipantRequest(@NotBlank(message = "Valid user id must be prov
                                  String userId,
 
                                  @NotBlank(message = "Attend status must be provided")
-                                 String attendStatus,
+                                 ParticipantAttendStatus attendStatus,
 
                                  @NotBlank(message = "Date user joined must be provided")
                                  LocalDate joinedOn) {

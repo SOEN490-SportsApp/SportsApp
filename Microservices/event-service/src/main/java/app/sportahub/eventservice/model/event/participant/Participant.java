@@ -1,10 +1,11 @@
-package app.sportahub.eventservice.model.event;
+package app.sportahub.eventservice.model.event.participant;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDate;
 
@@ -17,8 +18,8 @@ public class Participant {
     @NotBlank(message = "Valid user id must be provided")
     private String userId;
 
-    @NotBlank(message = "Attend status must be provided")
-    private String attendStatus;
+    @Field
+    private ParticipantAttendStatus attendStatus;
 
     @NotBlank(message = "Date user joined must be provided")
     private LocalDate joinedOn;
