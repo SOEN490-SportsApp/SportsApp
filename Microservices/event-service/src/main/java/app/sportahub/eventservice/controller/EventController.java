@@ -9,7 +9,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/event")
@@ -62,5 +61,12 @@ public class EventController {
     @Operation(summary = "Deletes an event", description = "Deletes an event from the database based on the provided event ID.")
     public void deleteEvent(@PathVariable String id) {
         eventService.deleteEvent(id);
+    }
+
+    @PostMapping("/{id}/join")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Join an event", description = "Enables a user to join an event, provided there are available slots.")
+    public void joinEvent(@PathVariable String id, @RequestParam String userId) {
+        eventService.joinEvent(id, userId);
     }
 }
