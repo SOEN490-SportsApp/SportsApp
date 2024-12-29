@@ -8,8 +8,10 @@ import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.enums.SkillLevelEnum;
 import app.sportahub.eventservice.exception.event.EventAlreadyExistsException;
 import app.sportahub.eventservice.exception.event.EventDoesNotExistException;
+import app.sportahub.eventservice.exception.event.EventFullException;
 import app.sportahub.eventservice.mapper.event.EventMapper;
 import app.sportahub.eventservice.model.event.Event;
+import app.sportahub.eventservice.model.event.participant.ParticipantAttendStatus;
 import app.sportahub.eventservice.repository.EventRepository;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -64,7 +66,7 @@ public class EventServiceTest {
 
         ParticipantRequest participantRequest = new ParticipantRequest(
                 "validUserId",
-                "testAttendStatus", LocalDate.of(2024, 1,1)
+                ParticipantAttendStatus.JOINED, LocalDate.of(2024, 1,1)
         );
 
         TeamRequest teamRequest = new TeamRequest(
@@ -87,6 +89,7 @@ public class EventServiceTest {
                 locationRequest,
                 LocalDate.of(2024,1,1),
                 "testDuration",
+                32,
                 participantRequests,
                 "testID",
                 teamRequests,
@@ -127,6 +130,7 @@ public class EventServiceTest {
         assertEquals(eventRequest.location().province(), result.locationResponse().province());
         assertEquals(eventRequest.location().country(), result.locationResponse().country());
         assertEquals(eventRequest.date(), result.date());
+        assertEquals(eventRequest.maxParticipants(), result.maxParticipants());
         assert eventRequest.participants() != null;
         assertEquals(eventRequest.participants().getFirst().userId(), result.participants().getFirst().getUserId());
         assertEquals(eventRequest.createdBy(), result.createdBy());
@@ -191,8 +195,10 @@ public class EventServiceTest {
         assertEquals(eventRequest.location().province(), result.locationResponse().province());
         assertEquals(eventRequest.location().country(), result.locationResponse().country());
         assertEquals(eventRequest.date(), result.date());
+        assertEquals(eventRequest.maxParticipants(), result.maxParticipants());
         assert eventRequest.participants() != null;
         assertEquals(eventRequest.participants().getFirst().userId(), result.participants().getFirst().getUserId());
+        assertEquals(eventRequest.participants().getFirst().attendStatus(), result.participants().getFirst().getAttendStatus());
         assertEquals(eventRequest.createdBy(), result.createdBy());
         assert eventRequest.teams() != null;
         assertEquals(eventRequest.teams().getFirst().teamId(), result.teams().getFirst().getTeamId());
@@ -335,5 +341,54 @@ public class EventServiceTest {
                 0
         )).delete(any());
 
+    }
+
+    @Test
+    public void joinEventShouldSuccessfullyJoin() {
+        // Arrange
+        String testId = "123";
+        String testUserId = "validUserId";
+        Event event = Event.builder()
+                .withId(testId)
+                .withMaxParticipants(20)
+                .build();
+
+        // Mock
+        when(eventRepository.findById(testId)).thenReturn(Optional.of(event));
+
+        // Act & Assert
+        eventService.joinEvent(testId, testUserId);
+
+        verify(eventRepository, times(1)).findById(testId);
+        verify(eventRepository, times(1)).save(event);
+    }
+
+    @Test
+    public void joinEventShouldThrowEventDoesNotExistException() {
+        // Arrange
+        String testId = new ObjectId().toHexString();
+        String testUserId = "validUserId";
+
+        // Act & Assert
+        assertThrows(EventDoesNotExistException.class, () -> eventService.joinEvent(testId, testUserId));
+    }
+
+    @Test
+    public void joinFullEventShouldThrowEventFullException() {
+        // Arrange
+        String testId = "123";
+        String testUserId = "validUserId";
+        EventRequest eventRequest = getEventRequest();
+        Event fullEvent = eventMapper.eventRequestToEvent(eventRequest)
+                .toBuilder()
+                .withId(testId)
+                .withMaxParticipants(0)
+                .build();
+
+        // Mock
+        when(eventRepository.findById(testId)).thenReturn(Optional.of(fullEvent));
+
+        // Act & Assert
+        assertThrows(EventFullException.class, () -> eventService.joinEvent(testId, testUserId));
     }
 }
