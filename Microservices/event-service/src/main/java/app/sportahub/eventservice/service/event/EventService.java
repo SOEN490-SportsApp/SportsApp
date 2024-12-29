@@ -17,4 +17,5 @@ public interface EventService {
 
     void deleteEvent(String id);
 
+    void joinEvent(String id, String userId);
 }
