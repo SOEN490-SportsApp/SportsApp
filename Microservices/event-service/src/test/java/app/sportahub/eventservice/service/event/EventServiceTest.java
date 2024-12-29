@@ -6,10 +6,7 @@ import app.sportahub.eventservice.dto.request.ParticipantRequest;
 import app.sportahub.eventservice.dto.request.TeamRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.enums.SkillLevelEnum;
-import app.sportahub.eventservice.exception.event.EventAlreadyExistsException;
-import app.sportahub.eventservice.exception.event.EventDoesNotExistException;
-import app.sportahub.eventservice.exception.event.EventFullException;
-import app.sportahub.eventservice.exception.event.UserAlreadyParticipantException;
+import app.sportahub.eventservice.exception.event.*;
 import app.sportahub.eventservice.mapper.event.EventMapper;
 import app.sportahub.eventservice.model.event.Event;
 import app.sportahub.eventservice.model.event.participant.Participant;
@@ -417,4 +414,52 @@ public class EventServiceTest {
         // Act & Assert
         assertThrows(UserAlreadyParticipantException.class, () -> eventService.joinEvent(testId, testUserId));
     }
+
+    @Test
+    public void joinEventWhenUserIsWhitelistedShouldAddParticipantSuccessfully() {
+        // Arrange
+        String testId = "123";
+        String testUserId = "whitelistedUserId1";
+        EventRequest eventRequest = getEventRequest();
+        Event privateEvent = eventMapper.eventRequestToEvent(eventRequest)
+                .toBuilder()
+                .withId(testId)
+                .withIsPrivate(true)
+                .withWhitelistedUsers(List.of("whitelistedUserId1", "whitelistedUserId2"))
+                .withParticipants(new ArrayList<>())
+                .withMaxParticipants(10)
+                .build();
+
+        // Mock
+        when(eventRepository.findById(testId)).thenReturn(Optional.of(privateEvent));
+
+        // Act
+        eventService.joinEvent(testId, testUserId);
+
+        // Assert
+        verify(eventRepository, times(1)).save(any(Event.class));
+    }
+
+    @Test
+    public void joinEventWhenUserIsNotWhitelistedShouldThrowUserIsNotEventWhitelistedException() {
+        // Arrange
+        String testId = "123";
+        String testUserId = "nonWhitelistedUserId";
+        EventRequest eventRequest = getEventRequest();
+        Event privateEvent = eventMapper.eventRequestToEvent(eventRequest)
+                .toBuilder()
+                .withId(testId)
+                .withIsPrivate(true)
+                .withWhitelistedUsers(List.of("whitelistedUserId1", "whitelistedUserId2"))
+                .withParticipants(new ArrayList<>())
+                .withMaxParticipants(10)
+                .build();
+
+        // Mock
+        when(eventRepository.findById(testId)).thenReturn(Optional.of(privateEvent));
+
+        // Act & Assert
+        assertThrows(UserIsNotEventWhitelistedException.class, () -> eventService.joinEvent(testId, testUserId));
+    }
+
 }
