@@ -4,8 +4,10 @@ import app.sportahub.eventservice.dto.request.EventRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.exception.event.EventAlreadyExistsException;
 import app.sportahub.eventservice.exception.event.EventDoesNotExistException;
+import app.sportahub.eventservice.exception.event.EventFullException;
 import app.sportahub.eventservice.mapper.event.EventMapper;
 import app.sportahub.eventservice.model.event.Event;
+import app.sportahub.eventservice.model.event.participant.Participant;
 import app.sportahub.eventservice.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -96,6 +98,7 @@ public class EventServiceImpl implements EventService {
 
     /**
      * Deletes an event from the database using the event id
+     *
      * @param id The id of the event to be deleted
      * @throws EventDoesNotExistException if there is no event associated with the provided id
      */
@@ -105,5 +108,42 @@ public class EventServiceImpl implements EventService {
         Event evt = eventRepository.findEventById(id).orElseThrow(() -> new EventDoesNotExistException(id));
         eventRepository.delete(evt);
         log.info("deleteEvent: Event with id: {} was successfully deleted", id);
+    }
+
+    /**
+     * Allows a user to join an event if it is not full.
+     *
+     * <p>This method retrieves the event by its ID and checks if the maximum number
+     * of participants has been reached. If the event is full, an {@link EventFullException}
+     * is thrown. Otherwise, the user is added as a participant to the event, and the
+     * updated event is saved to the repository.
+     *
+     * <p><strong>Note:</strong> This method does not currently verify whether the user
+     * exists. User validation will be implemented when inter-service communication is established.
+     *
+     * @param id     the unique identifier of the event
+     * @param userId the unique identifier of the user attempting to join the event
+     * @throws EventDoesNotExistException if the event with the specified ID does not exist
+     * @throws EventFullException         if the event has reached its maximum number of participants
+     */
+    @Override
+    public void joinEvent(String id, String userId) {
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new EventDoesNotExistException(id));
+
+        //TODO: Check if user exists, to be implemented once communications between services are established
+
+        if (event.getParticipants().size() >= event.getMaxParticipants()) {
+            throw new EventFullException(id, userId);
+        }
+
+        Participant participant = Participant.builder()
+                .withUserId(userId)
+                .withJoinedOn(LocalDateTime.now().toLocalDate())
+                .build();
+
+        event.getParticipants().add(participant);
+        eventRepository.save(event);
+        log.info("EventServiceImpl::joinEvent: User with id:{} joined event with id:{}", userId, id);
     }
 }
