@@ -115,6 +115,7 @@ public class EventServiceImpl implements EventService {
      * <ul>
      *   <li>Throws an {@link EventDoesNotExistException} if the event with the specified ID does not exist.</li>
      *   <li>Throws a {@link UserIsNotEventWhitelistedException} if the event is private and the user is not whitelisted.</li>
+     *   <li>Throws an {@link EventRegistrationClosedException} if the event is past its registration cutoff time.</li>
      *   <li>Throws an {@link EventFullException} if the event has reached its maximum number of participants.</li>
      *   <li>Throws a {@link UserAlreadyParticipantException} if the user is already participating in the event.</li>
      * </ul>
@@ -129,6 +130,7 @@ public class EventServiceImpl implements EventService {
      * @param userId the unique identifier of the user attempting to join the event
      * @throws EventDoesNotExistException         if the event with the specified ID does not exist
      * @throws UserIsNotEventWhitelistedException if the event is private and the user is not whitelisted
+     * @throws EventRegistrationClosedException   if the event is past its registration cutoff time
      * @throws EventFullException                 if the event has reached its maximum number of participants
      * @throws UserAlreadyParticipantException    if the user is already participating in the event
      */
@@ -141,6 +143,10 @@ public class EventServiceImpl implements EventService {
 
         if (event.getIsPrivate() && !event.getWhitelistedUsers().contains(userId)) {
             throw new UserIsNotEventWhitelistedException(id, userId);
+        }
+
+        if (LocalDateTime.parse(event.getCutOffTime()).isBefore(LocalDateTime.now())) {
+            throw new EventRegistrationClosedException(id);
         }
 
         if (event.getParticipants().size() >= event.getMaxParticipants()) {
