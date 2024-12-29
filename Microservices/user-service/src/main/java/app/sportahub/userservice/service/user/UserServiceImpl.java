@@ -1,6 +1,7 @@
 package app.sportahub.userservice.service.user;
 
 import app.sportahub.userservice.client.KeycloakApiClient;
+import app.sportahub.userservice.dto.response.user.FriendRequestResponse;
 import app.sportahub.userservice.dto.request.user.ProfileRequest;
 import app.sportahub.userservice.dto.request.user.UserRequest;
 import app.sportahub.userservice.dto.request.user.keycloak.KeycloakRequest;
@@ -8,8 +9,11 @@ import app.sportahub.userservice.dto.response.user.ProfileResponse;
 import app.sportahub.userservice.dto.response.user.UserResponse;
 import app.sportahub.userservice.dto.response.user.badge.BadgeResponse;
 import app.sportahub.userservice.dto.response.user.badge.BadgeWithCountResponse;
+import app.sportahub.userservice.enums.user.FriendRequestStatusEnum;
+import app.sportahub.userservice.exception.UserAlreadyInFriendListException;
 import app.sportahub.userservice.exception.user.UserDoesNotExistException;
 import app.sportahub.userservice.exception.user.UserEmailAlreadyExistsException;
+import app.sportahub.userservice.exception.user.UserSentFriendRequestToSelfException;
 import app.sportahub.userservice.exception.user.UsernameAlreadyExistsException;
 import app.sportahub.userservice.exception.user.badge.BadgeNotFoundException;
 import app.sportahub.userservice.exception.user.badge.UserAlreadyAssignedBadgeByThisGiverException;
@@ -142,5 +146,33 @@ public class UserServiceImpl implements UserService {
                             entry.getValue());
                 })
                 .toList();
+    }
+
+    @Override
+    public FriendRequestResponse sendFriendRequest(String userId, String receiverUsername) {
+        User userSender = userRepository.findById(userId)
+                .orElseThrow(() -> new UserDoesNotExistException(userId));
+        User userReceiver = userRepository.findUserByUsername(receiverUsername)
+                .orElseThrow(() -> new UserDoesNotExistException(receiverUsername));
+
+        if (userSender.equals(userReceiver)) {
+            throw new UserSentFriendRequestToSelfException();
+        }
+
+        for (Friend friend : userSender.getFriendList()) {
+            if (friend.getUsername().equals(userReceiver.getUsername()))
+                throw new UserAlreadyInFriendListException(userReceiver.getUsername(), friend.getFriendRequestStatus());
+        }
+
+        userSender.getFriendList().add(new Friend(userReceiver.getUsername(), FriendRequestStatusEnum.SENT));
+        userReceiver.getFriendList().add(new Friend(userSender.getUsername(), FriendRequestStatusEnum.RECEIVED));
+
+        User savedUser = userRepository.save(userSender);
+        log.info("UserServiceImpl::sendFriendRequest: User with id:{} sent a new friend request", savedUser.getId());
+
+        savedUser = userRepository.save(userReceiver);
+        log.info("UserServiceImpl::sendFriendRequest: User with id:{} received a new friend request", savedUser.getId());
+
+        return new FriendRequestResponse("Friend request sent successfully.", userReceiver.getUsername());
     }
 }

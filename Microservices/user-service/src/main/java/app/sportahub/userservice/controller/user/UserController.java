@@ -1,5 +1,6 @@
 package app.sportahub.userservice.controller.user;
 
+import app.sportahub.userservice.dto.response.user.FriendRequestResponse;
 import app.sportahub.userservice.dto.request.user.ProfileRequest;
 import app.sportahub.userservice.dto.request.user.UserRequest;
 import app.sportahub.userservice.dto.response.user.ProfileResponse;
@@ -65,5 +66,13 @@ public class UserController {
             description = "Retrieves all badges assigned to a user along with the count of each badge type.")
     public List<BadgeWithCountResponse> getUserBadges(@PathVariable String userId) {
         return userService.getUserBadges(userId);
+    }
+
+    @PostMapping("/{userId}/friends/requests")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Send a friend request to a user",
+    description = "Allows a user to send a friend request to another user and returns the details of the friend request.")
+    public FriendRequestResponse sendFriendRequest(@PathVariable String userId, @RequestParam String receiverUsername) {
+        return userService.sendFriendRequest(userId, receiverUsername);
     }
 }
