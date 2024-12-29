@@ -2,10 +2,7 @@ package app.sportahub.eventservice.service.event;
 
 import app.sportahub.eventservice.dto.request.EventRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
-import app.sportahub.eventservice.exception.event.EventAlreadyExistsException;
-import app.sportahub.eventservice.exception.event.EventDoesNotExistException;
-import app.sportahub.eventservice.exception.event.EventFullException;
-import app.sportahub.eventservice.exception.event.UserAlreadyParticipantException;
+import app.sportahub.eventservice.exception.event.*;
 import app.sportahub.eventservice.mapper.event.EventMapper;
 import app.sportahub.eventservice.model.event.Event;
 import app.sportahub.eventservice.model.event.participant.Participant;
@@ -112,22 +109,28 @@ public class EventServiceImpl implements EventService {
     }
 
     /**
-     * Allows a user to join an event if it is not full.
+     * Allows a user to join an event if they are eligible and the event is not full.
      *
-     * <p>This method retrieves the event by its ID and checks if the maximum number
-     * of participants has been reached. If the event is full, an {@link EventFullException}
-     * is thrown. If the event is not full, and that the user is already participating in the
-     * event, an {@link UserAlreadyParticipantException} is thrown. Otherwise, the user is
-     * added as a participant to the event, and the updated event is saved to the repository.
+     * <p>This method retrieves the event by its ID and enforces the following checks:
+     * <ul>
+     *   <li>Throws an {@link EventDoesNotExistException} if the event with the specified ID does not exist.</li>
+     *   <li>Throws a {@link UserIsNotEventWhitelistedException} if the event is private and the user is not whitelisted.</li>
+     *   <li>Throws an {@link EventFullException} if the event has reached its maximum number of participants.</li>
+     *   <li>Throws a {@link UserAlreadyParticipantException} if the user is already participating in the event.</li>
+     * </ul>
+     *
+     * <p>If all checks pass, the user is added as a participant to the event, and the updated event
+     * is saved to the repository.
      *
      * <p><strong>Note:</strong> This method does not currently verify whether the user
      * exists. User validation will be implemented when inter-service communication is established.
      *
      * @param id     the unique identifier of the event
      * @param userId the unique identifier of the user attempting to join the event
-     * @throws EventDoesNotExistException      if the event with the specified ID does not exist
-     * @throws EventFullException              if the event has reached its maximum number of participants
-     * @throws UserAlreadyParticipantException if the user is already participating in the event
+     * @throws EventDoesNotExistException         if the event with the specified ID does not exist
+     * @throws UserIsNotEventWhitelistedException if the event is private and the user is not whitelisted
+     * @throws EventFullException                 if the event has reached its maximum number of participants
+     * @throws UserAlreadyParticipantException    if the user is already participating in the event
      */
     @Override
     public void joinEvent(String id, String userId) {
@@ -135,6 +138,10 @@ public class EventServiceImpl implements EventService {
                 .orElseThrow(() -> new EventDoesNotExistException(id));
 
         //TODO: Check if user exists, to be implemented once communications between services are established
+
+        if (event.getIsPrivate() && !event.getWhitelistedUsers().contains(userId)) {
+            throw new UserIsNotEventWhitelistedException(id, userId);
+        }
 
         if (event.getParticipants().size() >= event.getMaxParticipants()) {
             throw new EventFullException(id, userId);
