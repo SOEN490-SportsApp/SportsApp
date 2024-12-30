@@ -1,5 +1,6 @@
 package app.sportahub.userservice.controller.user;
 
+import app.sportahub.userservice.dto.request.user.FriendRequestRequest;
 import app.sportahub.userservice.dto.response.user.FriendRequestResponse;
 import app.sportahub.userservice.dto.request.user.ProfileRequest;
 import app.sportahub.userservice.dto.request.user.UserRequest;
@@ -72,7 +73,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Send a friend request to a user",
     description = "Allows a user to send a friend request to another user and returns the details of the friend request.")
-    public FriendRequestResponse sendFriendRequest(@PathVariable String userId, @RequestParam String receiverUsername) {
-        return userService.sendFriendRequest(userId, receiverUsername);
+    public FriendRequestResponse sendFriendRequest(@PathVariable String userId, @RequestBody FriendRequestRequest friendRequestRequest) {
+        return userService.sendFriendRequest(userId, friendRequestRequest);
     }
 }

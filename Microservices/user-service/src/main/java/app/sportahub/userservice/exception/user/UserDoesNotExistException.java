@@ -8,6 +8,6 @@ import org.springframework.web.server.ResponseStatusException;
 public class UserDoesNotExistException extends ResponseStatusException {
 
     public UserDoesNotExistException(String identifier) {
-        super(HttpStatus.NOT_FOUND, "User with identifier:" + identifier + "does not exist.");
+        super(HttpStatus.NOT_FOUND, "User with identifier: " + identifier + " does not exist.");
     }
 }

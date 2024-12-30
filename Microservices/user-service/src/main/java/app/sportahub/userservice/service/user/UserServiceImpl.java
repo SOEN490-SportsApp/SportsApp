@@ -1,6 +1,7 @@
 package app.sportahub.userservice.service.user;
 
 import app.sportahub.userservice.client.KeycloakApiClient;
+import app.sportahub.userservice.dto.request.user.FriendRequestRequest;
 import app.sportahub.userservice.dto.response.user.FriendRequestResponse;
 import app.sportahub.userservice.dto.request.user.ProfileRequest;
 import app.sportahub.userservice.dto.request.user.UserRequest;
@@ -149,11 +150,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public FriendRequestResponse sendFriendRequest(String userId, String receiverUsername) {
+    public FriendRequestResponse sendFriendRequest(String userId, FriendRequestRequest friendRequestRequest) {
         User userSender = userRepository.findById(userId)
                 .orElseThrow(() -> new UserDoesNotExistException(userId));
-        User userReceiver = userRepository.findUserByUsername(receiverUsername)
-                .orElseThrow(() -> new UserDoesNotExistException(receiverUsername));
+        User userReceiver = userRepository.findUserByUsername(friendRequestRequest.receiverUsername())
+                .orElseThrow(() -> new UserDoesNotExistException(friendRequestRequest.receiverUsername()));
 
         if (userSender.equals(userReceiver)) {
             throw new UserSentFriendRequestToSelfException();

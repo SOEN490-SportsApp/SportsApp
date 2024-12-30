@@ -1,5 +1,6 @@
 package app.sportahub.userservice.service.user;
 
+import app.sportahub.userservice.dto.request.user.FriendRequestRequest;
 import app.sportahub.userservice.dto.response.user.FriendRequestResponse;
 import app.sportahub.userservice.dto.request.user.ProfileRequest;
 import app.sportahub.userservice.dto.request.user.UserRequest;
@@ -23,5 +24,5 @@ public interface UserService {
 
     List<BadgeWithCountResponse> getUserBadges(String userId);
 
-    FriendRequestResponse sendFriendRequest(String userId, String receiverUsername);
+    FriendRequestResponse sendFriendRequest(String userId, FriendRequestRequest friendRequestRequest);
 }
