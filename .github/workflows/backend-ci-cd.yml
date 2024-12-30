@@ -1,32 +1,41 @@
-name: Backend CI/CD
+name: UserService CI
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: 
 
 jobs:
-  build:
-    name: Build and analyze
+  build-and-analyze:
+    name: Build and Analyze UserService
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           java-version: 21
-          distribution: 'zulu' # Alternative distribution options are available
-      - name: Cache SonarQube packages
+          distribution: 'zulu'
+
+      - name: Cache SonarQube Packages
         uses: actions/cache@v4
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
-      - name: Cache Gradle packages
+
+      - name: Cache Gradle Packages
         uses: actions/cache@v4
         with:
           path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('Microservices/user-service/**/*.gradle') }}
           restore-keys: ${{ runner.os }}-gradle
-      - name: Build and analyze
+
+      - name: Build and Analyze with SonarQube
+        working-directory: Microservices/user-service # Specify the directory for this service
         env:
-          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}  # Needed to get PR information, if any
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Used for PR metadata
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}    # Your SonarQube token
         run: ./gradlew build sonar --info
