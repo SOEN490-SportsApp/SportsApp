@@ -48,4 +48,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: test-results-${{ matrix.service }}
-          path: ./microservices/${{ matrix.service }}/build/reports/tests/test
+          path: ./microservices/${{ matrix.service }}/build/reports/tests/test 
