@@ -1,18 +1,14 @@
 package app.sportahub.userservice.service.user;
 
 import app.sportahub.userservice.client.KeycloakApiClient;
-import app.sportahub.userservice.config.MongoConfig;
-import app.sportahub.userservice.dto.request.user.PreferencesRequest;
-import app.sportahub.userservice.dto.request.user.ProfileRequest;
-import app.sportahub.userservice.dto.request.user.SportLevelRequest;
-import app.sportahub.userservice.dto.request.user.UserRequest;
+import app.sportahub.userservice.dto.request.user.*;
 import app.sportahub.userservice.dto.request.user.keycloak.KeycloakRequest;
+import app.sportahub.userservice.dto.response.user.FriendRequestResponse;
 import app.sportahub.userservice.dto.response.user.ProfileResponse;
 import app.sportahub.userservice.dto.response.user.SportLevelResponse;
 import app.sportahub.userservice.dto.response.user.UserResponse;
-import app.sportahub.userservice.exception.user.UserDoesNotExistException;
-import app.sportahub.userservice.exception.user.UserEmailAlreadyExistsException;
-import app.sportahub.userservice.exception.user.UsernameAlreadyExistsException;
+import app.sportahub.userservice.enums.user.FriendRequestStatusEnum;
+import app.sportahub.userservice.exception.user.*;
 import app.sportahub.userservice.exception.user.badge.UserAlreadyAssignedBadgeByThisGiverException;
 import app.sportahub.userservice.mapper.user.ProfileMapper;
 import app.sportahub.userservice.mapper.user.UserMapper;
@@ -29,7 +25,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 
-import java.sql.Array;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -439,5 +434,179 @@ public class UserServiceTest {
     void getUserBadges_UserNotFound() {
         when(userRepository.findById("user1")).thenReturn(Optional.empty());
         assertThrows(UserDoesNotExistException.class, () -> userService.getUserBadges("user1"));
+    }
+
+    @Test
+    void sendFriendRequestShouldReturnSuccess() {
+        // Arrange
+        String senderId = "sender";
+        Optional<User> sendUser = Optional.of(User.builder()
+                .withId(senderId)
+                .withEmail("test@example.com")
+                .withUsername("sender")
+                .withProfile(Profile.builder()
+                        .withFirstName("John")
+                        .withLastName("Doe")
+                        .withDateOfBirth(LocalDate.of(1990, 1, 1))
+                        .withGender("Male")
+                        .withPostalCode("12345")
+                        .withPhoneNumber("1234567890")
+                        .withSportsOfPreference(
+                                List.of(new SportLevel("Basketball", "Intermediate"),
+                                        new SportLevel("Soccer", "Beginner")))
+                        .withRanking("100")
+                        .build())
+                .build());
+
+        String receiverId = "receiver";
+        Optional<User> receiverUser = Optional.of(User.builder()
+                .withId(receiverId)
+                .withEmail("test@example.com")
+                .withUsername("receiver")
+                .withProfile(Profile.builder()
+                        .withFirstName("John")
+                        .withLastName("Doe")
+                        .withDateOfBirth(LocalDate.of(1990, 1, 1))
+                        .withGender("Male")
+                        .withPostalCode("12345")
+                        .withPhoneNumber("1234567890")
+                        .withSportsOfPreference(
+                                List.of(new SportLevel("Basketball", "Intermediate"),
+                                        new SportLevel("Soccer", "Beginner")))
+                        .withRanking("100")
+                        .build())
+                .build());
+
+        when(userRepository.findUserById(senderId)).thenReturn(sendUser);
+        when(userRepository.findUserByUsername(receiverUser.get().getUsername())).thenReturn(receiverUser);
+        User send = sendUser.get();
+        User receiver = receiverUser.get();
+
+        when(userRepository.save(send)).thenReturn(send);
+        when(userRepository.save(receiver)).thenReturn(receiver);
+
+        // Act
+        FriendRequestResponse response = userService.sendFriendRequest(sendUser.get().getId(),
+                new FriendRequestRequest(receiverUser.get().getUsername()));
+
+        // Assert
+        assertNotNull(response);
+        assertEquals("Friend request sent successfully.",response.message());
+        assertFalse(send.getFriendList().isEmpty());
+        assertFalse(receiver.getFriendList().isEmpty());
+        assertEquals(FriendRequestStatusEnum.SENT, send.getFriendList().getFirst().getFriendRequestStatus());
+        assertEquals(FriendRequestStatusEnum.RECEIVED, receiver.getFriendList().getFirst().getFriendRequestStatus());
+    }
+
+    @Test
+    void sendFriendRequestShouldThrowUserDoesNotExistException() {
+        // Arrange
+        String userId = new ObjectId().toHexString();
+
+        // Act
+        UserDoesNotExistException exception = assertThrows(UserDoesNotExistException.class,
+                () -> userService.sendFriendRequest(userId, new FriendRequestRequest("test") ));
+
+        // Assert
+        assertEquals("404 NOT_FOUND \"User with identifier: " + userId + " does not exist.\"", exception.getMessage());
+    }
+
+    @Test
+    void sendFriendRequestShouldThrowUserAlreadyInFriendListException() {
+        // Arrange
+
+        List<Friend> senderFriendList = new ArrayList<>();
+        senderFriendList.add(new Friend("receiver", FriendRequestStatusEnum.SENT));
+
+        List<Friend> receiverFriendList = new ArrayList<>();
+        receiverFriendList.add(new Friend("sender", FriendRequestStatusEnum.RECEIVED));
+
+        String senderId = "sender";
+        Optional<User> sendUser = Optional.of(User.builder()
+                .withId(senderId)
+                .withEmail("test@example.com")
+                .withUsername("sender")
+                .withProfile(Profile.builder()
+                        .withFirstName("John")
+                        .withLastName("Doe")
+                        .withDateOfBirth(LocalDate.of(1990, 1, 1))
+                        .withGender("Male")
+                        .withPostalCode("12345")
+                        .withPhoneNumber("1234567890")
+                        .withSportsOfPreference(
+                                List.of(new SportLevel("Basketball", "Intermediate"),
+                                        new SportLevel("Soccer", "Beginner")))
+                        .withRanking("100")
+                        .build())
+                        .withFriendList(senderFriendList)
+                .build());
+
+        String receiverId = "receiver";
+        Optional<User> receiverUser = Optional.of(User.builder()
+                .withId(receiverId)
+                .withEmail("test@example.com")
+                .withUsername("receiver")
+                .withProfile(Profile.builder()
+                        .withFirstName("John")
+                        .withLastName("Doe")
+                        .withDateOfBirth(LocalDate.of(1990, 1, 1))
+                        .withGender("Male")
+                        .withPostalCode("12345")
+                        .withPhoneNumber("1234567890")
+                        .withSportsOfPreference(
+                                List.of(new SportLevel("Basketball", "Intermediate"),
+                                        new SportLevel("Soccer", "Beginner")))
+                        .withRanking("100")
+                        .build())
+                        .withFriendList(receiverFriendList)
+                .build());
+
+        when(userRepository.findUserById(senderId)).thenReturn(sendUser);
+        when(userRepository.findUserByUsername(receiverUser.get().getUsername())).thenReturn(receiverUser);
+        User send = sendUser.get();
+        User receiver = receiverUser.get();
+
+        // Act
+        UserAlreadyInFriendListException exception = assertThrows(UserAlreadyInFriendListException.class,
+                () -> userService.sendFriendRequest(sendUser.get().getId(),
+                new FriendRequestRequest(receiverUser.get().getUsername())));
+
+        // Assert
+        assertEquals("409 CONFLICT \"User with username: " + receiver.getUsername() + " and status: "
+                + send.getFriendList().getFirst().getFriendRequestStatus() + " already in friend list.\"", exception.getMessage());
+    }
+
+    @Test
+    void sendFriendRequestShouldThrowUserSentFriendRequestToSelfException() {
+        // Arrange
+        String senderId = "sender";
+        Optional<User> sendUser = Optional.of(User.builder()
+                .withId(senderId)
+                .withEmail("test@example.com")
+                .withUsername("sender")
+                .withProfile(Profile.builder()
+                        .withFirstName("John")
+                        .withLastName("Doe")
+                        .withDateOfBirth(LocalDate.of(1990, 1, 1))
+                        .withGender("Male")
+                        .withPostalCode("12345")
+                        .withPhoneNumber("1234567890")
+                        .withSportsOfPreference(
+                                List.of(new SportLevel("Basketball", "Intermediate"),
+                                        new SportLevel("Soccer", "Beginner")))
+                        .withRanking("100")
+                        .build())
+                .build());
+
+        when(userRepository.findUserById(senderId)).thenReturn(sendUser);
+        when(userRepository.findUserByUsername(sendUser.get().getUsername())).thenReturn(sendUser);
+        User send = sendUser.get();
+
+        // Act
+        UserSentFriendRequestToSelfException exception = assertThrows(UserSentFriendRequestToSelfException.class,
+                () -> userService.sendFriendRequest(senderId, new FriendRequestRequest(send.getUsername())));
+
+        // Assert
+        assertEquals("409 CONFLICT \"Can't send friend request to self\"", exception.getMessage());
     }
 }

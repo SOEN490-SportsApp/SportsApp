@@ -1,4 +1,4 @@
-package app.sportahub.userservice.exception;
+package app.sportahub.userservice.exception.user;
 
 import app.sportahub.userservice.enums.user.FriendRequestStatusEnum;
 import org.springframework.http.HttpStatus;
