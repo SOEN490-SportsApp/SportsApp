@@ -1,9 +1,12 @@
 package app.sportahub.userservice.dto.request.user;
 
+import app.sportahub.userservice.model.user.Friend;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+
+import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record UserRequest(String keycloakId,
@@ -22,5 +25,8 @@ public record UserRequest(String keycloakId,
                           ProfileRequest profile,
 
                           @Nullable
-                          PreferencesRequest preferences) {
+                          PreferencesRequest preferences,
+
+                          @Nullable
+                          List<Friend> friendList) {
 }

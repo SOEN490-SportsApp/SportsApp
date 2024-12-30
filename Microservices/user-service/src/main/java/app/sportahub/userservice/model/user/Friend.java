@@ -17,5 +17,5 @@ public class Friend {
     private String username;
 
     @NotBlank(message = "Friend request status must be provided.")
-    private Enum<FriendRequestStatusEnum> friendRequestStatus;
+    private FriendRequestStatusEnum friendRequestStatus;
 }
