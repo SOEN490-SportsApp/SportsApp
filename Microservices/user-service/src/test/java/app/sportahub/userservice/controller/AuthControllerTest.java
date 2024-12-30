@@ -98,7 +98,7 @@ public class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(sendVerificationEmailRequest)))
                 .andExpect(status().isNotFound())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.error").value("User with id:" + sendVerificationEmailRequest.email() + "does not exist."));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.error").value("User with identifier: " + sendVerificationEmailRequest.email() + " does not exist."));
     }
     @SneakyThrows
     @Test

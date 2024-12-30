@@ -29,6 +29,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 
+import java.sql.Array;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -86,7 +87,8 @@ public class UserServiceTest {
                 "testUser",
                 "123",
                 profileRequest,
-                preferences
+                preferences,
+                new ArrayList<>()
         );
         return userRequest;
     }
@@ -235,7 +237,7 @@ public class UserServiceTest {
         );
 
         assertEquals(
-                "404 NOT_FOUND \"User with id:" + userId + "does not exist.\"",
+                "404 NOT_FOUND \"User with identifier: " + userId + " does not exist.\"",
                 exception.getMessage()
         );
     }
@@ -319,7 +321,7 @@ public class UserServiceTest {
         UserDoesNotExistException exception = assertThrows(UserDoesNotExistException.class,
                 () -> userService.updateUserProfile("1", profileRequest));
 
-        assertEquals("404 NOT_FOUND \"User with id:1does not exist.\"", exception.getMessage());
+        assertEquals("404 NOT_FOUND \"User with identifier: 1 does not exist.\"", exception.getMessage());
 
         verify(userRepository, times(1)).findUserById("1");
         verify(userRepository, never()).save(any(User.class));
@@ -350,7 +352,7 @@ public class UserServiceTest {
                 null
         );
 
-        Optional<User> optionalExistingUser = Optional.of(new User("keycloak-123", "test@gmail.com", "testusername", existingProfile, null));
+        Optional<User> optionalExistingUser = Optional.of(new User("keycloak-123", "test@gmail.com", "testusername", existingProfile, null, null));
         User existingUser = optionalExistingUser.get();
         when(userRepository.findUserById(existingUser.getId())).thenReturn(optionalExistingUser);
         existingUser.getProfile().setDateOfBirth(profileRequest.dateOfBirth());
@@ -375,7 +377,7 @@ public class UserServiceTest {
         UserDoesNotExistException exception = assertThrows(UserDoesNotExistException.class,
                 () -> userService.patchUserProfile("1", profileRequest));
 
-        assertEquals("404 NOT_FOUND \"User with id:1does not exist.\"", exception.getMessage());
+        assertEquals("404 NOT_FOUND \"User with identifier: 1 does not exist.\"", exception.getMessage());
 
         verify(userRepository, times(1)).findUserById("1");
         verify(userRepository, never()).save(any(User.class));
