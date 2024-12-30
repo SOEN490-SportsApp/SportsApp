@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   ScrollView,
   StyleSheet,
-  Switch,
   Modal,
   FlatList,
   StatusBar,
@@ -14,44 +13,39 @@ import {
 } from 'react-native';
 import { useForm, Controller, useWatch } from 'react-hook-form';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useRouter } from 'expo-router';
 import ConfirmButton from '@/components/ConfirmButton';
 import { IconPlacement } from '@/utils/constants/enums';
 import themeColors from '@/utils/constants/colors';
 import { hs, vs, mhs } from '@/utils/helpers/uiScaler';
 import { API_ENDPOINTS } from '@/utils/api/endpoints';
 import { createEvent } from '@/services/eventService';
-import { useUpdateUserToStore, selectUser } from '@/state/user/actions';
-import { useSelector } from "react-redux";
+import { useSelector } from 'react-redux';
 
 const sports = ['Soccer', 'Basketball', 'Tennis', 'Swimming', 'Running', 'Football', 'Rugby'];
 
 const Create = () => {
-  const { control, handleSubmit, formState: { errors }, setValue } = useForm<EventFormData>();
+  const { control, handleSubmit, formState: { errors }, setValue, reset } = useForm<EventFormData>({
+    defaultValues: {
+      eventType: 'public', // Default to public
+    },
+  });
   const router = useRouter();
   const [isSportTypeModalVisible, setSportTypeModalVisible] = useState(false);
   const [eventDate, setEventDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-  // const { userID } = useLocalSearchParams();
-  // const createdBy = Array.isArray(userID) ? userID[0] : userID;
-  // useEffect(() => {
-  //   console.log("user id from create", createdBy);
-  // }, [createdBy]);
-
-  // const user = useSelector(selectUser);
   const user = useSelector((state: { user: any }) => state.user);
+
   useEffect(() => {
     if (!user) {
-      console.log("User not found");
+      console.log('User not found');
     }
   }, [user]);
 
   const navigateHome = () => {
-    router.replace("/(tabs)/home");
+    router.replace('/(tabs)/home');
   };
-
-  // console.log("user id from create", user.id);
 
   interface EventFormData {
     eventName: string;
@@ -63,50 +57,60 @@ const Create = () => {
     country: string;
     cutOffTime: string;
     description: string;
-    isPrivate: boolean;
     maxParticipants: string;
   }
 
   const onSubmit = async (data: EventFormData) => {
     try {
       const eventRequest = {
-        eventName: "erbe45",
-        eventType: "testEventType",
-        sportType: "testSportType",
+        eventName: data.eventName,
+        eventType: data.eventType,
+        sportType: data.sportType,
         location: {
-            name: "testLocationName",
-            streetNumber: "1",
-            streetName: "testStreetName",
-            city: "testCity",
-            province: "testProvince",
-            country: "testCountry",
-            postalCode: "A1B 2C3",
-            addressLine2: "testLine2",
-            phoneNumber: "555-555-5555",
-            latitude: "2",
-            longitude: "3"
+          name: data.locationName,
+          streetNumber: '',
+          streetName: '',
+          city: data.city,
+          province: data.province,
+          country: data.country,
+          postalCode: '',
+          addressLine2: '',
+          phoneNumber: '',
+          latitude: '',
+          longitude: '',
         },
-        date: "2024-01-01",
-        duration: "4",
-        maxParticipants: 4,
+        date: eventDate.toISOString().split('T')[0],
+        duration: '',
+        maxParticipants: data.maxParticipants,
         participants: [],
-        createdBy: "testID",
+        createdBy: user.id,
         teams: [],
-        cutOffTime: "5",
-        description: "testDescription",
-        isPrivate: "false",
+        cutOffTime: data.cutOffTime,
+        description: data.description,
+        isPrivate: data.eventType === 'private', // Set isPrivate based on eventType
         whiteListedUsers: [],
-        requiredSkillLevel: ["BEGINNER"]
-    };
+        requiredSkillLevel: [],
+      };
 
       await createEvent(eventRequest);
-      // await updateUserToStore(userID as string);
-      // router.replace("/(tabs)/home");
-      navigateHome();
 
+      // Reset the form and navigate to the home screen
+      reset({
+        eventName: '',
+        eventType: 'public',
+        sportType: '',
+        locationName: '',
+        city: '',
+        province: '',
+        country: '',
+        cutOffTime: '',
+        description: '',
+        maxParticipants: '',
+      });
+      setEventDate(new Date()); // Reset the date picker
+      navigateHome();
     } catch (error: any) {
-      Alert.alert('Error', 'Error occured creating event');
-      throw new Error(`Error creating event: ${error}`);
+      Alert.alert('Error', 'Error occurred while creating the event');
     }
   };
 
@@ -157,7 +161,7 @@ const Create = () => {
         <Controller
           control={control}
           name="eventName"
-          rules={{ required: "Event Name is required" }}
+          rules={{ required: 'Event Name is required' }}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
               placeholder="Enter Event Name"
@@ -168,7 +172,7 @@ const Create = () => {
             />
           )}
         />
-        {errors.eventName && typeof errors.eventName.message === 'string' && <Text style={styles.errorText}>{errors.eventName.message}</Text>}
+        {errors.eventName && <Text style={styles.errorText}>{errors.eventName.message}</Text>}
 
         <Text style={styles.label}>Event Type</Text>
         <View style={styles.radioGroup}>
@@ -176,13 +180,13 @@ const Create = () => {
             onPress={() => setValue('eventType', 'public')}
             style={[
               styles.radioButton,
-              useWatch({ control, name: 'eventType' }) === 'public' ? styles.radioButtonSelected : null,
+              watch.eventType === 'public' ? styles.radioButtonSelected : null,
             ]}
           >
             <Text
               style={[
                 styles.radioText,
-                useWatch({ control, name: 'eventType' }) === 'public' && styles.selectedText,
+                watch.eventType === 'public' && styles.selectedText,
               ]}
             >
               Public
@@ -192,13 +196,13 @@ const Create = () => {
             onPress={() => setValue('eventType', 'private')}
             style={[
               styles.radioButton,
-              useWatch({ control, name: 'eventType' }) === 'private' && styles.radioButtonSelected,
+              watch.eventType === 'private' ? styles.radioButtonSelected : null,
             ]}
           >
             <Text
               style={[
                 styles.radioText,
-                useWatch({ control, name: 'eventType' }) === 'private' && styles.selectedText,
+                watch.eventType === 'private' && styles.selectedText,
               ]}
             >
               Private
@@ -211,7 +215,7 @@ const Create = () => {
           <Text>{watch.sportType || 'Select a Sport'}</Text>
         </TouchableOpacity>
         {renderSportTypeModal()}
-        {errors.sportType && typeof errors.sportType.message === 'string' && <Text style={styles.errorText}>{errors.sportType.message}</Text>}
+        {errors.sportType && <Text style={styles.errorText}>{errors.sportType.message}</Text>}
 
         <Text style={styles.label}>Location</Text>
         <Controller
@@ -329,6 +333,7 @@ const Create = () => {
               onBlur={onBlur}
               onChangeText={onChange}
               value={value}
+              keyboardType="numeric"
             />
           )}
         />
@@ -356,20 +361,7 @@ const Create = () => {
         {errors.description && typeof errors.description.message === 'string' && (
           <Text style={styles.errorText}>{errors.description.message}</Text>
         )}
-
-        <View style={styles.switchContainer}>
-          <Text style={styles.label}>Private Event</Text>
-          <Controller
-            control={control}
-            name="isPrivate"
-            render={({ field: { onChange, value } }) => (
-              <Switch
-                value={value}
-                onValueChange={onChange}
-              />
-            )}
-          />
-        </View>
+        
       </ScrollView>
       <View style={styles.footer}>
         <ConfirmButton
