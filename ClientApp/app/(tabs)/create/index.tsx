@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -10,16 +10,19 @@ import {
   Modal,
   FlatList,
   StatusBar,
-  Alert
+  Alert,
 } from 'react-native';
 import { useForm, Controller, useWatch } from 'react-hook-form';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import ConfirmButton from '@/components/ConfirmButton';
 import { IconPlacement } from '@/utils/constants/enums';
 import themeColors from '@/utils/constants/colors';
-import { hs, vs, mhs, mvs } from '@/utils/helpers/uiScaler';
+import { hs, vs, mhs } from '@/utils/helpers/uiScaler';
+import { API_ENDPOINTS } from '@/utils/api/endpoints';
 import { createEvent } from '@/services/eventService';
+import { useUpdateUserToStore, selectUser } from '@/state/user/actions';
+import { useSelector } from "react-redux";
 
 const sports = ['Soccer', 'Basketball', 'Tennis', 'Swimming', 'Running', 'Football', 'Rugby'];
 
@@ -30,7 +33,25 @@ const Create = () => {
   const [eventDate, setEventDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-  const createdBy = '67302d306f52646e079d1483';
+  // const { userID } = useLocalSearchParams();
+  // const createdBy = Array.isArray(userID) ? userID[0] : userID;
+  // useEffect(() => {
+  //   console.log("user id from create", createdBy);
+  // }, [createdBy]);
+
+  // const user = useSelector(selectUser);
+  const user = useSelector((state: { user: any }) => state.user);
+  useEffect(() => {
+    if (!user) {
+      console.log("User not found");
+    }
+  }, [user]);
+
+  const navigateHome = () => {
+    router.replace("/(tabs)/home");
+  };
+
+  // console.log("user id from create", user.id);
 
   interface EventFormData {
     eventName: string;
@@ -43,44 +64,49 @@ const Create = () => {
     cutOffTime: string;
     description: string;
     isPrivate: boolean;
-  }
-
-  interface EventRequest {
-    eventName: string;
-    eventType: string;
-    sportType: string;
-    location: {
-      name: string;
-      city: string;
-      province: string;
-      country: string;
-    };
-    date: string;
-    createdBy: string;
-    cutOffTime: string;
-    description: string;
-    isPrivate: boolean;
+    maxParticipants: string;
   }
 
   const onSubmit = async (data: EventFormData) => {
-    const eventRequest: EventRequest = {
-      ...data,
-      location: {
-        name: data.locationName,
-        city: data.city,
-        province: data.province,
-        country: data.country,
-      },
-      date: eventDate.toISOString().split('T')[0],
-      createdBy,
+    try {
+      const eventRequest = {
+        eventName: "erbe45",
+        eventType: "testEventType",
+        sportType: "testSportType",
+        location: {
+            name: "testLocationName",
+            streetNumber: "1",
+            streetName: "testStreetName",
+            city: "testCity",
+            province: "testProvince",
+            country: "testCountry",
+            postalCode: "A1B 2C3",
+            addressLine2: "testLine2",
+            phoneNumber: "555-555-5555",
+            latitude: "2",
+            longitude: "3"
+        },
+        date: "2024-01-01",
+        duration: "4",
+        maxParticipants: 4,
+        participants: [],
+        createdBy: "testID",
+        teams: [],
+        cutOffTime: "5",
+        description: "testDescription",
+        isPrivate: "false",
+        whiteListedUsers: [],
+        requiredSkillLevel: ["BEGINNER"]
     };
 
-    try {
       await createEvent(eventRequest);
-      Alert.alert('Success', 'Event created successfully');
-      router.replace('/(tabs)/home');
+      // await updateUserToStore(userID as string);
+      // router.replace("/(tabs)/home");
+      navigateHome();
+
     } catch (error: any) {
-      Alert.alert('Error', error.message);
+      Alert.alert('Error', 'Error occured creating event');
+      throw new Error(`Error creating event: ${error}`);
     }
   };
 
@@ -267,6 +293,29 @@ const Create = () => {
             }}
           />
         )}
+
+        <Text style={styles.label}>Maximum Number of Participants</Text>
+        <Controller
+          control={control}
+          name="maxParticipants"
+          rules={{
+            required: "Maximum number of participants is required",
+            validate: (value) => {
+              const number = parseInt(value, 10);
+              return !isNaN(number) && number > 0 || "Must be a positive number";
+            },
+          }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              placeholder="Enter maximum participants"
+              style={styles.input}
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+              keyboardType="numeric"
+            />
+          )}
+        />
 
         <Text style={styles.label}>Cut Off Time</Text>
         <Controller
