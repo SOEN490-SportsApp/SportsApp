@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, ActivityIndicator, SafeAreaView, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons'; 
 import axiosInstance from '@/services/axiosInstance';
 import CustomTabMenu from '@/components/CustomTabMenu';
 import { useRouter } from 'expo-router';
@@ -161,7 +162,7 @@ const ProfilePage: React.FC = () => {
                     onPress={() => router.push('/(tabs)/profile/(settings)/settingsPage')} 
                     className="absolute right-4" // Position Edit button in top-right
                 >
-                    <Text className="text-blue-600 font-semibold">Edit</Text>
+                    <Icon name="settings-outline" size={24} color="black" />
                 </TouchableOpacity>
             </View>
             
