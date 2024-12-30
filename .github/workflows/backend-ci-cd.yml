@@ -37,5 +37,5 @@ jobs:
         working-directory: Microservices/user-service # Specify the directory for this service
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Used for PR metadata
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}    # Your SonarQube token
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_USERSERVICE }}    # Your SonarQube token
         run: ./gradlew build sonar --info
