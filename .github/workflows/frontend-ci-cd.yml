@@ -1,13 +1,7 @@
 name: Frontend CI/CD
 
 on:
-  pull_request:
-    branches: [ "*" ]
-  push:
-    branches:
-      - main
-      - dev
-      - 'releases/**'
+  workflow_dispatch: 
 
 jobs:
   test:
