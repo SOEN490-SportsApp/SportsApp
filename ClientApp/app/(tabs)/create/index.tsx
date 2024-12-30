@@ -27,13 +27,14 @@ const sports = ['Soccer', 'Basketball', 'Tennis', 'Swimming', 'Running', 'Footba
 const Create = () => {
   const { control, handleSubmit, formState: { errors }, setValue, reset } = useForm<EventFormData>({
     defaultValues: {
-      eventType: 'public', // Default to public
+      eventType: 'public',
     },
   });
   const router = useRouter();
   const [isSportTypeModalVisible, setSportTypeModalVisible] = useState(false);
   const [eventDate, setEventDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [isSuccessModalVisible, setSuccessModalVisible] = useState(false);
 
   const user = useSelector((state: { user: any }) => state.user);
 
@@ -87,14 +88,13 @@ const Create = () => {
         teams: [],
         cutOffTime: data.cutOffTime,
         description: data.description,
-        isPrivate: data.eventType === 'private', // Set isPrivate based on eventType
+        isPrivate: data.eventType === 'private',
         whiteListedUsers: [],
         requiredSkillLevel: [],
       };
 
       await createEvent(eventRequest);
 
-      // Reset the form and navigate to the home screen
       reset({
         eventName: '',
         eventType: 'public',
@@ -107,9 +107,13 @@ const Create = () => {
         description: '',
         maxParticipants: '',
       });
-      setEventDate(new Date()); // Reset the date picker
-      navigateHome();
-    } catch (error: any) {
+      setEventDate(new Date());
+      setSuccessModalVisible(true);
+      setTimeout(() => {
+        setSuccessModalVisible(false);
+        navigateHome();
+      }, 2000);
+    } catch (error) {
       Alert.alert('Error', 'Error occurred while creating the event');
     }
   };
@@ -371,6 +375,18 @@ const Create = () => {
           iconPlacement={IconPlacement.left}
         />
       </View>
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={isSuccessModalVisible}
+        onRequestClose={() => setSuccessModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.successModal}>
+            <Text style={styles.successText}>🎉 Event Created Successfully! 🎉</Text>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -495,6 +511,23 @@ const styles = StyleSheet.create({
     color: themeColors.text.error,
     fontSize: mhs(12),
     marginBottom: vs(8),
+  },
+  successModal: {
+    backgroundColor: 'white',
+    padding: hs(24),
+    borderRadius: mhs(12),
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  successText: {
+    fontSize: mhs(18),
+    fontWeight: 'bold',
+    color: themeColors.primary,
+    textAlign: 'center',
   },
 });
 
