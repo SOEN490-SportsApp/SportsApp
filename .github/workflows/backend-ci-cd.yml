@@ -39,7 +39,7 @@ jobs:
 
       - name: Upload Test Results for Service
         if: always()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: test-results-${{ matrix.service }}
           path: ./microservices/${{ matrix.service }}/build/reports/tests/test
