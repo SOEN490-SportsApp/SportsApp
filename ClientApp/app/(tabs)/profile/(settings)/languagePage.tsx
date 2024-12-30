@@ -13,7 +13,6 @@ const languagePage: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Select Language</Text>
 
       <View style={styles.optionsContainer}>
         {/* English Option */}
@@ -60,12 +59,6 @@ const styles = StyleSheet.create({
     backgroundColor: themeColors.background.light,
     paddingHorizontal: hs(16),
     paddingTop: vs(16),
-  },
-  header: {
-    fontSize: mhs(20),
-    fontWeight: 'bold',
-    color: themeColors.text.dark,
-    marginBottom: vs(16),
   },
   optionsContainer: {
     marginTop: vs(16),

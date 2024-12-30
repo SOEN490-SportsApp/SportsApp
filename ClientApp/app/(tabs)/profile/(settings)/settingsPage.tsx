@@ -33,14 +33,13 @@ const settingsPage: React.FC = () => {
           <Ionicons name="help-circle-outline" size={mvs(24)} color="black" style={styles.icon} />
           <Text style={styles.text}>Help</Text>
         </TouchableOpacity>
-      </ScrollView>
 
-      {/* Fixed Logout Button */}
-      <View style={styles.footer}>
-        <TouchableOpacity style={styles.logout} onPress={handleLogout}>
-          <Text style={styles.logoutText}>Log Out</Text>
+        {/* Log out */}
+        <TouchableOpacity style={styles.option} onPress={handleLogout}>
+          <Ionicons name="log-out-outline" size={mvs(24)} color="black" style={styles.icon} />
+          <Text style={styles.text}>Log out</Text>
         </TouchableOpacity>
-      </View>
+      </ScrollView>
     </View>
   );
 };
@@ -67,34 +66,6 @@ const styles = StyleSheet.create({
   text: {
     fontSize: mhs(16),
     color: themeColors.text.dark,
-  },
-  footer: {
-    position: 'absolute',
-    bottom: 0,
-    width: '100%',
-    backgroundColor: themeColors.background.light,
-    paddingVertical: vs(20),
-    alignItems: 'center',
-    borderTopWidth: 1,
-    borderTopColor: themeColors.border.light,
-  },
-  logout: {
-    width: '80%',
-    backgroundColor: themeColors.primary,
-    paddingVertical: vs(12),
-    borderRadius: mhs(25),
-    alignItems: 'center',
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-  },
-  logoutText: {
-    color: themeColors.text.light,
-    fontSize: mhs(16),
-    fontWeight: 'bold',
-    textTransform: 'uppercase',
   },
 });
 

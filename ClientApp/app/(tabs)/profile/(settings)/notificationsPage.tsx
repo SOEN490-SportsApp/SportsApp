@@ -12,7 +12,6 @@ const notificationsPage: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Notifications</Text>
       <View style={styles.option}>
         <Text style={styles.text}>Mute All</Text>
         <Switch
@@ -33,12 +32,6 @@ const styles = StyleSheet.create({
     backgroundColor: themeColors.background.light,
     paddingHorizontal: hs(16),
     paddingTop: vs(16),
-  },
-  header: {
-    fontSize: mhs(20),
-    fontWeight: 'bold',
-    color: themeColors.text.dark,
-    marginBottom: vs(16),
   },
   option: {
     flexDirection: 'row',

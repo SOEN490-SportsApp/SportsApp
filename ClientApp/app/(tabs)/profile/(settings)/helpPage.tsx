@@ -10,13 +10,11 @@ const helpPage: React.FC = () => {
   };
 
   const handlePrivacyPolicy = () => {
-    // Open Privacy Policy link in a web browser
-    // Linking.openURL('https://developer.moneris.com/More/Compliance/Sample%20Privacy%20Policy');
+
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.header}>Help & Support</Text>
 
       {/* Contact Support */}
       <TouchableOpacity style={styles.option} onPress={handleContactSupport}>
@@ -48,12 +46,6 @@ const styles = StyleSheet.create({
     backgroundColor: themeColors.background.light,
     paddingHorizontal: hs(16),
     paddingTop: vs(16),
-  },
-  header: {
-    fontSize: mhs(20),
-    fontWeight: 'bold',
-    color: themeColors.text.dark,
-    marginBottom: vs(16),
   },
   option: {
     flexDirection: 'row',
