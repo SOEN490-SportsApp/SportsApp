@@ -1,3 +1,4 @@
+import { useLocalSearchParams, router } from 'expo-router';
 import React from 'react';
 import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Icon } from 'react-native-elements';
@@ -16,6 +17,7 @@ const feedData: FeedItem[] = [
 ];
 
 const HomePage: React.FC = () => {
+
   const renderPostActions = () => {
     return (
       <View style={styles.actionsContainer}>
