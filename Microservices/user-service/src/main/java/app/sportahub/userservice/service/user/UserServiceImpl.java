@@ -11,7 +11,7 @@ import app.sportahub.userservice.dto.response.user.UserResponse;
 import app.sportahub.userservice.dto.response.user.badge.BadgeResponse;
 import app.sportahub.userservice.dto.response.user.badge.BadgeWithCountResponse;
 import app.sportahub.userservice.enums.user.FriendRequestStatusEnum;
-import app.sportahub.userservice.exception.UserAlreadyInFriendListException;
+import app.sportahub.userservice.exception.user.UserAlreadyInFriendListException;
 import app.sportahub.userservice.exception.user.UserDoesNotExistException;
 import app.sportahub.userservice.exception.user.UserEmailAlreadyExistsException;
 import app.sportahub.userservice.exception.user.UserSentFriendRequestToSelfException;
@@ -151,7 +151,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public FriendRequestResponse sendFriendRequest(String userId, FriendRequestRequest friendRequestRequest) {
-        User userSender = userRepository.findById(userId)
+        User userSender = userRepository.findUserById(userId)
                 .orElseThrow(() -> new UserDoesNotExistException(userId));
         User userReceiver = userRepository.findUserByUsername(friendRequestRequest.receiverUsername())
                 .orElseThrow(() -> new UserDoesNotExistException(friendRequestRequest.receiverUsername()));
