@@ -12,7 +12,7 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResponseStatusException.class)
-    public ResponseEntity<Map<String, Object>> handleEventDoesNotExistException(ResponseStatusException ex) {
+    public ResponseEntity<Map<String, Object>>handleResponseStatusException(ResponseStatusException ex) {
         Map<String, Object> response = new HashMap<>();
         response.put("error", ex.getReason());
         response.put("message", ex.getStatusCode().value());
