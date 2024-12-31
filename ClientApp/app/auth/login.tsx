@@ -9,18 +9,16 @@ import themeColors from "@/utils/constants/colors";
 import { IconPlacement } from "@/utils/constants/enums";
 import { hs, vs, mvs, mhs } from "@/utils/helpers/uiScaler";
 import { loginUser } from "@/services/authService";
-import { useUpdateUserToStore, selectUser } from '@/state/user/actions';
-import { useSelector } from "react-redux";
+import { useUpdateUserToStore } from '@/state/user/actions';
 
 interface LoginPageFormData {
   identifier: string;
   password: string;
-}
+} 
 
 const LoginPage: React.FC = () => {
   const router = useRouter();
   const updateUserToStore = useUpdateUserToStore();
-  const user = useSelector(selectUser);
   const { control, handleSubmit, formState: { errors } } = useForm<LoginPageFormData>();
   const [showPassword, setShowPassword] = useState(false);
 

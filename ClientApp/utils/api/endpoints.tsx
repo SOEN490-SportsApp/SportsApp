@@ -3,6 +3,8 @@ export const API_ENDPOINTS = {
     REFRESH_TOKEN: 'user-service/auth/refresh',
     LOGIN: 'user-service/auth/login',
     UPDATE_PROFILE: 'user-service/user/{userId}/profile',
-    GET_USER_BY_ID: 'user-service/user/{id}'
+    GET_USER_BY_ID: 'user-service/user/{id}',
+    CREATE_EVENT: 'event-service/event'
+    // add more after authentication
   };
   
