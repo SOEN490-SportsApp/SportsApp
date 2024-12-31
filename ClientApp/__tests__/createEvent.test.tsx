@@ -9,10 +9,8 @@ import { store } from '@/state/store';
 import { createEvent } from '@/services/eventService';
 import { Alert } from 'react-native';
 
-// Mock the createEvent service
 jest.mock('@/services/eventService');
 
-// Mock alert
 jest.spyOn(Alert, 'alert').mockImplementation(() => {});
 
 const mock = new axiosMockAdapter(axiosInstance);
@@ -37,10 +35,9 @@ describe('Create Component', () => {
       expect(screen.getByText('Select a Sport')).toBeTruthy();
       expect(screen.getByPlaceholderText('Location Name')).toBeTruthy();
       expect(screen.getByPlaceholderText('City')).toBeTruthy();
-      expect(screen.getByPlaceholderText('Province')).toBeTruthy();
-      expect(screen.getByPlaceholderText('Country')).toBeTruthy();
+      expect(screen.getByText('Select a Province')).toBeTruthy();
       expect(screen.getByPlaceholderText('Enter maximum participants')).toBeTruthy();
-      expect(screen.getByPlaceholderText('Cut Off Time')).toBeTruthy();
+      expect(screen.getByText('Select cut off time (in hours)')).toBeTruthy();
       expect(screen.getByPlaceholderText('Enter Description')).toBeTruthy();
     });
   });
@@ -56,14 +53,12 @@ describe('Create Component', () => {
       fireEvent.press(screen.getByText('CREATE EVENT'));
 
       await waitFor(() => {
-        // Debugging: Print the rendered output
         screen.debug();
 
         expect(screen.getByText('Event Name is required')).toBeTruthy();
         expect(screen.getByText('Location Name is required')).toBeTruthy();
         expect(screen.getByText('City is required')).toBeTruthy();
         expect(screen.getByText('Province is required')).toBeTruthy();
-        expect(screen.getByText('Country is required')).toBeTruthy();
         expect(screen.getByText('Maximum number of participants is required')).toBeTruthy();
         expect(screen.getByText('Cut Off Time is required')).toBeTruthy();
         expect(screen.getByText('Description is required')).toBeTruthy();
@@ -85,7 +80,6 @@ describe('Create Component', () => {
       fireEvent.changeText(screen.getByPlaceholderText('Location Name'), 'Test Location');
       fireEvent.changeText(screen.getByPlaceholderText('City'), 'Test City');
       fireEvent.changeText(screen.getByPlaceholderText('Province'), 'Test Province');
-      fireEvent.changeText(screen.getByPlaceholderText('Country'), 'Test Country');
       fireEvent.changeText(screen.getByPlaceholderText('Enter maximum participants'), '10');
       fireEvent.changeText(screen.getByPlaceholderText('Cut Off Time'), '12:00 PM');
       fireEvent.changeText(screen.getByPlaceholderText('Enter Description'), 'Test Description');
@@ -99,7 +93,6 @@ describe('Create Component', () => {
             name: 'Test Location',
             city: 'Test City',
             province: 'Test Province',
-            country: 'Test Country',
           }),
           maxParticipants: '10',
           cutOffTime: '12:00 PM',
@@ -121,7 +114,6 @@ describe('Create Component', () => {
       fireEvent.changeText(screen.getByPlaceholderText('Location Name'), 'Test Location');
       fireEvent.changeText(screen.getByPlaceholderText('City'), 'Test City');
       fireEvent.changeText(screen.getByPlaceholderText('Province'), 'Test Province');
-      fireEvent.changeText(screen.getByPlaceholderText('Country'), 'Test Country');
       fireEvent.changeText(screen.getByPlaceholderText('Enter maximum participants'), '10');
       fireEvent.changeText(screen.getByPlaceholderText('Cut Off Time'), '12:00 PM');
       fireEvent.changeText(screen.getByPlaceholderText('Enter Description'), 'Test Description');

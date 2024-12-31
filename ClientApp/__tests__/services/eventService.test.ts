@@ -1,8 +1,15 @@
 import axiosInstance from "@/services/axiosInstance";
 import { createEvent } from "@/services/eventService";
+import { API_ENDPOINTS } from "@/utils/api/endpoints";
 
 jest.mock('@/services/axiosInstance', () => ({
   post: jest.fn(),
+}));
+
+jest.mock('@/utils/api/endpoints', () => ({
+  API_ENDPOINTS: {
+    CREATE_EVENT: "event-service/event",
+  },
 }));
 
 describe("Event Service Tests", () => {
@@ -23,7 +30,7 @@ describe("Event Service Tests", () => {
     const result = await createEvent(eventData);
 
     expect(axiosInstance.post).toHaveBeenCalledWith(
-      "https://api-dev.sportahub.app/api/event-service/event",
+      API_ENDPOINTS.CREATE_EVENT,
       eventData
     );
     expect(result).toEqual(mockResponse.data);
@@ -40,7 +47,7 @@ describe("Event Service Tests", () => {
 
     await expect(createEvent(eventData)).rejects.toThrow("Event creation failed");
     expect(axiosInstance.post).toHaveBeenCalledWith(
-      "https://api-dev.sportahub.app/api/event-service/event",
+      API_ENDPOINTS.CREATE_EVENT,
       eventData
     );
   });
