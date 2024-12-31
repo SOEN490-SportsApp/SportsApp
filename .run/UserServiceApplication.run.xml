@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="UserServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+    <envs>
+      <env name="root:A10hKUmPQHtbNLDwEfbk2hgViSHP9FJP@sporta-dev:27012/user-service?authSource" value="admin" />
+    </envs>
+    <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+    <module name="user-service.main" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="app.sportahub.userservice.UserServiceApplication" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
