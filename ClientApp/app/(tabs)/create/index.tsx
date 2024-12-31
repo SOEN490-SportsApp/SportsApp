@@ -43,6 +43,8 @@ const Create = () => {
   const { control, handleSubmit, formState: { errors }, setValue, reset } = useForm<EventFormData>({
     defaultValues: {
       eventType: 'public',
+      sportType: '',
+      province: '',
     },
   });
   const router = useRouter();
@@ -152,7 +154,7 @@ const Create = () => {
               <TouchableOpacity
                 style={styles.modalItem}
                 onPress={() => {
-                  setValue('sportType', item.name);
+                  setValue('sportType', item.name, { shouldValidate: true });
                   setSportTypeModalVisible(false);
                 }}
               >
@@ -189,7 +191,7 @@ const Create = () => {
               <TouchableOpacity
                 style={styles.modalItem}
                 onPress={() => {
-                  setValue('province', item.name);
+                  setValue('province', item.name, { shouldValidate: true }); // Trigger validation
                   setProvinceModalVisible(false);
                 }}
               >
@@ -207,7 +209,7 @@ const Create = () => {
         </View>
       </View>
     </Modal>
-  );
+  );  
 
   const watch = useWatch({ control });
 
@@ -269,9 +271,19 @@ const Create = () => {
         </View>
 
         <Text style={styles.label}>Sport Type</Text>
-        <TouchableOpacity style={styles.input} onPress={() => setSportTypeModalVisible(true)}>
-          <Text>{watch.sportType || 'Select a Sport'}</Text>
-        </TouchableOpacity>
+        <Controller
+          control={control}
+          name="sportType"
+          rules={{ required: 'Sport Type is required' }}
+          render={({ field: { value } }) => (
+            <TouchableOpacity
+              style={[styles.input, errors.sportType && styles.inputError]}
+              onPress={() => setSportTypeModalVisible(true)}
+            >
+              <Text>{value || 'Select a Sport'}</Text>
+            </TouchableOpacity>
+          )}
+        />
         {renderSportTypeModal()}
         {errors.sportType && <Text style={styles.errorText}>{errors.sportType.message}</Text>}
 
@@ -308,9 +320,19 @@ const Create = () => {
         />
         {errors.city && typeof errors.city.message === 'string' && <Text style={styles.errorText}>{errors.city.message}</Text>}
 
-        <TouchableOpacity style={styles.input} onPress={() => setProvinceModalVisible(true)}>
-          <Text>{watch.province || 'Select a Province'}</Text>
-        </TouchableOpacity>
+        <Controller
+          control={control}
+          name="province"
+          rules={{ required: 'Province is required' }}
+          render={({ field: { value } }) => (
+            <TouchableOpacity
+              style={[styles.input, errors.province && styles.inputError]}
+              onPress={() => setProvinceModalVisible(true)}
+            >
+              <Text>{value || 'Select a Province'}</Text>
+            </TouchableOpacity>
+          )}
+        />
         {renderProvinceModal()}
         {errors.province && <Text style={styles.errorText}>{errors.province.message}</Text>}
 
@@ -486,7 +508,7 @@ const styles = StyleSheet.create({
     padding: hs(12),
     fontSize: mhs(16),
     color: themeColors.text.dark,
-    marginBottom: vs(12),
+    marginBottom: vs(4),
   },
   textArea: {
     height: vs(100),
@@ -571,6 +593,7 @@ const styles = StyleSheet.create({
   errorText: {
     color: themeColors.text.error,
     fontSize: mhs(12),
+    marginTop: vs(4),
     marginBottom: vs(8),
   },
   successModal: {
@@ -602,7 +625,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     fontSize: mhs(16),
-  },  
+  },
+  inputError: {
+    borderWidth: 1,
+    borderColor: themeColors.text.error,
+  },
 });
 
 export default Create;
