@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -18,11 +18,9 @@ import ConfirmButton from '@/components/ConfirmButton';
 import { IconPlacement } from '@/utils/constants/enums';
 import themeColors from '@/utils/constants/colors';
 import { hs, vs, mhs } from '@/utils/helpers/uiScaler';
-import { API_ENDPOINTS } from '@/utils/api/endpoints';
 import { createEvent } from '@/services/eventService';
 import { useSelector } from 'react-redux';
-
-const sports = ['Soccer', 'Basketball', 'Tennis', 'Swimming', 'Running', 'Football', 'Rugby'];
+import supportedSports from '@/utils/constants/supportedSports';
 
 const Create = () => {
   const { control, handleSubmit, formState: { errors }, setValue, reset } = useForm<EventFormData>({
@@ -37,16 +35,6 @@ const Create = () => {
   const [isSuccessModalVisible, setSuccessModalVisible] = useState(false);
 
   const user = useSelector((state: { user: any }) => state.user);
-
-  useEffect(() => {
-    if (!user) {
-      console.log('User not found');
-    }
-  }, [user]);
-
-  const navigateHome = () => {
-    router.replace('/(tabs)/home');
-  };
 
   interface EventFormData {
     eventName: string;
@@ -109,12 +97,9 @@ const Create = () => {
       });
       setEventDate(new Date());
       setSuccessModalVisible(true);
-      setTimeout(() => {
-        setSuccessModalVisible(false);
-        navigateHome();
-      }, 2000);
     } catch (error) {
       Alert.alert('Error', 'Error occurred while creating the event');
+      throw error;
     }
   };
 
@@ -128,18 +113,18 @@ const Create = () => {
       <View style={styles.modalOverlay}>
         <View style={styles.modalContainer}>
           <FlatList
-            data={sports}
-            keyExtractor={(item, index) => index.toString()}
+            data={supportedSports}
+            keyExtractor={(item) => item.id.toString()}
             contentContainerStyle={styles.flatListContainer}
             renderItem={({ item }) => (
               <TouchableOpacity
                 style={styles.modalItem}
                 onPress={() => {
-                  setValue('sportType', item);
+                  setValue('sportType', item.name);
                   setSportTypeModalVisible(false);
                 }}
               >
-                <Text style={styles.modalItemText}>{item}</Text>
+                <Text style={styles.modalItemText}>{item.name}</Text>
               </TouchableOpacity>
             )}
             showsVerticalScrollIndicator={false}
@@ -384,9 +369,19 @@ const Create = () => {
         <View style={styles.modalOverlay}>
           <View style={styles.successModal}>
             <Text style={styles.successText}>🎉 Event Created Successfully! 🎉</Text>
+            <TouchableOpacity
+              style={styles.successButton}
+              onPress={() => {
+                setSuccessModalVisible(false);
+                router.replace('/(tabs)/home');
+              }}
+            >
+              <Text style={styles.successButtonText}>Done</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
+
     </View>
   );
 };
@@ -451,12 +446,6 @@ const styles = StyleSheet.create({
   selectedText: {
     color: themeColors.text.light,
     fontWeight: 'bold',
-  },
-  switchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: vs(16),
   },
   footer: {
     padding: hs(16),
@@ -529,6 +518,19 @@ const styles = StyleSheet.create({
     color: themeColors.primary,
     textAlign: 'center',
   },
+  successButton: {
+    marginTop: vs(16),
+    paddingVertical: vs(10),
+    paddingHorizontal: hs(20),
+    backgroundColor: themeColors.primary,
+    borderRadius: mhs(8),
+  },
+  successButtonText: {
+    color: themeColors.text.light,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    fontSize: mhs(16),
+  },  
 });
 
 export default Create;
