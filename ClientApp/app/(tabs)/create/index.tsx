@@ -22,6 +22,23 @@ import { createEvent } from '@/services/eventService';
 import { useSelector } from 'react-redux';
 import supportedSports from '@/utils/constants/supportedSports';
 
+
+const provinces = [
+  { id: 1, name: "Alberta" },
+  { id: 2, name: "British Columbia" },
+  { id: 3, name: "Manitoba" },
+  { id: 4, name: "New Brunswick" },
+  { id: 5, name: "Newfoundland and Labrador" },
+  { id: 6, name: "Nova Scotia" },
+  { id: 7, name: "Ontario" },
+  { id: 8, name: "Prince Edward Island" },
+  { id: 9, name: "Quebec" },
+  { id: 10, name: "Saskatchewan" },
+  { id: 11, name: "Northwest Territories" },
+  { id: 12, name: "Nunavut" },
+  { id: 13, name: "Yukon" },
+];
+
 const Create = () => {
   const { control, handleSubmit, formState: { errors }, setValue, reset } = useForm<EventFormData>({
     defaultValues: {
@@ -33,6 +50,11 @@ const Create = () => {
   const [eventDate, setEventDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [isSuccessModalVisible, setSuccessModalVisible] = useState(false);
+  const [isProvinceModalVisible, setProvinceModalVisible] = useState(false);
+  const [cutOffDate, setCutOffDate] = useState(new Date());
+  const [cutOffTime, setCutOffTime] = useState(new Date());
+  const [showCutOffDatePicker, setShowCutOffDatePicker] = useState(false);
+  const [showCutOffTimePicker, setShowCutOffTimePicker] = useState(false);
 
   const user = useSelector((state: { user: any }) => state.user);
 
@@ -51,6 +73,14 @@ const Create = () => {
 
   const onSubmit = async (data: EventFormData) => {
     try {
+      const combinedCutOffDateTime = new Date(
+        cutOffDate.getFullYear(),
+        cutOffDate.getMonth(),
+        cutOffDate.getDate(),
+        cutOffTime.getHours(),
+        cutOffTime.getMinutes()
+      );
+
       const eventRequest = {
         eventName: data.eventName,
         eventType: data.eventType,
@@ -61,7 +91,7 @@ const Create = () => {
           streetName: '',
           city: data.city,
           province: data.province,
-          country: data.country,
+          country: "Canada",
           postalCode: '',
           addressLine2: '',
           phoneNumber: '',
@@ -74,7 +104,7 @@ const Create = () => {
         participants: [],
         createdBy: user.id,
         teams: [],
-        cutOffTime: data.cutOffTime,
+        cutOffTime: combinedCutOffDateTime.toISOString(),
         description: data.description,
         isPrivate: data.eventType === 'private',
         whiteListedUsers: [],
@@ -96,6 +126,8 @@ const Create = () => {
         maxParticipants: '',
       });
       setEventDate(new Date());
+      setCutOffDate(new Date());
+      setCutOffTime(new Date());
       setSuccessModalVisible(true);
     } catch (error) {
       Alert.alert('Error', 'Error occurred while creating the event');
@@ -132,6 +164,43 @@ const Create = () => {
           />
           <View style={styles.closeButtonContainer}>
             <TouchableOpacity onPress={() => setSportTypeModalVisible(false)} style={styles.modalCloseButton}>
+              <Text style={styles.modalCloseButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    </Modal>
+  );
+
+  const renderProvinceModal = () => (
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={isProvinceModalVisible}
+      onRequestClose={() => setProvinceModalVisible(false)}
+    >
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContainer}>
+          <FlatList
+            data={provinces}
+            keyExtractor={(item) => item.id.toString()}
+            contentContainerStyle={styles.flatListContainer}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={styles.modalItem}
+                onPress={() => {
+                  setValue('province', item.name);
+                  setProvinceModalVisible(false);
+                }}
+              >
+                <Text style={styles.modalItemText}>{item.name}</Text>
+              </TouchableOpacity>
+            )}
+            showsVerticalScrollIndicator={false}
+            style={styles.scrollableList}
+          />
+          <View style={styles.closeButtonContainer}>
+            <TouchableOpacity onPress={() => setProvinceModalVisible(false)} style={styles.modalCloseButton}>
               <Text style={styles.modalCloseButtonText}>Close</Text>
             </TouchableOpacity>
           </View>
@@ -239,41 +308,19 @@ const Create = () => {
         />
         {errors.city && typeof errors.city.message === 'string' && <Text style={styles.errorText}>{errors.city.message}</Text>}
 
-        <Controller
-          control={control}
-          name="province"
-          rules={{ required: "Province is required" }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              placeholder="Province"
-              style={styles.input}
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-            />
-          )}
-        />
-        {errors.province && typeof errors.province.message === 'string' && <Text style={styles.errorText}>{errors.province.message}</Text>}
-
-        <Controller
-          control={control}
-          name="country"
-          rules={{ required: "Country is required" }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              placeholder="Country"
-              style={styles.input}
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-            />
-          )}
-        />
-        {errors.country && typeof errors.country.message === 'string' && <Text style={styles.errorText}>{errors.country.message}</Text>}
+        <TouchableOpacity style={styles.input} onPress={() => setProvinceModalVisible(true)}>
+          <Text>{watch.province || 'Select a Province'}</Text>
+        </TouchableOpacity>
+        {renderProvinceModal()}
+        {errors.province && <Text style={styles.errorText}>{errors.province.message}</Text>}
 
         <Text style={styles.label}>Event Date</Text>
         <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.input}>
-          <Text>{eventDate.toDateString()}</Text>
+          <Text>
+            {eventDate.toISOString() === new Date().toISOString()
+              ? 'Select event date'
+              : eventDate.toDateString()}
+          </Text>
         </TouchableOpacity>
         {showDatePicker && (
           <DateTimePicker
@@ -295,7 +342,7 @@ const Create = () => {
             required: "Maximum number of participants is required",
             validate: (value) => {
               const number = parseInt(value, 10);
-              return !isNaN(number) && number > 0 || "Must be a positive number";
+              return !isNaN(number) && number > 0 || "Must be a positive integer";
             },
           }}
           render={({ field: { onChange, onBlur, value } }) => (
@@ -303,31 +350,56 @@ const Create = () => {
               placeholder="Enter maximum participants"
               style={styles.input}
               onBlur={onBlur}
-              onChangeText={onChange}
+              onChangeText={(text) => {
+                if (/^\d*$/.test(text)) {
+                  onChange(text);
+                }
+              }}
               value={value}
               keyboardType="numeric"
             />
           )}
         />
+        {errors.maxParticipants && <Text style={styles.errorText}>{errors.maxParticipants.message}</Text>}
 
         <Text style={styles.label}>Cut Off Time</Text>
-        <Controller
-          control={control}
-          name="cutOffTime"
-          rules={{ required: "Cut Off Time is required" }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              placeholder="Cut Off Time"
-              style={styles.input}
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-              keyboardType="numeric"
-            />
-          )}
-        />
-        {errors.cutOffTime && typeof errors.cutOffTime.message === 'string' && (
-          <Text style={styles.errorText}>{errors.cutOffTime.message}</Text>
+        <TouchableOpacity onPress={() => setShowCutOffDatePicker(true)} style={styles.input}>
+          <Text>
+            {cutOffDate.toDateString() === new Date().toDateString()
+              ? 'Select cut off date'
+              : cutOffDate.toDateString()}
+          </Text>
+        </TouchableOpacity>
+        {showCutOffDatePicker && (
+          <DateTimePicker
+            value={cutOffDate}
+            mode="date"
+            display="default"
+            onChange={(event, selectedDate) => {
+              setShowCutOffDatePicker(false);
+              if (selectedDate) setCutOffDate(selectedDate);
+            }}
+          />
+        )}
+
+        <TouchableOpacity onPress={() => setShowCutOffTimePicker(true)} style={styles.input}>
+          <Text>
+            {cutOffTime.getHours() === new Date().getHours() &&
+            cutOffTime.getMinutes() === new Date().getMinutes()
+              ? 'Select cut off time (in hours)'
+              : cutOffTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </Text>
+        </TouchableOpacity>
+        {showCutOffTimePicker && (
+          <DateTimePicker
+            value={cutOffTime}
+            mode="time"
+            display="default"
+            onChange={(event, selectedTime) => {
+              setShowCutOffTimePicker(false);
+              if (selectedTime) setCutOffTime(selectedTime);
+            }}
+          />
         )}
 
         <Text style={styles.label}>Description</Text>
