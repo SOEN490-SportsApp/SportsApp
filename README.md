@@ -1,3 +1,9 @@
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=sportaforked_UserService&metric=coverage)](https://sonarcloud.io/summary/new_code?id=sportaforked_UserService)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=sportaforked_EventService&metric=coverage)](https://sonarcloud.io/summary/new_code?id=sportaforked_EventService)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=sportaforked_EmailService&metric=coverage)](https://sonarcloud.io/summary/new_code?id=sportaforked_EmailService)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=sportaforked_GatewayService&metric=coverage)](https://sonarcloud.io/summary/new_code?id=sportaforked_GatewayService)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=sportaforked_EventService&metric=coverage)](https://sonarcloud.io/summary/new_code?id=sportaforked_ClientApp)
+
 <h1>Release Demos</h1>
 
 [Release 1 Video Presentation](https://drive.google.com/file/d/1eRpaNODa4Dt50EICdGhrMVTBgtZf7av6/view?usp=drive_link)
