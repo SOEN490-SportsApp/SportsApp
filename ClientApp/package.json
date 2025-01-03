@@ -12,7 +12,7 @@
     "web": "expo start --web",
     "test": "jest --transformIgnorePatterns \"node_modules/(?!@toolz/allow)/\" --env=jsdom",
     "ci-test": "jest --transformIgnorePatterns \"node_modules/(?!@toolz/allow)/\" --env=jsdom --coverage",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
+    "lint": "eslint --fix . --ext .js,.jsx,.ts,.tsx"
   },
   "jest": {
     "preset": "jest-expo",
