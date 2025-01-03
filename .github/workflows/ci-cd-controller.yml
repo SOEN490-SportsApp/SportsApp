@@ -12,6 +12,12 @@ on:
 jobs:
   determine-pipelines:
     runs-on: ubuntu-latest
+    outputs:
+      RUN_USERSERVICE_PIPELINE: ${{ steps.set-env.outputs.RUN_USERSERVICE_PIPELINE }}
+      RUN_EVENTSERVICE_PIPELINE: ${{ steps.set-env.outputs.RUN_EVENTSERVICE_PIPELINE }}
+      RUN_EMAILSERVICE_PIPELINE: ${{ steps.set-env.outputs.RUN_EMAILSERVICE_PIPELINE }}
+      RUN_GATEWAYSERVICE_PIPELINE: ${{ steps.set-env.outputs.RUN_GATEWAYSERVICE_PIPELINE }}
+      RUN_CLIENTAPP_PIPELINE: ${{ steps.set-env.outputs.RUN_CLIENTAPP_PIPELINE }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -21,9 +27,6 @@ jobs:
       - name: Determine Changed Files
         id: changed-files
         uses: tj-actions/changed-files@v36
-
-      - name: Debug Changed Files
-        run: echo "${{ steps.changed-files.outputs.all_changed_files }}"
 
       - name: Set Environment Variables for Services
         id: set-env
@@ -44,75 +47,43 @@ jobs:
             echo "RUN_CLIENTAPP_PIPELINE=true" >> $GITHUB_ENV
           fi
 
-      - name: Print Environment Variables
-        run: |
-          echo "RUN_USERSERVICE_PIPELINE=${{ env.RUN_USERSERVICE_PIPELINE }}"
-          echo "RUN_EVENTSERVICE_PIPELINE=${{ env.RUN_EVENTSERVICE_PIPELINE }}"
-          echo "RUN_EMAILSERVICE_PIPELINE=${{ env.RUN_EMAILSERVICE_PIPELINE }}"
-          echo "RUN_GATEWAYSERVICE_PIPELINE=${{ env.RUN_GATEWAYSERVICE_PIPELINE }}"
-          echo "RUN_CLIENTAPP_PIPELINE=${{ env.RUN_CLIENTAPP_PIPELINE }}"
-   
+          # Output the environment variables
+          echo "::set-output name=RUN_USERSERVICE_PIPELINE::${RUN_USERSERVICE_PIPELINE}"
+          echo "::set-output name=RUN_EVENTSERVICE_PIPELINE::${RUN_EVENTSERVICE_PIPELINE}"
+          echo "::set-output name=RUN_EMAILSERVICE_PIPELINE::${RUN_EMAILSERVICE_PIPELINE}"
+          echo "::set-output name=RUN_GATEWAYSERVICE_PIPELINE::${RUN_GATEWAYSERVICE_PIPELINE}"
+          echo "::set-output name=RUN_CLIENTAPP_PIPELINE::${RUN_CLIENTAPP_PIPELINE}"
+
   trigger-workflows:
     needs: determine-pipelines
     runs-on: ubuntu-latest
-    
     steps:
-      - name: Print All Environment Variables
-        run: env
-        
-      - name: Print Environment Variables
-        run: |
-          echo "RUN_USERSERVICE_PIPELINE=${{ env.RUN_USERSERVICE_PIPELINE }}"
-          echo "RUN_EVENTSERVICE_PIPELINE=${{ env.RUN_EVENTSERVICE_PIPELINE }}"
-          echo "RUN_EMAILSERVICE_PIPELINE=${{ env.RUN_EMAILSERVICE_PIPELINE }}"
-          echo "RUN_GATEWAYSERVICE_PIPELINE=${{ env.RUN_GATEWAYSERVICE_PIPELINE }}"
-          echo "RUN_CLIENTAPP_PIPELINE=${{ env.RUN_CLIENTAPP_PIPELINE }}"
-          
-      - name: Print Environment Variables
-        run: |
-          echo "RUN_CLIENTAPP_PIPELINE=${{ env.RUN_CLIENTAPP_PIPELINE }}"
-          echo "RUN_CLIENTAPP_PIPELINE=true" >> $GITHUB_ENV
-
-      - name: Print Environment Variables
-        run: |
-          echo "RUN_USERSERVICE_PIPELINE=${{ env.RUN_USERSERVICE_PIPELINE }}"
-          echo "RUN_EVENTSERVICE_PIPELINE=${{ env.RUN_EVENTSERVICE_PIPELINE }}"
-          echo "RUN_EMAILSERVICE_PIPELINE=${{ env.RUN_EMAILSERVICE_PIPELINE }}"
-          echo "RUN_GATEWAYSERVICE_PIPELINE=${{ env.RUN_GATEWAYSERVICE_PIPELINE }}"
-          echo "RUN_CLIENTAPP_PIPELINE=${{ env.RUN_CLIENTAPP_PIPELINE }}"
-          
       - name: Trigger UserService CI/CD
-        if: ${{ env.RUN_USERSERVICE_PIPELINE == 'true' }}
+        if: ${{ needs.determine-pipelines.outputs.RUN_USERSERVICE_PIPELINE == 'true' }}
         uses: benc-uk/workflow-dispatch@v1
         with:
           workflow: user-service-ci-cd.yml
-          ref: main
 
       - name: Trigger EventService CI/CD
-        if: ${{ env.RUN_EVENTSERVICE_PIPELINE == 'true' }}
+        if: ${{ needs.determine-pipelines.outputs.RUN_EVENTSERVICE_PIPELINE == 'true' }}
         uses: benc-uk/workflow-dispatch@v1
         with:
           workflow: event-service-ci-cd.yml
-          ref: main
 
       - name: Trigger EmailService CI/CD
-        if: ${{ env.RUN_EMAILSERVICE_PIPELINE == 'true' }}
+        if: ${{ needs.determine-pipelines.outputs.RUN_EMAILSERVICE_PIPELINE == 'true' }}
         uses: benc-uk/workflow-dispatch@v1
         with:
           workflow: email-service-ci-cd.yml
-          ref: main
 
       - name: Trigger GatewayService CI/CD
-        if: ${{ env.RUN_GATEWAYSERVICE_PIPELINE == 'true' }}
+        if: ${{ needs.determine-pipelines.outputs.RUN_GATEWAYSERVICE_PIPELINE == 'true' }}
         uses: benc-uk/workflow-dispatch@v1
         with:
           workflow: gateway-service-ci-cd.yml
-          ref: main
 
       - name: Trigger ClientApp CI/CD
-        if: ${{ env.RUN_CLIENTAPP_PIPELINE == 'true' }}
+        if: ${{ needs.determine-pipelines.outputs.RUN_CLIENTAPP_PIPELINE == 'true' }}
         uses: benc-uk/workflow-dispatch@v1
         with:
           workflow: frontend-ci-cd.yml
-          repo: wade3hamati/SportsAppForked
-          ref: main
