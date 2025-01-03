@@ -49,6 +49,7 @@ jobs:
         
   sonar:
     needs: test
+    if: always()
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
