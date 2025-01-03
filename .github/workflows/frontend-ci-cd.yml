@@ -1,16 +1,54 @@
-name: Frontend CI/CD
+name: ClientApp CI/CD
 
 on:
-  workflow_dispatch: 
+  workflow_dispatch:
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Node Modules
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('ClientApp/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./ClientApp
+
+      - name: Lint with ESLint
+        run: npm run lint
+        working-directory: ./ClientApp
+
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install depedencies
+
+      - name: Cache Node Modules
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('ClientApp/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
         run: npm install
         working-directory: ./ClientApp
-      - name: Run tests
-        run: npm run ci-test
+
+      - name: Run Jest Tests with Coverage
+        run: npm test -- --coverage
         working-directory: ./ClientApp
+
+      - name: Build and Analyze with SonarQube
+        working-directory: ./ClientApp
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_CLIENTAPP }}
+        run: npx sonar-scanner
