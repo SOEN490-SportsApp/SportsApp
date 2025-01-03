@@ -57,32 +57,33 @@ jobs:
     needs: determine-pipelines
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger UserService CI
-        if: env.RUN_USERSERVICE_PIPELINE == 'true'
-        uses: benc-uk/workflow-dispatch@v4
+      - name: Trigger UserService CI/CD
+        if: ${{ env.RUN_USERSERVICE_PIPELINE == 'true' }}
+        uses: benc-uk/workflow-dispatch@v1
         with:
           workflow: user-service-ci-cd.yml
 
-      - name: Trigger ProductService CI
-        if: env.RUN_PRODUCTSERVICE_PIPELINE == 'true'
-        uses: benc-uk/workflow-dispatch@v4
+      - name: Trigger ProductService CI/CD
+        if: ${{ env.RUN_PRODUCTSERVICE_PIPELINE == 'true' }}
+        uses: benc-uk/workflow-dispatch@v1
         with:
           workflow: product-service-ci-cd.yml
 
-      - name: Trigger OrderService CI
-        if: env.RUN_ORDERSERVICE_PIPELINE == 'true'
-        uses: benc-uk/workflow-dispatch@v4
+      - name: Trigger OrderService CI/CD
+        if: ${{ env.RUN_ORDERSERVICE_PIPELINE == 'true' }}
+        uses: benc-uk/workflow-dispatch@v1
         with:
           workflow: order-service-ci-cd.yml
 
-      - name: Trigger GatewayService CI
-        if: env.RUN_GATEWAYSERVICE_PIPELINE == 'true'
-        uses: benc-uk/workflow-dispatch@v4
+      - name: Trigger GatewayService CI/CD
+        if: ${{ env.RUN_GATEWAYSERVICE_PIPELINE == 'true' }}
+        uses: benc-uk/workflow-dispatch@v1
         with:
           workflow: gateway-service-ci-cd.yml
 
-      - name: Trigger ClientApp CI
-        if: env.RUN_CLIENTAPP_PIPELINE == 'true'
-        uses: benc-uk/workflow-dispatch@v4
+      - name: Trigger ClientApp CI/CD
+        if: ${{ env.RUN_CLIENTAPP_PIPELINE == 'true' }}
+        uses: benc-uk/workflow-dispatch@v1
         with:
           workflow: frontend-ci-cd.yml
+
