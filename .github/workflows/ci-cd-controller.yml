@@ -1,7 +1,13 @@
 name: CI/CD Controller
 
 on:
-  workflow_dispatch:
+  pull_request:
+    branches: [ "*" ]
+  push:
+    branches:
+      - main
+      - dev
+      - 'releases/**'
 
 jobs:
   determine-pipelines:
