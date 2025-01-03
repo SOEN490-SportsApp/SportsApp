@@ -22,6 +22,9 @@ jobs:
         id: changed-files
         uses: tj-actions/changed-files@v36
 
+      - name: Debug Changed Files
+        run: echo "${{ steps.changed-files.outputs.all_changed_files }}"
+
       - name: Set Environment Variables for Services
         id: set-env
         run: |
@@ -41,7 +44,7 @@ jobs:
           if [[ "${{ steps.changed-files.outputs.all_changed_files }}" =~ "ClientApp" ]]; then
             echo "RUN_CLIENTAPP_PIPELINE=true" >> $GITHUB_ENV
           fi
-
+          
   trigger-workflows:
     needs: determine-pipelines
     runs-on: ubuntu-latest
