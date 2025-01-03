@@ -32,24 +32,24 @@ jobs:
           if [[ "${{ steps.changed-files.outputs.all_changed_files }}" =~ "Microservices/user-service/" ]]; then
             echo "RUN_USERSERVICE_PIPELINE=true" >> $GITHUB_ENV
           fi
-          if [[ "${{ steps.changed-files.outputs.all_changed_files }}" =~ "Microservices/product-service/" ]]; then
-            echo "RUN_PRODUCTSERVICE_PIPELINE=true" >> $GITHUB_ENV
+          if [[ "${{ steps.changed-files.outputs.all_changed_files }}" =~ "Microservices/event-service/" ]]; then
+            echo "RUN_EVENTSERVICE_PIPELINE=true" >> $GITHUB_ENV
           fi
-          if [[ "${{ steps.changed-files.outputs.all_changed_files }}" =~ "Microservices/order-service/" ]]; then
-            echo "RUN_ORDERSERVICE_PIPELINE=true" >> $GITHUB_ENV
+          if [[ "${{ steps.changed-files.outputs.all_changed_files }}" =~ "Microservices/email-service/" ]]; then
+            echo "RUN_EMAILSERVICE_PIPELINE=true" >> $GITHUB_ENV
           
           if [[ "${{ steps.changed-files.outputs.all_changed_files }}" =~ "Microservices/gateway/" ]]; then
             echo "RUN_GATEWAYSERVICE_PIPELINE=true" >> $GITHUB_ENV
           
-          if [[ "${{ steps.changed-files.outputs.all_changed_files }}" =~ "ClientApp" ]]; then
+          if [[ "${{ steps.changed-files.outputs.all_changed_files }}" =~ "ClientApp/" ]]; then
             echo "RUN_CLIENTAPP_PIPELINE=true" >> $GITHUB_ENV
           fi
           
       - name: Print Environment Variables
         run: |
           echo "RUN_USERSERVICE_PIPELINE=${{ env.RUN_USERSERVICE_PIPELINE }}"
-          echo "RUN_PRODUCTSERVICE_PIPELINE=${{ env.RUN_PRODUCTSERVICE_PIPELINE }}"
-          echo "RUN_ORDERSERVICE_PIPELINE=${{ env.RUN_ORDERSERVICE_PIPELINE }}"
+          echo "RUN_EVENTSERVICE_PIPELINE=${{ env.RUN_EVENTSERVICE_PIPELINE }}"
+          echo "RUN_EMAILSERVICE_PIPELINE=${{ env.RUN_EMAILSERVICE_PIPELINE }}"
           echo "RUN_GATEWAYSERVICE_PIPELINE=${{ env.RUN_GATEWAYSERVICE_PIPELINE }}"
           echo "RUN_CLIENTAPP_PIPELINE=${{ env.RUN_CLIENTAPP_PIPELINE }}"
    
@@ -61,29 +61,29 @@ jobs:
         if: ${{ env.RUN_USERSERVICE_PIPELINE == 'true' }}
         uses: benc-uk/workflow-dispatch@v1
         with:
-          workflow: user-service-ci-cd.yml
+          workflow: UserService CI/CD
 
-      - name: Trigger ProductService CI/CD
-        if: ${{ env.RUN_PRODUCTSERVICE_PIPELINE == 'true' }}
+      - name: Trigger EventService CI/CD
+        if: ${{ env.RUN_EVENTSERVICE_PIPELINE == 'true' }}
         uses: benc-uk/workflow-dispatch@v1
         with:
-          workflow: product-service-ci-cd.yml
+          workflow: EventService CI/CD
 
-      - name: Trigger OrderService CI/CD
-        if: ${{ env.RUN_ORDERSERVICE_PIPELINE == 'true' }}
+      - name: Trigger EmailService CI/CD
+        if: ${{ env.RUN_EMAILSERVICE_PIPELINE == 'true' }}
         uses: benc-uk/workflow-dispatch@v1
         with:
-          workflow: order-service-ci-cd.yml
+          workflow: EmailService CI/CD
 
       - name: Trigger GatewayService CI/CD
         if: ${{ env.RUN_GATEWAYSERVICE_PIPELINE == 'true' }}
         uses: benc-uk/workflow-dispatch@v1
         with:
-          workflow: gateway-service-ci-cd.yml
+          workflow: GatewayService CI/CD
 
       - name: Trigger ClientApp CI/CD
         if: ${{ env.RUN_CLIENTAPP_PIPELINE == 'true' }}
         uses: benc-uk/workflow-dispatch@v1
         with:
-          workflow: frontend-ci-cd.yml
+          workflow: ClientApp CI/CD
 
