@@ -30,7 +30,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
+      
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./ClientApp
+      
       - name: Cache Node Modules
         uses: actions/cache@v4
         with:
@@ -38,6 +42,7 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('ClientApp/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
+            
       - name: Run Jest Tests with Coverage
         run: npm test --coverage
         working-directory: ./ClientApp
@@ -48,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Build and Analyze with SonarQube
-        working-directory: ./ClientApp
+        working-directory: /ClientApp
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_CLIENTAPP }}
