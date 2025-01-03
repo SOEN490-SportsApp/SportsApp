@@ -46,12 +46,25 @@ jobs:
       - name: Run Jest Tests with Coverage
         run: npm test --coverage
         working-directory: ./ClientApp
-
-  sonar: 
+        
+  sonar:
     needs: test
-    if: always()
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: List Full Directory Structure
+        run: ls -laR
+
+      - name: Verify ClientApp Directory
+        run: |
+          if [ ! -d "./ClientApp" ]; then
+            echo "Error: ClientApp directory not found"
+            exit 1
+          fi
+
       - name: Build and Analyze with SonarQube
         working-directory: ./ClientApp
         env:
