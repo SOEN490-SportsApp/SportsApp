@@ -43,6 +43,7 @@ jobs:
         working-directory: ./ClientApp
 
   sonar: 
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Build and Analyze with SonarQube
