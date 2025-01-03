@@ -32,27 +32,20 @@ jobs:
         id: set-env
         run: |
           if [[ "${{ steps.changed-files.outputs.all_changed_files }}" =~ "Microservices/user-service/" ]]; then
-            echo "RUN_USERSERVICE_PIPELINE=true" >> $GITHUB_ENV
+            echo "RUN_USERSERVICE_PIPELINE=true" >> $GITHUB_OUTPUT
           fi
           if [[ "${{ steps.changed-files.outputs.all_changed_files }}" =~ "Microservices/event-service/" ]]; then
-            echo "RUN_EVENTSERVICE_PIPELINE=true" >> $GITHUB_ENV
+            echo "RUN_EVENTSERVICE_PIPELINE=true" >> $GITHUB_OUTPUT
           fi
           if [[ "${{ steps.changed-files.outputs.all_changed_files }}" =~ "Microservices/email-service/" ]]; then
-            echo "RUN_EMAILSERVICE_PIPELINE=true" >> $GITHUB_ENV
+            echo "RUN_EMAILSERVICE_PIPELINE=true" >> $GITHUB_OUTPUT
           fi
           if [[ "${{ steps.changed-files.outputs.all_changed_files }}" =~ "Microservices/gateway/" ]]; then
-            echo "RUN_GATEWAYSERVICE_PIPELINE=true" >> $GITHUB_ENV
+            echo "RUN_GATEWAYSERVICE_PIPELINE=true" >> $GITHUB_OUTPUT
           fi
           if [[ "${{ steps.changed-files.outputs.all_changed_files }}" =~ "ClientApp/" ]]; then
-            echo "RUN_CLIENTAPP_PIPELINE=true" >> $GITHUB_ENV
+            echo "RUN_CLIENTAPP_PIPELINE=true" >> $GITHUB_OUTPUT
           fi
-
-          # Output the environment variables
-          echo "::set-output name=RUN_USERSERVICE_PIPELINE::${RUN_USERSERVICE_PIPELINE}"
-          echo "::set-output name=RUN_EVENTSERVICE_PIPELINE::${RUN_EVENTSERVICE_PIPELINE}"
-          echo "::set-output name=RUN_EMAILSERVICE_PIPELINE::${RUN_EMAILSERVICE_PIPELINE}"
-          echo "::set-output name=RUN_GATEWAYSERVICE_PIPELINE::${RUN_GATEWAYSERVICE_PIPELINE}"
-          echo "::set-output name=RUN_CLIENTAPP_PIPELINE::${RUN_CLIENTAPP_PIPELINE}"
 
   trigger-workflows:
     needs: determine-pipelines
