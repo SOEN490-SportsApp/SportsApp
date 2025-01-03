@@ -39,7 +39,7 @@ jobs:
             ${{ runner.os }}-node-
 
       - name: Run Jest Tests with Coverage
-        run: npm test -- --coverage
+        run: npm test --coverage
         working-directory: ./ClientApp
 
   sonar: 
