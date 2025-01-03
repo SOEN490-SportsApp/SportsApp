@@ -61,7 +61,7 @@ jobs:
 
       - name: Print Environment Variables
         run: |
-          echo "${{ env.RUN_CLIENTAPP_PIPELINE }}"
+          echo $GITHUB_ENV
 
       - name: Trigger UserService CI/CD
         if: ${{ env.RUN_USERSERVICE_PIPELINE == 'true' }}
