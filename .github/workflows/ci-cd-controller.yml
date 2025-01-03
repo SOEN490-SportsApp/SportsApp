@@ -61,8 +61,7 @@ jobs:
 
       - name: Print Environment Variables
         run: |
-          echo "RUN_USERSERVICE_PIPELINE=${{ env.RUN_USERSERVICE_PIPELINE }}"
-          echo "RUN_USERSERVICE_PIPELINE=true" >> $GITHUB_ENV
+          echo "${{ env.RUN_CLIENTAPP_PIPELINE }}"
 
       - name: Trigger UserService CI/CD
         if: ${{ env.RUN_USERSERVICE_PIPELINE == 'true' }}
