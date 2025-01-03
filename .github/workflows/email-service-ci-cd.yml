@@ -33,13 +33,13 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('Microservices/email-service/*.gradle') }}
           restore-keys: ${{ runner.os }}-gradle
 
+      - name: Generate Test Report
+        working-directory: Microservices/email-service
+        run: ./gradlew test jacocoTestCoverageVerification
+        
       - name: Build and Analyze with SonarQube
         working-directory: Microservices/email-service
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_EMAILSERVICE }}
         run: ./gradlew build sonar --info
-
-      - name: Generate Test Report
-        working-directory: Microservices/email-service
-        run: ./gradlew test jacocoTestCoverageVerification
