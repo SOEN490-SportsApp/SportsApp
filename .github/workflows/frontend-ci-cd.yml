@@ -38,14 +38,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-      - name: Install dependencies
-        run: npm install
-        working-directory: ./ClientApp
-
       - name: Run Jest Tests with Coverage
         run: npm test -- --coverage
         working-directory: ./ClientApp
 
+  sonar: 
+    runs-on: ubuntu-latest
+    steps:
       - name: Build and Analyze with SonarQube
         working-directory: ./ClientApp
         env:
