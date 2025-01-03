@@ -56,6 +56,14 @@ jobs:
     needs: determine-pipelines
     runs-on: ubuntu-latest
     steps:
+      - name: Print All Environment Variables
+        run: env
+
+      - name: Print Environment Variables
+        run: |
+          echo "RUN_USERSERVICE_PIPELINE=${{ env.RUN_USERSERVICE_PIPELINE }}"
+          echo "RUN_USERSERVICE_PIPELINE=true" >> $GITHUB_ENV
+
       - name: Trigger UserService CI/CD
         if: ${{ env.RUN_USERSERVICE_PIPELINE == 'true' }}
         uses: benc-uk/workflow-dispatch@v1
