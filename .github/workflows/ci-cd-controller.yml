@@ -28,7 +28,6 @@ jobs:
       - name: Set Environment Variables for Services
         id: set-env
         run: |
-          # Detect changes for each service and set flags
           if [[ "${{ steps.changed-files.outputs.all_changed_files }}" =~ "Microservices/user-service/" ]]; then
             echo "RUN_USERSERVICE_PIPELINE=true" >> $GITHUB_ENV
           fi
@@ -37,14 +36,14 @@ jobs:
           fi
           if [[ "${{ steps.changed-files.outputs.all_changed_files }}" =~ "Microservices/email-service/" ]]; then
             echo "RUN_EMAILSERVICE_PIPELINE=true" >> $GITHUB_ENV
-          
+          fi
           if [[ "${{ steps.changed-files.outputs.all_changed_files }}" =~ "Microservices/gateway/" ]]; then
             echo "RUN_GATEWAYSERVICE_PIPELINE=true" >> $GITHUB_ENV
-          
+          fi
           if [[ "${{ steps.changed-files.outputs.all_changed_files }}" =~ "ClientApp/" ]]; then
             echo "RUN_CLIENTAPP_PIPELINE=true" >> $GITHUB_ENV
           fi
-          
+
       - name: Print Environment Variables
         run: |
           echo "RUN_USERSERVICE_PIPELINE=${{ env.RUN_USERSERVICE_PIPELINE }}"
@@ -61,29 +60,33 @@ jobs:
         if: ${{ env.RUN_USERSERVICE_PIPELINE == 'true' }}
         uses: benc-uk/workflow-dispatch@v1
         with:
-          workflow: UserService CI/CD
+          workflow: user-service-ci-cd.yml
+          ref: main
 
       - name: Trigger EventService CI/CD
         if: ${{ env.RUN_EVENTSERVICE_PIPELINE == 'true' }}
         uses: benc-uk/workflow-dispatch@v1
         with:
-          workflow: EventService CI/CD
+          workflow: event-service-ci-cd.yml
+          ref: main
 
       - name: Trigger EmailService CI/CD
         if: ${{ env.RUN_EMAILSERVICE_PIPELINE == 'true' }}
         uses: benc-uk/workflow-dispatch@v1
         with:
-          workflow: EmailService CI/CD
+          workflow: email-service-ci-cd.yml
+          ref: main
 
       - name: Trigger GatewayService CI/CD
         if: ${{ env.RUN_GATEWAYSERVICE_PIPELINE == 'true' }}
         uses: benc-uk/workflow-dispatch@v1
         with:
-          workflow: GatewayService CI/CD
+          workflow: gateway-service-ci-cd.yml
+          ref: main
 
       - name: Trigger ClientApp CI/CD
         if: ${{ env.RUN_CLIENTAPP_PIPELINE == 'true' }}
         uses: benc-uk/workflow-dispatch@v1
         with:
-          workflow: ClientApp CI/CD
-
+          workflow: frontend-ci-cd.yml
+          ref: main
