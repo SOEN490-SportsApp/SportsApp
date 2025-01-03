@@ -6,4 +6,3 @@ import jakarta.validation.constraints.NotEmpty;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record LoginResponse(@NotEmpty String userID, @NotEmpty TokenResponse tokenResponse) {
 }
-//hi
