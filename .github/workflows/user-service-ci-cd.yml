@@ -1,4 +1,4 @@
-name: UserService CI
+name: UserService CI/CD
 
 on:
   workflow_dispatch: 

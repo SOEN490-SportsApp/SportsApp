@@ -1,4 +1,4 @@
-name: EmailService CI
+name: EmailService CI/CD
 
 on:
   workflow_dispatch:

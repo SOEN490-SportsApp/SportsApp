@@ -1,4 +1,4 @@
-name: EventService CI
+name: EventService CI/CD
 
 on:
   workflow_dispatch:
