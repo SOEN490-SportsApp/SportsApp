@@ -53,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Build and Analyze with SonarQube
-        working-directory: /ClientApp
+        working-directory: ./ClientApp
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_CLIENTAPP }}
