@@ -55,14 +55,32 @@ jobs:
   trigger-workflows:
     needs: determine-pipelines
     runs-on: ubuntu-latest
+    
     steps:
       - name: Print All Environment Variables
         run: env
+        
+      - name: Print Environment Variables
+        run: |
+          echo "RUN_USERSERVICE_PIPELINE=${{ env.RUN_USERSERVICE_PIPELINE }}"
+          echo "RUN_EVENTSERVICE_PIPELINE=${{ env.RUN_EVENTSERVICE_PIPELINE }}"
+          echo "RUN_EMAILSERVICE_PIPELINE=${{ env.RUN_EMAILSERVICE_PIPELINE }}"
+          echo "RUN_GATEWAYSERVICE_PIPELINE=${{ env.RUN_GATEWAYSERVICE_PIPELINE }}"
+          echo "RUN_CLIENTAPP_PIPELINE=${{ env.RUN_CLIENTAPP_PIPELINE }}"
+          
+      - name: Print Environment Variables
+        run: |
+          echo "RUN_CLIENTAPP_PIPELINE=${{ env.RUN_CLIENTAPP_PIPELINE }}"
+          echo "RUN_CLIENTAPP_PIPELINE=true" >> $GITHUB_ENV
 
       - name: Print Environment Variables
         run: |
-          echo $GITHUB_ENV
-
+          echo "RUN_USERSERVICE_PIPELINE=${{ env.RUN_USERSERVICE_PIPELINE }}"
+          echo "RUN_EVENTSERVICE_PIPELINE=${{ env.RUN_EVENTSERVICE_PIPELINE }}"
+          echo "RUN_EMAILSERVICE_PIPELINE=${{ env.RUN_EMAILSERVICE_PIPELINE }}"
+          echo "RUN_GATEWAYSERVICE_PIPELINE=${{ env.RUN_GATEWAYSERVICE_PIPELINE }}"
+          echo "RUN_CLIENTAPP_PIPELINE=${{ env.RUN_CLIENTAPP_PIPELINE }}"
+          
       - name: Trigger UserService CI/CD
         if: ${{ env.RUN_USERSERVICE_PIPELINE == 'true' }}
         uses: benc-uk/workflow-dispatch@v1
