@@ -45,6 +45,14 @@ jobs:
             echo "RUN_CLIENTAPP_PIPELINE=true" >> $GITHUB_ENV
           fi
           
+      - name: Print Environment Variables
+        run: |
+          echo "RUN_USERSERVICE_PIPELINE=${{ env.RUN_USERSERVICE_PIPELINE }}"
+          echo "RUN_PRODUCTSERVICE_PIPELINE=${{ env.RUN_PRODUCTSERVICE_PIPELINE }}"
+          echo "RUN_ORDERSERVICE_PIPELINE=${{ env.RUN_ORDERSERVICE_PIPELINE }}"
+          echo "RUN_GATEWAYSERVICE_PIPELINE=${{ env.RUN_GATEWAYSERVICE_PIPELINE }}"
+          echo "RUN_CLIENTAPP_PIPELINE=${{ env.RUN_CLIENTAPP_PIPELINE }}"
+   
   trigger-workflows:
     needs: determine-pipelines
     runs-on: ubuntu-latest
