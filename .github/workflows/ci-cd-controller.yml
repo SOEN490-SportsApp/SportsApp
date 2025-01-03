@@ -86,9 +86,8 @@ jobs:
 
       - name: Trigger ClientApp CI/CD
         if: ${{ env.RUN_CLIENTAPP_PIPELINE == 'true' }}
-        run: |
-          curl -X POST \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            https://api.github.com/repos/wade3Hamati/SportsAppForked/actions/workflows/frontend-ci-cd.yml/dispatches \
-            -d '{"ref":"main"}'
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: frontend-ci-cd.yml
+          repo: wade3hamati/SportsAppForked
+          ref: main
