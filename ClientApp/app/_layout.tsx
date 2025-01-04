@@ -6,7 +6,7 @@ import "../global.css";
 export default function RootLayout() {
   return (
     <Provider store={store}>
-      <Stack initialRouteName="login">
+      <Stack initialRouteName="auth/login">
         <Stack.Screen name="auth/login" options={{ headerShown: false }} />
         <Stack.Screen name="auth/registerAccount" options={{ headerShown: false }} />
         <Stack.Screen name="auth/registerProfile" options={{ headerShown: false }} />
