@@ -1,51 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, ActivityIndicator, SafeAreaView, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons'; 
-import axiosInstance from '@/services/axiosInstance';
 import CustomTabMenu from '@/components/CustomTabMenu';
-import { useRouter } from 'expo-router';
-
-// Define the profile type
-interface Profile {
-    firstName: string;
-    lastName: string;
-    bio: string;
-    email: string;
-    username: string;
-    profile: string;
-    dateOfBirth: string;
-    phoneNumber: number;
-    ranking: number;
-    preferences: {
-        notifications: boolean;
-        language: string;
-    };
-    dateCreated: Date;
-    updatedAt: Date;
-}
+import { useRouter} from 'expo-router';
+import { UserState } from '@/types/user';
+import { calculateAge } from '@/utils/helpers/ageOfUser';
+import { useSelector } from 'react-redux';
 
 const screenHeight = Dimensions.get('window').height;
 const maxHeight = screenHeight * 0.5
 
-// Function to calculate age based on dateOfBirth
-// TODO
-export function calculateAge(dateOfBirth: string): number {
-    const dob = new Date(dateOfBirth);
-    const today = new Date();
-    let age = today.getFullYear() - dob.getFullYear();
-    const monthDifference = today.getMonth() - dob.getMonth();
-    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < dob.getDate())) {
-        age--;
-    }
-    return age;
-}
-
-// Activity tab content without swipe control
+// Activity tab content hard coded
 const ActivityTab = () => (
     //TODO fix the overlap between the two scroll views when the events are scolled up 
     <View className="p-4 bg-white">
-        {/* Horizontal Scroll for Badges */}
-        {/*TODO change this to a badge component */}
+        {/* Horizontal Scroll for Badges hard coded*/}
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View className="flex-row gap-x-4">
                 <View className="w-20 h-20 bg-gray-700 rounded-full" />
@@ -59,8 +28,7 @@ const ActivityTab = () => (
             </View>
         </ScrollView>
 
-        {/* Vertical Scroll for Event Cards */}
-        {/*TODO change this to an event component */}
+        {/* Vertical Scroll for Event Cards hard coded */}
         <ScrollView className=" pt-3 space-y-4" style={{ maxHeight}}>
             {Array.from({ length: 6 }).map((_, index) => (
                 <View key={index} className="mt-4 p-4 rounded-lg" style={{ backgroundColor: '#0C9E04' }}>
@@ -73,64 +41,67 @@ const ActivityTab = () => (
     </View>
 );
 
-// Stats tab content
-const StatsTab = () => (
+// Friends tab content hard coded
+const FriendsTab = () => (
     <View className="p-4 bg-white flex-1">
-        <Text className="text-lg font-semibold text-black">Running</Text>
-        <View className="h-40 rounded-lg mt-4" style={{ backgroundColor: '#0C9E04' }}/>
+        {/* Vertical Scroll for Friends Cards hard coded */}
+        <ScrollView className=" pt-3 space-y-4" style={{ maxHeight}}>
+            {Array.from({ length: 6 }).map((_, index) => (
+                <View key={index} className="mt-4 p-4 rounded-lg" style={{ backgroundColor: '#0C9E04' }}>
+                    <Text className="text-xl font-bold text-black">Friend {index + 1}</Text>
+                </View>
+            ))}
+        </ScrollView>
     </View>
 );
 
+// About tab content with user data
+const AboutTab: React.FC<{ user: UserState }> = ({ user }) => {
+    
+    let age = 'N/A'; 
+    try {
+        age = calculateAge(user).toString();
+    } catch (error) {
+        console.error("Error calculating age:", error);
+        age = 'Invalid Date of Birth'; 
+    }
 
-// About tab content
-const AboutTab: React.FC<{ profile: Profile }> = ({ profile }) => (
-    //TODO change this to an About component
-    <View className="p-4 bg-white flex-1">
-        <View className= "rounded-lg p-4" style={{ backgroundColor: '#0C9E04' }}>
-            <Text testID="Bio" className="text-black text-base">Bio: {profile.bio}</Text>
-            <Text testID="Age" className="text-black text-base mt-2">Age: {calculateAge(profile.dateOfBirth)}</Text>
-            <Text testID="email" className="text-black text-base mt-2">email: {profile.email}</Text>
-            <Text testID="phone" className="text-black text-base mt-2">phone: {profile.phoneNumber}</Text>
+    return (
+        <View className="p-4 bg-white flex-1">
+            <View className="rounded-lg p-4" style={{ backgroundColor: '#0C9E04' }}>
+                <Text testID="Gender" className="text-black text-base">
+                    Gender: {user.profile.gender || 'Not Provided'}
+                </Text>
+                <Text testID="Age" className="text-black text-base mt-2">
+                    Age: {age}
+                </Text>
+                <Text testID="Phone" className="text-black text-base mt-2">
+                    Phone: {user?.profile.phoneNumber || 'Not Provided'}
+                </Text>
+            </View>
         </View>
-    </View>
-);
+    );
+};
 
 const ProfilePage: React.FC = () => {
     const router = useRouter();
-
-    const [profile, setProfile] = useState<Profile>({
-        firstName: 'Placeholder',
-        lastName: 'Placeholder',
-        bio: 'Placeholder: This is a short default bio description.',
-        email: "default_email@example.com",
-        username: "userNameDefault",
-        profile: "",
-        dateOfBirth: '1995-08-13',
-        phoneNumber: 555555555,
-        ranking: 10,
-        preferences: {
-            notifications: true,
-            language: "en"
-        },
-        dateCreated: new Date('2024-08-13'),
-        updatedAt: new Date('2024-08-13'),   
-    });
-
+    const user = useSelector((state: { user: any }) => state.user);
     const [loading, setLoading] = useState<boolean>(true);
 
-    const fetchProfileData = async () => {
-        try {
-            const response = await axiosInstance.get<Profile>('/users/2');
-            setProfile(response.data);
-        } catch (error) {
-            console.error("Failed to fetch profile data:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
     useEffect(() => {
-        fetchProfileData();
+        const getUserFromStore = async () => {
+            try {
+                if (!user) {
+                    throw new Error('User not found');
+                }
+            } catch (error) {
+                console.error('Error getting profile from store:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+    
+        getUserFromStore();
     }, []);
 
     if (loading) {
@@ -144,13 +115,13 @@ const ProfilePage: React.FC = () => {
     // CustomTabMenu links for titles and content 
     const routes = [
         { key: 'activity', title: 'Activity', testID: 'Activity' },
-        { key: 'stats', title: 'Stats', testID: 'Stats' },
+        { key: 'friends', title: 'Friends', testID: 'Friends' },
         { key: 'about', title: 'About', testID: 'About'},
     ];
     const scenes = {
         activity: <ActivityTab />,
-        stats: <StatsTab />,
-        about: <AboutTab profile={profile} />,
+        friends: <FriendsTab />,
+        about: <AboutTab user={user} />,
     };
 
     return (
@@ -170,14 +141,15 @@ const ProfilePage: React.FC = () => {
             <View className="items-center p-4 bg-white">
                 <Image
                     className="w-20 h-20 rounded-full"
-                    source={{ uri: profile.profile || 'https://example.com/profile-image.png' }}
+                    source={{ uri: 'https://example.com/profile-image.png' }}
                     defaultSource={require('@/assets/images/Unknown.jpg')}
                 />
                 <Text testID="firstName" className="text-2xl font-bold text-black mt-4">
-                    {profile.firstName} {profile.lastName}
+                    {user?.profile.firstName} {user?.profile.lastName}
                 </Text>
-                {/*TODO change this with update data base option*/}
-                <Text className="text-sm text-gray-500">Add Location</Text>
+                <Text className="text-sm text-gray-500">
+                    {user?.profile.postalCode.slice(0,3)}
+                </Text>
             </View>
 
             {/* CustomTabMenu with dynamic routes and scenes */}
