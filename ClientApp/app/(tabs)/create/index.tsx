@@ -57,6 +57,7 @@ const Create = () => {
   const [cutOffTime, setCutOffTime] = useState(new Date());
   const [showCutOffDatePicker, setShowCutOffDatePicker] = useState(false);
   const [showCutOffTimePicker, setShowCutOffTimePicker] = useState(false);
+  const [requiredSkillLevel, setRequiredSkillLevel] = useState<string[]>([]);
 
   const user = useSelector((state: { user: any }) => state.user);
 
@@ -71,6 +72,7 @@ const Create = () => {
     cutOffTime: string;
     description: string;
     maxParticipants: string;
+    requiredSkillLevel: string[];
   }
 
   const onSubmit = async (data: EventFormData) => {
@@ -110,8 +112,10 @@ const Create = () => {
         description: data.description,
         isPrivate: data.eventType === 'private',
         whiteListedUsers: [],
-        requiredSkillLevel: [],
+        requiredSkillLevel: requiredSkillLevel.map((level) => level.toUpperCase()),
       };
+
+      console.log('event request:', eventRequest);
 
       await createEvent(eventRequest);
 
@@ -130,6 +134,7 @@ const Create = () => {
       setEventDate(new Date());
       setCutOffDate(new Date());
       setCutOffTime(new Date());
+      setRequiredSkillLevel([]);
       setSuccessModalVisible(true);
     } catch (error) {
       Alert.alert('Error', 'Error occurred while creating the event');
@@ -212,6 +217,15 @@ const Create = () => {
   );  
 
   const watch = useWatch({ control });
+
+  const toggleSkillLevel = (level: string) => {
+    const updatedSkillLevels = requiredSkillLevel.includes(level)
+      ? requiredSkillLevel.filter((item) => item !== level)
+      : [...requiredSkillLevel, level];
+  
+    setRequiredSkillLevel(updatedSkillLevels);
+    setValue('requiredSkillLevel', updatedSkillLevels);
+  };  
 
   return (
     <View style={[styles.container, { paddingTop: StatusBar.currentHeight || vs(24) }]}>
@@ -424,6 +438,29 @@ const Create = () => {
           />
         )}
 
+        <Text style={styles.label}>Required Skill Level</Text>
+        <View style={styles.skillLevelGroup}>
+          {["Beginner", "Intermediate", "Advanced"].map((level) => (
+            <TouchableOpacity
+              key={level}
+              style={[
+                styles.skillLevelOption,
+                requiredSkillLevel.includes(level) && styles.skillLevelSelected,
+              ]}
+              onPress={() => toggleSkillLevel(level)}
+            >
+              <Text
+                style={[
+                  styles.skillLevelText,
+                  requiredSkillLevel.includes(level) && styles.skillLevelTextSelected,
+                ]}
+              >
+                {level}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
         <Text style={styles.label}>Description</Text>
         <Controller
           control={control}
@@ -630,6 +667,30 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: themeColors.text.error,
   },
+  skillLevelGroup: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: vs(16),
+  },
+  skillLevelOption: {
+    padding: hs(12),
+    borderWidth: 1,
+    borderColor: themeColors.border.light,
+    borderRadius: mhs(8),
+    backgroundColor: themeColors.background.lightGrey,
+  },
+  skillLevelSelected: {
+    backgroundColor: themeColors.primary,
+    borderColor: themeColors.primary,
+  },
+  skillLevelText: {
+    fontSize: mhs(14),
+    color: themeColors.text.dark,
+  },
+  skillLevelTextSelected: {
+    color: themeColors.text.light,
+    fontWeight: "bold",
+  },  
 });
 
 export default Create;
