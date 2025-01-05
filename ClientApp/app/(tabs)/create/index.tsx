@@ -115,8 +115,6 @@ const Create = () => {
         requiredSkillLevel: requiredSkillLevel.map((level) => level.toUpperCase()),
       };
 
-      console.log('event request:', eventRequest);
-
       await createEvent(eventRequest);
 
       reset({
