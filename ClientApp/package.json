@@ -11,7 +11,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "test": "jest --transformIgnorePatterns \"node_modules/(?!@toolz/allow)/\" --env=jsdom",
-    "ci-test": "jest --transformIgnorePatterns 'node_modules/(?!(expo|@expo|@expo/vector-icons|expo-.|@unimodules|unimodules-.|@toolz/allow)/)' --env=jsdom --coverage",
+    "ci-test": "jest --transformIgnorePatterns \"node_modules/(?!@toolz/allow)/\" --env=jsdom --coverage",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "jest": {
