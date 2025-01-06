@@ -1,5 +1,7 @@
 import { UserState } from '@/types/user';
 
+//REMOVE COMMENT HERE LATER FOR PUSH
+
 export function calculateAge(user: UserState): number {
     if (!user.profile.dateOfBirth) {
         throw new Error ("Date of birth is not provided");
