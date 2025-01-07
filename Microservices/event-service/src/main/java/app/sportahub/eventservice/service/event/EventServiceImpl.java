@@ -22,12 +22,26 @@ public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
 
+    /**
+     * Returns a specific event with an id matching the provided id.
+     *
+     * @param id The id of the event we want to return
+     * @return an {@link EventResponse} object representing the event that matched the given id
+     * @throws EventDoesNotExistException if no event has a matching id
+     */
     @Override
     public EventResponse getEventById(String id) {
         return eventMapper.eventToEventResponse(eventRepository.findEventById(id)
                 .orElseThrow(() -> new EventDoesNotExistException(id)));
     }
 
+    /**
+     * Creates an event with the provided information found in the {@link EventRequest}.
+     *
+     * @param eventRequest the new data to create the event with
+     * @return an {@link EventResponse} object representing the event that was created
+     * @throws EventAlreadyExistsException if an event with the same name is created
+     */
     @Override
     public EventResponse createEvent(EventRequest eventRequest) {
         eventRepository.findEventByEventName(eventRequest.eventName())

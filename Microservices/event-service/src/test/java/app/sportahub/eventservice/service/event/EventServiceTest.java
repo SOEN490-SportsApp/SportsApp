@@ -24,6 +24,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -87,6 +88,7 @@ public class EventServiceTest {
                 "testSportType",
                 locationRequest,
                 LocalDate.of(2024, 1, 1),
+                LocalTime.of(10,55),
                 "testDuration",
                 32,
                 participantRequests,
