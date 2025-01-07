@@ -2,7 +2,7 @@ package app.sportahub.userservice.service.user;
 
 import app.sportahub.userservice.client.KeycloakApiClient;
 import app.sportahub.userservice.dto.request.user.FriendRequestRequest;
-import app.sportahub.userservice.dto.response.user.FriendRequestResponse;
+import app.sportahub.userservice.dto.response.user.friend.FriendRequestResponse;
 import app.sportahub.userservice.dto.request.user.ProfileRequest;
 import app.sportahub.userservice.dto.request.user.UserRequest;
 import app.sportahub.userservice.dto.request.user.keycloak.KeycloakRequest;
@@ -10,6 +10,7 @@ import app.sportahub.userservice.dto.response.user.ProfileResponse;
 import app.sportahub.userservice.dto.response.user.UserResponse;
 import app.sportahub.userservice.dto.response.user.badge.BadgeResponse;
 import app.sportahub.userservice.dto.response.user.badge.BadgeWithCountResponse;
+import app.sportahub.userservice.dto.response.user.friend.ViewFriendRequestsResponse;
 import app.sportahub.userservice.enums.user.FriendRequestStatusEnum;
 import app.sportahub.userservice.exception.user.UserAlreadyInFriendListException;
 import app.sportahub.userservice.exception.user.UserDoesNotExistException;
@@ -175,5 +176,23 @@ public class UserServiceImpl implements UserService {
         log.info("UserServiceImpl::sendFriendRequest: User with id:{} received a new friend request", savedUser.getId());
 
         return new FriendRequestResponse("Friend request sent successfully.", userReceiver.getUsername());
+    }
+
+    /**
+     * This method returns the usernames of all the users who sent a friend request to the user with the given user id.
+     *
+     * @param userId The user id of the user whose friends requests you want to retrieve
+     * @return a list of {@link ViewFriendRequestsResponse} containing the usernames of the users who sent a friend request
+     * @throws UserDoesNotExistException if the given user id doesn't correspond to a user
+     */
+    @Override
+    public List<ViewFriendRequestsResponse> getFriendRequests(String userId) {
+        User user = userRepository.findUserById(userId)
+                .orElseThrow(() -> new UserDoesNotExistException(userId));
+        List<Friend> friends = user.getFriendList();
+
+        return friends.stream()
+                .filter(s -> s.getFriendRequestStatus().equals(FriendRequestStatusEnum.RECEIVED))
+                .map(friend -> new ViewFriendRequestsResponse(friend.getUsername())).toList();
     }
 }
