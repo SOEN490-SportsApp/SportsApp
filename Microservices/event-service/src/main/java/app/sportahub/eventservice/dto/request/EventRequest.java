@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -27,6 +28,9 @@ public record EventRequest(
 
         @NotNull(message = "Date must be provided")
         LocalDate date,
+
+        @NotNull(message = "Start time must be provided")
+        LocalTime startTime,
 
         @Nullable
         String duration,

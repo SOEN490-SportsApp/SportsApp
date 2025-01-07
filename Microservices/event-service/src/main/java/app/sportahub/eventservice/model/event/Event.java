@@ -11,6 +11,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -37,6 +38,9 @@ public class Event extends BaseEntity {
 
     @NotEmpty(message = "Date must be provided")
     private LocalDate date;
+
+    @NotEmpty(message = "Start time must be provided")
+    private LocalTime startTime;
 
     private String duration;
 
