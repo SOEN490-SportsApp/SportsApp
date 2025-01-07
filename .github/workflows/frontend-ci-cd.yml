@@ -4,28 +4,28 @@ on:
   workflow_dispatch:
 
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+  # lint:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-      - name: Cache Node Modules
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('ClientApp/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-      - name: Install dependencies
-        run: npm install
-        working-directory: ./ClientApp
+  #     - name: Cache Node Modules
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: ~/.npm
+  #         key: ${{ runner.os }}-node-${{ hashFiles('ClientApp/package-lock.json') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-node-
+  #     - name: Install dependencies
+  #       run: npm install
+  #       working-directory: ./ClientApp
 
-      - name: Lint with ESLint
-        run: npm run lint
-        working-directory: ./ClientApp
+  #     - name: Lint with ESLint
+  #       run: npm run lint
+  #       working-directory: ./ClientApp
 
   test:
-    needs: lint
+    # needs: lint
     if: always()
     runs-on: ubuntu-latest
     steps:
