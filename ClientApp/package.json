@@ -12,7 +12,10 @@
     "web": "expo start --web",
     "test": "jest --transformIgnorePatterns \"node_modules/(?!@toolz/allow)/\" --env=jsdom",
     "ci-test": "jest --transformIgnorePatterns \"node_modules/(?!@toolz/allow)/\" --env=jsdom --coverage",
-    "lint": "eslint --fix . --ext .js,.jsx,.ts,.tsx"
+    "lint": "eslint --fix . --ext .js,.jsx,.ts,.tsx",
+    "coverage": "jest --transformIgnorePatterns \"node_modules/(?!@toolz/allow)/\" --env=jsdom\n --coverage",
+    "test-sonar": "jest --transformIgnorePatterns \"node_modules/(?!@toolz/allow)/\" --env=jsdom\n --watchAll=false --coverage --testResultsProcessor jest-sonar-reporter",
+    "sonar": "node sonarqube-scanner.js"
   },
   "jest": {
     "preset": "jest-expo",
@@ -73,6 +76,7 @@
     "expo-system-ui": "~3.0.7",
     "expo-web-browser": "~13.0.3",
     "hermes-parser": "^0.25.0",
+    "jest-sonar-reporter": "^2.0.0",
     "nativewind": "^4.1.23",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -93,7 +97,9 @@
     "react-native-web": "~0.19.10",
     "react-redux": "^9.1.2",
     "sonar-scanner": "^3.1.0",
-    "tailwindcss": "^3.4.14"
+    "sonarqube-scanner": "^4.2.6",
+    "tailwindcss": "^3.4.14",
+    "type-scripts": "^1.2.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

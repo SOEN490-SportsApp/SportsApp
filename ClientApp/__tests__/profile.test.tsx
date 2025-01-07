@@ -1,34 +1,33 @@
 import React from 'react';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import {
+  fireEvent, render, screen, waitFor,
+} from '@testing-library/react-native';
 import '@testing-library/jest-native/extend-expect';
 import axiosMockAdapter from 'axios-mock-adapter';
-import axiosInstance from '../services/axiosInstance';
-import ProfilePage from '@/app/(tabs)/profile/index';
-import { calculateAge } from '@/app/(tabs)/profile/index';
 import { Provider } from 'react-redux';
+import axiosInstance from '../services/axiosInstance';
+import ProfilePage, { calculateAge } from '@/app/(tabs)/profile/index';
 import { store } from '@/state/store';
 
-//TODO the Endpoint must be set to dynamic value /users/* or something else...
-
+// TODO the Endpoint must be set to dynamic value /users/* or something else...
 
 // Initialize axios-mock-adapter
 const mock = new axiosMockAdapter(axiosInstance);
 
 describe('ProfilePage Component', () => {
-
   const mockUserData = {
     firstName: 'John',
     lastName: 'Doe',
     bio: 'Test Bio',
-    email: "test@email.com",
-    username: "userNameDefault",
-    profile: "",
+    email: 'test@email.com',
+    username: 'userNameDefault',
+    profile: '',
     dateOfBirth: '1995-08-13',
     phoneNumber: 555555555,
     ranking: 10,
     preferences: {
       notifications: true,
-      language: "en"
+      language: 'en',
     },
     dateCreated: new Date('2024-08-13'),
     updatedAt: new Date('2024-08-13'),
@@ -46,7 +45,7 @@ describe('ProfilePage Component', () => {
       render(
         <Provider store={store}>
           <ProfilePage />
-        </Provider>
+        </Provider>,
       );
 
       await waitFor(() => expect(screen.queryByTestId('loading')).toBeNull());
@@ -59,7 +58,7 @@ describe('ProfilePage Component', () => {
       render(
         <Provider store={store}>
           <ProfilePage />
-        </Provider>
+        </Provider>,
       );
 
       await waitFor(() => {
@@ -85,7 +84,7 @@ describe('ProfilePage Component', () => {
       render(
         <Provider store={store}>
           <ProfilePage />
-        </Provider>
+        </Provider>,
       );
       await waitFor(() => expect(screen.queryByTestId('loading')).toBeNull());
     });

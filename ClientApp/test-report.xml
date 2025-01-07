@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testExecutions version="1">
+  <file path="/home/wade3/Desktop/CONCORDIA/10thSemester/SOEN490/SportsAppForked/ClientApp/__tests__/services/authService.test.ts">
+    <testCase name="Auth Service Tests should save tokens and start refresh timer upon successful login" duration="4"/>
+    <testCase name="Auth Service Tests should throw error on login failure" duration="18"/>
+    <testCase name="Auth Service Tests should clear tokens and stop refresh timer on logout" duration="1"/>
+  </file>
+  <file path="/home/wade3/Desktop/CONCORDIA/10thSemester/SOEN490/SportsAppForked/ClientApp/__tests__/services/secureStore.test.ts">
+    <testCase name="Secure Storage Functions should save a value to secure store" duration="0"/>
+    <testCase name="Secure Storage Functions should retrieve a value from secure store" duration="1"/>
+    <testCase name="Secure Storage Functions should return null for non-existent key" duration="0"/>
+    <testCase name="Secure Storage Functions should delete a value from secure store" duration="0"/>
+  </file>
+  <file path="/home/wade3/Desktop/CONCORDIA/10thSemester/SOEN490/SportsAppForked/ClientApp/__tests__/auth/login.test.tsx">
+  </file>
+  <file path="/home/wade3/Desktop/CONCORDIA/10thSemester/SOEN490/SportsAppForked/ClientApp/__tests__/auth/registerProfile.test.tsx">
+  </file>
+  <file path="/home/wade3/Desktop/CONCORDIA/10thSemester/SOEN490/SportsAppForked/ClientApp/__tests__/auth/registerAccount.test.tsx">
+  </file>
+  <file path="/home/wade3/Desktop/CONCORDIA/10thSemester/SOEN490/SportsAppForked/ClientApp/__tests__/profile.test.tsx">
+  </file>
+  <file path="/home/wade3/Desktop/CONCORDIA/10thSemester/SOEN490/SportsAppForked/ClientApp/__tests__/services/tokenService.test.ts">
+  </file>
+</testExecutions>

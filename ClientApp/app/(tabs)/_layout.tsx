@@ -1,14 +1,14 @@
 import React from 'react';
 import { router, Tabs } from 'expo-router';
-import { logoutUser } from '@/services/authService';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { logoutUser } from '@/services/authService';
 
 async function handleLogout() {
   try {
     await logoutUser();
     router.replace('/auth/login');
   } catch (error) {
-    console.error("Logout error:", error);
+    console.error('Logout error:', error);
   }
 }
 
@@ -69,8 +69,8 @@ export default function TabLayout() {
         }}
         listeners={{
           tabPress: (e) => {
-            e.preventDefault(); 
-            // FIXME this should be the logout button later 
+            e.preventDefault();
+            // FIXME this should be the logout button later
             handleLogout();
             // -------
           },
@@ -79,10 +79,3 @@ export default function TabLayout() {
     </Tabs>
   );
 }
-
-
-
-
-
-
-
