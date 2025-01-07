@@ -10,14 +10,14 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "test": "jest --transformIgnorePatterns \"node_modules/(?!@toolz/allow)/\" --env=jsdom",
-    "ci-test": "jest --transformIgnorePatterns \"node_modules/(?!@toolz/allow)/\" --env=jsdom --coverage",
+    "test": "jest --transformIgnorePatterns \"node_modules/(?!@toolz/allow|expo-font)/\" --env=jsdom",
+    "ci-test": "jest --transformIgnorePatterns \"node_modules/(?!@toolz/allow|expo-font)/\" --env=jsdom --coverage",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "jest": {
     "preset": "jest-expo",
     "setupFilesAfterEnv": [
-      "<rootDir>/jestSetup.ts",
+      "<rootDir>/jest.setup.ts",
       "@testing-library/jest-native/extend-expect"
     ],
     "moduleNameMapper": {
