@@ -632,7 +632,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void getFriendRequestsShouldThrowUserNotFoundException() {
+    void getFriendRequestsShouldThrowUserDoesNotExistException() {
         // Arrange
         String userId = new ObjectId().toHexString();
 
