@@ -51,21 +51,23 @@ jobs:
     needs: test
     if: always()
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+
       - name: Install dependencies
         run: npm install
         working-directory: ./ClientApp
-         
-      - name: Test and coverage
-        run: npm test --coverage
 
-      - name: Build and Analyze with SonarQube
+      - name: Run Tests
+        run: npm test --coverage
         working-directory: ./ClientApp
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_CLIENTAPP }}
-        run: npx sonar-scanner
+
+      - name: SonarQube Scan
+        run: |
+          npx sonar-scanner -Dsonar.projectBaseDir=./ClientApp
+        working-directory: ./ClientApp
