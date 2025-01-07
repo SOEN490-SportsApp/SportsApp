@@ -56,15 +56,8 @@ jobs:
         with:
           fetch-depth: 0
           
-      - name: List Full Directory Structure
-        run: ls -laR
-
-      - name: Verify ClientApp Directory
-        run: |
-          if [ ! -d "./ClientApp" ]; then
-            echo "Error: ClientApp directory not found"
-            exit 1
-          fi
+      - name: Install Jest
+        run: npm install jest
 
       - name: Build and Analyze with SonarQube
         working-directory: ./ClientApp
