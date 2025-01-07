@@ -56,12 +56,14 @@ jobs:
         with:
           fetch-depth: 0
           
-      - name: Install Jest
-        run: npm install jest jest-expo
+      - name: Install dependencies
+        run: npm install
+         
+      - name: Test and coverage
+        run: npm test --coverage
 
       - name: Build and Analyze with SonarQube
         working-directory: ./ClientApp
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_CLIENTAPP }}
-        run: npm run test-sonar
