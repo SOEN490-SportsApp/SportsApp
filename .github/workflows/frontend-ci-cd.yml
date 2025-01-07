@@ -4,66 +4,49 @@ on:
   workflow_dispatch:
 
 jobs:
-  # lint:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-
-  #     - name: Cache Node Modules
-  #       uses: actions/cache@v4
-  #       with:
-  #         path: ~/.npm
-  #         key: ${{ runner.os }}-node-${{ hashFiles('ClientApp/package-lock.json') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-node-
-  #     - name: Install dependencies
-  #       run: npm install
-  #       working-directory: ./ClientApp
-
-  #     - name: Lint with ESLint
-  #       run: npm run lint
-  #       working-directory: ./ClientApp
-
-  test:
-    # needs: lint
-    if: always()
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Install dependencies
-        run: npm install
-        working-directory: ./ClientApp
-      
-      - name: Cache Node Modules
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('ClientApp/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-            
-      - name: Run Jest Tests with Coverage
-        run: npm test --coverage
-        working-directory: ./ClientApp
-        
-  sonar:
-    needs: test
-    if: always()
+  build:
+    name: Build and Analyze
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
 
-      - name: Install dependencies
-        run: npm install
-        working-directory: ./ClientApp
+    - name: Install dependencies
+      run: |
+        npm install
 
-      - name: SonarQube Scan
-        run: |
-          npx sonar-scanner -Dsonar.projectBaseDir=./ClientApp
-        working-directory: ./ClientApp
+    - name: Run tests and generate coverage
+      run: |
+        npm test --coverage --watchAll=false
+        # Optionally, you can run react-native tests as well if you have them
+        # npx react-native test
+
+    - name: Cache node modules
+      uses: actions/cache@v3
+      with:
+        path: node_modules
+        key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-modules-
+
+    - name: SonarCloud Scan
+      uses: SonarSource/sonarcloud-github-action@v2.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_CLIENTAPP }}
+      with:
+        projectBaseDir: .
+        sonarProperties: sonar-project.properties
+
+    - name: Upload coverage to SonarCloud
+      if: success()
+      run: |
+        curl -u ${{ secrets.SONAR_TOKEN_CLIENTAPP }} \
+             -X POST -F "file=@coverage/lcov-report.json" \
+             https://sonarcloud.io/api/coverage/upload
