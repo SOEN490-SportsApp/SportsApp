@@ -14,7 +14,7 @@
     "ci-test": "jest --transformIgnorePatterns \"node_modules/(?!@toolz/allow)/\" --env=jsdom --coverage",
     "lint": "eslint --fix . --ext .js,.jsx,.ts,.tsx",
     "coverage": "jest --transformIgnorePatterns \"node_modules/(?!@toolz/allow)/\" --env=jsdom\n --coverage",
-    "test-sonar": "jest --transformIgnorePatterns \"node_modules/(?!@toolz/allow)/\" --env=jsdom\n --watchAll=false --coverage --testResultsProcessor jest-sonar-reporter",
+    "test-sonar": "jest --transformIgnorePatterns \"node_modules/(?!@toolz/allow)/\" --env=jsdom\n --coverage --testResultsProcessor jest-sonar-reporter",
     "sonar": "node sonarqube-scanner.js"
   },
   "jest": {
