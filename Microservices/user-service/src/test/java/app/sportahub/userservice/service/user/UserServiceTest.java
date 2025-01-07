@@ -3,10 +3,11 @@ package app.sportahub.userservice.service.user;
 import app.sportahub.userservice.client.KeycloakApiClient;
 import app.sportahub.userservice.dto.request.user.*;
 import app.sportahub.userservice.dto.request.user.keycloak.KeycloakRequest;
-import app.sportahub.userservice.dto.response.user.FriendRequestResponse;
+import app.sportahub.userservice.dto.response.user.friend.FriendRequestResponse;
 import app.sportahub.userservice.dto.response.user.ProfileResponse;
 import app.sportahub.userservice.dto.response.user.SportLevelResponse;
 import app.sportahub.userservice.dto.response.user.UserResponse;
+import app.sportahub.userservice.dto.response.user.friend.ViewFriendRequestsResponse;
 import app.sportahub.userservice.enums.user.FriendRequestStatusEnum;
 import app.sportahub.userservice.exception.user.*;
 import app.sportahub.userservice.exception.user.badge.UserAlreadyAssignedBadgeByThisGiverException;
@@ -608,5 +609,38 @@ public class UserServiceTest {
 
         // Assert
         assertEquals("409 CONFLICT \"Can't send friend request to self\"", exception.getMessage());
+    }
+
+    @Test
+    void getFriendRequestsShouldReturnSuccess() {
+        // Arrange
+        User user = new User();
+        user.setUsername("testUsername");
+        List<Friend> friendList = new ArrayList<>();
+        friendList.add(new Friend("sender", FriendRequestStatusEnum.SENT));
+        friendList.add(new Friend("receiver", FriendRequestStatusEnum.RECEIVED));
+        user.setFriendList(friendList);
+
+        // Act
+        when(userRepository.findUserById("id")).thenReturn(Optional.of(user));
+
+        // Assert
+        List<ViewFriendRequestsResponse> listResponse = userService.getFriendRequests("id");
+        assertFalse(listResponse.isEmpty());
+        assertEquals(1, listResponse.size());
+        assertEquals("receiver", listResponse.getFirst().userName());
+    }
+
+    @Test
+    void getFriendRequestsShouldThrowUserNotFoundException() {
+        // Arrange
+        String userId = new ObjectId().toHexString();
+
+        // Act
+        UserDoesNotExistException exception = assertThrows(UserDoesNotExistException.class,
+                () -> userService.getFriendRequests(userId));
+
+        // Assert
+        assertEquals("404 NOT_FOUND \"User with identifier: " + userId + " does not exist.\"", exception.getMessage());
     }
 }

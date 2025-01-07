@@ -1,12 +1,13 @@
 package app.sportahub.userservice.controller.user;
 
 import app.sportahub.userservice.dto.request.user.FriendRequestRequest;
-import app.sportahub.userservice.dto.response.user.FriendRequestResponse;
+import app.sportahub.userservice.dto.response.user.friend.FriendRequestResponse;
 import app.sportahub.userservice.dto.request.user.ProfileRequest;
 import app.sportahub.userservice.dto.request.user.UserRequest;
 import app.sportahub.userservice.dto.response.user.ProfileResponse;
 import app.sportahub.userservice.dto.response.user.UserResponse;
 import app.sportahub.userservice.dto.response.user.badge.BadgeWithCountResponse;
+import app.sportahub.userservice.dto.response.user.friend.ViewFriendRequestsResponse;
 import app.sportahub.userservice.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -76,4 +77,13 @@ public class UserController {
     public FriendRequestResponse sendFriendRequest(@PathVariable String userId, @RequestBody FriendRequestRequest friendRequestRequest) {
         return userService.sendFriendRequest(userId, friendRequestRequest);
     }
+
+    @GetMapping("/{userId}/friend-requests")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "view received friend requests",
+    description = "Retrieves all the user's friend requests stored in their friend list.")
+    public List<ViewFriendRequestsResponse> getFriendRequests(@PathVariable String userId) {
+        return userService.getFriendRequests(userId);
+    }
+
 }
