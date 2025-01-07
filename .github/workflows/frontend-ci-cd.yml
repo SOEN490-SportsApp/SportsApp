@@ -57,7 +57,7 @@ jobs:
           fetch-depth: 0
           
       - name: Install Jest
-        run: npm install jest
+        run: npm install jest jest-expo
 
       - name: Build and Analyze with SonarQube
         working-directory: ./ClientApp
