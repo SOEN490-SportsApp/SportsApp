@@ -32,38 +32,38 @@ describe('Register Account Screen', () => {
         });
     });
 
-    // it('shows an alert when terms not accepted', async () => {
-    //     const { getByPlaceholderText, getByText } = render(
-    //     <AuthProvider>
-    //         <RegisterAccountPage />
-    //     </AuthProvider>
-    //     );
+    it('shows an alert when terms not accepted', async () => {
+        const { getByPlaceholderText, getByText } = render(
+        <Provider store={store}>
+            <RegisterAccountPage />
+        </Provider>
+        );
 
-    //     fireEvent.changeText(getByPlaceholderText('Username'), 'testUser');
-    //     fireEvent.changeText(getByPlaceholderText('Email'), 'testuser@example.com');
-    //     fireEvent.changeText(getByPlaceholderText('Password'), 'testPassword');
-    //     fireEvent.changeText(getByPlaceholderText('Confirm Password'), 'testPassword');
-    //     fireEvent.press(getByText('Sign Up'));
+        fireEvent.changeText(getByPlaceholderText('Username'), 'testUser');
+        fireEvent.changeText(getByPlaceholderText('Email'), 'testuser@example.com');
+        fireEvent.changeText(getByPlaceholderText('Password'), 'testPassword');
+        fireEvent.changeText(getByPlaceholderText('Confirm Password'), 'testPassword');
+        fireEvent.press(getByText('Sign Up'));
 
-    //     await waitFor(() => {
-    //         expect(Alert.alert).toHaveBeenCalledWith("", "You must agree to the terms to continue.");
-    //     });
-    // });
+        await waitFor(() => {
+            expect(Alert.alert).toHaveBeenCalledWith("", "You must agree to the terms to continue.");
+        });
+    });
 
-    // it('shows an alert when passwords do not match', async () => {
-    //     const { getByPlaceholderText, getByText } = render(<RegisterAccountPage />);
+    it('shows an alert when passwords do not match', async () => {
+        const { getByPlaceholderText, getByText } = render(<RegisterAccountPage />);
 
-    //     fireEvent.changeText(getByPlaceholderText('Username'), 'testUser');
-    //     fireEvent.changeText(getByPlaceholderText('Email'), 'testuser@example.com');
-    //     fireEvent.changeText(getByPlaceholderText('Password'), 'testPassword');
-    //     fireEvent.changeText(getByPlaceholderText('Confirm Password'), 'differentTestPassword');
-    //     fireEvent.press(await screen.findByTestId('agreeToTermsCheckbox'));
-    //     fireEvent.press(getByText('Sign Up'));
+        fireEvent.changeText(getByPlaceholderText('Username'), 'testUser');
+        fireEvent.changeText(getByPlaceholderText('Email'), 'testuser@example.com');
+        fireEvent.changeText(getByPlaceholderText('Password'), 'testPassword');
+        fireEvent.changeText(getByPlaceholderText('Confirm Password'), 'differentTestPassword');
+        fireEvent.press(await screen.findByTestId('agreeToTermsCheckbox'));
+        fireEvent.press(getByText('Sign Up'));
 
-    //     await waitFor(() => {
-    //         expect(Alert.alert).toHaveBeenCalledWith("Oh oh!", "Passwords do not match.");
-    //     });
-    // });
+        await waitFor(() => {
+            expect(Alert.alert).toHaveBeenCalledWith("Oh oh!", "Passwords do not match.");
+        });
+    });
 });
 
 
