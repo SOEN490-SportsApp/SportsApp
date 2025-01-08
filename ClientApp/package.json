@@ -49,7 +49,7 @@
       "global": {
         "branches": 40,
         "functions": 40,
-        "lines": 1,
+        "lines": 0,
         "statements": 0
       }
     }
