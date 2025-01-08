@@ -15,7 +15,7 @@
     "lint": "eslint --fix . --ext .js,.jsx,.ts,.tsx",
     "coverage": "jest --transformIgnorePatterns \"node_modules/(?!@toolz/allow)/\" --env=jsdom\n --coverage",
     "test-sonar": "jest --transformIgnorePatterns \"node_modules/(?!@toolz/allow)/\" --env=jsdom\n --coverage --testResultsProcessor jest-sonar-reporter",
-    "sonar": "node sonarqube-scanner.js"
+    "sonar": "npx sonar-scanner -Dsonar.host.url=https://sonarcloud.io -Dsonar.projectKey=sportaforked_ClientApp -Dsonar.organization=sportaforked -Dsonar.tests=__tests__ -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info -Dsonar.testExecutionReportPaths=test-report.xml -Dsonar.sourceEncoding=UTF-8"
   },
   "jest": {
     "preset": "jest-expo",
