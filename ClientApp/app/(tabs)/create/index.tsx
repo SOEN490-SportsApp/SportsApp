@@ -10,6 +10,7 @@ import {
   FlatList,
   StatusBar,
   Alert,
+  SafeAreaView,
 } from "react-native";
 import { useForm, Controller, useWatch } from "react-hook-form";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -239,326 +240,336 @@ const Create = () => {
   };
 
   return (
-    <View
-      style={[
-        styles.container,
-        { paddingTop: StatusBar.currentHeight || vs(24) },
-      ]}
-    >
-      <Text style={styles.header}>Create Event</Text>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.label}>Event Name</Text>
-        <Controller
-          control={control}
-          name="eventName"
-          rules={{ required: "Event Name is required" }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              placeholder="Enter Event Name"
-              style={styles.input}
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-            />
-          )}
-        />
-        {errors.eventName && (
-          <Text style={styles.errorText}>{errors.eventName.message}</Text>
-        )}
-
-        <Text style={styles.label}>Event Type</Text>
-        <View style={styles.radioGroup}>
-          <TouchableOpacity
-            onPress={() => setValue("eventType", "public")}
-            style={[
-              styles.radioButton,
-              watch.eventType === "public" ? styles.radioButtonSelected : null,
-            ]}
-          >
-            <Text
-              style={[
-                styles.radioText,
-                watch.eventType === "public" && styles.selectedText,
-              ]}
-            >
-              Public
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => setValue("eventType", "private")}
-            style={[
-              styles.radioButton,
-              watch.eventType === "private" ? styles.radioButtonSelected : null,
-            ]}
-          >
-            <Text
-              style={[
-                styles.radioText,
-                watch.eventType === "private" && styles.selectedText,
-              ]}
-            >
-              Private
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        <Text style={styles.label}>Sport Type</Text>
-        <Controller
-          control={control}
-          name="sportType"
-          rules={{ required: "Sport Type is required" }}
-          render={({ field: { value } }) => (
-            <TouchableOpacity
-              style={[styles.input, errors.sportType && styles.inputError]}
-              onPress={() => setSportTypeModalVisible(true)}
-            >
-              <Text>{value || "Select a Sport"}</Text>
-            </TouchableOpacity>
-          )}
-        />
-        {renderSportTypeModal()}
-        {errors.sportType && (
-          <Text style={styles.errorText}>{errors.sportType.message}</Text>
-        )}
-
-        <Text style={styles.label}>Location</Text>
-        <Controller
-          control={control}
-          name="locationName"
-          rules={{ required: "Location Name is required" }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              placeholder="Location Name"
-              style={styles.input}
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-            />
-          )}
-        />
-        {errors.locationName &&
-          typeof errors.locationName.message === "string" && (
-            <Text style={styles.errorText}>{errors.locationName.message}</Text>
-          )}
-
-        <Controller
-          control={control}
-          name="city"
-          rules={{ required: "City is required" }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              placeholder="City"
-              style={styles.input}
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-            />
-          )}
-        />
-        {errors.city && typeof errors.city.message === "string" && (
-          <Text style={styles.errorText}>{errors.city.message}</Text>
-        )}
-
-        <Controller
-          control={control}
-          name="province"
-          rules={{ required: "Province is required" }}
-          render={({ field: { value } }) => (
-            <TouchableOpacity
-              style={[styles.input, errors.province && styles.inputError]}
-              onPress={() => setProvinceModalVisible(true)}
-            >
-              <Text>{value || "Select a Province"}</Text>
-            </TouchableOpacity>
-          )}
-        />
-        {renderProvinceModal()}
-        {errors.province && (
-          <Text style={styles.errorText}>{errors.province.message}</Text>
-        )}
-
-        <Text style={styles.label}>Event Date</Text>
-        <TouchableOpacity
-          onPress={() => setShowDatePicker(true)}
-          style={styles.input}
-        >
-          <Text>
-            {eventDate.toISOString() === new Date().toISOString()
-              ? "Select event date"
-              : eventDate.toDateString()}
-          </Text>
-        </TouchableOpacity>
-        {showDatePicker && (
-          <DateTimePicker
-            value={eventDate}
-            mode="date"
-            display="default"
-            onChange={(event, selectedDate) => {
-              setShowDatePicker(false);
-              if (selectedDate) setEventDate(selectedDate);
-            }}
+    <SafeAreaView style={styles.safeArea}>
+      <View
+        style={[
+          styles.container,
+          { paddingTop: StatusBar.currentHeight || vs(24) },
+        ]}
+      >
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <Text style={styles.label}>Event Name</Text>
+          <Controller
+            control={control}
+            name="eventName"
+            rules={{ required: "Event Name is required" }}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                placeholder="Enter Event Name"
+                style={styles.input}
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+              />
+            )}
           />
-        )}
-
-        <Text style={styles.label}>Maximum Number of Participants</Text>
-        <Controller
-          control={control}
-          name="maxParticipants"
-          rules={{
-            required: "Maximum number of participants is required",
-            validate: (value) => {
-              const number = parseInt(value, 10);
-              return (
-                (!isNaN(number) && number > 0) || "Must be a positive integer"
-              );
-            },
-          }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              placeholder="Enter maximum participants"
-              style={styles.input}
-              onBlur={onBlur}
-              onChangeText={(text) => {
-                if (/^\d*$/.test(text)) {
-                  onChange(text);
-                }
-              }}
-              value={value}
-              keyboardType="numeric"
-            />
+          {errors.eventName && (
+            <Text style={styles.errorText}>{errors.eventName.message}</Text>
           )}
-        />
-        {errors.maxParticipants && (
-          <Text style={styles.errorText}>{errors.maxParticipants.message}</Text>
-        )}
 
-        <Text style={styles.label}>Cut Off Time</Text>
-        <TouchableOpacity
-          onPress={() => setShowCutOffDatePicker(true)}
-          style={styles.input}
-        >
-          <Text>
-            {cutOffDate.toDateString() === new Date().toDateString()
-              ? "Select cut off date"
-              : cutOffDate.toDateString()}
-          </Text>
-        </TouchableOpacity>
-        {showCutOffDatePicker && (
-          <DateTimePicker
-            value={cutOffDate}
-            mode="date"
-            display="default"
-            onChange={(event, selectedDate) => {
-              setShowCutOffDatePicker(false);
-              if (selectedDate) setCutOffDate(selectedDate);
-            }}
-          />
-        )}
-
-        <TouchableOpacity
-          onPress={() => setShowCutOffTimePicker(true)}
-          style={styles.input}
-        >
-          <Text>
-            {cutOffTime.getHours() === new Date().getHours() &&
-            cutOffTime.getMinutes() === new Date().getMinutes()
-              ? "Select cut off time (in hours)"
-              : cutOffTime.toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-          </Text>
-        </TouchableOpacity>
-        {showCutOffTimePicker && (
-          <DateTimePicker
-            value={cutOffTime}
-            mode="time"
-            display="default"
-            onChange={(event, selectedTime) => {
-              setShowCutOffTimePicker(false);
-              if (selectedTime) setCutOffTime(selectedTime);
-            }}
-          />
-        )}
-
-        <Text style={styles.label}>Required Skill Level</Text>
-        <View style={styles.skillLevelGroup}>
-          {["Beginner", "Intermediate", "Advanced"].map((level) => (
+          <Text style={styles.label}>Event Type</Text>
+          <View style={styles.radioGroup}>
             <TouchableOpacity
-              key={level}
+              onPress={() => setValue("eventType", "public")}
               style={[
-                styles.skillLevelOption,
-                requiredSkillLevel.includes(level) && styles.skillLevelSelected,
+                styles.radioButton,
+                watch.eventType === "public"
+                  ? styles.radioButtonSelected
+                  : null,
               ]}
-              onPress={() => toggleSkillLevel(level)}
             >
               <Text
                 style={[
-                  styles.skillLevelText,
-                  requiredSkillLevel.includes(level) &&
-                    styles.skillLevelTextSelected,
+                  styles.radioText,
+                  watch.eventType === "public" && styles.selectedText,
                 ]}
               >
-                {level}
+                Public
               </Text>
             </TouchableOpacity>
-          ))}
-        </View>
-
-        <Text style={styles.label}>Description</Text>
-        <Controller
-          control={control}
-          name="description"
-          rules={{ required: "Description is required" }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              placeholder="Enter Description"
-              style={[styles.input, styles.textArea]}
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-              multiline
-              numberOfLines={4}
-            />
-          )}
-        />
-        {errors.description &&
-          typeof errors.description.message === "string" && (
-            <Text style={styles.errorText}>{errors.description.message}</Text>
-          )}
-      </ScrollView>
-      <View style={styles.footer}>
-        <ConfirmButton
-          text="CREATE EVENT"
-          onPress={handleSubmit(onSubmit)}
-          icon={null}
-          iconPlacement={IconPlacement.left}
-        />
-      </View>
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={isSuccessModalVisible}
-        onRequestClose={() => setSuccessModalVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.successModal}>
-            <Text style={styles.successText}>
-              🎉 Event Created Successfully! 🎉
-            </Text>
             <TouchableOpacity
-              style={styles.successButton}
-              onPress={() => {
-                setSuccessModalVisible(false);
-                router.replace("/(tabs)/home");
-              }}
+              onPress={() => setValue("eventType", "private")}
+              style={[
+                styles.radioButton,
+                watch.eventType === "private"
+                  ? styles.radioButtonSelected
+                  : null,
+              ]}
             >
-              <Text style={styles.successButtonText}>Done</Text>
+              <Text
+                style={[
+                  styles.radioText,
+                  watch.eventType === "private" && styles.selectedText,
+                ]}
+              >
+                Private
+              </Text>
             </TouchableOpacity>
           </View>
+
+          <Text style={styles.label}>Sport Type</Text>
+          <Controller
+            control={control}
+            name="sportType"
+            rules={{ required: "Sport Type is required" }}
+            render={({ field: { value } }) => (
+              <TouchableOpacity
+                style={[styles.input, errors.sportType && styles.inputError]}
+                onPress={() => setSportTypeModalVisible(true)}
+              >
+                <Text>{value || "Select a Sport"}</Text>
+              </TouchableOpacity>
+            )}
+          />
+          {renderSportTypeModal()}
+          {errors.sportType && (
+            <Text style={styles.errorText}>{errors.sportType.message}</Text>
+          )}
+
+          <Text style={styles.label}>Location</Text>
+          <Controller
+            control={control}
+            name="locationName"
+            rules={{ required: "Location Name is required" }}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                placeholder="Location Name"
+                style={styles.input}
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+              />
+            )}
+          />
+          {errors.locationName &&
+            typeof errors.locationName.message === "string" && (
+              <Text style={styles.errorText}>
+                {errors.locationName.message}
+              </Text>
+            )}
+
+          <Controller
+            control={control}
+            name="city"
+            rules={{ required: "City is required" }}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                placeholder="City"
+                style={styles.input}
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+              />
+            )}
+          />
+          {errors.city && typeof errors.city.message === "string" && (
+            <Text style={styles.errorText}>{errors.city.message}</Text>
+          )}
+
+          <Controller
+            control={control}
+            name="province"
+            rules={{ required: "Province is required" }}
+            render={({ field: { value } }) => (
+              <TouchableOpacity
+                style={[styles.input, errors.province && styles.inputError]}
+                onPress={() => setProvinceModalVisible(true)}
+              >
+                <Text>{value || "Select a Province"}</Text>
+              </TouchableOpacity>
+            )}
+          />
+          {renderProvinceModal()}
+          {errors.province && (
+            <Text style={styles.errorText}>{errors.province.message}</Text>
+          )}
+
+          <Text style={styles.label}>Event Date</Text>
+          <TouchableOpacity
+            onPress={() => setShowDatePicker(true)}
+            style={styles.input}
+          >
+            <Text>
+              {eventDate.toISOString() === new Date().toISOString()
+                ? "Select event date"
+                : eventDate.toDateString()}
+            </Text>
+          </TouchableOpacity>
+          {showDatePicker && (
+            <DateTimePicker
+              value={eventDate}
+              mode="date"
+              display="default"
+              onChange={(event, selectedDate) => {
+                setShowDatePicker(false);
+                if (selectedDate) setEventDate(selectedDate);
+              }}
+            />
+          )}
+
+          <Text style={styles.label}>Maximum Number of Participants</Text>
+          <Controller
+            control={control}
+            name="maxParticipants"
+            rules={{
+              required: "Maximum number of participants is required",
+              validate: (value) => {
+                const number = parseInt(value, 10);
+                return (
+                  (!isNaN(number) && number > 0) || "Must be a positive integer"
+                );
+              },
+            }}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                placeholder="Enter maximum participants"
+                style={styles.input}
+                onBlur={onBlur}
+                onChangeText={(text) => {
+                  if (/^\d*$/.test(text)) {
+                    onChange(text);
+                  }
+                }}
+                value={value}
+                keyboardType="numeric"
+              />
+            )}
+          />
+          {errors.maxParticipants && (
+            <Text style={styles.errorText}>
+              {errors.maxParticipants.message}
+            </Text>
+          )}
+
+          <Text style={styles.label}>Cut Off Time</Text>
+          <TouchableOpacity
+            onPress={() => setShowCutOffDatePicker(true)}
+            style={styles.input}
+          >
+            <Text>
+              {cutOffDate.toDateString() === new Date().toDateString()
+                ? "Select cut off date"
+                : cutOffDate.toDateString()}
+            </Text>
+          </TouchableOpacity>
+          {showCutOffDatePicker && (
+            <DateTimePicker
+              value={cutOffDate}
+              mode="date"
+              display="default"
+              onChange={(event, selectedDate) => {
+                setShowCutOffDatePicker(false);
+                if (selectedDate) setCutOffDate(selectedDate);
+              }}
+            />
+          )}
+
+          <TouchableOpacity
+            onPress={() => setShowCutOffTimePicker(true)}
+            style={styles.input}
+          >
+            <Text>
+              {cutOffTime.getHours() === new Date().getHours() &&
+              cutOffTime.getMinutes() === new Date().getMinutes()
+                ? "Select cut off time (in hours)"
+                : cutOffTime.toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+            </Text>
+          </TouchableOpacity>
+          {showCutOffTimePicker && (
+            <DateTimePicker
+              value={cutOffTime}
+              mode="time"
+              display="default"
+              onChange={(event, selectedTime) => {
+                setShowCutOffTimePicker(false);
+                if (selectedTime) setCutOffTime(selectedTime);
+              }}
+            />
+          )}
+
+          <Text style={styles.label}>Required Skill Level</Text>
+          <View style={styles.skillLevelGroup}>
+            {["Beginner", "Intermediate", "Advanced"].map((level) => (
+              <TouchableOpacity
+                key={level}
+                style={[
+                  styles.skillLevelOption,
+                  requiredSkillLevel.includes(level) &&
+                    styles.skillLevelSelected,
+                ]}
+                onPress={() => toggleSkillLevel(level)}
+              >
+                <Text
+                  style={[
+                    styles.skillLevelText,
+                    requiredSkillLevel.includes(level) &&
+                      styles.skillLevelTextSelected,
+                  ]}
+                >
+                  {level}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          <Text style={styles.label}>Description</Text>
+          <Controller
+            control={control}
+            name="description"
+            rules={{ required: "Description is required" }}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                placeholder="Enter Description"
+                style={[styles.input, styles.textArea]}
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+                multiline
+                numberOfLines={4}
+              />
+            )}
+          />
+          {errors.description &&
+            typeof errors.description.message === "string" && (
+              <Text style={styles.errorText}>{errors.description.message}</Text>
+            )}
+        </ScrollView>
+        <View style={styles.footer}>
+          <ConfirmButton
+            text="CREATE EVENT"
+            onPress={handleSubmit(onSubmit)}
+            icon={null}
+            iconPlacement={IconPlacement.left}
+          />
         </View>
-      </Modal>
-    </View>
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={isSuccessModalVisible}
+          onRequestClose={() => setSuccessModalVisible(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.successModal}>
+              <Text style={styles.successText}>
+                🎉 Event Created Successfully! 🎉
+              </Text>
+              <TouchableOpacity
+                style={styles.successButton}
+                onPress={() => {
+                  setSuccessModalVisible(false);
+                  router.replace("/(tabs)/home");
+                }}
+              >
+                <Text style={styles.successButtonText}>Done</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+      </View>
+    </SafeAreaView>
   );
 };
 
@@ -566,14 +577,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: themeColors.background.light,
-  },
-  header: {
-    fontSize: mhs(20),
-    fontWeight: "bold",
-    color: themeColors.text.dark,
-    textAlign: "center",
-    padding: hs(16),
-    backgroundColor: themeColors.background.lightGrey,
   },
   scrollContent: {
     padding: hs(16),
@@ -735,6 +738,10 @@ const styles = StyleSheet.create({
   skillLevelTextSelected: {
     color: themeColors.text.light,
     fontWeight: "bold",
+  },
+  safeArea: {
+    flex: 1,
+    backgroundColor: themeColors.background.light, // Use your background color
   },
 });
 
