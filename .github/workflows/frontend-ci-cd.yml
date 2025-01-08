@@ -54,7 +54,7 @@ jobs:
         npx sonar-scanner \
           -Dsonar.projectKey=sportaforked_ClientApp \
           -Dsonar.organization=sportaforked \
-          -Dsonar.sources=./src \
+          -Dsonar.sources=./ \
           -Dsonar.host.url=https://sonarcloud.io \
           -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info \
           -Dsonar.token=${{ secrets.SONAR_TOKEN_CLIENTAPP }}
