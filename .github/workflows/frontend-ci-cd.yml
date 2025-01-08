@@ -20,12 +20,12 @@ jobs:
     - name: Install dependencies
       run: |
         npm install
+      working-directory: ./ClientApp
 
     - name: Run tests and generate coverage
       run: |
         npm test --coverage --watchAll=false
-        # Optionally, you can run react-native tests as well if you have them
-        # npx react-native test
+      working-directory: ./ClientApp
 
     - name: Cache node modules
       uses: actions/cache@v3
