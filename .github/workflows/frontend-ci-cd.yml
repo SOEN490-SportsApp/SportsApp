@@ -36,11 +36,13 @@ jobs:
       working-directory: ./ClientApp
 
     - name: Run SonarCloud Scan
-      run: npx sonar-scanner -Dsonar.projectKey=sportaforked_ClientApp \
-                               -Dsonar.organization=sportaforked \
-                               -Dsonar.sources=./ \
-                               -Dsonar.host.url=https://sonarcloud.io \
-                               -Dsonar.login=${{ secrets.SONAR_TOKEN_CLIENTAPP }}
+      run: |
+          npx sonar-scanner \
+            -Dsonar.projectKey=sportaforked_ClientApp \
+            -Dsonar.organization=sportaforked \
+            -Dsonar.sources=./ \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.login=${{ secrets.SONAR_TOKEN_CLIENTAPP }}
 
     - name: Upload coverage to SonarCloud
       if: success()
