@@ -77,8 +77,7 @@ const RegisterProfilePage: React.FC = () => {
         ranking: "Test Ranking",
       };
       await registerProfile(profile, userID as string);
-      await updateUserToStore(userID as string);
-      router.replace("/(tabs)/home");
+      router.replace("/auth/login");
     } catch (error: any){
       Alert.alert('Error', 'Error occured creating profile');
       throw new Error(`Error regestering profile: ${error}`);
@@ -501,7 +500,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   genderContainer: {
-    width: "40%",
+    width: "30%",
   },
   genderModalTouchable: {
     flexDirection: "row",
@@ -523,9 +522,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: themeColors.background.lightGrey,
     borderRadius: 24,
-    padding: vs(8),
-    paddingLeft: hs(16),
-    minHeight: vs(64),
+    paddingLeft: hs(8),
+    minHeight: vs(56),
   },
   stepTwoContainer: {
     marginBottom: vs(16),

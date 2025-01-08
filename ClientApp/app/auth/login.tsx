@@ -26,8 +26,14 @@ const LoginPage: React.FC = () => {
     try {
       const res = await loginUser(data.identifier, data.password);
       await updateUserToStore(res.userID);
-      router.push('/(tabs)/home');
+      const {firstName, lastName} = user.profile
+      if(firstName === '' && lastName === ''){
+        router.push({pathname: '/auth/registerProfile', params: { userID: res.userID }});
+      }else{
+        router.push('/(tabs)/home');
+      }
     } catch (error: any) {
+      console.log(error)
       Alert.alert('Error', error.message);
     }
   };

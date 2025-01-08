@@ -5,8 +5,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from "expo-router";
 import { IconPlacement } from '@/utils/constants/enums';
 import { hs, mhs, mvs, vs } from "@/utils/helpers/uiScaler";
-import { loginUser, registerUser } from "@/services/authService";
-import { useUpdateUserToStore } from '@/state/user/actions';
+import { registerUser } from "@/services/authService";
 import ConfirmButton from "@/components/ConfirmButton";
 import AuthenticationDivider from "@/components/AuthenticationDivider";
 import Checkbox from 'expo-checkbox';
@@ -22,7 +21,6 @@ interface RegisterAccountPageFormData {
 
 const RegisterAccountPage: React.FC = () => {
   const router = useRouter();
-  const updateUserToStore = useUpdateUserToStore();
   const { control, handleSubmit, formState: { errors }, watch, setValue } = useForm<RegisterAccountPageFormData>();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -31,9 +29,8 @@ const RegisterAccountPage: React.FC = () => {
     if (data.password !== data.confirmPassword) return Alert.alert("Oh oh!", "Passwords do not match.");
     if (!data.agreeToTerms) return Alert.alert("", "You must agree to the terms to continue.");
     try{
-      await registerUser(data.email, data.username, data.password);
-      const response = await loginUser(data.username, data.password);
-      router.push({pathname: '/auth/registerProfile', params: { userID: response.userID }});
+      const response = await registerUser(data.email, data.username, data.password);
+      router.push({pathname: '/auth/registerProfile', params: { userID: response.data.userID }});
     } catch (error: any){
       Alert.alert("Error", "Failed to create account.");
       console.error(`Failed to create account: ${error}. ${error.message}`);
