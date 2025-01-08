@@ -1,7 +1,8 @@
 package app.sportahub.userservice.service.user;
 
 import app.sportahub.userservice.client.KeycloakApiClient;
-import app.sportahub.userservice.dto.request.user.FriendRequestRequest;
+import app.sportahub.userservice.dto.request.user.friend.FriendRequestRequest;
+import app.sportahub.userservice.dto.request.user.friend.UpdateFriendRequestRequest;
 import app.sportahub.userservice.dto.response.user.friend.FriendRequestResponse;
 import app.sportahub.userservice.dto.request.user.ProfileRequest;
 import app.sportahub.userservice.dto.request.user.UserRequest;
@@ -10,13 +11,13 @@ import app.sportahub.userservice.dto.response.user.ProfileResponse;
 import app.sportahub.userservice.dto.response.user.UserResponse;
 import app.sportahub.userservice.dto.response.user.badge.BadgeResponse;
 import app.sportahub.userservice.dto.response.user.badge.BadgeWithCountResponse;
+import app.sportahub.userservice.dto.response.user.friend.UpdateFriendRequestResponse;
 import app.sportahub.userservice.dto.response.user.friend.ViewFriendRequestsResponse;
 import app.sportahub.userservice.enums.user.FriendRequestStatusEnum;
-import app.sportahub.userservice.exception.user.friend.InvalidFriendRequestStatusTypeException;
-import app.sportahub.userservice.exception.user.friend.UserAlreadyInFriendListException;
+import app.sportahub.userservice.enums.user.UpdateFriendRequestActionEnum;
+import app.sportahub.userservice.exception.user.friend.*;
 import app.sportahub.userservice.exception.user.UserDoesNotExistException;
 import app.sportahub.userservice.exception.user.UserEmailAlreadyExistsException;
-import app.sportahub.userservice.exception.user.friend.UserSentFriendRequestToSelfException;
 import app.sportahub.userservice.exception.user.UsernameAlreadyExistsException;
 import app.sportahub.userservice.exception.user.badge.BadgeNotFoundException;
 import app.sportahub.userservice.exception.user.badge.UserAlreadyAssignedBadgeByThisGiverException;
@@ -24,6 +25,7 @@ import app.sportahub.userservice.mapper.user.ProfileMapper;
 import app.sportahub.userservice.mapper.user.UserMapper;
 import app.sportahub.userservice.model.user.*;
 import app.sportahub.userservice.repository.BadgeRepository;
+import app.sportahub.userservice.repository.FriendRepository;
 import app.sportahub.userservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +48,7 @@ public class UserServiceImpl implements UserService {
     private final KeycloakApiClient keycloakApiClient;
     private final UserMapper userMapper;
     private final ProfileMapper profileMapper;
+    private final FriendRepository friendRepository;
 
     @Override
     public UserResponse createUser(UserRequest userRequest) {
@@ -167,8 +170,22 @@ public class UserServiceImpl implements UserService {
                 throw new UserAlreadyInFriendListException(userReceiver.getUsername(), friend.getFriendRequestStatus());
         }
 
-        userSender.getFriendList().add(new Friend(userReceiver.getUsername(), FriendRequestStatusEnum.SENT));
-        userReceiver.getFriendList().add(new Friend(userSender.getUsername(), FriendRequestStatusEnum.RECEIVED));
+        Friend newSenderFriend = Friend.builder()
+                .withCreatedAt(Timestamp.valueOf(LocalDateTime.now()))
+                .withUpdatedAt(Timestamp.valueOf(LocalDateTime.now()))
+                .withUsername(userReceiver.getUsername())
+                .withFriendRequestStatus(FriendRequestStatusEnum.SENT)
+                .build();
+
+        Friend newReceiverFriend = Friend.builder()
+                .withCreatedAt(Timestamp.valueOf(LocalDateTime.now()))
+                .withUpdatedAt(Timestamp.valueOf(LocalDateTime.now()))
+                .withUsername(userSender.getUsername())
+                .withFriendRequestStatus(FriendRequestStatusEnum.RECEIVED)
+                .build();
+
+        userSender.getFriendList().add(newSenderFriend);
+        userReceiver.getFriendList().add(newReceiverFriend);
 
         User savedUser = userRepository.save(userSender);
         log.info("UserServiceImpl::sendFriendRequest: User with id:{} sent a new friend request", savedUser.getId());
@@ -177,6 +194,87 @@ public class UserServiceImpl implements UserService {
         log.info("UserServiceImpl::sendFriendRequest: User with id:{} received a new friend request", savedUser.getId());
 
         return new FriendRequestResponse("Friend request sent successfully.", userReceiver.getUsername());
+    }
+
+    @Override
+    public UpdateFriendRequestResponse updateFriendRequest(String userId, String requestId,
+                                                           UpdateFriendRequestRequest updateFriendRequestRequest) {
+        User user = userRepository.findUserById(userId).orElseThrow(() -> new UserDoesNotExistException(userId))
+                .toBuilder()
+                .withUpdatedAt(Timestamp.valueOf(LocalDateTime.now()))
+                .build();
+
+        User friendUser = userRepository.findUserByUsername(updateFriendRequestRequest.friendUsername())
+                .orElseThrow(() -> new UserDoesNotExistException(updateFriendRequestRequest.friendUsername()))
+                .toBuilder()
+                .withUpdatedAt(Timestamp.valueOf(LocalDateTime.now()))
+                .build();
+
+        Friend friend = friendRepository.findFriendById(requestId).orElseThrow(() -> new FriendDoesNotExistException(requestId))
+                .toBuilder()
+                .withUpdatedAt(Timestamp.valueOf(LocalDateTime.now()))
+                .build();
+
+        if (!friend.getUsername().equals(friendUser.getUsername())) {
+            throw new GivenFriendUsernameDoesNotMatchFriendFoundByIdException(friendUser.getUsername(), friend.getUsername());
+        }
+
+        UpdateFriendRequestActionEnum action = updateFriendRequestRequest.action();
+        boolean isFriendFound1 = false;
+        boolean isFriendFound2 = false;
+        List<Friend> userFriendList = user.getFriendList();
+        List<Friend> friendUserFriendList = friendUser.getFriendList();
+
+        for (Friend e : userFriendList) {
+            if (e.getUsername().equals(friend.getUsername())) {
+                isFriendFound1 = true;
+                if (action.equals(UpdateFriendRequestActionEnum.ACCEPT)) {
+                    e.setFriendRequestStatus(FriendRequestStatusEnum.ACCEPTED);
+                } else if (action.equals(UpdateFriendRequestActionEnum.DECLINE)) {
+                    userFriendList.remove(e);
+                }
+                for (Friend el : friendUserFriendList) {
+                    if (el.getUsername().equals(user.getUsername())) {
+                        isFriendFound2 = true;
+                        if (action.equals(UpdateFriendRequestActionEnum.ACCEPT)) {
+                            el.setFriendRequestStatus(FriendRequestStatusEnum.ACCEPTED);
+                        } else if (action.equals(UpdateFriendRequestActionEnum.DECLINE)) {
+                            userFriendList.remove(el);
+                        }
+                    }
+                }
+                break;
+            }
+        }
+
+        if (!isFriendFound1)
+            throw new FriendNotFoundInFriendListException(user.getUsername(), friendUser.getUsername());
+        if (!isFriendFound2)
+            throw new FriendNotFoundInFriendListException(friendUser.getUsername(), user.getUsername());
+
+        user.setFriendList(userFriendList);
+        User savedUser = userRepository.save(user);
+        friendUser.setFriendList(friendUserFriendList);
+        User savedFriendUser = userRepository.save(friendUser);
+        String responseMessage;
+
+        if (action.equals(UpdateFriendRequestActionEnum.ACCEPT)) {
+            log.info("UserServiceImpl::updateFriendRequest: User with id:{} accepted the friend request of user with id:{}",
+                    savedUser.getId(), savedFriendUser.getId());
+
+            responseMessage = "User with username: " + savedUser.getUsername()
+                    + " accepted the friend request of user with username" + savedFriendUser.getUsername() + " successfully";
+
+        } else if (action.equals(UpdateFriendRequestActionEnum.DECLINE)) {
+            log.info("UserServiceImpl::updateFriendRequest: User with id:{} declined the friend request of user with id:{}",
+                    savedUser.getId(), savedFriendUser.getId());
+
+            responseMessage = "User with username: " + savedUser.getUsername()
+                    + " declined the friend request of user with username" + savedFriendUser.getUsername() + " successfully";
+        } else {
+            throw new UnexpectedUpdateFriendRequestActionException(action);
+        }
+        return new UpdateFriendRequestResponse(responseMessage);
     }
 
     /**
