@@ -17,6 +17,15 @@ jobs:
       with:
         node-version: '16'
 
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Verify Java Version
+      run: java -version
+
     - name: Install dependencies
       run: |
         npm install
@@ -30,7 +39,7 @@ jobs:
     - name: Cache node modules
       uses: actions/cache@v3
       with:
-        path: node_modules
+        path: ./ClientApp/node_modules
         key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
         restore-keys: |
           ${{ runner.os }}-node-modules-
@@ -42,9 +51,10 @@ jobs:
 
     - name: Run SonarCloud Scan
       run: |
-          npx sonar-scanner \
-            -Dsonar.projectKey=sportaforked_ClientApp \
-            -Dsonar.organization=sportaforked \
-            -Dsonar.sources=./ \
-            -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.login=${{ secrets.SONAR_TOKEN_CLIENTAPP }}
+        npx sonar-scanner \
+          -Dsonar.projectKey=sportaforked_ClientApp \
+          -Dsonar.organization=sportaforked \
+          -Dsonar.sources=./ \
+          -Dsonar.host.url=https://sonarcloud.io \
+          -Dsonar.login=${{ secrets.SONAR_TOKEN_CLIENTAPP }}
+      working-directory: ./ClientApp
