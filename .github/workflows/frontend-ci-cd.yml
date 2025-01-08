@@ -22,6 +22,11 @@ jobs:
         npm install
       working-directory: ./ClientApp
       
+    - name: Install sonar-scanner
+      run: |
+        npm install sonar-scanner
+      working-directory: ./ClientApp
+
     - name: Cache node modules
       uses: actions/cache@v3
       with:
