@@ -2,6 +2,7 @@ package app.sportahub.userservice.service.user;
 
 import app.sportahub.userservice.client.KeycloakApiClient;
 import app.sportahub.userservice.dto.request.user.*;
+import app.sportahub.userservice.dto.request.user.friend.FriendRequestRequest;
 import app.sportahub.userservice.dto.request.user.keycloak.KeycloakRequest;
 import app.sportahub.userservice.dto.response.user.friend.FriendRequestResponse;
 import app.sportahub.userservice.dto.response.user.ProfileResponse;
@@ -11,6 +12,8 @@ import app.sportahub.userservice.dto.response.user.friend.ViewFriendRequestsResp
 import app.sportahub.userservice.enums.user.FriendRequestStatusEnum;
 import app.sportahub.userservice.exception.user.*;
 import app.sportahub.userservice.exception.user.badge.UserAlreadyAssignedBadgeByThisGiverException;
+import app.sportahub.userservice.exception.user.friend.UserAlreadyInFriendListException;
+import app.sportahub.userservice.exception.user.friend.UserSentFriendRequestToSelfException;
 import app.sportahub.userservice.exception.user.friend.InvalidFriendRequestStatusTypeException;
 import app.sportahub.userservice.exception.user.friend.UserAlreadyInFriendListException;
 import app.sportahub.userservice.exception.user.friend.UserSentFriendRequestToSelfException;
@@ -18,6 +21,7 @@ import app.sportahub.userservice.mapper.user.ProfileMapper;
 import app.sportahub.userservice.mapper.user.UserMapper;
 import app.sportahub.userservice.model.user.*;
 import app.sportahub.userservice.repository.BadgeRepository;
+import app.sportahub.userservice.repository.FriendRepository;
 import app.sportahub.userservice.repository.UserRepository;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,6 +55,9 @@ public class UserServiceTest {
     private BadgeRepository badgeRepository;
 
     @Mock
+    private FriendRepository friendRepository;
+
+    @Mock
     private KeycloakApiClient keycloakApiClient;
 
     private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
@@ -62,7 +69,7 @@ public class UserServiceTest {
     @BeforeEach
     void setUp() {
         userService = new UserServiceImpl(userRepository, badgeRepository,
-                keycloakApiClient, userMapper, profileMapper);
+                keycloakApiClient, userMapper, profileMapper, friendRepository);
     }
 
     private UserRequest getUserRequest() {
