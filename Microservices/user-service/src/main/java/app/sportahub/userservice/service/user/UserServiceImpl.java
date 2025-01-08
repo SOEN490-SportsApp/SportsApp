@@ -14,6 +14,7 @@ import app.sportahub.userservice.dto.response.user.badge.BadgeWithCountResponse;
 import app.sportahub.userservice.dto.response.user.friend.UpdateFriendRequestResponse;
 import app.sportahub.userservice.dto.response.user.friend.ViewFriendRequestsResponse;
 import app.sportahub.userservice.enums.user.FriendRequestStatusEnum;
+import app.sportahub.userservice.enums.user.UpdateFriendRequestActionEnum;
 import app.sportahub.userservice.exception.user.friend.*;
 import app.sportahub.userservice.exception.user.UserDoesNotExistException;
 import app.sportahub.userservice.exception.user.UserEmailAlreadyExistsException;

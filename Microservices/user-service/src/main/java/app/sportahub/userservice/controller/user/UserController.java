@@ -1,12 +1,14 @@
 package app.sportahub.userservice.controller.user;
 
 import app.sportahub.userservice.dto.request.user.friend.FriendRequestRequest;
+import app.sportahub.userservice.dto.request.user.friend.UpdateFriendRequestRequest;
 import app.sportahub.userservice.dto.response.user.friend.FriendRequestResponse;
 import app.sportahub.userservice.dto.request.user.ProfileRequest;
 import app.sportahub.userservice.dto.request.user.UserRequest;
 import app.sportahub.userservice.dto.response.user.ProfileResponse;
 import app.sportahub.userservice.dto.response.user.UserResponse;
 import app.sportahub.userservice.dto.response.user.badge.BadgeWithCountResponse;
+import app.sportahub.userservice.dto.response.user.friend.UpdateFriendRequestResponse;
 import app.sportahub.userservice.dto.response.user.friend.ViewFriendRequestsResponse;
 import app.sportahub.userservice.enums.user.FriendRequestStatusEnum;
 import app.sportahub.userservice.service.user.UserService;
@@ -77,9 +79,19 @@ public class UserController {
     @PostMapping("/{userId}/friends/requests")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Send a friend request to a user",
-            description = "Allows a user to send a friend request to another user and returns the details of the friend request.")
-    public FriendRequestResponse sendFriendRequest(@PathVariable String userId, @RequestBody FriendRequestRequest friendRequestRequest) {
+    description = "Allows a user to send a friend request to another user and returns the details of the friend request.")
+    public FriendRequestResponse sendFriendRequest(@PathVariable String userId,
+                                                   @Valid @RequestBody FriendRequestRequest friendRequestRequest) {
         return userService.sendFriendRequest(userId, friendRequestRequest);
+    }
+
+    @PutMapping("/{userId}/friend-requests/{requestId}")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Accept or decline a friend request",
+    description = "Allows a user to accept or decline a friend request and returns a success message if successful.")
+    public UpdateFriendRequestResponse updateFriendRequest(@PathVariable String userId, @PathVariable String requestId,
+                                                           @Valid @RequestBody UpdateFriendRequestRequest updateFriendRequestRequest) {
+        return userService.updateFriendRequest(userId, requestId, updateFriendRequestRequest);
     }
 
     @GetMapping("/{userId}/friend-requests")
