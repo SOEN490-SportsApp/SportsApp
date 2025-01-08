@@ -27,20 +27,18 @@ jobs:
         npm test --coverage --watchAll=false
       working-directory: ./ClientApp
 
-    - name: Cache node modules
-      uses: actions/cache@v3
-      with:
-        path: node_modules
-        key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-node-modules-
-
-    - name: SonarCloud Scan
+    - name: SonarQube Scan
+      uses: SonarSource/sonarqube-scan-action@v4
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_CLIENTAPP }}
-      run: npm run sonar
-      working-directory: ./ClientApp
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_CLIENTAPP }}
+          
+    # - name: SonarCloud Scan
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_CLIENTAPP }}
+    #   run: npm run sonar
+    #   working-directory: ./ClientApp
 
     - name: Upload coverage to SonarCloud
       if: success()
