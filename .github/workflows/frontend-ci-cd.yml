@@ -37,12 +37,12 @@ jobs:
 
     - name: SonarCloud Scan
       uses: SonarSource/sonarcloud-github-action@v1
+      with:
+        projectBaseDir: ./ClientApp  
+        sonarProperties: sonar-project.properties 
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_CLIENTAPP }}
-      with:
-        projectBaseDir: .
-        sonarProperties: sonar-project.properties
 
     - name: Upload coverage to SonarCloud
       if: success()
