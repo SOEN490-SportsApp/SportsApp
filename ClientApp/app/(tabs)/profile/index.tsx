@@ -125,16 +125,16 @@ const ProfilePage: React.FC = () => {
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-white">
+        <SafeAreaView className="flex-1 bg-white pt-6">
             {/* Top Header with Edit Button */}
             <View className="flex-row justify-center items-center p-4 relative">
                 <Text className="text-2xl font-bold text-black">Profile</Text>
-                <TouchableOpacity 
-                    onPress={() => router.push('/(tabs)/profile/(settings)/settingsPage')} 
-                    className="absolute right-4" // Position Edit button in top-right
-                >
-                    <Icon name="settings-outline" size={24} color="black" />
-                </TouchableOpacity>
+                <TouchableOpacity
+                 onPress={() => router.push('/editProfile')}
+                 className="absolute right-4" 
+                   >
+              <Text className="text-base font-bold text-black">Edit</Text>
+             </TouchableOpacity>
             </View>
             
             {/* Profile Header */}
