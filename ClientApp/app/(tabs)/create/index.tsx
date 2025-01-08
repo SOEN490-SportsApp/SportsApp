@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -10,18 +10,17 @@ import {
   FlatList,
   StatusBar,
   Alert,
-} from 'react-native';
-import { useForm, Controller, useWatch } from 'react-hook-form';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { useRouter } from 'expo-router';
-import ConfirmButton from '@/components/ConfirmButton';
-import { IconPlacement } from '@/utils/constants/enums';
-import themeColors from '@/utils/constants/colors';
-import { hs, vs, mhs } from '@/utils/helpers/uiScaler';
-import { createEvent } from '@/services/eventService';
-import { useSelector } from 'react-redux';
-import supportedSports from '@/utils/constants/supportedSports';
-
+} from "react-native";
+import { useForm, Controller, useWatch } from "react-hook-form";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { useRouter } from "expo-router";
+import ConfirmButton from "@/components/ConfirmButton";
+import { IconPlacement } from "@/utils/constants/enums";
+import themeColors from "@/utils/constants/colors";
+import { hs, vs, mhs } from "@/utils/helpers/uiScaler";
+import { createEvent } from "@/services/eventService";
+import { useSelector } from "react-redux";
+import supportedSports from "@/utils/constants/supportedSports";
 
 const provinces = [
   { id: 1, name: "Alberta" },
@@ -40,11 +39,17 @@ const provinces = [
 ];
 
 const Create = () => {
-  const { control, handleSubmit, formState: { errors }, setValue, reset } = useForm<EventFormData>({
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    reset,
+  } = useForm<EventFormData>({
     defaultValues: {
-      eventType: 'public',
-      sportType: '',
-      province: '',
+      eventType: "public",
+      sportType: "",
+      province: "",
     },
   });
   const router = useRouter();
@@ -91,43 +96,45 @@ const Create = () => {
         sportType: data.sportType,
         location: {
           name: data.locationName,
-          streetNumber: '',
-          streetName: '',
+          streetNumber: "",
+          streetName: "",
           city: data.city,
           province: data.province,
           country: "Canada",
-          postalCode: '',
-          addressLine2: '',
-          phoneNumber: '',
-          latitude: '',
-          longitude: '',
+          postalCode: "",
+          addressLine2: "",
+          phoneNumber: "",
+          latitude: "",
+          longitude: "",
         },
-        date: eventDate.toISOString().split('T')[0],
-        duration: '',
+        date: eventDate.toISOString().split("T")[0],
+        duration: "",
         maxParticipants: data.maxParticipants,
         participants: [],
         createdBy: user.id,
         teams: [],
         cutOffTime: combinedCutOffDateTime.toISOString(),
         description: data.description,
-        isPrivate: data.eventType === 'private',
+        isPrivate: data.eventType === "private",
         whiteListedUsers: [],
-        requiredSkillLevel: requiredSkillLevel.map((level) => level.toUpperCase()),
+        requiredSkillLevel: requiredSkillLevel.map((level) =>
+          level.toUpperCase()
+        ),
       };
 
       await createEvent(eventRequest);
 
       reset({
-        eventName: '',
-        eventType: 'public',
-        sportType: '',
-        locationName: '',
-        city: '',
-        province: '',
-        country: '',
-        cutOffTime: '',
-        description: '',
-        maxParticipants: '',
+        eventName: "",
+        eventType: "public",
+        sportType: "",
+        locationName: "",
+        city: "",
+        province: "",
+        country: "",
+        cutOffTime: "",
+        description: "",
+        maxParticipants: "",
       });
       setEventDate(new Date());
       setCutOffDate(new Date());
@@ -135,7 +142,7 @@ const Create = () => {
       setRequiredSkillLevel([]);
       setSuccessModalVisible(true);
     } catch (error) {
-      Alert.alert('Error', 'Error occurred while creating the event');
+      Alert.alert("Error", "Error occurred while creating the event");
       throw error;
     }
   };
@@ -157,7 +164,7 @@ const Create = () => {
               <TouchableOpacity
                 style={styles.modalItem}
                 onPress={() => {
-                  setValue('sportType', item.name, { shouldValidate: true });
+                  setValue("sportType", item.name, { shouldValidate: true });
                   setSportTypeModalVisible(false);
                 }}
               >
@@ -168,7 +175,10 @@ const Create = () => {
             style={styles.scrollableList}
           />
           <View style={styles.closeButtonContainer}>
-            <TouchableOpacity onPress={() => setSportTypeModalVisible(false)} style={styles.modalCloseButton}>
+            <TouchableOpacity
+              onPress={() => setSportTypeModalVisible(false)}
+              style={styles.modalCloseButton}
+            >
               <Text style={styles.modalCloseButtonText}>Close</Text>
             </TouchableOpacity>
           </View>
@@ -194,7 +204,7 @@ const Create = () => {
               <TouchableOpacity
                 style={styles.modalItem}
                 onPress={() => {
-                  setValue('province', item.name, { shouldValidate: true }); // Trigger validation
+                  setValue("province", item.name, { shouldValidate: true }); // Trigger validation
                   setProvinceModalVisible(false);
                 }}
               >
@@ -205,14 +215,17 @@ const Create = () => {
             style={styles.scrollableList}
           />
           <View style={styles.closeButtonContainer}>
-            <TouchableOpacity onPress={() => setProvinceModalVisible(false)} style={styles.modalCloseButton}>
+            <TouchableOpacity
+              onPress={() => setProvinceModalVisible(false)}
+              style={styles.modalCloseButton}
+            >
               <Text style={styles.modalCloseButtonText}>Close</Text>
             </TouchableOpacity>
           </View>
         </View>
       </View>
     </Modal>
-  );  
+  );
 
   const watch = useWatch({ control });
 
@@ -220,20 +233,25 @@ const Create = () => {
     const updatedSkillLevels = requiredSkillLevel.includes(level)
       ? requiredSkillLevel.filter((item) => item !== level)
       : [...requiredSkillLevel, level];
-  
+
     setRequiredSkillLevel(updatedSkillLevels);
-    setValue('requiredSkillLevel', updatedSkillLevels);
-  };  
+    setValue("requiredSkillLevel", updatedSkillLevels);
+  };
 
   return (
-    <View style={[styles.container, { paddingTop: StatusBar.currentHeight || vs(24) }]}>
+    <View
+      style={[
+        styles.container,
+        { paddingTop: StatusBar.currentHeight || vs(24) },
+      ]}
+    >
       <Text style={styles.header}>Create Event</Text>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={styles.label}>Event Name</Text>
         <Controller
           control={control}
           name="eventName"
-          rules={{ required: 'Event Name is required' }}
+          rules={{ required: "Event Name is required" }}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
               placeholder="Enter Event Name"
@@ -244,37 +262,39 @@ const Create = () => {
             />
           )}
         />
-        {errors.eventName && <Text style={styles.errorText}>{errors.eventName.message}</Text>}
+        {errors.eventName && (
+          <Text style={styles.errorText}>{errors.eventName.message}</Text>
+        )}
 
         <Text style={styles.label}>Event Type</Text>
         <View style={styles.radioGroup}>
           <TouchableOpacity
-            onPress={() => setValue('eventType', 'public')}
+            onPress={() => setValue("eventType", "public")}
             style={[
               styles.radioButton,
-              watch.eventType === 'public' ? styles.radioButtonSelected : null,
+              watch.eventType === "public" ? styles.radioButtonSelected : null,
             ]}
           >
             <Text
               style={[
                 styles.radioText,
-                watch.eventType === 'public' && styles.selectedText,
+                watch.eventType === "public" && styles.selectedText,
               ]}
             >
               Public
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => setValue('eventType', 'private')}
+            onPress={() => setValue("eventType", "private")}
             style={[
               styles.radioButton,
-              watch.eventType === 'private' ? styles.radioButtonSelected : null,
+              watch.eventType === "private" ? styles.radioButtonSelected : null,
             ]}
           >
             <Text
               style={[
                 styles.radioText,
-                watch.eventType === 'private' && styles.selectedText,
+                watch.eventType === "private" && styles.selectedText,
               ]}
             >
               Private
@@ -286,18 +306,20 @@ const Create = () => {
         <Controller
           control={control}
           name="sportType"
-          rules={{ required: 'Sport Type is required' }}
+          rules={{ required: "Sport Type is required" }}
           render={({ field: { value } }) => (
             <TouchableOpacity
               style={[styles.input, errors.sportType && styles.inputError]}
               onPress={() => setSportTypeModalVisible(true)}
             >
-              <Text>{value || 'Select a Sport'}</Text>
+              <Text>{value || "Select a Sport"}</Text>
             </TouchableOpacity>
           )}
         />
         {renderSportTypeModal()}
-        {errors.sportType && <Text style={styles.errorText}>{errors.sportType.message}</Text>}
+        {errors.sportType && (
+          <Text style={styles.errorText}>{errors.sportType.message}</Text>
+        )}
 
         <Text style={styles.label}>Location</Text>
         <Controller
@@ -314,7 +336,10 @@ const Create = () => {
             />
           )}
         />
-        {errors.locationName && typeof errors.locationName.message === 'string' && <Text style={styles.errorText}>{errors.locationName.message}</Text>}
+        {errors.locationName &&
+          typeof errors.locationName.message === "string" && (
+            <Text style={styles.errorText}>{errors.locationName.message}</Text>
+          )}
 
         <Controller
           control={control}
@@ -330,29 +355,36 @@ const Create = () => {
             />
           )}
         />
-        {errors.city && typeof errors.city.message === 'string' && <Text style={styles.errorText}>{errors.city.message}</Text>}
+        {errors.city && typeof errors.city.message === "string" && (
+          <Text style={styles.errorText}>{errors.city.message}</Text>
+        )}
 
         <Controller
           control={control}
           name="province"
-          rules={{ required: 'Province is required' }}
+          rules={{ required: "Province is required" }}
           render={({ field: { value } }) => (
             <TouchableOpacity
               style={[styles.input, errors.province && styles.inputError]}
               onPress={() => setProvinceModalVisible(true)}
             >
-              <Text>{value || 'Select a Province'}</Text>
+              <Text>{value || "Select a Province"}</Text>
             </TouchableOpacity>
           )}
         />
         {renderProvinceModal()}
-        {errors.province && <Text style={styles.errorText}>{errors.province.message}</Text>}
+        {errors.province && (
+          <Text style={styles.errorText}>{errors.province.message}</Text>
+        )}
 
         <Text style={styles.label}>Event Date</Text>
-        <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.input}>
+        <TouchableOpacity
+          onPress={() => setShowDatePicker(true)}
+          style={styles.input}
+        >
           <Text>
             {eventDate.toISOString() === new Date().toISOString()
-              ? 'Select event date'
+              ? "Select event date"
               : eventDate.toDateString()}
           </Text>
         </TouchableOpacity>
@@ -376,7 +408,9 @@ const Create = () => {
             required: "Maximum number of participants is required",
             validate: (value) => {
               const number = parseInt(value, 10);
-              return !isNaN(number) && number > 0 || "Must be a positive integer";
+              return (
+                (!isNaN(number) && number > 0) || "Must be a positive integer"
+              );
             },
           }}
           render={({ field: { onChange, onBlur, value } }) => (
@@ -394,13 +428,18 @@ const Create = () => {
             />
           )}
         />
-        {errors.maxParticipants && <Text style={styles.errorText}>{errors.maxParticipants.message}</Text>}
+        {errors.maxParticipants && (
+          <Text style={styles.errorText}>{errors.maxParticipants.message}</Text>
+        )}
 
         <Text style={styles.label}>Cut Off Time</Text>
-        <TouchableOpacity onPress={() => setShowCutOffDatePicker(true)} style={styles.input}>
+        <TouchableOpacity
+          onPress={() => setShowCutOffDatePicker(true)}
+          style={styles.input}
+        >
           <Text>
             {cutOffDate.toDateString() === new Date().toDateString()
-              ? 'Select cut off date'
+              ? "Select cut off date"
               : cutOffDate.toDateString()}
           </Text>
         </TouchableOpacity>
@@ -416,12 +455,18 @@ const Create = () => {
           />
         )}
 
-        <TouchableOpacity onPress={() => setShowCutOffTimePicker(true)} style={styles.input}>
+        <TouchableOpacity
+          onPress={() => setShowCutOffTimePicker(true)}
+          style={styles.input}
+        >
           <Text>
             {cutOffTime.getHours() === new Date().getHours() &&
             cutOffTime.getMinutes() === new Date().getMinutes()
-              ? 'Select cut off time (in hours)'
-              : cutOffTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              ? "Select cut off time (in hours)"
+              : cutOffTime.toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
           </Text>
         </TouchableOpacity>
         {showCutOffTimePicker && (
@@ -450,7 +495,8 @@ const Create = () => {
               <Text
                 style={[
                   styles.skillLevelText,
-                  requiredSkillLevel.includes(level) && styles.skillLevelTextSelected,
+                  requiredSkillLevel.includes(level) &&
+                    styles.skillLevelTextSelected,
                 ]}
               >
                 {level}
@@ -476,10 +522,10 @@ const Create = () => {
             />
           )}
         />
-        {errors.description && typeof errors.description.message === 'string' && (
-          <Text style={styles.errorText}>{errors.description.message}</Text>
-        )}
-        
+        {errors.description &&
+          typeof errors.description.message === "string" && (
+            <Text style={styles.errorText}>{errors.description.message}</Text>
+          )}
       </ScrollView>
       <View style={styles.footer}>
         <ConfirmButton
@@ -497,12 +543,14 @@ const Create = () => {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.successModal}>
-            <Text style={styles.successText}>🎉 Event Created Successfully! 🎉</Text>
+            <Text style={styles.successText}>
+              🎉 Event Created Successfully! 🎉
+            </Text>
             <TouchableOpacity
               style={styles.successButton}
               onPress={() => {
                 setSuccessModalVisible(false);
-                router.replace('/(tabs)/home');
+                router.replace("/(tabs)/home");
               }}
             >
               <Text style={styles.successButtonText}>Done</Text>
@@ -510,7 +558,6 @@ const Create = () => {
           </View>
         </View>
       </Modal>
-
     </View>
   );
 };
@@ -522,9 +569,9 @@ const styles = StyleSheet.create({
   },
   header: {
     fontSize: mhs(20),
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: themeColors.text.dark,
-    textAlign: 'center',
+    textAlign: "center",
     padding: hs(16),
     backgroundColor: themeColors.background.lightGrey,
   },
@@ -533,7 +580,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: mhs(16),
-    fontWeight: '600',
+    fontWeight: "600",
     color: themeColors.text.dark,
     marginBottom: vs(8),
   },
@@ -547,11 +594,11 @@ const styles = StyleSheet.create({
   },
   textArea: {
     height: vs(100),
-    textAlignVertical: 'top',
+    textAlignVertical: "top",
   },
   radioGroup: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
     gap: hs(30),
     marginBottom: vs(16),
   },
@@ -570,11 +617,11 @@ const styles = StyleSheet.create({
   radioText: {
     fontSize: mhs(14),
     color: themeColors.text.dark,
-    textAlign: 'center',
+    textAlign: "center",
   },
   selectedText: {
     color: themeColors.text.light,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   footer: {
     padding: hs(16),
@@ -582,30 +629,30 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   modalContainer: {
-    width: '80%',
+    width: "80%",
     backgroundColor: themeColors.background.light,
     padding: hs(16),
     borderRadius: mhs(8),
-    alignItems: 'center',
+    alignItems: "center",
   },
   flatListContainer: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   scrollableList: {
     maxHeight: vs(200),
-    width: '100%',
+    width: "100%",
   },
   modalItem: {
     padding: hs(12),
     borderBottomWidth: 1,
     borderBottomColor: themeColors.border.light,
-    width: '90%',
-    alignItems: 'center',
+    width: "90%",
+    alignItems: "center",
   },
   modalItemText: {
     fontSize: mhs(16),
@@ -622,8 +669,8 @@ const styles = StyleSheet.create({
   },
   modalCloseButtonText: {
     color: themeColors.text.light,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: "bold",
+    textAlign: "center",
   },
   errorText: {
     color: themeColors.text.error,
@@ -632,11 +679,11 @@ const styles = StyleSheet.create({
     marginBottom: vs(8),
   },
   successModal: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     padding: hs(24),
     borderRadius: mhs(12),
-    alignItems: 'center',
-    shadowColor: '#000',
+    alignItems: "center",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
@@ -644,9 +691,9 @@ const styles = StyleSheet.create({
   },
   successText: {
     fontSize: mhs(18),
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: themeColors.primary,
-    textAlign: 'center',
+    textAlign: "center",
   },
   successButton: {
     marginTop: vs(16),
@@ -657,8 +704,8 @@ const styles = StyleSheet.create({
   },
   successButtonText: {
     color: themeColors.text.light,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: "bold",
+    textAlign: "center",
     fontSize: mhs(16),
   },
   inputError: {
@@ -688,7 +735,7 @@ const styles = StyleSheet.create({
   skillLevelTextSelected: {
     color: themeColors.text.light,
     fontWeight: "bold",
-  },  
+  },
 });
 
 export default Create;
