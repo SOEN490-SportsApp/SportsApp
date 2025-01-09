@@ -57,12 +57,12 @@ const Create = () => {
   });
   const router = useRouter();
   const [isSportTypeModalVisible, setSportTypeModalVisible] = useState(false);
-  const [eventDate, setEventDate] = useState(new Date());
+  const [eventDate, setEventDate] = useState<Date | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [isSuccessModalVisible, setSuccessModalVisible] = useState(false);
   const [isProvinceModalVisible, setProvinceModalVisible] = useState(false);
-  const [cutOffDate, setCutOffDate] = useState(new Date());
-  const [cutOffTime, setCutOffTime] = useState(new Date());
+  const [cutOffDate, setCutOffDate] = useState<Date | null>(null);
+  const [cutOffTime, setCutOffTime] = useState<Date | null>(null);
   const [showCutOffDatePicker, setShowCutOffDatePicker] = useState(false);
   const [showCutOffTimePicker, setShowCutOffTimePicker] = useState(false);
   const [requiredSkillLevel, setRequiredSkillLevel] = useState<string[]>([]);
@@ -85,6 +85,11 @@ const Create = () => {
 
   const onSubmit = async (data: EventFormData) => {
     try {
+      if (!cutOffDate || !cutOffTime) {
+        Alert.alert("Error", "Cut off date and time are required");
+        return;
+      }
+
       const combinedCutOffDateTime = new Date(
         cutOffDate.getFullYear(),
         cutOffDate.getMonth(),
@@ -110,7 +115,7 @@ const Create = () => {
           latitude: "",
           longitude: "",
         },
-        date: eventDate.toISOString().split("T")[0],
+        date: eventDate ? eventDate.toISOString().split("T")[0] : "",
         duration: "",
         maxParticipants: data.maxParticipants,
         participants: [],
@@ -139,9 +144,9 @@ const Create = () => {
         description: "",
         maxParticipants: "",
       });
-      setEventDate(new Date());
-      setCutOffDate(new Date());
-      setCutOffTime(new Date());
+      setEventDate(null);
+      setCutOffDate(null);
+      setCutOffTime(null);
       setRequiredSkillLevel([]);
       setSuccessModalVisible(true);
     } catch (error) {
@@ -400,14 +405,12 @@ const Create = () => {
               style={styles.input}
             >
               <Text>
-                {eventDate.toISOString() === new Date().toISOString()
-                  ? "Select event date"
-                  : eventDate.toDateString()}
+                {eventDate ? eventDate.toDateString() : "Select event date"}
               </Text>
             </TouchableOpacity>
             {showDatePicker && (
               <DateTimePicker
-                value={eventDate}
+                value={eventDate || new Date()}
                 mode="date"
                 display="default"
                 onChange={(event, selectedDate) => {
@@ -459,14 +462,12 @@ const Create = () => {
               style={styles.input}
             >
               <Text>
-                {cutOffDate.toDateString() === new Date().toDateString()
-                  ? "Select cut off date"
-                  : cutOffDate.toDateString()}
+                {cutOffDate ? cutOffDate.toDateString() : "Select cut off date"}
               </Text>
             </TouchableOpacity>
             {showCutOffDatePicker && (
               <DateTimePicker
-                value={cutOffDate}
+                value={cutOffDate || new Date()}
                 mode="date"
                 display="default"
                 onChange={(event, selectedDate) => {
@@ -481,18 +482,17 @@ const Create = () => {
               style={styles.input}
             >
               <Text>
-                {cutOffTime.getHours() === new Date().getHours() &&
-                cutOffTime.getMinutes() === new Date().getMinutes()
-                  ? "Select cut off time (in hours)"
-                  : cutOffTime.toLocaleTimeString([], {
+                {cutOffTime
+                  ? cutOffTime.toLocaleTimeString([], {
                       hour: "2-digit",
                       minute: "2-digit",
-                    })}
+                    })
+                  : "Select cut off time (in hours)"}
               </Text>
             </TouchableOpacity>
             {showCutOffTimePicker && (
               <DateTimePicker
-                value={cutOffTime}
+                value={cutOffTime || new Date()}
                 mode="time"
                 display="default"
                 onChange={(event, selectedTime) => {
