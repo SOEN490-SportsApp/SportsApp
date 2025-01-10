@@ -1,6 +1,6 @@
 import { saveToSecureStore, getFromSecureStore, deleteFromSecureStore } from './secureStore';
 import { API_ENDPOINTS } from '@/utils/api/endpoints';
-import axiosInstance from './axiosInstance';
+import { getAxiosInstance } from './axiosInstance';
 
 const ACCESS_TOKEN_PART1_KEY = 'accessTokenPart1';
 const ACCESS_TOKEN_PART2_KEY = 'accessTokenPart2';
@@ -35,6 +35,7 @@ export async function getAuthHeaders() {
 }
 
 export async function refreshAccessToken() {
+    const axiosInstance = getAxiosInstance();
     const refreshToken = await getFromSecureStore(REFRESH_TOKEN_KEY);
     if (!refreshToken) throw new Error('Refresh token not found');
     try {
