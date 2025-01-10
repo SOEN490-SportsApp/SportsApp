@@ -12,14 +12,12 @@ import app.sportahub.userservice.dto.response.user.badge.BadgeResponse;
 import app.sportahub.userservice.dto.response.user.badge.BadgeWithCountResponse;
 import app.sportahub.userservice.dto.response.user.friend.ViewFriendRequestsResponse;
 import app.sportahub.userservice.enums.user.FriendRequestStatusEnum;
-import app.sportahub.userservice.exception.user.friend.InvalidFriendRequestStatusTypeException;
-import app.sportahub.userservice.exception.user.friend.UserAlreadyInFriendListException;
-import app.sportahub.userservice.exception.user.UserDoesNotExistException;
-import app.sportahub.userservice.exception.user.UserEmailAlreadyExistsException;
-import app.sportahub.userservice.exception.user.friend.UserSentFriendRequestToSelfException;
-import app.sportahub.userservice.exception.user.UsernameAlreadyExistsException;
+import app.sportahub.userservice.exception.user.*;
 import app.sportahub.userservice.exception.user.badge.BadgeNotFoundException;
 import app.sportahub.userservice.exception.user.badge.UserAlreadyAssignedBadgeByThisGiverException;
+import app.sportahub.userservice.exception.user.friend.InvalidFriendRequestStatusTypeException;
+import app.sportahub.userservice.exception.user.friend.UserAlreadyInFriendListException;
+import app.sportahub.userservice.exception.user.friend.UserSentFriendRequestToSelfException;
 import app.sportahub.userservice.mapper.user.ProfileMapper;
 import app.sportahub.userservice.mapper.user.UserMapper;
 import app.sportahub.userservice.model.user.*;
@@ -27,6 +25,8 @@ import app.sportahub.userservice.repository.BadgeRepository;
 import app.sportahub.userservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -199,5 +199,16 @@ public class UserServiceImpl implements UserService {
         return friends.stream()
                 .filter(s -> typeList.contains(s.getFriendRequestStatus()) )
                 .map(friend -> new ViewFriendRequestsResponse(friend.getUsername())).toList();
+    }
+
+    @Override
+    public Page<ProfileResponse> searchUsers(String firstName, String lastName, List<String> sport, List<String> rankings, String gender, String age, Pageable pageable) {
+        if (firstName == null & lastName == null & sport == null && rankings == null && gender == null && age == null ) {
+            throw new NoSearchCriteriaProvidedException();
+        }
+        log.info("UserServiceImpl::searchUsers: User created a search query");
+        Page<User> users = userRepository.searchUsers(firstName, lastName, sport, rankings, gender, age, pageable);
+
+        return users.map(user -> profileMapper.profileToProfileResponse(user.getProfile()));
     }
 }
