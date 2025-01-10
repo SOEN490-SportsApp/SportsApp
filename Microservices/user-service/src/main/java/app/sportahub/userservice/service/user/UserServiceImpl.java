@@ -12,10 +12,11 @@ import app.sportahub.userservice.dto.response.user.badge.BadgeResponse;
 import app.sportahub.userservice.dto.response.user.badge.BadgeWithCountResponse;
 import app.sportahub.userservice.dto.response.user.friend.ViewFriendRequestsResponse;
 import app.sportahub.userservice.enums.user.FriendRequestStatusEnum;
-import app.sportahub.userservice.exception.user.UserAlreadyInFriendListException;
+import app.sportahub.userservice.exception.user.friend.InvalidFriendRequestStatusTypeException;
+import app.sportahub.userservice.exception.user.friend.UserAlreadyInFriendListException;
 import app.sportahub.userservice.exception.user.UserDoesNotExistException;
 import app.sportahub.userservice.exception.user.UserEmailAlreadyExistsException;
-import app.sportahub.userservice.exception.user.UserSentFriendRequestToSelfException;
+import app.sportahub.userservice.exception.user.friend.UserSentFriendRequestToSelfException;
 import app.sportahub.userservice.exception.user.UsernameAlreadyExistsException;
 import app.sportahub.userservice.exception.user.badge.BadgeNotFoundException;
 import app.sportahub.userservice.exception.user.badge.UserAlreadyAssignedBadgeByThisGiverException;
@@ -30,7 +31,6 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -188,10 +188,14 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public List<ViewFriendRequestsResponse> getFriendRequests(String userId, List<FriendRequestStatusEnum> typeList) {
+        if (typeList.contains(FriendRequestStatusEnum.ACCEPTED)) {
+            throw new InvalidFriendRequestStatusTypeException(FriendRequestStatusEnum.ACCEPTED);
+        }
+
         User user = userRepository.findUserById(userId)
                 .orElseThrow(() -> new UserDoesNotExistException(userId));
         List<Friend> friends = user.getFriendList();
-//s.getFriendRequestStatus().equals(Arrays.asList(typeList).containsFriendRequestStatusEnum.RECEIVED)
+
         return friends.stream()
                 .filter(s -> typeList.contains(s.getFriendRequestStatus()) )
                 .map(friend -> new ViewFriendRequestsResponse(friend.getUsername())).toList();
