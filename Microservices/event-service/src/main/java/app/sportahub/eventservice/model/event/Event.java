@@ -42,6 +42,9 @@ public class Event extends BaseEntity {
     @NotEmpty(message = "Start time must be provided")
     private LocalTime startTime;
 
+    @NotEmpty(message = "End time must be provided")
+    private LocalTime endTime;
+
     private String duration;
 
     @NotNull
