@@ -5,11 +5,12 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from "expo-router";
 import { IconPlacement } from '@/utils/constants/enums';
 import { hs, mhs, mvs, vs } from "@/utils/helpers/uiScaler";
-import { registerUser } from "@/services/authService";
+import { loginUser, registerUser } from "@/services/authService";
 import ConfirmButton from "@/components/ConfirmButton";
 import AuthenticationDivider from "@/components/AuthenticationDivider";
 import Checkbox from 'expo-checkbox';
 import themeColors from "@/utils/constants/colors";
+import { useUpdateUserToStore } from "@/state/user/actions";
 
 interface RegisterAccountPageFormData {
   username: string;
@@ -20,6 +21,7 @@ interface RegisterAccountPageFormData {
 }
 
 const RegisterAccountPage: React.FC = () => {
+  const [userID, setUserID] = useState("");
   const router = useRouter();
   const { control, handleSubmit, formState: { errors }, watch, setValue } = useForm<RegisterAccountPageFormData>();
   const [showPassword, setShowPassword] = useState(false);
@@ -30,12 +32,18 @@ const RegisterAccountPage: React.FC = () => {
     if (!data.agreeToTerms) return Alert.alert("", "You must agree to the terms to continue.");
     try{
       const response = await registerUser(data.email, data.username, data.password);
-      router.push({pathname: '/auth/registerProfile', params: { userID: response.data.userID }});
+      setUserID(response.data.id);
+      // router.push(`/auth/registerProfile?userID=${response.data.id}`);
     } catch (error: any){
       Alert.alert("Error", "Failed to create account.");
       console.error(`Failed to create account: ${error}. ${error.message}`);
     }
   };
+
+  const confirmEmail = async(data:RegisterAccountPageFormData) => {
+    const response = await loginUser(data.email, data.password)
+    router.push(`/auth/registerProfile?userID=${userID}`);
+  }
 
   return (
     <View style={styles.container}>
@@ -189,6 +197,14 @@ const RegisterAccountPage: React.FC = () => {
           iconPlacement={IconPlacement.left}
         />
 
+        {/* Confirm Button */}
+        <ConfirmButton
+          icon={<MaterialCommunityIcons name="login" size={25} color="#fff" />}
+          text="confirm"
+          onPress={handleSubmit(confirmEmail)}
+          iconPlacement={IconPlacement.left}
+        />
+     
         <AuthenticationDivider text="Or" />
       </View>
 
