@@ -589,10 +589,10 @@ public class UserServiceTest {
         // Arrange
 
         List<Friend> userFriendList = new ArrayList<>();
-        userFriendList.add(new Friend("friend", FriendRequestStatusEnum.SENT));
+        userFriendList.add(new Friend("friend", FriendRequestStatusEnum.RECEIVED));
 
         List<Friend> friendFriendList = new ArrayList<>();
-        friendFriendList.add(new Friend("user", FriendRequestStatusEnum.RECEIVED));
+        friendFriendList.add(new Friend("user", FriendRequestStatusEnum.SENT));
 
         String userId = "userID";
         String username = "user";
@@ -736,10 +736,10 @@ public class UserServiceTest {
         // Arrange
         String requestId = new ObjectId().toHexString();
         List<Friend> userFriendList = new ArrayList<>();
-        userFriendList.add(new Friend("friend", FriendRequestStatusEnum.SENT));
+        userFriendList.add(new Friend("friend", FriendRequestStatusEnum.RECEIVED));
 
         List<Friend> friendFriendList = new ArrayList<>();
-        friendFriendList.add(new Friend("user", FriendRequestStatusEnum.RECEIVED));
+        friendFriendList.add(new Friend("user", FriendRequestStatusEnum.SENT));
 
         String userId = "userID";
         String username = "user";
@@ -776,10 +776,10 @@ public class UserServiceTest {
     void updateFriendRequestShouldThrowFriendNotFoundInFriendListExceptionFromIsFriendFound1() {
         // Arrange
         List<Friend> userFriendList = new ArrayList<>();
-        Friend userFriend = new Friend("friend", FriendRequestStatusEnum.SENT);
+        Friend userFriend = new Friend("friend", FriendRequestStatusEnum.RECEIVED);
 
         List<Friend> friendFriendList = new ArrayList<>();
-        friendFriendList.add(new Friend("user", FriendRequestStatusEnum.RECEIVED));
+        friendFriendList.add(new Friend("user", FriendRequestStatusEnum.SENT));
 
         String userId = "userID";
         String username = "user";
@@ -843,6 +843,45 @@ public class UserServiceTest {
                 + friendUser.getUsername() + " does not have friend with identifier: "
                 + user.getUsername() + " in their friend list.\"", exception.getMessage());
     }
+
+    @Test
+    void updateFriendRequestShouldThrowTryingToAcceptInvalidFriendRequestException() {
+        // Arrange
+
+        List<Friend> userFriendList = new ArrayList<>();
+        userFriendList.add(new Friend("friend", FriendRequestStatusEnum.SENT));
+
+        List<Friend> friendFriendList = new ArrayList<>();
+        friendFriendList.add(new Friend("user", FriendRequestStatusEnum.RECEIVED));
+
+        String userId = "userID";
+        String username = "user";
+        User user = getUser(userId, username, userFriendList).orElseThrow();
+
+        String friendId = "friendID";
+        String friendUsername = "friend";
+        User friendUser = getUser(friendId, friendUsername, friendFriendList).orElseThrow();
+
+        UpdateFriendRequestRequest updateFriendRequestRequest = new UpdateFriendRequestRequest(friendUsername,
+                UpdateFriendRequestActionEnum.ACCEPT);
+
+        when(userRepository.findUserById(userId)).thenReturn(Optional.of(user));
+        when(userRepository.findUserByUsername(friendUser.getUsername())).thenReturn(Optional.of(friendUser));
+        when(friendRepository.findFriendById(any())).thenReturn(Optional.of(userFriendList.getFirst()));
+        lenient().when(userRepository.save(user)).thenReturn(user);
+        lenient().when(userRepository.save(friendUser)).thenReturn(friendUser);
+
+        // Act
+        TryingToAcceptInvalidFriendRequestException exception = assertThrows(
+                TryingToAcceptInvalidFriendRequestException.class, () -> userService
+                        .updateFriendRequest(userId, "requestID", updateFriendRequestRequest)) ;
+
+        // Assert
+        assertEquals("409 CONFLICT \"User with identifier: " + user.getUsername()
+                + " is trying to accept a friend request from: " + friendUser.getUsername()
+                + " but the status of the friend request is " + user.getFriendList().getFirst().getFriendRequestStatus()
+                + " instead of RECEIVED.\"", exception.getMessage());
+        }
 
     @Test
     void getFriendRequestsShouldReturnSuccess() {

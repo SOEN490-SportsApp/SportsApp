@@ -227,6 +227,11 @@ public class UserServiceImpl implements UserService {
 
         for (Friend e : userFriendList) {
             if (e.getUsername().equals(friend.getUsername())) {
+                if (!e.getFriendRequestStatus().equals(FriendRequestStatusEnum.RECEIVED) &&
+                        action.equals(UpdateFriendRequestActionEnum.ACCEPT)) {
+                    throw new TryingToAcceptInvalidFriendRequestException(user.getUsername(),
+                            friendUser.getUsername(), e.getFriendRequestStatus());
+                }
                 isFriendFound1 = true;
                 if (action.equals(UpdateFriendRequestActionEnum.ACCEPT)) {
                     e.setFriendRequestStatus(FriendRequestStatusEnum.ACCEPTED);
