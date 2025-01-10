@@ -8,6 +8,7 @@ import app.sportahub.userservice.dto.response.user.ProfileResponse;
 import app.sportahub.userservice.dto.response.user.UserResponse;
 import app.sportahub.userservice.dto.response.user.badge.BadgeWithCountResponse;
 import app.sportahub.userservice.dto.response.user.friend.ViewFriendRequestsResponse;
+import app.sportahub.userservice.enums.user.FriendRequestStatusEnum;
 import app.sportahub.userservice.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -82,8 +83,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "view received friend requests",
     description = "Retrieves all the user's friend requests stored in their friend list.")
-    public List<ViewFriendRequestsResponse> getFriendRequests(@PathVariable String userId) {
-        return userService.getFriendRequests(userId);
+    public List<ViewFriendRequestsResponse> getFriendRequests(@PathVariable String userId, @RequestParam List<FriendRequestStatusEnum> type) {
+        return userService.getFriendRequests(userId, type);
     }
-
 }
