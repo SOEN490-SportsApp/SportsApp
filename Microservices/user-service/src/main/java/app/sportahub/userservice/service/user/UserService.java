@@ -8,6 +8,7 @@ import app.sportahub.userservice.dto.response.user.ProfileResponse;
 import app.sportahub.userservice.dto.response.user.UserResponse;
 import app.sportahub.userservice.dto.response.user.badge.BadgeWithCountResponse;
 import app.sportahub.userservice.dto.response.user.friend.ViewFriendRequestsResponse;
+import app.sportahub.userservice.enums.user.FriendRequestStatusEnum;
 
 import java.util.List;
 
@@ -27,5 +28,5 @@ public interface UserService {
 
     FriendRequestResponse sendFriendRequest(String userId, FriendRequestRequest friendRequestRequest);
 
-    List<ViewFriendRequestsResponse> getFriendRequests(String userId);
+    List<ViewFriendRequestsResponse> getFriendRequests(String userId, List<FriendRequestStatusEnum> typeList);
 }

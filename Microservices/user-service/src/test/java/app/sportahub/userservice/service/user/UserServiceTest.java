@@ -620,12 +620,15 @@ public class UserServiceTest {
         friendList.add(new Friend("sender", FriendRequestStatusEnum.SENT));
         friendList.add(new Friend("receiver", FriendRequestStatusEnum.RECEIVED));
         user.setFriendList(friendList);
+        List<FriendRequestStatusEnum> typeList = new ArrayList<>();
+        typeList.add(FriendRequestStatusEnum.RECEIVED);
+
 
         // Act
         when(userRepository.findUserById("id")).thenReturn(Optional.of(user));
 
         // Assert
-        List<ViewFriendRequestsResponse> listResponse = userService.getFriendRequests("id");
+        List<ViewFriendRequestsResponse> listResponse = userService.getFriendRequests("id", typeList);
         assertFalse(listResponse.isEmpty());
         assertEquals(1, listResponse.size());
         assertEquals("receiver", listResponse.getFirst().userName());
@@ -635,10 +638,12 @@ public class UserServiceTest {
     void getFriendRequestsShouldThrowUserDoesNotExistException() {
         // Arrange
         String userId = new ObjectId().toHexString();
+        List<FriendRequestStatusEnum> typeList = new ArrayList<>();
+        typeList.add(FriendRequestStatusEnum.RECEIVED);
 
         // Act
         UserDoesNotExistException exception = assertThrows(UserDoesNotExistException.class,
-                () -> userService.getFriendRequests(userId));
+                () -> userService.getFriendRequests(userId, typeList));
 
         // Assert
         assertEquals("404 NOT_FOUND \"User with identifier: " + userId + " does not exist.\"", exception.getMessage());

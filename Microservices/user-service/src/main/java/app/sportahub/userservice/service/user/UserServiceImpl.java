@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -186,13 +187,13 @@ public class UserServiceImpl implements UserService {
      * @throws UserDoesNotExistException if the given user id doesn't correspond to a user
      */
     @Override
-    public List<ViewFriendRequestsResponse> getFriendRequests(String userId) {
+    public List<ViewFriendRequestsResponse> getFriendRequests(String userId, List<FriendRequestStatusEnum> typeList) {
         User user = userRepository.findUserById(userId)
                 .orElseThrow(() -> new UserDoesNotExistException(userId));
         List<Friend> friends = user.getFriendList();
-
+//s.getFriendRequestStatus().equals(Arrays.asList(typeList).containsFriendRequestStatusEnum.RECEIVED)
         return friends.stream()
-                .filter(s -> s.getFriendRequestStatus().equals(FriendRequestStatusEnum.RECEIVED))
+                .filter(s -> typeList.contains(s.getFriendRequestStatus()) )
                 .map(friend -> new ViewFriendRequestsResponse(friend.getUsername())).toList();
     }
 }
