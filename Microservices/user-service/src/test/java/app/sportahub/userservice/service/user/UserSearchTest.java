@@ -153,7 +153,6 @@ public class UserSearchTest {
         assertEquals("406 NOT_ACCEPTABLE \"No Search Criteria Provided.\"", exception.getMessage());
     }
 
-
     @Test
     void testSearchUsers_InvalidPageOrSize() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
@@ -176,17 +175,6 @@ public class UserSearchTest {
 
         assertNotNull(result);
         verify(userRepository, times(1)).searchUsers("John", "Doe", null, null, "Male", "25", pageable);
-    }
-
-    @Test
-    void testSearchUsers_NoCriteriaThrowsException() {
-        Pageable pageable = PageRequest.of(0, 10);
-
-        Exception exception = assertThrows(NoSearchCriteriaProvidedException.class, () -> {
-            userService.searchUsers(null, null, null, null, null, null, pageable);
-        });
-
-        assertEquals(NoSearchCriteriaProvidedException.class, exception.getClass());
     }
 
     @Test
