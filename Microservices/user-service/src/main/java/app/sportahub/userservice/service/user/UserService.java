@@ -30,6 +30,8 @@ public interface UserService {
 
     List<BadgeWithCountResponse> getUserBadges(String userId);
 
+    void deleteUserById(String id);
+
     FriendRequestResponse sendFriendRequest(String userId, FriendRequestRequest friendRequestRequest);
 
     List<ViewFriendRequestsResponse> getFriendRequests(String userId, List<FriendRequestStatusEnum> typeList);
