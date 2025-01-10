@@ -1,5 +1,6 @@
 package app.sportahub.userservice.exception;
 
+import app.sportahub.userservice.exception.user.*;
 import app.sportahub.userservice.exception.user.InvalidCredentialsException;
 import app.sportahub.userservice.exception.user.UserDoesNotExistException;
 import app.sportahub.userservice.exception.user.UserEmailAlreadyExistsException;
@@ -98,6 +99,14 @@ public class GlobalExceptionHandler {
         Map<String, Object> response = new HashMap<>();
         response.put("error", ex.getMessage());
         response.put("status", HttpStatus.BAD_REQUEST.value());
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(NoSearchCriteriaProvidedException.class)
+    public ResponseEntity<Map<String, Object>> handleNoSearchCriteriaProvidedException(NoSearchCriteriaProvidedException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("error", ex.getMessage());
+        response.put("status", HttpStatus.NOT_ACCEPTABLE.value());
         return ResponseEntity.badRequest().body(response);
     }
 }
