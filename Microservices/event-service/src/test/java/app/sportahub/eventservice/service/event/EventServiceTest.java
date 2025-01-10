@@ -89,6 +89,7 @@ public class EventServiceTest {
                 locationRequest,
                 LocalDate.of(2024, 1, 1),
                 LocalTime.of(10,55),
+                LocalTime.of(18, 55),
                 "testDuration",
                 32,
                 participantRequests,

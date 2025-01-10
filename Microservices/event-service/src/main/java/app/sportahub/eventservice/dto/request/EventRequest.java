@@ -32,6 +32,9 @@ public record EventRequest(
         @NotNull(message = "Start time must be provided")
         LocalTime startTime,
 
+        @NotNull(message = "End time must be provided")
+        LocalTime endTime,
+
         @Nullable
         String duration,
 
