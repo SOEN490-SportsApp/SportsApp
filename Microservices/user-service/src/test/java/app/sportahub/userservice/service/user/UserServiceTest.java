@@ -11,6 +11,9 @@ import app.sportahub.userservice.dto.response.user.friend.ViewFriendRequestsResp
 import app.sportahub.userservice.enums.user.FriendRequestStatusEnum;
 import app.sportahub.userservice.exception.user.*;
 import app.sportahub.userservice.exception.user.badge.UserAlreadyAssignedBadgeByThisGiverException;
+import app.sportahub.userservice.exception.user.friend.InvalidFriendRequestStatusTypeException;
+import app.sportahub.userservice.exception.user.friend.UserAlreadyInFriendListException;
+import app.sportahub.userservice.exception.user.friend.UserSentFriendRequestToSelfException;
 import app.sportahub.userservice.mapper.user.ProfileMapper;
 import app.sportahub.userservice.mapper.user.UserMapper;
 import app.sportahub.userservice.model.user.*;
@@ -622,13 +625,12 @@ public class UserServiceTest {
         user.setFriendList(friendList);
         List<FriendRequestStatusEnum> typeList = new ArrayList<>();
         typeList.add(FriendRequestStatusEnum.RECEIVED);
-
-
-        // Act
         when(userRepository.findUserById("id")).thenReturn(Optional.of(user));
 
-        // Assert
+        // Act
         List<ViewFriendRequestsResponse> listResponse = userService.getFriendRequests("id", typeList);
+
+        // Assert
         assertFalse(listResponse.isEmpty());
         assertEquals(1, listResponse.size());
         assertEquals("receiver", listResponse.getFirst().userName());
@@ -647,5 +649,28 @@ public class UserServiceTest {
 
         // Assert
         assertEquals("404 NOT_FOUND \"User with identifier: " + userId + " does not exist.\"", exception.getMessage());
+    }
+
+    @Test
+    void getFriendRequestsShouldThrowInvalidFriendRequestStatusException() {
+        // Arrange
+        User user = new User();
+        user.setUsername("testUsername");
+        List<Friend> friendList = new ArrayList<>();
+        friendList.add(new Friend("sender", FriendRequestStatusEnum.SENT));
+        friendList.add(new Friend("receiver", FriendRequestStatusEnum.RECEIVED));
+        user.setFriendList(friendList);
+        List<FriendRequestStatusEnum> typeList = new ArrayList<>();
+        typeList.add(FriendRequestStatusEnum.RECEIVED);
+        typeList.add(FriendRequestStatusEnum.SENT);
+        typeList.add(FriendRequestStatusEnum.ACCEPTED);
+
+        // Act
+        InvalidFriendRequestStatusTypeException exception = assertThrows(InvalidFriendRequestStatusTypeException.class,
+                () -> userService.getFriendRequests("id", typeList));
+
+        // Assert
+        assertEquals("400 BAD_REQUEST \"Invalid friend request status type: "
+                + FriendRequestStatusEnum.ACCEPTED + " for this operation.\"", exception.getMessage());
     }
 }

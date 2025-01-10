@@ -1,4 +1,4 @@
-package app.sportahub.userservice.exception.user;
+package app.sportahub.userservice.exception.user.friend;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
