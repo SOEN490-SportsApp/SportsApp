@@ -117,7 +117,7 @@ const LoginPage: React.FC = () => {
           </View>
           {errors.password && (<Text style={styles.errorText}>{errors.password.message}</Text>)}
 
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => router.push('/auth/resetPassword')}>
             <Text style={styles.forgotPasswordText}>
               Forgot your password?
             </Text>

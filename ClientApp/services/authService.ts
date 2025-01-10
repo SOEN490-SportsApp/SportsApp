@@ -39,3 +39,12 @@ export async function registerUser(email: string, username: string, password: st
     throw error.response?.data || error;
   }
 }
+
+export async function resetPassword(email: string){
+  try{
+    const response = await axiosInstance.put(API_ENDPOINTS.RESET_PASSWORD, {email})
+    return response;
+  }catch(err: any){
+    console.log("Reset password failed: ", err)
+  }
+}

@@ -4,7 +4,8 @@ export const API_ENDPOINTS = {
     LOGIN: 'user-service/auth/login',
     UPDATE_PROFILE: 'user-service/user/{userId}/profile',
     GET_USER_BY_ID: 'user-service/user/{id}',
-    CREATE_EVENT: 'event-service/event'
+    CREATE_EVENT: 'event-service/event',
+    RESET_PASSWORD: 'user-service/auth/reset-password'
     // add more after authentication
   };
   

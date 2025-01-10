@@ -34,7 +34,7 @@ export const setupAxiosInstance = (dispatch: any): AxiosInstance => {
     axiosInstance.interceptors.request.use(
         async (config) => {
             try {
-                const AUTH_ENDPOINTS = [API_ENDPOINTS.LOGIN, API_ENDPOINTS.REFRESH_TOKEN, API_ENDPOINTS.REGISTER];
+                const AUTH_ENDPOINTS = [API_ENDPOINTS.LOGIN, API_ENDPOINTS.REFRESH_TOKEN, API_ENDPOINTS.REGISTER, API_ENDPOINTS.RESET_PASSWORD];
 
                 if (
                     AUTH_ENDPOINTS.some((endpoint) => config.url?.includes(endpoint))
@@ -59,7 +59,7 @@ export const setupAxiosInstance = (dispatch: any): AxiosInstance => {
             const status = error.response?.status;
             switch (status) {
                 case 400:
-                    consoleError(ALERT_MESSAGES.badRequest.title, ALERT_MESSAGES.badRequest.message, status);
+                    console.error(ALERT_MESSAGES.badRequest.title, ALERT_MESSAGES.badRequest.message, status);
                     break;
                 case 401:
                     const retryCount = (error.config as any)._retryCount || 0;

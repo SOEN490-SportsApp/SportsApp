@@ -18,3 +18,4 @@ export const hs = horizontalScale;
 export const vs = verticalScale;
 export const mhs = moderateHorizontalScale;
 export const mvs = moderateVerticalScale;
+export const windowHeight = height;
