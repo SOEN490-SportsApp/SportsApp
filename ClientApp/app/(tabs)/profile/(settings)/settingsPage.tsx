@@ -4,9 +4,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import themeColors from "@/utils/constants/colors";
 import { hs, vs, mvs, mhs } from "@/utils/helpers/uiScaler";
+import { useDispatch } from 'react-redux';
+import { logoutUser } from '@/services/authService';
 
 const settingsPage: React.FC = () => {
+  const dispatch = useDispatch();
   const handleLogout = () => {
+    logoutUser(dispatch);
     router.replace('/auth/login');
   };
 
@@ -29,7 +33,7 @@ const settingsPage: React.FC = () => {
         </TouchableOpacity>
 
         {/* Help */}
-        <TouchableOpacity style={styles.option} onPress={() => router.push('/profile/(settings)/helpPage')}>
+        <TouchableOpacity style={styles.option} onPress={() => router.push('/(tabs)/profile/(settings)/helpPage')}>
           <Ionicons name="help-circle-outline" size={mvs(24)} color="black" style={styles.icon} />
           <Text style={styles.text}>Help</Text>
         </TouchableOpacity>
