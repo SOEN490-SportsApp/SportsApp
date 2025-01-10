@@ -16,6 +16,7 @@ import app.sportahub.userservice.enums.user.UpdateFriendRequestActionEnum;
 import app.sportahub.userservice.exception.user.*;
 import app.sportahub.userservice.exception.user.badge.UserAlreadyAssignedBadgeByThisGiverException;
 import app.sportahub.userservice.exception.user.friend.*;
+import app.sportahub.userservice.exception.user.keycloak.KeycloakCommunicationException;
 import app.sportahub.userservice.mapper.user.ProfileMapper;
 import app.sportahub.userservice.mapper.user.UserMapper;
 import app.sportahub.userservice.model.user.*;
@@ -485,6 +486,50 @@ public class UserServiceTest {
     void getUserBadges_UserNotFound() {
         when(userRepository.findById("user1")).thenReturn(Optional.empty());
         assertThrows(UserDoesNotExistException.class, () -> userService.getUserBadges("user1"));
+    }
+
+    @Test
+    void deleteUserById_success() {
+        String userId = "123";
+        User user = new User();
+        user.setId(userId);
+        user.setKeycloakId("keycloak-123");
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(keycloakApiClient.deleteUser("keycloak-123")).thenReturn(Mono.empty());
+
+        userService.deleteUserById(userId);
+
+        verify(userRepository, times(1)).deleteById(userId);
+        verify(keycloakApiClient, times(1)).deleteUser("keycloak-123");
+    }
+
+    @Test
+    void deleteUserById_userNotFound() {
+        String userId = "123";
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        assertThrows(UserDoesNotExistException.class, () -> userService.deleteUserById(userId));
+
+        verify(userRepository, never()).deleteById(anyString());
+        verify(keycloakApiClient, never()).deleteUser(anyString());
+    }
+
+    @Test
+    void deleteUserById_keycloakCommunicationError() {
+        String userId = "123";
+        User user = new User();
+        user.setId(userId);
+        user.setKeycloakId("keycloak-123");
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(keycloakApiClient.deleteUser("keycloak-123"))
+                .thenReturn(Mono.error(new RuntimeException("Keycloak API error")));
+
+        assertThrows(KeycloakCommunicationException.class, () -> userService.deleteUserById(userId));
+
+        verify(userRepository, never()).deleteById(anyString());
+        verify(keycloakApiClient, times(1)).deleteUser("keycloak-123");
     }
 
     @Test

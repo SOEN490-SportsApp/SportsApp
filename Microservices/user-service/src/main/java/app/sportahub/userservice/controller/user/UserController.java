@@ -76,6 +76,14 @@ public class UserController {
         return userService.getUserBadges(userId);
     }
 
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Delete user by ID",
+            description = "Deletes a user by their unique identifier.")
+    public void deleteUserById(@PathVariable String id) {
+        userService.deleteUserById(id);
+    }
+
     @PostMapping("/{userId}/friends/requests")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Send a friend request to a user",
