@@ -1,11 +1,12 @@
-import axiosInstance from './axiosInstance';
 import { saveTokens, clearTokens, startTokenRefresh, stopTokenRefresh } from './tokenService';
 import { API_ENDPOINTS } from '@/utils/api/endpoints';
 import { clearUser } from '@/state/user/userSlice';
 import { useDispatch } from 'react-redux';
+import { getAxiosInstance } from './axiosInstance';
 
 export async function loginUser(identifier: string, password: string) {
   try {
+    const axiosInstance = getAxiosInstance();
     const response = await axiosInstance.post(API_ENDPOINTS.LOGIN, { identifier, password });
     const { userID, tokenResponse: { accessToken, refreshToken } } = response.data;
     await saveTokens(accessToken, refreshToken);
@@ -17,8 +18,7 @@ export async function loginUser(identifier: string, password: string) {
   }
 }
 
-export async function logoutUser() {
-  const dispatch = useDispatch();
+export async function logoutUser(dispatch: any) {
   try {
     await clearTokens();
     dispatch(clearUser());
@@ -30,6 +30,7 @@ export async function logoutUser() {
 }
 
 export async function registerUser(email: string, username: string, password: string) {
+  const axiosInstance = getAxiosInstance();
   try {
     const response = await axiosInstance.post(API_ENDPOINTS.REGISTER, {email, username, password});
     return response;

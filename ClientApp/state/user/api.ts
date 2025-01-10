@@ -1,5 +1,5 @@
 import { UserState } from '@/types';
-import axiosInstance from '@/services/axiosInstance';
+import { getAxiosInstance } from '@/services/axiosInstance';
 import { API_ENDPOINTS } from '@/utils/api/endpoints';
 import { mapApiResponseToUserState } from '@/utils/mappers/apiMappers';
 
@@ -10,6 +10,7 @@ import { mapApiResponseToUserState } from '@/utils/mappers/apiMappers';
  */
 
 export const getUserById = async (userId: string): Promise<UserState> => {
+  const axiosInstance = getAxiosInstance();
   try {
     const response = await axiosInstance.get(API_ENDPOINTS.GET_USER_BY_ID.replace('{id}', userId));
     const userData = mapApiResponseToUserState(response.data);
