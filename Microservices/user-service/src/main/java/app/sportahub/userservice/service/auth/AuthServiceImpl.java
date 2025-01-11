@@ -11,7 +11,7 @@ import app.sportahub.userservice.dto.response.user.UserResponse;
 import app.sportahub.userservice.exception.user.*;
 import app.sportahub.userservice.mapper.user.UserMapper;
 import app.sportahub.userservice.model.user.User;
-import app.sportahub.userservice.repository.UserRepository;
+import app.sportahub.userservice.repository.user.UserRepository;
 import app.sportahub.userservice.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;

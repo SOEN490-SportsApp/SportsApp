@@ -22,7 +22,7 @@ import app.sportahub.userservice.mapper.user.ProfileMapper;
 import app.sportahub.userservice.mapper.user.UserMapper;
 import app.sportahub.userservice.model.user.*;
 import app.sportahub.userservice.repository.BadgeRepository;
-import app.sportahub.userservice.repository.UserRepository;
+import app.sportahub.userservice.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -203,7 +203,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<ProfileResponse> searchUsers(String firstName, String lastName, List<String> sport, List<String> rankings, String gender, String age, Pageable pageable) {
-        if (firstName == null & lastName == null & sport == null && rankings == null && gender == null && age == null ) {
+        if (firstName == null & lastName == null & sport == null && rankings == null && gender == null && age == null) {
             throw new NoSearchCriteriaProvidedException();
         }
         log.info("UserServiceImpl::searchUsers: User created a search query");

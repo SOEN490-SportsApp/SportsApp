@@ -1,4 +1,4 @@
-package app.sportahub.userservice.repository;
+package app.sportahub.userservice.repository.user;
 
 import app.sportahub.userservice.model.user.User;
 import org.springframework.data.domain.Page;
