@@ -11,7 +11,7 @@ import { Profile, SportPreference } from "@/types";
 import { useUpdateUserToStore } from '@/state/user/actions';
 import { registerProfile } from "@/utils/api/profileApiClient";
 import themeColors from "@/utils/constants/colors";
-import ConfirmButton from "@/components/ConfirmButton";
+import ConfirmButton from "@/components/Helper Components/ConfirmButton";
 import FormErrorMessage from "@/components/Errors/FormErrorMessage";
 import RegisterProfileSports from "@/components/RegisterProfile/RegisterProfileSports";
 
