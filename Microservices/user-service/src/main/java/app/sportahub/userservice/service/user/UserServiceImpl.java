@@ -1,26 +1,27 @@
 package app.sportahub.userservice.service.user;
 
 import app.sportahub.userservice.client.KeycloakApiClient;
-import app.sportahub.userservice.dto.request.user.friend.FriendRequestRequest;
-import app.sportahub.userservice.dto.request.user.friend.UpdateFriendRequestRequest;
-import app.sportahub.userservice.dto.response.user.friend.FriendRequestResponse;
 import app.sportahub.userservice.dto.request.user.ProfileRequest;
 import app.sportahub.userservice.dto.request.user.UserRequest;
+import app.sportahub.userservice.dto.request.user.friend.FriendRequestRequest;
+import app.sportahub.userservice.dto.request.user.friend.UpdateFriendRequestRequest;
 import app.sportahub.userservice.dto.request.user.keycloak.KeycloakRequest;
 import app.sportahub.userservice.dto.response.user.ProfileResponse;
 import app.sportahub.userservice.dto.response.user.UserResponse;
 import app.sportahub.userservice.dto.response.user.badge.BadgeResponse;
 import app.sportahub.userservice.dto.response.user.badge.BadgeWithCountResponse;
+import app.sportahub.userservice.dto.response.user.friend.FriendRequestResponse;
 import app.sportahub.userservice.dto.response.user.friend.UpdateFriendRequestResponse;
 import app.sportahub.userservice.dto.response.user.friend.ViewFriendRequestsResponse;
 import app.sportahub.userservice.enums.user.FriendRequestStatusEnum;
 import app.sportahub.userservice.enums.user.UpdateFriendRequestActionEnum;
-import app.sportahub.userservice.exception.user.friend.*;
 import app.sportahub.userservice.exception.user.UserDoesNotExistException;
 import app.sportahub.userservice.exception.user.UserEmailAlreadyExistsException;
 import app.sportahub.userservice.exception.user.UsernameAlreadyExistsException;
 import app.sportahub.userservice.exception.user.badge.BadgeNotFoundException;
 import app.sportahub.userservice.exception.user.badge.UserAlreadyAssignedBadgeByThisGiverException;
+import app.sportahub.userservice.exception.user.friend.*;
+import app.sportahub.userservice.exception.user.keycloak.KeycloakCommunicationException;
 import app.sportahub.userservice.mapper.user.ProfileMapper;
 import app.sportahub.userservice.mapper.user.UserMapper;
 import app.sportahub.userservice.model.user.*;
@@ -30,6 +31,7 @@ import app.sportahub.userservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -152,6 +154,25 @@ public class UserServiceImpl implements UserService {
                             entry.getValue());
                 })
                 .toList();
+    }
+
+    /**
+     * Deletes a user by their unique identifier.
+     *
+     * @param userId the unique identifier of the user to delete
+     * @throws UserDoesNotExistException if the user with the specified ID does not exist
+     * @throws KeycloakCommunicationException if the user cannot be deleted from Keycloak
+     */
+    @Override
+    @Transactional
+    public void deleteUserById(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserDoesNotExistException(userId));
+
+        keycloakApiClient.deleteUser(user.getKeycloakId())
+                .block();
+        userRepository.deleteById(userId);
+        log.info("deleteUser: User with id: {} was successfully deleted", userId);
     }
 
     @Override
