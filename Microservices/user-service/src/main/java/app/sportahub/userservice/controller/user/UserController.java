@@ -102,8 +102,7 @@ public class UserController {
             @RequestParam(required = false) String gender,
             @RequestParam(required = false) String age,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size)
-    {
+            @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
         return userService.searchUsers(firstName, lastName, sports, rankings, gender, age, pageable);
     }
