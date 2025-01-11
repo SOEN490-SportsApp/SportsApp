@@ -369,7 +369,7 @@ const EventsList = () => {
         data={events}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <EventCard event={item} onPress={handleEventPress} showSkillTags={false} showLocation={false} showTimeLeft={false} showDescription={false} />
+          <EventCard event={item} onPress={handleEventPress} />
         )}
         // Adding pull-to-refresh functionality
         refreshControl={
