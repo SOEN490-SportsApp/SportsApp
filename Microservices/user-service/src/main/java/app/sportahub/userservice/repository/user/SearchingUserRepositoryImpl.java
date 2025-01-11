@@ -1,7 +1,8 @@
-package app.sportahub.userservice.repository;
+package app.sportahub.userservice.repository.user;
 
 import app.sportahub.userservice.model.user.User;
 import com.mongodb.BasicDBObject;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -23,17 +24,9 @@ import java.util.regex.Pattern;
  * and supports complex criteria such as first name, last name, sports preferences,
  * ranking, gender, and age.
  */
+@RequiredArgsConstructor
 public class SearchingUserRepositoryImpl implements SearchingUserRepository {
     private final MongoTemplate mongoTemplate;
-
-    /**
-     * Constructs a new instance of {@code CustomUserRepositoryImpl}.
-     *
-     * @param mongoTemplate the {@link MongoTemplate} used to interact with the MongoDB database
-     */
-    public SearchingUserRepositoryImpl(MongoTemplate mongoTemplate) {
-        this.mongoTemplate = mongoTemplate;
-    }
 
     /**
      * Searches for users in the database based on the provided criteria.
