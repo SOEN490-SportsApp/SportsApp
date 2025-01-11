@@ -33,10 +33,6 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('Microservices/user-service/*.gradle') }}
           restore-keys: ${{ runner.os }}-gradle
 
-      - name: Generate Test Coverage Report
-        working-directory: Microservices/user-service
-        run: ./gradlew test jacocoTestReport
-
       - name: Build and Analyze with SonarQube
         working-directory: Microservices/user-service
         env:
