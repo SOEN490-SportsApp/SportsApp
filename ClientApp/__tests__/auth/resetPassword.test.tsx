@@ -32,7 +32,7 @@ describe("Forgot password test", () => {
     fireEvent.changeText(getByTestId("email-input"), "invalidemail@example.com");
     fireEvent.press(getByTestId("confirmButton"));
     await waitFor(() => {
-     expect(Alert.alert).toHaveBeenCalledWith("Email not found.", "Please enter a valid email.");
+     expect(Alert.alert).toHaveBeenCalledWith("Email not found.", "User with email does not exist. Please enter a valid email.");
     });
   })
 
