@@ -8,7 +8,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class FriendNotFoundInFriendListException extends ResponseStatusException {
 
     public FriendNotFoundInFriendListException(String userIdentifier, String friendIdentifier) {
-        super(HttpStatus.NOT_FOUND, "User with identifier: " + userIdentifier
-                + " does not have friend with identifier: " + friendIdentifier + " in their friend list." );
+        super(HttpStatus.NOT_FOUND, "User with identifier " + userIdentifier
+                + " does not have friend with identifier " + friendIdentifier + " in their friend list." );
     }
 }

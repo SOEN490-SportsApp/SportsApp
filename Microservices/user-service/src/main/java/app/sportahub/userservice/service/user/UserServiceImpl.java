@@ -216,7 +216,7 @@ public class UserServiceImpl implements UserService {
                 .build();
 
         if (!friend.getUsername().equals(friendUser.getUsername())) {
-            throw new GivenFriendUsernameDoesNotMatchFriendFoundByIdException(friendUser.getUsername(), requestId);
+            throw new GivenFriendUsernameDoesNotMatchFriendFoundByIdException(friendUser.getUsername(), friend.getUsername());
         }
 
         UpdateFriendRequestActionEnum action = updateFriendRequestRequest.action();
@@ -239,9 +239,8 @@ public class UserServiceImpl implements UserService {
                         if (action.equals(UpdateFriendRequestActionEnum.ACCEPT)) {
                             el.setFriendRequestStatus(FriendRequestStatusEnum.ACCEPTED);
                         } else if (action.equals(UpdateFriendRequestActionEnum.DECLINE)) {
-                            friendUserFriendList.remove(el);
+                            userFriendList.remove(el);
                         }
-                        break;
                     }
                 }
                 break;
@@ -254,24 +253,24 @@ public class UserServiceImpl implements UserService {
             throw new FriendNotFoundInFriendListException(friendUser.getUsername(), user.getUsername());
 
         user.setFriendList(userFriendList);
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
         friendUser.setFriendList(friendUserFriendList);
-        userRepository.save(friendUser);
+        User savedFriendUser = userRepository.save(friendUser);
         String responseMessage;
 
         if (action.equals(UpdateFriendRequestActionEnum.ACCEPT)) {
             log.info("UserServiceImpl::updateFriendRequest: User with id:{} accepted the friend request of user with id:{}",
-                    user.getId(), friendUser.getId());
+                    savedUser.getId(), savedFriendUser.getId());
 
-            responseMessage = "User with username: " + user.getUsername()
-                    + " accepted the friend request of user with username: " + friendUser.getUsername() + " successfully";
+            responseMessage = "User with username: " + savedUser.getUsername()
+                    + " accepted the friend request of user with username" + savedFriendUser.getUsername() + " successfully";
 
         } else if (action.equals(UpdateFriendRequestActionEnum.DECLINE)) {
             log.info("UserServiceImpl::updateFriendRequest: User with id:{} declined the friend request of user with id:{}",
-                    user.getId(), friendUser.getId());
+                    savedUser.getId(), savedFriendUser.getId());
 
-            responseMessage = "User with username: " + user.getUsername()
-                    + " declined the friend request of user with username: " + friendUser.getUsername() + " successfully";
+            responseMessage = "User with username: " + savedUser.getUsername()
+                    + " declined the friend request of user with username" + savedFriendUser.getUsername() + " successfully";
         } else {
             throw new UnexpectedUpdateFriendRequestActionException(action);
         }
