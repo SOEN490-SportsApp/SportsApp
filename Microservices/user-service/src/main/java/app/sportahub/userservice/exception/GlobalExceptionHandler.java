@@ -3,7 +3,7 @@ package app.sportahub.userservice.exception;
 import app.sportahub.userservice.exception.user.InvalidCredentialsException;
 import app.sportahub.userservice.exception.user.UserDoesNotExistException;
 import app.sportahub.userservice.exception.user.UserEmailAlreadyExistsException;
-import app.sportahub.userservice.exception.user.friend.*;
+import app.sportahub.userservice.exception.user.friend.UserSentFriendRequestToSelfException;
 import app.sportahub.userservice.exception.user.UserWithEmailDoesNotExistException;
 import app.sportahub.userservice.exception.user.badge.BadgeNotFoundException;
 import app.sportahub.userservice.exception.user.keycloak.KeycloakCommunicationException;
@@ -99,45 +99,5 @@ public class GlobalExceptionHandler {
         response.put("error", ex.getMessage());
         response.put("status", HttpStatus.BAD_REQUEST.value());
         return ResponseEntity.badRequest().body(response);
-    }
-
-    @ExceptionHandler(FriendDoesNotExistException.class)
-    public ResponseEntity<Map<String, Object>> handleFriendDoesNotExistException(FriendDoesNotExistException ex) {
-        Map<String, Object> response = new HashMap<>();
-        response.put("error", ex.getMessage());
-        response.put("status", HttpStatus.NOT_FOUND.value());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-    }
-
-    @ExceptionHandler(FriendNotFoundInFriendListException.class)
-    public ResponseEntity<Map<String, Object>> handleFriendNotFoundInFriendListException(FriendNotFoundInFriendListException ex) {
-        Map<String, Object> response = new HashMap<>();
-        response.put("error", ex.getMessage());
-        response.put("status", HttpStatus.NOT_FOUND.value());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-    }
-
-    @ExceptionHandler(GivenFriendUsernameDoesNotMatchFriendFoundByIdException.class)
-    public ResponseEntity<Map<String,Object>> handleGivenFriendUsernameDoesNotMatchFriendFoundById(GivenFriendUsernameDoesNotMatchFriendFoundByIdException ex) {
-        Map<String, Object> response = new HashMap<>();
-        response.put("error", ex.getMessage());
-        response.put("status", HttpStatus.CONFLICT.value());
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
-    }
-
-    @ExceptionHandler(UnexpectedUpdateFriendRequestActionException.class)
-    public ResponseEntity<Map<String, Object>> handleUnexpectedUpdateFriendRequestActionException(UnexpectedUpdateFriendRequestActionException ex) {
-        Map<String, Object> response = new HashMap<>();
-        response.put("error", ex.getMessage());
-        response.put("status", HttpStatus.BAD_REQUEST.value());
-        return ResponseEntity.badRequest().body(response);
-    }
-
-    @ExceptionHandler(UserAlreadyInFriendListException.class)
-    public ResponseEntity<Map<String, Object>> handleUserAlreadyInFriendListException(UserAlreadyInFriendListException ex) {
-        Map<String, Object> response = new HashMap<>();
-        response.put("error", ex.getMessage());
-        response.put("status", HttpStatus.CONFLICT.value());
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 }
