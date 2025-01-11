@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, ActivityIndicator, SafeAreaView, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons'; 
-import CustomTabMenu from '@/components/CustomTabMenu';
+import CustomTabMenu from '@/components/Helper Components/CustomTabMenu';
 import { useRouter} from 'expo-router';
 import { UserState } from '@/types/user';
 import { calculateAge } from '@/utils/helpers/ageOfUser';

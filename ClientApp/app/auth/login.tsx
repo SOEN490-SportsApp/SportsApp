@@ -3,8 +3,8 @@ import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Alert} from
 import { useForm, Controller } from "react-hook-form";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import ConfirmButton from "@/components/ConfirmButton";
-import AuthenticationDivider from "@/components/AuthenticationDivider";
+import ConfirmButton from "@/components/Helper Components/ConfirmButton";
+import AuthenticationDivider from "@/components/Helper Components/AuthenticationDivider";
 import themeColors from "@/utils/constants/colors";
 import { IconPlacement } from "@/utils/constants/enums";
 import { hs, vs, mvs, mhs } from "@/utils/helpers/uiScaler";
