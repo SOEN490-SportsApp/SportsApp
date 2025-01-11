@@ -10,7 +10,7 @@ import { IconPlacement } from "@/utils/constants/enums";
 import { hs, vs, mvs, mhs } from "@/utils/helpers/uiScaler";
 import { loginUser } from "@/services/authService";
 import { useUpdateUserToStore } from '@/state/user/actions';
-import { UserState } from "@/types";
+import { getUserById } from "@/state/user/api";
 
 interface LoginPageFormData {
   identifier: string;
@@ -27,7 +27,8 @@ const LoginPage: React.FC = () => {
     try {
       const res = await loginUser(data.identifier, data.password);
       await updateUserToStore(res.userID);
-      const {firstName, lastName} = res.profile
+      const response = await getUserById(res.userID);
+      const {firstName, lastName} = response.profile
       if(firstName === '' && lastName === ''){
         router.push({pathname: '/auth/registerProfile', params: { userID: res.userID }});
       }else{
