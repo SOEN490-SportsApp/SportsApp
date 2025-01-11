@@ -1,9 +1,6 @@
 package app.sportahub.eventservice.service.event;
 
-import app.sportahub.eventservice.dto.request.EventRequest;
-import app.sportahub.eventservice.dto.request.LocationRequest;
-import app.sportahub.eventservice.dto.request.ParticipantRequest;
-import app.sportahub.eventservice.dto.request.TeamRequest;
+import app.sportahub.eventservice.dto.request.*;
 import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.enums.SkillLevelEnum;
 import app.sportahub.eventservice.exception.event.*;
@@ -134,7 +131,7 @@ public class EventServiceTest {
         assertEquals(eventRequest.date(), result.date());
         assertEquals(eventRequest.maxParticipants(), result.maxParticipants());
         assert eventRequest.participants() != null;
-        assertEquals(eventRequest.participants().getFirst().userId(), result.participants().getFirst().getUserId());
+        assertEquals(eventRequest.participants().getFirst().userId(), result.participants().getFirst().userId());
         assertEquals(eventRequest.createdBy(), result.createdBy());
         assert eventRequest.teams() != null;
         assertEquals(eventRequest.teams().getFirst().teamId(), result.teams().getFirst().getTeamId());
@@ -199,8 +196,7 @@ public class EventServiceTest {
         assertEquals(eventRequest.date(), result.date());
         assertEquals(eventRequest.maxParticipants(), result.maxParticipants());
         assert eventRequest.participants() != null;
-        assertEquals(eventRequest.participants().getFirst().userId(), result.participants().getFirst().getUserId());
-        assertEquals(eventRequest.participants().getFirst().attendStatus(), result.participants().getFirst().getAttendStatus());
+        assertEquals(eventRequest.participants().getFirst().userId(), result.participants().getFirst().userId());
         assertEquals(eventRequest.createdBy(), result.createdBy());
         assert eventRequest.teams() != null;
         assertEquals(eventRequest.teams().getFirst().teamId(), result.teams().getFirst().getTeamId());
@@ -363,6 +359,7 @@ public class EventServiceTest {
         // Act & Assert
         eventService.joinEvent(testId, testUserId);
 
+        assertEquals(ParticipantAttendStatus.JOINED, event.getParticipants().getFirst().getAttendStatus());
         verify(eventRepository, times(1)).findById(testId);
         verify(eventRepository, times(1)).save(event);
     }
@@ -445,6 +442,7 @@ public class EventServiceTest {
         eventService.joinEvent(testId, testUserId);
 
         // Assert
+        assertEquals(ParticipantAttendStatus.JOINED, privateEvent.getParticipants().getFirst().getAttendStatus());
         verify(eventRepository, times(1)).save(any(Event.class));
     }
 
