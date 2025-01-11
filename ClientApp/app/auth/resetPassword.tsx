@@ -10,17 +10,25 @@ import { resetPassword } from "@/services/authService";
 const ResetPassword: React.FC = () => {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState("idle");
+  let regex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
   const onSubmit = async () => {
-    setStatus("loading");
-    try {
-      const response = await resetPassword(email);
-      if (response?.status === 200 || response?.status === 201) {
-        setStatus("success");
+    if (regex.test(email)) {
+      setStatus("loading");
+      try {
+        const response = await resetPassword(email);
+        if (response?.status === 200 || response?.status === 201) {
+          setStatus("success");
+        }
+      } catch (err: any) {
+        if (err?.status === "404") {
+          console.log("here");
+        }
+        setStatus("idle");
+        Alert.alert("Email not found.", "User with email does not exist. Please enter a valid email.");
+        console.log(err);
       }
-    } catch (err: any) {
-      setStatus("idle");
-      Alert.alert("Email not found.", "Please enter a valid email.");
-      console.log(err);
+    } else {
+      Alert.alert("Invalid Email", "Please enter a valid email.");
     }
   };
 
@@ -37,7 +45,7 @@ const ResetPassword: React.FC = () => {
         <Text testID="success-message" style={styles.joinText}>
           Email submitted successfully!{" "}
           <Text style={styles.successText}>
-            Check your inbox for reset instructions. 
+            Check your inbox for reset instructions.
           </Text>
         </Text>
         <Text style={[styles.sportaText, styles.joinText]}>{email}</Text>
@@ -92,7 +100,7 @@ const ResetPassword: React.FC = () => {
                 </View>
                 <View style={styles.inputContainer}>
                   <TextInput
-                  testID="email-input"
+                    testID="email-input"
                     style={styles.input}
                     onChangeText={(text) => setEmail(text)}
                     value={email}
