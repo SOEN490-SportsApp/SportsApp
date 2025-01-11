@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { hs, vs, mhs, windowHeight } from "@/utils/helpers/uiScaler";
 import themeColors from "@/utils/constants/colors";
 import { View, Text, TextInput, StyleSheet, Image, Alert } from "react-native";
-import ConfirmButton from "@/components/ConfirmButton";
+import ConfirmButton from "@/components/Helper Components/ConfirmButton";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { IconPlacement } from "@/utils/constants/enums";
 import { resetPassword } from "@/services/authService";
