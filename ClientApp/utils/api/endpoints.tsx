@@ -5,7 +5,8 @@ export const API_ENDPOINTS = {
     UPDATE_PROFILE: 'user-service/user/{userId}/profile',
     GET_USER_BY_ID: 'user-service/user/{id}',
     CREATE_EVENT: 'event-service/event',
-    RESET_PASSWORD: 'user-service/auth/reset-password'
-    // add more after authentication
+    RESET_PASSWORD: 'user-service/auth/reset-password',
+    GET_EVENT_BY_ID: 'event-service/event/{id}',
+    JOIN_EVENT_BY_ID: 'event-service/event/{id}/join',
   };
   
