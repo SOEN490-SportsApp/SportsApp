@@ -16,6 +16,7 @@ public interface EventMapper {
     @Mapping(target = "locationResponse", source = "location")
     EventResponse eventToEventResponse(Event event);
 
+    @Mapping(target = "id", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void patchEventFromRequest(EventRequest eventRequest, @MappingTarget Event event);
 }
