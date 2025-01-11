@@ -131,10 +131,16 @@ const ProfilePage: React.FC = () => {
                 <Text className="text-2xl font-bold text-black">Profile</Text>
                 <TouchableOpacity
                  onPress={() => router.push('/editProfile')}
-                 className="absolute right-4" 
+                 className="absolute left-4" 
                    >
-              <Text className="text-base font-bold text-black">Edit</Text>
-             </TouchableOpacity>
+                    <Text className="text-base font-bold" style={{ color: "#007AFF" }}>Edit</Text>
+                </TouchableOpacity>
+             <TouchableOpacity 
+                    onPress={() => router.push('/(tabs)/profile/(settings)/settingsPage')} 
+                    className="absolute right-4" // Position Edit button in top-right
+                >
+                    <Icon name="settings-outline" size={24} color="black" />
+                </TouchableOpacity>
             </View>
             
             {/* Profile Header */}
