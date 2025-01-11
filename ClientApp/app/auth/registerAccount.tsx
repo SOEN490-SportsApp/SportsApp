@@ -33,17 +33,13 @@ const RegisterAccountPage: React.FC = () => {
     try{
       const response = await registerUser(data.email, data.username, data.password);
       setUserID(response.data.id);
-      // router.push(`/auth/registerProfile?userID=${response.data.id}`);
+      Alert.alert('Account Created', `Check your email at ${data.email} to verify your account.`)
+      router.push('/auth/login');
     } catch (error: any){
       Alert.alert("Error", "Failed to create account.");
       console.error(`Failed to create account: ${error}. ${error.message}`);
     }
   };
-
-  const confirmEmail = async(data:RegisterAccountPageFormData) => {
-    const response = await loginUser(data.email, data.password)
-    router.push(`/auth/registerProfile?userID=${userID}`);
-  }
 
   return (
     <View style={styles.container}>
@@ -194,14 +190,6 @@ const RegisterAccountPage: React.FC = () => {
           icon={<MaterialCommunityIcons name="login" size={25} color="#fff" />}
           text="Sign Up"
           onPress={handleSubmit(onSubmit)}
-          iconPlacement={IconPlacement.left}
-        />
-
-        {/* Confirm Button */}
-        <ConfirmButton
-          icon={<MaterialCommunityIcons name="login" size={25} color="#fff" />}
-          text="confirm"
-          onPress={handleSubmit(confirmEmail)}
           iconPlacement={IconPlacement.left}
         />
      

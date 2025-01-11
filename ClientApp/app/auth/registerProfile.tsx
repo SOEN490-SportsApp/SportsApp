@@ -77,7 +77,8 @@ const RegisterProfilePage: React.FC = () => {
         ranking: "Test Ranking",
       };
       await registerProfile(profile, userID as string);
-      router.replace("/auth/login");
+      await updateUserToStore(userID as string);
+      router.replace("/(tabs)/home");
     } catch (error: any){
       Alert.alert('Error', 'Error occured creating profile');
       throw new Error(`Error regestering profile: ${error}`);

@@ -2,17 +2,18 @@ import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import '@testing-library/jest-native/extend-expect';
 import axiosMockAdapter from 'axios-mock-adapter';
-import axiosInstance from '../services/axiosInstance';
+import { getAxiosInstance, setupAxiosInstance } from '../services/axiosInstance';
 import ProfilePage from '@/app/(tabs)/profile';
 import { calculateAge } from '@/utils/helpers/ageOfUser';
-import { Provider } from 'react-redux';
+import { Provider, useDispatch } from 'react-redux';
 import { store } from '@/state/store';
 import { UserState } from '@/types/user';
 import configureStore from 'redux-mock-store';
 
 // Initialize axios-mock-adapter
 const mockStore = configureStore([]);
-const mock = new axiosMockAdapter(axiosInstance);
+// const mock = new axiosMockAdapter(getAxiosInstance());
+let mock: axiosMockAdapter;
 
 describe('ProfilePage Component', () => {
 
@@ -43,6 +44,11 @@ describe('ProfilePage Component', () => {
 
 
   const expectedAge = calculateAge(mockUserData);
+
+  beforeAll(() => {
+    setupAxiosInstance(jest.fn()); // Pass a mock dispatch function
+    mock = new axiosMockAdapter(getAxiosInstance());
+});
 
   afterEach(() => {
     mock.reset();
