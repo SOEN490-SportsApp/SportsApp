@@ -2,6 +2,7 @@ package app.sportahub.eventservice.controller;
 
 import app.sportahub.eventservice.dto.request.EventRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
+import app.sportahub.eventservice.dto.response.ParticipantResponse;
 import app.sportahub.eventservice.service.event.EventService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -66,7 +67,7 @@ public class EventController {
     @PostMapping("/{id}/join")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Join an event", description = "Enables a user to join an event, provided there are available slots.")
-    public void joinEvent(@PathVariable String id, @RequestParam String userId) {
-        eventService.joinEvent(id, userId);
+    public ParticipantResponse joinEvent(@PathVariable String id, @RequestParam String userId) {
+        return eventService.joinEvent(id, userId);
     }
 }

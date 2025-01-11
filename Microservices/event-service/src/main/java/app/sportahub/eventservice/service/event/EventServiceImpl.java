@@ -2,10 +2,12 @@ package app.sportahub.eventservice.service.event;
 
 import app.sportahub.eventservice.dto.request.EventRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
+import app.sportahub.eventservice.dto.response.ParticipantResponse;
 import app.sportahub.eventservice.exception.event.*;
 import app.sportahub.eventservice.mapper.event.EventMapper;
 import app.sportahub.eventservice.model.event.Event;
 import app.sportahub.eventservice.model.event.participant.Participant;
+import app.sportahub.eventservice.model.event.participant.ParticipantAttendStatus;
 import app.sportahub.eventservice.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -71,7 +73,7 @@ public class EventServiceImpl implements EventService {
      */
     @Override
     public EventResponse updateEvent(String id, EventRequest eventRequest) {
-        Event event = eventRepository.findById(id)
+        eventRepository.findById(id)
                 .orElseThrow(() -> new EventDoesNotExistException(id));
 
         Event updatedEvent = eventMapper.eventRequestToEvent(eventRequest)
@@ -149,7 +151,7 @@ public class EventServiceImpl implements EventService {
      * @throws UserAlreadyParticipantException    if the user is already participating in the event
      */
     @Override
-    public void joinEvent(String id, String userId) {
+    public ParticipantResponse joinEvent(String id, String userId) {
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new EventDoesNotExistException(id));
 
@@ -175,11 +177,14 @@ public class EventServiceImpl implements EventService {
 
         Participant participant = Participant.builder()
                 .withUserId(userId)
+                .withAttendStatus(ParticipantAttendStatus.JOINED)
                 .withJoinedOn(LocalDateTime.now().toLocalDate())
                 .build();
 
         event.getParticipants().add(participant);
         eventRepository.save(event);
         log.info("EventServiceImpl::joinEvent: User with id:{} joined event with id:{}", userId, id);
+        return new ParticipantResponse(participant.getUserId(), participant.getAttendStatus(),
+                participant.getJoinedOn());
     }
 }

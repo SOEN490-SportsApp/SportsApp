@@ -2,8 +2,7 @@ package app.sportahub.eventservice.service.event;
 
 import app.sportahub.eventservice.dto.request.EventRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
-
-import java.util.Map;
+import app.sportahub.eventservice.dto.response.ParticipantResponse;
 
 public interface EventService {
 
@@ -17,5 +16,5 @@ public interface EventService {
 
     void deleteEvent(String id);
 
-    void joinEvent(String id, String userId);
+    ParticipantResponse joinEvent(String id, String userId);
 }
