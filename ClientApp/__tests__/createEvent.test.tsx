@@ -7,7 +7,7 @@ import {
 } from "@testing-library/react-native";
 import "@testing-library/jest-native/extend-expect";
 import axiosMockAdapter from "axios-mock-adapter";
-import axiosInstance from "@/services/axiosInstance";
+import { getAxiosInstance, setupAxiosInstance } from "@/services/axiosInstance";
 import Create from "@/app/(tabs)/create";
 import { Provider } from "react-redux";
 import { store } from "@/state/store";
@@ -18,9 +18,12 @@ jest.mock("@/services/eventService");
 
 jest.spyOn(Alert, "alert").mockImplementation(() => {});
 
-const mock = new axiosMockAdapter(axiosInstance);
-
+let mock: axiosMockAdapter; 
 describe("Create Component", () => {
+   beforeAll(() => {
+      setupAxiosInstance(jest.fn()); // Pass a mock dispatch function
+       mock = new axiosMockAdapter(getAxiosInstance());
+  });
   afterEach(() => {
     mock.reset();
   });
