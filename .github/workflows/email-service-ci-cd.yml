@@ -30,8 +30,8 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_EMAILSERVICE }}
         with:
           args: >
-            -D sonar.projectKey=sportaforked_EmailService
-            -D sonar.organization=sportaforked
+            -D sonar.projectKey=Sporta_SportsApp_EmailMicroService
+            -D sonar.organization=soen490-sportsapp
             -D sonar.host.url=https://sonarcloud.io
             -D sonar.java.binaries=Microservices/email-service/build/classes/java/main
             -D sonar.sources=Microservices/email-service/src/main/java
