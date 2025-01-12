@@ -15,8 +15,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 public class Friend extends BaseEntity {
 
-    @NotBlank(message = "Username of friend must be provided.")
-    private String username;
+    @NotBlank(message = "User id of friend must be provided.")
+    private String userId;
 
     @NotBlank(message = "Friend request status must be provided.")
     private FriendRequestStatusEnum friendRequestStatus;

@@ -35,6 +35,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 
@@ -49,6 +50,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final ProfileMapper profileMapper;
     private final FriendRepository friendRepository;
+    private final UserService userService;
 
     @Override
     public UserResponse createUser(UserRequest userRequest) {
@@ -158,42 +160,46 @@ public class UserServiceImpl implements UserService {
     public FriendRequestResponse sendFriendRequest(String userId, FriendRequestRequest friendRequestRequest) {
         User userSender = userRepository.findUserById(userId)
                 .orElseThrow(() -> new UserDoesNotExistException(userId));
-        User userReceiver = userRepository.findUserByUsername(friendRequestRequest.receiverUsername())
-                .orElseThrow(() -> new UserDoesNotExistException(friendRequestRequest.receiverUsername()));
+        User userReceiver = userRepository.findUserById(friendRequestRequest.receiverUserId())
+                .orElseThrow(() -> new UserDoesNotExistException(friendRequestRequest.receiverUserId()));
 
         if (userSender.equals(userReceiver)) {
             throw new UserSentFriendRequestToSelfException();
         }
 
         for (Friend friend : userSender.getFriendList()) {
-            if (friend.getUsername().equals(userReceiver.getUsername()))
+            if (friend.getUserId().equals(userReceiver.getId()))
                 throw new UserAlreadyInFriendListException(userReceiver.getUsername(), friend.getFriendRequestStatus());
         }
 
         Friend newSenderFriend = Friend.builder()
                 .withCreatedAt(Timestamp.valueOf(LocalDateTime.now()))
                 .withUpdatedAt(Timestamp.valueOf(LocalDateTime.now()))
-                .withUsername(userReceiver.getUsername())
+                .withUserId(userReceiver.getId())
                 .withFriendRequestStatus(FriendRequestStatusEnum.SENT)
                 .build();
+        Friend savedSenderFriend = friendRepository.save(newSenderFriend);
+        System.out.println(savedSenderFriend);
 
         Friend newReceiverFriend = Friend.builder()
                 .withCreatedAt(Timestamp.valueOf(LocalDateTime.now()))
                 .withUpdatedAt(Timestamp.valueOf(LocalDateTime.now()))
-                .withUsername(userSender.getUsername())
+                .withUserId(userSender.getId())
                 .withFriendRequestStatus(FriendRequestStatusEnum.RECEIVED)
                 .build();
+        friendRepository.save(newReceiverFriend);
 
         userSender.getFriendList().add(newSenderFriend);
         userReceiver.getFriendList().add(newReceiverFriend);
 
-        User savedUser = userRepository.save(userSender);
-        log.info("UserServiceImpl::sendFriendRequest: User with id:{} sent a new friend request", savedUser.getId());
+        User savedSenderUser = userRepository.save(userSender);
+        log.info("UserServiceImpl::sendFriendRequest: User with id: {} sent a new friend request", savedSenderUser.getId());
 
-        savedUser = userRepository.save(userReceiver);
-        log.info("UserServiceImpl::sendFriendRequest: User with id:{} received a new friend request", savedUser.getId());
+        User savedReceiverUser = userRepository.save(userReceiver);
+        log.info("UserServiceImpl::sendFriendRequest: User with id: {} received a new friend request",
+                savedReceiverUser.getId());
 
-        return new FriendRequestResponse("Friend request sent successfully.", userReceiver.getUsername());
+        return new FriendRequestResponse("Friend request sent successfully.", savedSenderFriend.getId());
     }
 
     @Override
@@ -204,8 +210,8 @@ public class UserServiceImpl implements UserService {
                 .withUpdatedAt(Timestamp.valueOf(LocalDateTime.now()))
                 .build();
 
-        User friendUser = userRepository.findUserByUsername(updateFriendRequestRequest.friendUsername())
-                .orElseThrow(() -> new UserDoesNotExistException(updateFriendRequestRequest.friendUsername()))
+        User friendUser = userRepository.findUserById(updateFriendRequestRequest.friendUserId())
+                .orElseThrow(() -> new UserDoesNotExistException(updateFriendRequestRequest.friendUserId()))
                 .toBuilder()
                 .withUpdatedAt(Timestamp.valueOf(LocalDateTime.now()))
                 .build();
@@ -215,68 +221,66 @@ public class UserServiceImpl implements UserService {
                 .withUpdatedAt(Timestamp.valueOf(LocalDateTime.now()))
                 .build();
 
-        if (!friend.getUsername().equals(friendUser.getUsername())) {
-            throw new GivenFriendUsernameDoesNotMatchFriendFoundByIdException(friendUser.getUsername(), requestId);
+        if (!friend.getUserId().equals(friendUser.getId())) {
+            throw new GivenFriendUserIdDoesNotMatchFriendFoundByIdException(friendUser.getId(), requestId);
         }
 
         UpdateFriendRequestActionEnum action = updateFriendRequestRequest.action();
-        boolean isFriendFound1 = false;
-        boolean isFriendFound2 = false;
+        AtomicBoolean isFriendFound1 = new AtomicBoolean(false);
+        AtomicBoolean isFriendFound2 = new AtomicBoolean(false);
         List<Friend> userFriendList = user.getFriendList();
         List<Friend> friendUserFriendList = friendUser.getFriendList();
 
-        for (Friend e : userFriendList) {
-            if (e.getUsername().equals(friend.getUsername())) {
-                if (!e.getFriendRequestStatus().equals(FriendRequestStatusEnum.RECEIVED) &&
-                        action.equals(UpdateFriendRequestActionEnum.ACCEPT)) {
-                    throw new TryingToAcceptInvalidFriendRequestException(user.getUsername(),
-                            friendUser.getUsername(), e.getFriendRequestStatus());
-                }
-                isFriendFound1 = true;
-                if (action.equals(UpdateFriendRequestActionEnum.ACCEPT)) {
-                    e.setFriendRequestStatus(FriendRequestStatusEnum.ACCEPTED);
-                } else if (action.equals(UpdateFriendRequestActionEnum.DECLINE)) {
-                    userFriendList.remove(e);
-                }
-                for (Friend el : friendUserFriendList) {
-                    if (el.getUsername().equals(user.getUsername())) {
-                        isFriendFound2 = true;
-                        if (action.equals(UpdateFriendRequestActionEnum.ACCEPT)) {
-                            el.setFriendRequestStatus(FriendRequestStatusEnum.ACCEPTED);
-                        } else if (action.equals(UpdateFriendRequestActionEnum.DECLINE)) {
-                            friendUserFriendList.remove(el);
-                        }
-                        break;
-                    }
-                }
-                break;
+        userFriendList.stream().filter(e -> e.getUserId().equals(friend.getUserId())).findAny().ifPresent(e -> {
+            if (!e.getFriendRequestStatus().equals(FriendRequestStatusEnum.RECEIVED) &&
+                    action.equals(UpdateFriendRequestActionEnum.ACCEPT)) {
+                throw new TryingToAcceptInvalidFriendRequestException(user.getId(),
+                        friendUser.getId(), e.getFriendRequestStatus());
             }
-        }
 
-        if (!isFriendFound1)
-            throw new FriendNotFoundInFriendListException(user.getUsername(), friendUser.getUsername());
-        if (!isFriendFound2)
-            throw new FriendNotFoundInFriendListException(friendUser.getUsername(), user.getUsername());
+            isFriendFound1.set(true);
+
+            if (action.equals(UpdateFriendRequestActionEnum.ACCEPT)) {
+                e.setFriendRequestStatus(FriendRequestStatusEnum.ACCEPTED);
+            } else if (action.equals(UpdateFriendRequestActionEnum.DECLINE)) {
+                userFriendList.remove(e);
+            }
+
+            friendUserFriendList.stream().filter(el -> el.getUserId().equals(user.getId())).findAny().ifPresent(el -> {
+                isFriendFound2.set(true);
+                if (action.equals(UpdateFriendRequestActionEnum.ACCEPT)) {
+                    el.setFriendRequestStatus(FriendRequestStatusEnum.ACCEPTED);
+                } else if (action.equals(UpdateFriendRequestActionEnum.DECLINE)) {
+                    friendUserFriendList.remove(el);
+                }
+            });
+        });
+
+        if (!isFriendFound1.get())
+            throw new FriendNotFoundInFriendListException(user.getId(), friendUser.getId());
+        if (!isFriendFound2.get())
+            throw new FriendNotFoundInFriendListException(friendUser.getId(), user.getId());
 
         user.setFriendList(userFriendList);
         userRepository.save(user);
         friendUser.setFriendList(friendUserFriendList);
         userRepository.save(friendUser);
         String responseMessage;
+        friendRepository.save(friend);
 
         if (action.equals(UpdateFriendRequestActionEnum.ACCEPT)) {
             log.info("UserServiceImpl::updateFriendRequest: User with id:{} accepted the friend request of user with id:{}",
                     user.getId(), friendUser.getId());
 
-            responseMessage = "User with username: " + user.getUsername()
-                    + " accepted the friend request of user with username: " + friendUser.getUsername() + " successfully";
+            responseMessage = "User with id: " + user.getId()
+                    + " accepted the friend request of user with id: " + friendUser.getId() + " successfully";
 
         } else if (action.equals(UpdateFriendRequestActionEnum.DECLINE)) {
             log.info("UserServiceImpl::updateFriendRequest: User with id:{} declined the friend request of user with id:{}",
                     user.getId(), friendUser.getId());
 
-            responseMessage = "User with username: " + user.getUsername()
-                    + " declined the friend request of user with username: " + friendUser.getUsername() + " successfully";
+            responseMessage = "User with id: " + user.getId()
+                    + " declined the friend request of user with id: " + friendUser.getId() + " successfully";
         } else {
             throw new UnexpectedUpdateFriendRequestActionException(action);
         }
@@ -302,6 +306,7 @@ public class UserServiceImpl implements UserService {
 
         return friends.stream()
                 .filter(s -> typeList.contains(s.getFriendRequestStatus()) )
-                .map(friend -> new ViewFriendRequestsResponse(friend.getUsername())).toList();
+                .map(friend -> new ViewFriendRequestsResponse(
+                        getUserById(friend.getUserId()).username(),friend.getUserId(), friend.getId())).toList();
     }
 }
