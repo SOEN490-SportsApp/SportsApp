@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, Text } from 'react-native';
-import EventsList from '../Event/EventsList';
+import EventsList from '../Event/EventsListHomePage';
 
 const Feed = () => {
   return (
