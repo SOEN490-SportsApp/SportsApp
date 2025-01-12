@@ -1,13 +1,32 @@
 package app.sportahub.userservice.controller.user;
 
-import app.sportahub.userservice.dto.request.user.friend.FriendRequestRequest;
-import app.sportahub.userservice.dto.request.user.friend.UpdateFriendRequestRequest;
-import app.sportahub.userservice.dto.response.user.friend.FriendRequestResponse;
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
 import app.sportahub.userservice.dto.request.user.ProfileRequest;
 import app.sportahub.userservice.dto.request.user.UserRequest;
+import app.sportahub.userservice.dto.request.user.friend.FriendRequestRequest;
+import app.sportahub.userservice.dto.request.user.friend.UpdateFriendRequestRequest;
 import app.sportahub.userservice.dto.response.user.ProfileResponse;
 import app.sportahub.userservice.dto.response.user.UserResponse;
 import app.sportahub.userservice.dto.response.user.badge.BadgeWithCountResponse;
+import app.sportahub.userservice.dto.response.user.friend.FriendRequestResponse;
 import app.sportahub.userservice.dto.response.user.friend.UpdateFriendRequestResponse;
 import app.sportahub.userservice.dto.response.user.friend.ViewFriendRequestsResponse;
 import app.sportahub.userservice.enums.user.FriendRequestStatusEnum;
@@ -16,13 +35,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/user")
@@ -33,6 +45,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/{id}")
+    @PreAuthorize("#id == authentication.name || hasRole('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Retrieve user by ID",
             description = "Fetches a user by their unique identifier.")
@@ -41,6 +54,7 @@ public class UserController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Do not use this to register a user! Create a new user",
             description = "Creates a new user resource to the database based on the provided user details.")
@@ -49,18 +63,21 @@ public class UserController {
     }
 
     @PutMapping("/{id}/profile")
+    @PreAuthorize("#id == authentication.name || hasRole('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     public ProfileResponse updateProfile(@PathVariable String id, @Valid @RequestBody ProfileRequest profileRequest) {
         return userService.updateUserProfile(id, profileRequest);
     }
 
     @PatchMapping("/{id}/profile")
+    @PreAuthorize("#id == authentication.name || hasRole('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     public ProfileResponse patchProfile(@PathVariable String id, @Valid @RequestBody ProfileRequest profileRequest) {
         return userService.patchUserProfile(id, profileRequest);
     }
 
     @PostMapping("/{userId}/badge")
+    @PreAuthorize("#giverId == authentication.name || hasRole('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Assign a badge to a user",
             description = "Allows a user to assign a badge to another user and returns details of the assigned badge.")
@@ -85,6 +102,7 @@ public class UserController {
     }
 
     @PostMapping("/{userId}/friends/requests")
+    @PreAuthorize("#userId == authentication.name || hasRole('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Send a friend request to a user",
     description = "Allows a user to send a friend request to another user and returns the details of the friend request.")
@@ -103,6 +121,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/friend-requests")
+    @PreAuthorize("#userId == authentication.name || hasRole('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "view received friend requests",
     description = "Retrieves user's friend requests stored in their friend list based on given type.")
