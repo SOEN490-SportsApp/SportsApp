@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { FlatList, View, StyleSheet, Alert, Animated, RefreshControl } from 'react-native';
 import EventCard from './EventCard';
 import { Event } from '@/types/event';
+import { router } from 'expo-router';
 
 // FIXME Sample event data until we can fetch from an API
 const events: Event[] = [
@@ -350,7 +351,8 @@ const EventsList = () => {
 
   const handleEventPress = (eventId: string) => {
     // FIXME should reroute to the event page once finished
-    Alert.alert('Event Pressed', `Event ID: ${eventId}`);
+    eventId = "6782edf7ba257b189946ff27";
+    router.push(`/events/${eventId}`);
   };
 
   const onRefresh = () => {
