@@ -1,6 +1,6 @@
 package app.sportahub.userservice.controller.user;
 
-import app.sportahub.userservice.dto.request.user.FriendRequestRequest;
+import app.sportahub.userservice.dto.request.user.friend.FriendRequestRequest;
 import app.sportahub.userservice.dto.response.user.friend.FriendRequestResponse;
 import app.sportahub.userservice.dto.request.user.ProfileRequest;
 import app.sportahub.userservice.dto.request.user.UserRequest;
