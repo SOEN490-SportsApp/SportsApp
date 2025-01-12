@@ -7,8 +7,8 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@SuperBuilder(toBuilder = true,setterPrefix = "with")
-@EqualsAndHashCode(callSuper = false)
+@SuperBuilder(toBuilder = true, setterPrefix = "with")
+@EqualsAndHashCode(callSuper=false)
 @AllArgsConstructor
 @NoArgsConstructor
 @Document("friend")

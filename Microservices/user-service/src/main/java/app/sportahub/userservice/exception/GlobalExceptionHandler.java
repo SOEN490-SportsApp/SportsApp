@@ -103,8 +103,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UserSentFriendRequestToSelfException.class)
     public ResponseEntity<Map<String, Object>> handleUserSentFriendRequestToSelfException(UserSentFriendRequestToSelfException ex) {
         Map<String, Object> response = new HashMap<>();
-        response.put("error", ex.getMessage());
-        response.put("status", HttpStatus.BAD_REQUEST.value());
-        return ResponseEntity.badRequest().body(response);
+        response.put("error", ex.getReason());
+        response.put("message", ex.getStatusCode().value());
+        return ResponseEntity.status(ex.getStatusCode()).body(response);
     }
 }

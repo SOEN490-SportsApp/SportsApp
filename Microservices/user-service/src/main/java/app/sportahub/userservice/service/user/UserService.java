@@ -30,8 +30,8 @@ public interface UserService {
 
     FriendRequestResponse sendFriendRequest(String userId, FriendRequestRequest friendRequestRequest);
 
-    List<ViewFriendRequestsResponse> getFriendRequests(String userId, List<FriendRequestStatusEnum> typeList);
-
     UpdateFriendRequestResponse updateFriendRequest(String userId, String requestId,
                                                     UpdateFriendRequestRequest updateFriendRequestRequest);
+
+    List<ViewFriendRequestsResponse> getFriendRequests(String userId, List<FriendRequestStatusEnum> typeList);
 }
