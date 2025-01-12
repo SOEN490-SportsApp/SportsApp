@@ -1,22 +1,43 @@
-name: Frontend CI/CD
+name: ClientApp CI/CD
 
 on:
-  pull_request:
-    branches: [ "*" ]
-  push:
-    branches:
-      - main
-      - dev
-      - 'releases/**'
+  workflow_dispatch:
 
 jobs:
-  test:
+  build:
+    name: Build and Analyze
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - name: Install depedencies
-        run: npm install
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Install dependencies
+        run: |
+          npm install
         working-directory: ./ClientApp
-      - name: Run tests
-        run: npm run ci-test
+
+      - name: Run tests and generate coverage
+        run: |
+          npm run generate-report
         working-directory: ./ClientApp
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_CLIENTAPP }}
+        with:
+          args: >
+            -D sonar.projectKey=sportaforked_ClientApp
+            -D sonar.organization=sportaforked
+            -D sonar.host.url=https://sonarcloud.io
+            -D sonar.sources=ClientApp/
+            -D sonar.tests=ClientApp/__tests__
+            -D sonar.exclusions=ClientApp/__tests__/**
+            -D sonar.javascript.lcov.reportPaths=ClientApp/coverage/lcov.info
