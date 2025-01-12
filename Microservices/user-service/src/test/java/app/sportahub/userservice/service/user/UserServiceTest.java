@@ -2,22 +2,25 @@ package app.sportahub.userservice.service.user;
 
 import app.sportahub.userservice.client.KeycloakApiClient;
 import app.sportahub.userservice.dto.request.user.*;
+import app.sportahub.userservice.dto.request.user.friend.FriendRequestRequest;
+import app.sportahub.userservice.dto.request.user.friend.UpdateFriendRequestRequest;
 import app.sportahub.userservice.dto.request.user.keycloak.KeycloakRequest;
 import app.sportahub.userservice.dto.response.user.friend.FriendRequestResponse;
 import app.sportahub.userservice.dto.response.user.ProfileResponse;
 import app.sportahub.userservice.dto.response.user.SportLevelResponse;
 import app.sportahub.userservice.dto.response.user.UserResponse;
+import app.sportahub.userservice.dto.response.user.friend.UpdateFriendRequestResponse;
 import app.sportahub.userservice.dto.response.user.friend.ViewFriendRequestsResponse;
 import app.sportahub.userservice.enums.user.FriendRequestStatusEnum;
+import app.sportahub.userservice.enums.user.UpdateFriendRequestActionEnum;
 import app.sportahub.userservice.exception.user.*;
 import app.sportahub.userservice.exception.user.badge.UserAlreadyAssignedBadgeByThisGiverException;
-import app.sportahub.userservice.exception.user.friend.InvalidFriendRequestStatusTypeException;
-import app.sportahub.userservice.exception.user.friend.UserAlreadyInFriendListException;
-import app.sportahub.userservice.exception.user.friend.UserSentFriendRequestToSelfException;
+import app.sportahub.userservice.exception.user.friend.*;
 import app.sportahub.userservice.mapper.user.ProfileMapper;
 import app.sportahub.userservice.mapper.user.UserMapper;
 import app.sportahub.userservice.model.user.*;
 import app.sportahub.userservice.repository.BadgeRepository;
+import app.sportahub.userservice.repository.FriendRepository;
 import app.sportahub.userservice.repository.user.UserRepository;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,6 +54,9 @@ public class UserServiceTest {
     private BadgeRepository badgeRepository;
 
     @Mock
+    private FriendRepository friendRepository;
+
+    @Mock
     private KeycloakApiClient keycloakApiClient;
 
     private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
@@ -62,7 +68,7 @@ public class UserServiceTest {
     @BeforeEach
     void setUp() {
         userService = new UserServiceImpl(userRepository, badgeRepository,
-                keycloakApiClient, userMapper, profileMapper);
+                keycloakApiClient, userMapper, profileMapper, friendRepository);
     }
 
     private UserRequest getUserRequest() {
@@ -90,6 +96,47 @@ public class UserServiceTest {
                 new ArrayList<>()
         );
         return userRequest;
+    }
+
+    private Optional<User> getUser(String userID, String username) {
+        return Optional.of(User.builder()
+                .withId(userID)
+                .withEmail(username +"@email.com")
+                        .withUsername(username)
+                .withProfile(Profile.builder()
+                        .withFirstName("John")
+                        .withLastName("Doe")
+                        .withDateOfBirth(LocalDate.of(1990, 1, 1))
+                        .withGender("Male")
+                        .withPostalCode("12345")
+                        .withPhoneNumber("1234567890")
+                        .withSportsOfPreference(
+                                List.of(new SportLevel("Basketball", "Intermediate"),
+                                        new SportLevel("Soccer", "Beginner")))
+                        .withRanking("100")
+                        .build())
+                        .build());
+    }
+
+    private Optional<User> getUser(String userID, String username, List<Friend> friendList) {
+        return Optional.of(User.builder()
+                .withId(userID)
+                .withEmail(username +"@email.com")
+                .withUsername(username)
+                .withProfile(Profile.builder()
+                        .withFirstName("John")
+                        .withLastName("Doe")
+                        .withDateOfBirth(LocalDate.of(1990, 1, 1))
+                        .withGender("Male")
+                        .withPostalCode("12345")
+                        .withPhoneNumber("1234567890")
+                        .withSportsOfPreference(
+                                List.of(new SportLevel("Basketball", "Intermediate"),
+                                        new SportLevel("Soccer", "Beginner")))
+                        .withRanking("100")
+                        .build())
+                        .withFriendList(friendList)
+                .build());
     }
 
     @Test
@@ -443,55 +490,30 @@ public class UserServiceTest {
     @Test
     void sendFriendRequestShouldReturnSuccess() {
         // Arrange
-        String senderId = "sender";
-        Optional<User> sendUser = Optional.of(User.builder()
-                .withId(senderId)
-                .withEmail("test@example.com")
-                .withUsername("sender")
-                .withProfile(Profile.builder()
-                        .withFirstName("John")
-                        .withLastName("Doe")
-                        .withDateOfBirth(LocalDate.of(1990, 1, 1))
-                        .withGender("Male")
-                        .withPostalCode("12345")
-                        .withPhoneNumber("1234567890")
-                        .withSportsOfPreference(
-                                List.of(new SportLevel("Basketball", "Intermediate"),
-                                        new SportLevel("Soccer", "Beginner")))
-                        .withRanking("100")
-                        .build())
-                .build());
+        String senderId = "senderId";
+        String senderUsername = "sender";
+        Optional<User> sendUser = getUser(senderId, senderUsername);
 
-        String receiverId = "receiver";
-        Optional<User> receiverUser = Optional.of(User.builder()
-                .withId(receiverId)
-                .withEmail("test@example.com")
-                .withUsername("receiver")
-                .withProfile(Profile.builder()
-                        .withFirstName("John")
-                        .withLastName("Doe")
-                        .withDateOfBirth(LocalDate.of(1990, 1, 1))
-                        .withGender("Male")
-                        .withPostalCode("12345")
-                        .withPhoneNumber("1234567890")
-                        .withSportsOfPreference(
-                                List.of(new SportLevel("Basketball", "Intermediate"),
-                                        new SportLevel("Soccer", "Beginner")))
-                        .withRanking("100")
-                        .build())
-                .build());
+        String receiverId = "receiverId";
+        String receiverUsername = "receiver";
+        Optional<User> receiverUser = getUser(receiverId, receiverUsername);
 
         when(userRepository.findUserById(senderId)).thenReturn(sendUser);
-        when(userRepository.findUserByUsername(receiverUser.get().getUsername())).thenReturn(receiverUser);
-        User send = sendUser.get();
-        User receiver = receiverUser.get();
+        when(userRepository.findUserById(receiverId)).thenReturn(receiverUser);
+        User send = sendUser.orElseThrow();
+        User receiver = receiverUser.orElseThrow();
+        FriendRequestRequest friendRequestRequest = new FriendRequestRequest(receiverUser.get().getId());
+        Friend friend = Friend.builder().withFriendRequestStatus(FriendRequestStatusEnum.SENT)
+                        .withUserId(receiverId)
+                                .build();
 
         when(userRepository.save(send)).thenReturn(send);
         when(userRepository.save(receiver)).thenReturn(receiver);
+        when(friendRepository.save(any())).thenReturn(friend);
 
         // Act
         FriendRequestResponse response = userService.sendFriendRequest(sendUser.get().getId(),
-                new FriendRequestRequest(receiverUser.get().getUsername()));
+                friendRequestRequest);
 
         // Assert
         assertNotNull(response);
@@ -520,60 +542,28 @@ public class UserServiceTest {
         // Arrange
 
         List<Friend> senderFriendList = new ArrayList<>();
-        senderFriendList.add(new Friend("receiver", FriendRequestStatusEnum.SENT));
+        senderFriendList.add(new Friend("receiverId", FriendRequestStatusEnum.SENT));
 
         List<Friend> receiverFriendList = new ArrayList<>();
-        receiverFriendList.add(new Friend("sender", FriendRequestStatusEnum.RECEIVED));
+        receiverFriendList.add(new Friend("senderId", FriendRequestStatusEnum.RECEIVED));
 
-        String senderId = "sender";
-        Optional<User> sendUser = Optional.of(User.builder()
-                .withId(senderId)
-                .withEmail("test@example.com")
-                .withUsername("sender")
-                .withProfile(Profile.builder()
-                        .withFirstName("John")
-                        .withLastName("Doe")
-                        .withDateOfBirth(LocalDate.of(1990, 1, 1))
-                        .withGender("Male")
-                        .withPostalCode("12345")
-                        .withPhoneNumber("1234567890")
-                        .withSportsOfPreference(
-                                List.of(new SportLevel("Basketball", "Intermediate"),
-                                        new SportLevel("Soccer", "Beginner")))
-                        .withRanking("100")
-                        .build())
-                        .withFriendList(senderFriendList)
-                .build());
+        String senderId = "senderId";
+        String senderUsername = "sender";
+        Optional<User> sendUser = getUser(senderId, senderUsername, senderFriendList);
 
-        String receiverId = "receiver";
-        Optional<User> receiverUser = Optional.of(User.builder()
-                .withId(receiverId)
-                .withEmail("test@example.com")
-                .withUsername("receiver")
-                .withProfile(Profile.builder()
-                        .withFirstName("John")
-                        .withLastName("Doe")
-                        .withDateOfBirth(LocalDate.of(1990, 1, 1))
-                        .withGender("Male")
-                        .withPostalCode("12345")
-                        .withPhoneNumber("1234567890")
-                        .withSportsOfPreference(
-                                List.of(new SportLevel("Basketball", "Intermediate"),
-                                        new SportLevel("Soccer", "Beginner")))
-                        .withRanking("100")
-                        .build())
-                        .withFriendList(receiverFriendList)
-                .build());
+        String receiverId = "receiverId";
+        String receiverUsername = "receiver";
+        Optional<User> receiverUser = getUser(receiverId, receiverUsername, receiverFriendList);
 
-        when(userRepository.findUserById(senderId)).thenReturn(sendUser);
-        when(userRepository.findUserByUsername(receiverUser.get().getUsername())).thenReturn(receiverUser);
-        User send = sendUser.get();
-        User receiver = receiverUser.get();
+        lenient().when(userRepository.findUserById(senderId)).thenReturn(sendUser);
+        lenient().when(userRepository.findUserById(receiverId)).thenReturn(receiverUser);
+        User send = sendUser.orElseThrow();
+        User receiver = receiverUser.orElseThrow();
 
         // Act
         UserAlreadyInFriendListException exception = assertThrows(UserAlreadyInFriendListException.class,
                 () -> userService.sendFriendRequest(sendUser.get().getId(),
-                new FriendRequestRequest(receiverUser.get().getUsername())));
+                new FriendRequestRequest(receiverUser.get().getId())));
 
         // Assert
         assertEquals("409 CONFLICT \"User with username: " + receiver.getUsername() + " and status: "
@@ -584,35 +574,312 @@ public class UserServiceTest {
     void sendFriendRequestShouldThrowUserSentFriendRequestToSelfException() {
         // Arrange
         String senderId = "sender";
-        Optional<User> sendUser = Optional.of(User.builder()
-                .withId(senderId)
-                .withEmail("test@example.com")
-                .withUsername("sender")
-                .withProfile(Profile.builder()
-                        .withFirstName("John")
-                        .withLastName("Doe")
-                        .withDateOfBirth(LocalDate.of(1990, 1, 1))
-                        .withGender("Male")
-                        .withPostalCode("12345")
-                        .withPhoneNumber("1234567890")
-                        .withSportsOfPreference(
-                                List.of(new SportLevel("Basketball", "Intermediate"),
-                                        new SportLevel("Soccer", "Beginner")))
-                        .withRanking("100")
-                        .build())
-                .build());
+        String sendUsername = "sender";
+        Optional<User> sendUser = getUser(senderId, sendUsername);
 
         when(userRepository.findUserById(senderId)).thenReturn(sendUser);
-        when(userRepository.findUserByUsername(sendUser.get().getUsername())).thenReturn(sendUser);
-        User send = sendUser.get();
+        User send = sendUser.orElseThrow();
 
         // Act
         UserSentFriendRequestToSelfException exception = assertThrows(UserSentFriendRequestToSelfException.class,
-                () -> userService.sendFriendRequest(senderId, new FriendRequestRequest(send.getUsername())));
+                () -> userService.sendFriendRequest(senderId, new FriendRequestRequest(send.getId())));
 
         // Assert
         assertEquals("409 CONFLICT \"Can't send friend request to self\"", exception.getMessage());
     }
+
+    @Test
+    void updateFriendRequestACCEPTShouldReturnSuccess() {
+        // Arrange
+
+        List<Friend> userFriendList = new ArrayList<>();
+        userFriendList.add(new Friend("friendID", FriendRequestStatusEnum.RECEIVED));
+        userFriendList.add(new Friend("otherFriendID", FriendRequestStatusEnum.RECEIVED));
+
+        List<Friend> friendFriendList = new ArrayList<>();
+        friendFriendList.add(new Friend("userID", FriendRequestStatusEnum.SENT));
+
+        String userId = "userID";
+        String username = "user";
+        User user = getUser(userId, username, userFriendList).orElseThrow();
+
+        String friendId = "friendID";
+        String friendUsername = "friend";
+        User friendUser = getUser(friendId, friendUsername, friendFriendList).orElseThrow();
+
+        UpdateFriendRequestRequest updateFriendRequestRequest = new UpdateFriendRequestRequest(friendId,
+                UpdateFriendRequestActionEnum.ACCEPT);
+
+        lenient().when(userRepository.findUserById(userId)).thenReturn(Optional.of(user));
+        lenient().when(userRepository.findUserById(friendId)).thenReturn(Optional.of(friendUser));
+        when(friendRepository.findFriendById(any())).thenReturn(Optional.of(userFriendList.getFirst()));
+        lenient().when(userRepository.save(user)).thenReturn(user);
+        lenient().when(userRepository.save(friendUser)).thenReturn(friendUser);
+
+        // Act
+        UpdateFriendRequestResponse updateFriendRequestResponse = userService
+                .updateFriendRequest(userId, "requestID", updateFriendRequestRequest );
+
+        // Assert
+        assertEquals("User with id: " + user.getId()
+                + " accepted the friend request of user with id: " + friendUser.getId() + " successfully",
+                updateFriendRequestResponse.message());
+
+        assertEquals(FriendRequestStatusEnum.ACCEPTED, user.getFriendList().getFirst().getFriendRequestStatus());
+        assertEquals(FriendRequestStatusEnum.ACCEPTED, friendUser.getFriendList().getFirst().getFriendRequestStatus());
+    }
+
+    @Test
+    void updateFriendRequestDECLINEShouldReturnSuccess() {
+        // Arrange
+
+        List<Friend> userFriendList = new ArrayList<>();
+        userFriendList.add(new Friend("friendID", FriendRequestStatusEnum.SENT));
+
+        List<Friend> friendFriendList = new ArrayList<>();
+        friendFriendList.add(new Friend("userID", FriendRequestStatusEnum.RECEIVED));
+
+        String userId = "userID";
+        String username = "user";
+        User user = getUser(userId, username, userFriendList).orElseThrow();
+
+        String friendId = "friendID";
+        String friendUsername = "friend";
+        User friendUser = getUser(friendId, friendUsername, friendFriendList).orElseThrow();
+
+        UpdateFriendRequestRequest updateFriendRequestRequest = new UpdateFriendRequestRequest(friendId,
+                UpdateFriendRequestActionEnum.DECLINE);
+
+        lenient().when(userRepository.findUserById(userId)).thenReturn(Optional.of(user));
+        lenient().when(userRepository.findUserById(friendId)).thenReturn(Optional.of(friendUser));
+        when(friendRepository.findFriendById(any())).thenReturn(Optional.of(userFriendList.getFirst()));
+        lenient().when(userRepository.save(user)).thenReturn(user);
+        lenient().when(userRepository.save(friendUser)).thenReturn(friendUser);
+
+        // Act
+        UpdateFriendRequestResponse updateFriendRequestResponse = userService
+                .updateFriendRequest(userId, "requestID", updateFriendRequestRequest );
+
+        // Assert
+        assertEquals("User with id: " + user.getId()
+                        + " declined the friend request of user with id: " + friendUser.getId() + " successfully",
+                updateFriendRequestResponse.message());
+
+        assertTrue(user.getFriendList().isEmpty());
+        assertTrue(friendUser.getFriendList().isEmpty());
+    }
+
+    @Test
+    void updateFriendRequestShouldThrowUserDoesNotExistExceptionOnUserID() {
+        // Arrange
+        String userId = new ObjectId().toHexString();
+
+        // Act
+        UserDoesNotExistException exception = assertThrows(UserDoesNotExistException.class, () ->
+                        userService.updateFriendRequest(userId, "requestId",
+                                new UpdateFriendRequestRequest("friendUsername",
+                                        UpdateFriendRequestActionEnum.ACCEPT)));
+
+        // Assert
+        assertEquals("404 NOT_FOUND \"User with identifier: " + userId + " does not exist.\"",
+                exception.getMessage());
+    }
+
+    @Test
+    void updateFriendRequestShouldThrowUserDoesNotExistExceptionOnFriendUsername() {
+        // Arrange
+        String userId = "userID";
+        String username = "user";
+        User user = getUser(userId, username).orElseThrow();
+        String friendUsername = new ObjectId().toHexString();
+
+        UpdateFriendRequestRequest updateFriendRequestRequest = new UpdateFriendRequestRequest(friendUsername,
+                UpdateFriendRequestActionEnum.DECLINE);
+
+        when(userRepository.findUserById(userId)).thenReturn(Optional.of(user));
+
+        // Act
+        UserDoesNotExistException exception = assertThrows(UserDoesNotExistException.class, () ->
+                userService.updateFriendRequest(userId, "requestId",
+                        updateFriendRequestRequest));
+
+        // Assert
+        assertEquals("404 NOT_FOUND \"User with identifier: " + friendUsername + " does not exist.\"",
+                exception.getMessage());
+    }
+
+    @Test
+    void updateFriendRequestShouldThrowFriendDoesNotExistException() {
+        // Arrange
+        String requestId = new ObjectId().toHexString();
+        String userId = "userID";
+        String username = "user";
+        User user = getUser(userId, username).orElseThrow();
+
+        String friendId = "friendID";
+        String friendUsername = "friend";
+        User friendUser = getUser(friendId, friendUsername).orElseThrow();
+
+        UpdateFriendRequestRequest updateFriendRequestRequest = new UpdateFriendRequestRequest(friendId,
+                UpdateFriendRequestActionEnum.DECLINE);
+
+        when(userRepository.findUserById(userId)).thenReturn(Optional.of(user));
+        when(userRepository.findUserById(friendId)).thenReturn(Optional.of(friendUser));
+
+        // Act
+        FriendDoesNotExistException exception = assertThrows(FriendDoesNotExistException.class, () ->
+                userService.updateFriendRequest(userId, requestId,
+                        updateFriendRequestRequest));
+
+        // Assert
+        assertEquals("404 NOT_FOUND \"Friend with identifier: " + requestId + " does not exist.\"",
+                exception.getMessage());
+    }
+
+    @Test
+    void updateFriendRequestShouldThrowGivenFriendUsernameDoesNotMatchFriendFoundByIdException() {
+        // Arrange
+        String requestId = new ObjectId().toHexString();
+        List<Friend> userFriendList = new ArrayList<>();
+        userFriendList.add(new Friend("friendId", FriendRequestStatusEnum.RECEIVED));
+
+        String userId = "userID";
+        String username = "user";
+        User user = getUser(userId, username, userFriendList).orElseThrow();
+
+        String wrongUserId = "wrongUserId";
+        String wrongUserUsername = "wrongUser";
+        User wrongUser = getUser(wrongUserId, wrongUserUsername).orElseThrow();
+
+        UpdateFriendRequestRequest updateFriendRequestRequest = new UpdateFriendRequestRequest(wrongUser.getId(),
+                UpdateFriendRequestActionEnum.ACCEPT);
+
+        when(userRepository.findUserById(userId)).thenReturn(Optional.of(user));
+        when(userRepository.findUserById(wrongUser.getId())).thenReturn(Optional.of(wrongUser));
+        when(friendRepository.findFriendById(any())).thenReturn(Optional.of(userFriendList.getFirst()));
+
+        // Act
+        GivenFriendUserIdDoesNotMatchFriendFoundByIdException exception =
+                assertThrows(GivenFriendUserIdDoesNotMatchFriendFoundByIdException.class, () ->
+                userService.updateFriendRequest(userId, requestId ,
+                        updateFriendRequestRequest));
+
+        // Assert
+        assertEquals("409 CONFLICT \"Given friend with the user id: "
+                + wrongUser.getId() + " does not match the friend found with the given request id: "
+                + requestId + "\"", exception.getMessage());
+    }
+
+    @Test
+    void updateFriendRequestShouldThrowFriendNotFoundInFriendListExceptionFromIsFriendFound1() {
+        // Arrange
+        List<Friend> userFriendList = new ArrayList<>();
+        Friend userFriend = new Friend("friendID", FriendRequestStatusEnum.RECEIVED);
+
+        List<Friend> friendFriendList = new ArrayList<>();
+        friendFriendList.add(new Friend("userID", FriendRequestStatusEnum.SENT));
+
+        String userId = "userID";
+        String username = "user";
+        User user = getUser(userId, username, userFriendList).orElseThrow();
+
+        String friendId = "friendID";
+        String friendUsername = "friend";
+        User friendUser = getUser(friendId, friendUsername, friendFriendList).orElseThrow();
+
+        UpdateFriendRequestRequest updateFriendRequestRequest = new UpdateFriendRequestRequest(friendId,
+                UpdateFriendRequestActionEnum.DECLINE);
+
+        lenient().when(userRepository.findUserById(userId)).thenReturn(Optional.of(user));
+        lenient().when(userRepository.findUserById(friendUser.getId())).thenReturn(Optional.of(friendUser));
+        when(friendRepository.findFriendById(any())).thenReturn(Optional.of(userFriend));
+        lenient().when(userRepository.save(user)).thenReturn(user);
+        lenient().when(userRepository.save(friendUser)).thenReturn(friendUser);
+
+        // Act
+        FriendNotFoundInFriendListException exception = assertThrows(FriendNotFoundInFriendListException.class, () ->
+                userService.updateFriendRequest(userId, "requestId", updateFriendRequestRequest));
+
+        // Assert
+        assertEquals("404 NOT_FOUND \"User with identifier: "
+                + user.getId() + " does not have friend with identifier: "
+                + friendUser.getId() + " in their friend list.\"", exception.getMessage());
+    }
+
+    @Test
+    void updateFriendRequestShouldThrowFriendNotFoundInFriendListExceptionFromIsFriendFound2() {
+        // Arrange
+        List<Friend> userFriendList = new ArrayList<>();
+        Friend userFriend = new Friend("friendID", FriendRequestStatusEnum.SENT);
+        userFriendList.add(userFriend);
+
+        List<Friend> friendFriendList = new ArrayList<>();
+
+        String userId = "userID";
+        String username = "user";
+        User user = getUser(userId, username, userFriendList).orElseThrow();
+
+        String friendId = "friendID";
+        String friendUsername = "friend";
+        User friendUser = getUser(friendId, friendUsername, friendFriendList).orElseThrow();
+
+        UpdateFriendRequestRequest updateFriendRequestRequest = new UpdateFriendRequestRequest(friendId,
+                UpdateFriendRequestActionEnum.DECLINE);
+
+        lenient().when(userRepository.findUserById(userId)).thenReturn(Optional.of(user));
+        lenient().when(userRepository.findUserById(friendUser.getId())).thenReturn(Optional.of(friendUser));
+        when(friendRepository.findFriendById(any())).thenReturn(Optional.of(userFriend));
+        lenient().when(userRepository.save(user)).thenReturn(user);
+        lenient().when(userRepository.save(friendUser)).thenReturn(friendUser);
+
+        // Act
+        FriendNotFoundInFriendListException exception = assertThrows(FriendNotFoundInFriendListException.class, () ->
+                userService.updateFriendRequest(userId, "requestId", updateFriendRequestRequest));
+
+        // Assert
+        assertEquals("404 NOT_FOUND \"User with identifier: "
+                + friendUser.getId() + " does not have friend with identifier: "
+                + user.getId() + " in their friend list.\"", exception.getMessage());
+    }
+
+    @Test
+    void updateFriendRequestShouldThrowTryingToAcceptInvalidFriendRequestException() {
+        // Arrange
+
+        List<Friend> userFriendList = new ArrayList<>();
+        userFriendList.add(new Friend("friendID", FriendRequestStatusEnum.SENT));
+
+        List<Friend> friendFriendList = new ArrayList<>();
+        friendFriendList.add(new Friend("userID", FriendRequestStatusEnum.RECEIVED));
+
+        String userId = "userID";
+        String username = "user";
+        User user = getUser(userId, username, userFriendList).orElseThrow();
+
+        String friendId = "friendID";
+        String friendUsername = "friend";
+        User friendUser = getUser(friendId, friendUsername, friendFriendList).orElseThrow();
+
+        UpdateFriendRequestRequest updateFriendRequestRequest = new UpdateFriendRequestRequest(friendId,
+                UpdateFriendRequestActionEnum.ACCEPT);
+
+        lenient().when(userRepository.findUserById(userId)).thenReturn(Optional.of(user));
+        lenient().when(userRepository.findUserById(friendUser.getId())).thenReturn(Optional.of(friendUser));
+        when(friendRepository.findFriendById(any())).thenReturn(Optional.of(userFriendList.getFirst()));
+        lenient().when(userRepository.save(user)).thenReturn(user);
+        lenient().when(userRepository.save(friendUser)).thenReturn(friendUser);
+
+        // Act
+        TryingToAcceptInvalidFriendRequestException exception = assertThrows(
+                TryingToAcceptInvalidFriendRequestException.class, () -> userService
+                        .updateFriendRequest(userId, "requestID", updateFriendRequestRequest)) ;
+
+        // Assert
+        assertEquals("409 CONFLICT \"User with identifier: " + user.getId()
+                + " is trying to accept a friend request from: " + friendUser.getId()
+                + " but the status of the friend request is " + user.getFriendList().getFirst().getFriendRequestStatus()
+                + " instead of RECEIVED.\"", exception.getMessage());
+        }
 
     @Test
     void getFriendRequestsShouldReturnSuccess() {
@@ -620,12 +887,22 @@ public class UserServiceTest {
         User user = new User();
         user.setUsername("testUsername");
         List<Friend> friendList = new ArrayList<>();
-        friendList.add(new Friend("sender", FriendRequestStatusEnum.SENT));
-        friendList.add(new Friend("receiver", FriendRequestStatusEnum.RECEIVED));
+        Friend friend1 = new Friend("senderId", FriendRequestStatusEnum.SENT);
+        friend1.setId("friend1RequestId");
+        friendList.add(friend1);
+        Friend friend2 = new Friend("receiverId", FriendRequestStatusEnum.RECEIVED);
+        friend2.setId("friend2RequestId");
+        friendList.add(friend2);
         user.setFriendList(friendList);
+
+        User receiverUser = new User();
+        receiverUser.setUsername("receiverUsername");
+        receiverUser.setId("receiverId");
+
         List<FriendRequestStatusEnum> typeList = new ArrayList<>();
         typeList.add(FriendRequestStatusEnum.RECEIVED);
-        when(userRepository.findUserById("id")).thenReturn(Optional.of(user));
+        lenient().when(userRepository.findUserById("id")).thenReturn(Optional.of(user));
+        lenient().when(userRepository.findUserById("receiverId")).thenReturn(Optional.of(receiverUser));
 
         // Act
         List<ViewFriendRequestsResponse> listResponse = userService.getFriendRequests("id", typeList);
@@ -633,7 +910,9 @@ public class UserServiceTest {
         // Assert
         assertFalse(listResponse.isEmpty());
         assertEquals(1, listResponse.size());
-        assertEquals("receiver", listResponse.getFirst().userName());
+        assertEquals("receiverId", listResponse.getFirst().friendUserId());
+        assertEquals("receiverUsername", listResponse.getFirst().friendUsername());
+        assertEquals("friend2RequestId", listResponse.getFirst().id());
     }
 
     @Test

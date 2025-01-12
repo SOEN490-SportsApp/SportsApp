@@ -4,7 +4,7 @@ import app.sportahub.userservice.exception.user.*;
 import app.sportahub.userservice.exception.user.InvalidCredentialsException;
 import app.sportahub.userservice.exception.user.UserDoesNotExistException;
 import app.sportahub.userservice.exception.user.UserEmailAlreadyExistsException;
-import app.sportahub.userservice.exception.user.friend.UserSentFriendRequestToSelfException;
+import app.sportahub.userservice.exception.user.friend.*;
 import app.sportahub.userservice.exception.user.UserWithEmailDoesNotExistException;
 import app.sportahub.userservice.exception.user.badge.BadgeNotFoundException;
 import app.sportahub.userservice.exception.user.keycloak.KeycloakCommunicationException;
@@ -94,6 +94,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<Map<String, Object>>handleResponseStatusException(ResponseStatusException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("error", ex.getReason());
+        response.put("message", ex.getStatusCode().value());
+        return ResponseEntity.status(ex.getStatusCode()).body(response);
+    }
     @ExceptionHandler(UserSentFriendRequestToSelfException.class)
     public ResponseEntity<Map<String, Object>> handleUserSentFriendRequestToSelfException(UserSentFriendRequestToSelfException ex) {
         Map<String, Object> response = new HashMap<>();
