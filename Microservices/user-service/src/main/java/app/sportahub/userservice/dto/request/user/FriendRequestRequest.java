@@ -1,4 +1,4 @@
 package app.sportahub.userservice.dto.request.user;
 
-public record FriendRequestRequest(String receiverUsername) {
+public record FriendRequestRequest(String receiverUserId) {
 }
