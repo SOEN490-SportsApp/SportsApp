@@ -30,8 +30,8 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_GATEWAYSERVICE }}
         with:
           args: >
-            -D sonar.projectKey=sportaforked_GatewayService
-            -D sonar.organization=sportaforked
+            -D sonar.projectKey=Sporta_SportsApp_GatewayMicroService
+            -D sonar.organization=soen490-sportsapp
             -D sonar.host.url=https://sonarcloud.io
             -D sonar.java.binaries=Microservices/gateway/build/classes/java/main
             -D sonar.sources=Microservices/gateway/src/main/java

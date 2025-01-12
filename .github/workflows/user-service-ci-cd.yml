@@ -30,8 +30,8 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_USERSERVICE }}
         with:
           args: >
-            -Dsonar.projectKey=sportaforked_UserService
-            -Dsonar.organization=sportaforked
+            -Dsonar.projectKey=Sporta_SportsApp_UserMicroService
+            -Dsonar.organization=soen490-sportsapp
             -Dsonar.host.url=https://sonarcloud.io
             -Dsonar.java.binaries=Microservices/user-service/build/classes/java/main
             -Dsonar.sources=Microservices/user-service/src/main/java

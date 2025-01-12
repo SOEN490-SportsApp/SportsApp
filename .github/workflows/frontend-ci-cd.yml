@@ -34,8 +34,8 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_CLIENTAPP }}
         with:
           args: >
-            -D sonar.projectKey=sportaforked_ClientApp
-            -D sonar.organization=sportaforked
+            -D sonar.projectKey=Sporta_SportsApp_ClientApp
+            -D sonar.organization=soen490-sportsapp
             -D sonar.host.url=https://sonarcloud.io
             -D sonar.sources=ClientApp/
             -D sonar.tests=ClientApp/__tests__
