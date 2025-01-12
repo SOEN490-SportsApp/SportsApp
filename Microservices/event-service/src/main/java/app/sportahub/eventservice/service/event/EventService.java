@@ -18,6 +18,8 @@ public interface EventService {
 
     EventResponse patchEvent(String id, EventRequest eventRequest);
 
+    boolean isCreator(String id, String userId);
+
     void deleteEvent(String id);
 
     ParticipantResponse joinEvent(String id, String userId);

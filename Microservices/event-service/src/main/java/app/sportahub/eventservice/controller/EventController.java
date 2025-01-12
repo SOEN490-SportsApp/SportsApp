@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -46,6 +47,7 @@ public class EventController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("@eventService.isCreator(#id, authentication.name) || hasRole('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     @Operation(
             summary = "Update an existing event",
@@ -57,6 +59,7 @@ public class EventController {
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("@eventService.isCreator(#id, authentication.name) || hasRole('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     @Operation(
             summary = "Partially update an existing event",
@@ -68,6 +71,7 @@ public class EventController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("@eventService.isCreator(#id, authentication.name) || hasRole('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Deletes an event", description = "Deletes an event from the database based on the provided event ID.")
     public void deleteEvent(@PathVariable String id) {
@@ -75,6 +79,7 @@ public class EventController {
     }
 
     @PostMapping("/{id}/join")
+    @PreAuthorize("authentication.name == #userId|| hasRole('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Join an event", description = "Enables a user to join an event, provided there are available slots.")
     public ParticipantResponse joinEvent(@PathVariable String id, @RequestParam String userId) {
