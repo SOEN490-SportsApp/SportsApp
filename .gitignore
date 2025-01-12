@@ -6,3 +6,5 @@ node_modules/
 .DS_Store
 ClientApp/package-lock.json
 ClientApp/coverage
+
+sports-app.code-workspace
