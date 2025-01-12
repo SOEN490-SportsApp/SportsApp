@@ -3,7 +3,7 @@ plugins {
 	id 'org.springframework.boot' version '3.3.5'
 	id 'io.spring.dependency-management' version '1.1.6'
 	id 'org.cyclonedx.bom' version '1.10.0'
-	id "org.sonarqube" version "6.0.1.5171"
+	id 'jacoco'
 }
 
 group = 'app.sportahub'
@@ -62,10 +62,25 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
-sonar {
-	properties {
-		property "sonar.projectKey", "Sporta_SportsApp_EventMicroService"
-		property "sonar.organization", "soen490-sportsapp"
-		property "sonar.host.url", "https://sonarcloud.io"
+jacoco {
+	toolVersion = "0.8.12"
+}
+
+jacocoTestReport {
+	dependsOn test
+	reports {
+		xml.required = true
+		html.required = true
 	}
 }
+
+jacocoTestCoverageVerification {
+	violationRules {
+		rule {
+			limit {
+				minimum = 80
+			}
+		}
+	}
+}
+
