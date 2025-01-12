@@ -1,18 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { router, useLocalSearchParams, useRouter } from "expo-router";
-import { View, Text, StyleSheet, ScrollView, Image, ActivityIndicator } from "react-native";
-import { API_ENDPOINTS } from "@/utils/api/endpoints";
-import { Event } from "@/types/event";
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Image } from "react-native";
+import { useLocalSearchParams, router } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { mvs } from "@/utils/helpers/uiScaler";
-import { IconPlacement } from "@/utils/constants/enums";
-import EventHeader from "@/components/EventHeader";
-import ConfirmButton from "@/components/ConfirmButton";
-import axiosInstance from "@/services/axiosInstance";
 import { useSelector } from "react-redux";
+import SkillTag from "@/components/Event/SkillTag";
+import { Event } from "@/types/event";
+import { API_ENDPOINTS } from "@/utils/api/endpoints";
+import { getAxiosInstance } from "@/services/axiosInstance";
+import ConfirmButton from "@/components/Helper Components/ConfirmButton";
 import themeColors from "@/utils/constants/colors";
 
 const EventDetails = () => {
+  const axiosInstance = getAxiosInstance();
   const user = useSelector((state: { user: any }) => state.user);
   const { eventId } = useLocalSearchParams<{ eventId: string }>();
   const [event, setEvent] = useState<Event | null>(null);
@@ -21,16 +20,16 @@ const EventDetails = () => {
 
   const handleJoinEvent = async () => {
     try {
-      const response = await axiosInstance.post(
+      await axiosInstance.post(
         API_ENDPOINTS.JOIN_EVENT_BY_ID.replace("{id}", eventId!),
         null,
         { params: { userId: user.id } }
       );
-      alert("Successfully joined event.");
+      alert("Successfully joined the event!");
       router.back();
     } catch (err) {
-      setError("Failed to join event.");
       console.error(err);
+      setError("Failed to join the event.");
     }
   };
 
@@ -42,8 +41,8 @@ const EventDetails = () => {
         );
         setEvent(response.data);
       } catch (err) {
-        setError("Failed to fetch event details.");
         console.error(err);
+        setError("Failed to fetch event details.");
       } finally {
         setLoading(false);
       }
@@ -55,7 +54,7 @@ const EventDetails = () => {
   if (loading) {
     return (
       <View style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color="#000" testID="loader"/>
+        <ActivityIndicator size="large" color="#000" />
       </View>
     );
   }
@@ -80,183 +79,165 @@ const EventDetails = () => {
     (participant) => participant.userId === user.id
   );
 
-  const cutoffTime = new Date();
-  cutoffTime.setHours(cutoffTime.getHours() + parseInt(event.cutOffTime, 10));
-  const currentTime = new Date();
-  const timeDiff = cutoffTime.getTime() - currentTime.getTime();
-  const hoursLeft = Math.floor(timeDiff / (1000 * 60 * 60));
-
   return (
-    <View style={styles.container}>
-      <ScrollView style={styles.scrollView}>
-        {/* EventHeader Component */}
-        <EventHeader sportType={event.sportType} />
+    <ScrollView contentContainerStyle={styles.container}>
+      {/* Event Header */}
+      <View style={styles.header}>
+        <MaterialCommunityIcons
+          name={event.sportType ? (event.sportType.toLowerCase() as any) : "help-circle-outline"}
+          size={50}
+          color="#94504b"
+        />
+        <Text style={styles.eventName}>{event.eventName}</Text>
+      </View>
 
-        {/* Event Details */}
-        <View style={styles.detailsContainer}>
-          {/* Event Title */}
-          <View style={styles.eventHeader}>
-            <Text style={styles.eventName}>{event.eventName}</Text>
-          </View>
+      {/* Event Details */}
+      <View style={styles.details}>
+        <Text style={styles.detailText}>
+          📍 {event.locationResponse?.streetNumber} {event.locationResponse?.streetName}, {event.locationResponse.city}, {event.locationResponse.province}
+        </Text>
+        <Text style={styles.detailText}>
+          📅 {new Date(event.date).toDateString()}
+        </Text>
+        <Text style={styles.detailText}>
+          {event.isPrivate ? "🔒 Private Event" : "🌐 Public Event"}
+        </Text>
+        {/* Skill Tags */}
+        <View style={styles.skillTags}>
+          {event.requiredSkillLevel.map((level, index) => (
+            <SkillTag key={index} level={level} />
+          ))}
+        </View>
+      </View>
 
-          {/* Address */}
-          <Text style={styles.eventLocation}>
-            {`${event.locationResponse.streetNumber} ${event.locationResponse.streetName}, ${event.locationResponse.city}, ${event.locationResponse.province}`}
+      {/* Description */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Description</Text>
+        <Text style={styles.sectionText}>
+          {event.description || "No description provided for this event."}
+        </Text>
+      </View>
+
+      {/* Participants */}
+      <View style={styles.section}>
+        <View style={styles.participantsHeader}>
+          <Text style={styles.sectionTitle}>Participants</Text>
+          <Text style={styles.participantsCount}>
+            {event.participants.filter((p) => p.attendStatus === null).length}/
+            {event.maxParticipants}
           </Text>
-
-          {/* Badges */}
-          <View style={styles.badgesContainer}>
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>{event.requiredSkillLevel.join(", ")}</Text>
-            </View>
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>{event.isPrivate ? "Private" : "Public"}</Text>
-            </View>
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>{event.date}</Text>
-            </View>
-          </View>
         </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Description</Text>
-          <Text style={styles.description}>{event.description}</Text>
-        </View>
-        <View style={styles.section}>
-          <View style={styles.participantsHeader}>
-            <Text style={styles.sectionTitle}>Participants</Text>
-            <Text style={styles.participantsCount}>
-              {event.participants.filter((p) => p.attendStatus === null).length}/
-              {event.maxParticipants}
+        <View style={styles.participantsContainer}>
+          {event.participants.filter((p) => p.attendStatus === null).length >
+            0 ? (
+            event.participants
+              .filter((p) => p.attendStatus === null)
+              .map((participant) => (
+                <View
+                  key={participant.userId}
+                  style={styles.participant}
+                >
+                  <Image
+                    source={require("@/assets/images/avatar-placeholder.png")}
+                    style={[styles.participantAvatar, participant.userId === user.id && styles.currentUserBorder ]}
+                    testID="participant-avatar"
+                  />
+                  {participant.userId === user.id && (
+                    <Text style={styles.currentUserText}>You</Text>
+                  )}
+                </View>
+              ))
+          ) : (
+            <Text style={styles.noParticipantsText}>
+              No participants yet. Be the first to join!
             </Text>
-          </View>
-          <View style={styles.participantsContainer}>
-            {event.participants.filter((p) => p.attendStatus === null).length >
-              0 ? (
-              event.participants
-                .filter((p) => p.attendStatus === null)
-                .map((participant) => (
-                  <View
-                    key={participant.userId}
-                    style={[
-                      styles.participant,
-                      participant.userId === user.id && styles.currentUserBorder,
-                    ]}
-                  >
-                    <Image
-                      source={require("@/assets/images/avatar-placeholder.png")}
-                      style={styles.participantAvatar}
-                      testID="participant-avatar"
-                    />
-                  </View>
-                ))
-            ) : (
-              <Text style={styles.noParticipantsText}>
-                No participants yet. Be the first to join!
-              </Text>
-            )}
-          </View>
+          )}
         </View>
-      </ScrollView>
+      </View>
+
+      {/* Join Button */}
       {!isUserParticipant && (
-        <View style={styles.joinButtonContainer}>
-          <ConfirmButton
-            text="Join Event"
-            onPress={handleJoinEvent}
-            icon={
-              <MaterialCommunityIcons name="login" size={mvs(24)} color="#fff" />
-            }
-            iconPlacement={IconPlacement.left}
-          />
-        </View>
+        <ConfirmButton
+          text="Join Event"
+          onPress={handleJoinEvent} icon={undefined} iconPlacement={null} />
       )}
-    </View>
+    </ScrollView>
   );
-}
+};
+
+export default EventDetails;
 
 const styles = StyleSheet.create({
   container: {
+    flexGrow: 1,
+    padding: 15,
+    backgroundColor: "#f5f5f5",
+  },
+  loaderContainer: {
     flex: 1,
-    backgroundColor: "#f9f9f9",
+    justifyContent: "center",
+    alignItems: "center",
   },
-  scrollView: {
+  errorContainer: {
     flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
   },
-  detailsContainer: {
-    padding: 16,
-    backgroundColor: "#fff",
-    marginBottom: 8,
+  errorText: {
+    fontSize: 16,
+    color: "red",
+    textAlign: "center",
   },
-  eventHeader: {
-    marginBottom: 8,
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 20,
+    backgroundColor: "#ffffff",
+    padding: 15,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
   },
   eventName: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: "bold",
+    marginLeft: 15,
     color: "#333",
   },
-  cutoffTime: {
+  details: {
+    marginBottom: 15,
+    backgroundColor: "#ffffff",
+    padding: 15,
+    borderRadius: 10,
+  },
+  detailText: {
     fontSize: 14,
-    fontWeight: "500",
-    color: "#e53935",
-    marginLeft: 8,
-  },
-  eventDate: {
-    fontSize: 16,
-    color: "#777",
-    marginVertical: 4,
-  },
-  eventLocation: {
-    fontSize: 16,
     color: "#555",
+    marginBottom: 5,
   },
-  badgesContainer: {
+  skillTags: {
     flexDirection: "row",
     flexWrap: "wrap",
-    marginTop: 8,
-  },
-  badge: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 16,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    marginRight: 8,
-    backgroundColor: "#f0f0f0",
-  },
-  badgeText: {
-    fontSize: 14,
-    color: "#333",
-    fontWeight: "500",
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  skillLevel: {
-    fontSize: 16,
-    color: "#555",
-    marginTop: 8,
-    fontStyle: "italic",
-  },
-  eventPrivacy: {
-    fontSize: 16,
-    color: "#555",
-    marginLeft: 16,
+    marginVertical: 5,
   },
   section: {
-    padding: 16,
-    backgroundColor: "#fff",
-    marginBottom: 8,
+    marginVertical: 10,
+    backgroundColor: "#ffffff",
+    padding: 15,
+    borderRadius: 10,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
     color: "#333",
+    marginBottom: 5,
   },
-  description: {
-    fontSize: 16,
+  sectionText: {
+    fontSize: 14,
     color: "#555",
   },
   participantsHeader: {
@@ -287,24 +268,10 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     borderColor: themeColors.primary,
   },
-  joinButtonContainer: {
-    marginHorizontal: 64,
-    padding: 16,
-    backgroundColor: "#f9f9f9",
-  },
-  loaderContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  errorText: {
-    fontSize: 16,
-    color: "red",
+  currentUserText: {
+    fontSize: 12,
+    marginTop: 5,
+    textAlign: "center",
   },
   noParticipantsText: {
     fontSize: 13,
@@ -313,5 +280,3 @@ const styles = StyleSheet.create({
     marginVertical: 16,
   },
 });
-
-export default EventDetails;
