@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 @Data
 public class Friend {
 
-    @NotBlank(message = "Username of friend must be provided.")
-    private String username;
+    @NotBlank(message = "User id of friend must be provided.")
+    private String userId;
 
     @NotBlank(message = "Friend request status must be provided.")
     private FriendRequestStatusEnum friendRequestStatus;

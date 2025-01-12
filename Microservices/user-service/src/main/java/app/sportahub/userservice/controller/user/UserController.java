@@ -85,7 +85,7 @@ public class UserController {
     @GetMapping("/{userId}/friend-requests")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "view received friend requests",
-    description = "Retrieves all the user's friend requests stored in their friend list.")
+    description = "Retrieves user's friend requests stored in their friend list based on given type.")
     public List<ViewFriendRequestsResponse> getFriendRequests(@PathVariable String userId, @RequestParam List<FriendRequestStatusEnum> type) {
         return userService.getFriendRequests(userId, type);
     }
