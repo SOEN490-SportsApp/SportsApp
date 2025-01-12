@@ -16,18 +16,20 @@ interface EventCardProps {
   showLocation?: boolean;
   showSportType?: boolean;
   showTimeLeft?: boolean;
+  isForProfile?: boolean;
 }
 
 const EventCard: React.FC<EventCardProps> = ({
   event,
   onPress,
-  showSkillTags = true, 
-  showCapacity = true, 
-  showDescription = true,
+  isForProfile = false,
+  showSkillTags = isForProfile? false: true, 
+  showCapacity = isForProfile? false: true, 
+  showDescription = isForProfile? false: true,
   showDetailPreview = true,
   showDate = true,
-  showLocation = true,
-  showTimeLeft = true,
+  showLocation = isForProfile? false: true,
+  showTimeLeft = isForProfile? false: true,
   showSportType = true,
 }) => {
 
@@ -55,6 +57,8 @@ const timeLeftshown = "";
 
 // Ensure both currentTime and cutoffTime are valid
 let timeLeftShown = "";
+let eventStarted = false;
+let canJoin = true;
 
 if (!isNaN(cutoffTime.getTime())) {
   const timeLeft = cutoffTime.getTime() - currentTime.getTime();
@@ -75,16 +79,32 @@ if (!isNaN(cutoffTime.getTime())) {
       timeLeftShown = `${weeksLeft} week${weeksLeft > 1 ? "s" : ""}`;
     }
   } else {
-    return null  }
+    if (!isForProfile) return null;
+    canJoin = false;
+    if(currentTime.getTime() > new Date(event.cutOffTime).getTime()) {
+      eventStarted = true;
+    }
+  }
 } else {
   console.error("Invalid cutoff time format.");
 }
 
+// Dynamic styling for the card
+const dynamicCardStyle = {
+  backgroundColor: (eventStarted && isForProfile)? "#B9B9B9" : "#ffffff", // Light red for expired, white for active
+  borderColor: canJoin ? "#f5c2c7" : "#cccccc", // Red border for expired, grey for active
+};
+
+const dynamicTimeLeftStyle = {
+  color: canJoin ? "#dc3545" : "#000000", // Red text for expired, black for active
+};
+
 return (
-  <TouchableOpacity style={styles.card} onPress={() => onPress(event.id)}>
+  <TouchableOpacity style={[styles.card, dynamicCardStyle]} onPress={() => onPress(event.id)}>
     <Text style={styles.eventName}>{event.eventName}</Text> 
     {showDetailPreview && 
     <Text style={styles.eventDetails}>
+      {/*TODO - Add distance calculation after backend does it*/}
       {showSportType ? `${event.sportType} - X km away` : `X km away`}
       </Text>}
     
