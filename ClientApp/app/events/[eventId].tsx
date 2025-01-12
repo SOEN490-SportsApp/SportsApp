@@ -9,6 +9,7 @@ import { API_ENDPOINTS } from "@/utils/api/endpoints";
 import { getAxiosInstance } from "@/services/axiosInstance";
 import ConfirmButton from "@/components/Helper Components/ConfirmButton";
 import themeColors from "@/utils/constants/colors";
+import { mhs, mvs } from "@/utils/helpers/uiScaler";
 
 const EventDetails = () => {
   const axiosInstance = getAxiosInstance();
@@ -170,7 +171,7 @@ export default EventDetails;
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    padding: 15,
+    padding: mhs(15),
     backgroundColor: "#f5f5f5",
   },
   loaderContainer: {
@@ -182,20 +183,20 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 20,
+    padding: mhs(20),
   },
   errorText: {
-    fontSize: 16,
+    fontSize: mvs(16),
     color: "red",
     textAlign: "center",
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: mvs(20),
     backgroundColor: "#ffffff",
-    padding: 15,
-    borderRadius: 10,
+    padding: mhs(15),
+    borderRadius: mhs(10),
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
@@ -203,51 +204,51 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   eventName: {
-    fontSize: 20,
+    fontSize: mvs(20),
     fontWeight: "bold",
-    marginLeft: 15,
+    marginLeft: mhs(15),
     color: "#333",
   },
   details: {
-    marginBottom: 15,
+    marginBottom: mvs(15),
     backgroundColor: "#ffffff",
-    padding: 15,
-    borderRadius: 10,
+    padding: mhs(15),
+    borderRadius: mhs(10),
   },
   detailText: {
-    fontSize: 14,
+    fontSize: mvs(14),
     color: "#555",
-    marginBottom: 5,
+    marginBottom: mvs(5),
   },
   skillTags: {
     flexDirection: "row",
     flexWrap: "wrap",
-    marginVertical: 5,
+    marginVertical: mvs(5),
   },
   section: {
-    marginVertical: 10,
+    marginVertical: mvs(10),
     backgroundColor: "#ffffff",
-    padding: 15,
-    borderRadius: 10,
+    padding: mhs(15),
+    borderRadius: mhs(10),
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: mvs(16),
     fontWeight: "bold",
     color: "#333",
-    marginBottom: 5,
+    marginBottom: mvs(5),
   },
   sectionText: {
-    fontSize: 14,
+    fontSize: mvs(14),
     color: "#555",
   },
   participantsHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingBottom: 8,
+    paddingBottom: mvs(8),
   },
   participantsCount: {
-    fontSize: 16,
+    fontSize: mvs(16),
     color: "#777",
   },
   participantsContainer: {
@@ -256,27 +257,27 @@ const styles = StyleSheet.create({
   },
   participant: {
     alignItems: "center",
-    marginRight: 16,
+    marginRight: mhs(16),
   },
   participantAvatar: {
-    width: 45,
-    height: 45,
-    borderRadius: 30,
+    width: mhs(45),
+    height: mvs(45),
+    borderRadius: mhs(30),
   },
   currentUserBorder: {
-    borderWidth: 3,
-    borderRadius: 30,
+    borderWidth: mhs(3),
+    borderRadius: mhs(30),
     borderColor: themeColors.primary,
   },
   currentUserText: {
-    fontSize: 12,
-    marginTop: 5,
+    fontSize: mvs(12),
+    marginTop: mvs(5),
     textAlign: "center",
   },
   noParticipantsText: {
-    fontSize: 13,
+    fontSize: mvs(13),
     color: "#777",
     textAlign: "center",
-    marginVertical: 16,
+    marginVertical: mvs(16),
   },
 });
