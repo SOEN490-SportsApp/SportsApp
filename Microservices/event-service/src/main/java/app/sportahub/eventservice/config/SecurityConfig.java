@@ -1,4 +1,4 @@
-package app.sportahub.userservice.config.auth;
+package app.sportahub.eventservice.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,7 +10,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
-import app.sportahub.userservice.utils.KeycloakJwtAuthenticationConverter;
+import app.sportahub.eventservice.utils.KeycloakJwtAuthenticationConverter;
 import lombok.SneakyThrows;
 
 @Configuration
@@ -28,12 +28,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         return http
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-
                         .requestMatchers(
-                                "/auth/register",
-                                "/auth/login",
-                                "/auth/refresh",
-                                "/auth/reset-password",
                                 "/swagger-ui.html",
                                 "/api-docs",
                                 "/api-docs/**",
