@@ -6,6 +6,7 @@ import { useRouter} from 'expo-router';
 import { UserState } from '@/types/user';
 import { calculateAge } from '@/utils/helpers/ageOfUser';
 import { useSelector } from 'react-redux';
+import EventListProfilePage from '@/components/Event/EventListProfilePage';
 
 const screenHeight = Dimensions.get('window').height;
 const maxHeight = screenHeight * 0.5
@@ -14,7 +15,7 @@ const maxHeight = screenHeight * 0.5
 const ActivityTab = () => (
     //TODO fix the overlap between the two scroll views when the events are scolled up 
     <View className="p-4 bg-white">
-        {/* Horizontal Scroll for Badges hard coded*/}
+        {/* Horizontal Scroll for Badges hard coded */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View className="flex-row gap-x-4">
                 <View className="w-20 h-20 bg-gray-700 rounded-full" />
@@ -28,16 +29,9 @@ const ActivityTab = () => (
             </View>
         </ScrollView>
 
-        {/* Vertical Scroll for Event Cards hard coded */}
-        <ScrollView className=" pt-3 space-y-4" style={{ maxHeight}}>
-            {Array.from({ length: 6 }).map((_, index) => (
-                <View key={index} className="mt-4 p-4 rounded-lg" style={{ backgroundColor: '#0C9E04' }}>
-                    <Text className="text-xl font-bold text-black">EVENT {index + 1}</Text>
-                    <Text className="text-gray-800 text-sm">Location</Text>
-                    <Text className="text-gray-800 text-xs mt-1">Date</Text>
-                </View>
-            ))}
-        </ScrollView>
+        <View>
+            <EventListProfilePage />
+        </View>
     </View>
 );
 
@@ -116,7 +110,7 @@ const ProfilePage: React.FC = () => {
     const routes = [
         { key: 'activity', title: 'Activity', testID: 'Activity' },
         { key: 'friends', title: 'Friends', testID: 'Friends' },
-        { key: 'about', title: 'About', testID: 'About'},
+        { key: 'about', title: 'My Events', testID: 'About'},
     ];
     const scenes = {
         activity: <ActivityTab />,
@@ -127,8 +121,7 @@ const ProfilePage: React.FC = () => {
     return (
         <SafeAreaView className="flex-1 bg-white pt-6">
             {/* Top Header with Edit Button */}
-            <View className="flex-row justify-center items-center p-4 relative">
-                <Text className="text-2xl font-bold text-black">Profile</Text>
+            <View className="flex-row justify-center items-center p-3 relative">
                 <TouchableOpacity
                  onPress={() => router.push('/editProfile')}
                  className="absolute left-4" 
@@ -137,7 +130,7 @@ const ProfilePage: React.FC = () => {
                 </TouchableOpacity>
              <TouchableOpacity 
                     onPress={() => router.push('/(tabs)/profile/(settings)/settingsPage')} 
-                    className="absolute right-4" // Position Edit button in top-right
+                    className="absolute right-4"
                 >
                     <Icon name="settings-outline" size={24} color="black" />
                 </TouchableOpacity>
@@ -150,7 +143,7 @@ const ProfilePage: React.FC = () => {
                     source={{ uri: 'https://example.com/profile-image.png' }}
                     defaultSource={require('@/assets/images/Unknown.jpg')}
                 />
-                <Text testID="firstName" className="text-2xl font-bold text-black mt-4">
+                <Text testID="firstName" className="text-2xl font-bold text-black mt-2">
                     {user?.profile.firstName} {user?.profile.lastName}
                 </Text>
                 <Text className="text-sm text-gray-500">
