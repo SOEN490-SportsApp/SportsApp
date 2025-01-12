@@ -1,0 +1,39 @@
+name: GatewayService CI/CD
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-analyze:
+    name: Build and Analyze UserService
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: 'zulu'
+
+      - name: Build Project & Generate Test Reports
+        working-directory: ./Microservices/gateway
+        run: ./gradlew build jacocoTestReport
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_GATEWAYSERVICE }}
+        with:
+          args: >
+            -D sonar.projectKey=sportaforked_GatewayService
+            -D sonar.organization=sportaforked
+            -D sonar.host.url=https://sonarcloud.io
+            -D sonar.java.binaries=Microservices/gateway/build/classes/java/main
+            -D sonar.sources=Microservices/gateway/src/main/java
+            -D sonar.tests=Microservices/gateway/src/test/java
+            -D sonar.jacoco.reportPaths=Microservices/gateway/build/reports/jacoco/test/jacocoTestReport.xml
