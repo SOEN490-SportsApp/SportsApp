@@ -1,0 +1,105 @@
+name: CI/CD Controller
+
+on:
+  pull_request:
+    branches: [ "*" ]
+  push:
+    branches:
+      - main
+      - dev
+      - 'releases/**'
+
+jobs:
+  determine-pipelines:
+    runs-on: ubuntu-latest
+    outputs:
+      RUN_USERSERVICE_PIPELINE: ${{ steps.set-env.outputs.RUN_USERSERVICE_PIPELINE }}
+      RUN_EVENTSERVICE_PIPELINE: ${{ steps.set-env.outputs.RUN_EVENTSERVICE_PIPELINE }}
+      RUN_EMAILSERVICE_PIPELINE: ${{ steps.set-env.outputs.RUN_EMAILSERVICE_PIPELINE }}
+      RUN_GATEWAYSERVICE_PIPELINE: ${{ steps.set-env.outputs.RUN_GATEWAYSERVICE_PIPELINE }}
+      RUN_CLIENTAPP_PIPELINE: ${{ steps.set-env.outputs.RUN_CLIENTAPP_PIPELINE }}
+      BRANCH: ${{ steps.extract-branch.outputs.BRANCH }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine Changed Files
+        id: changed-files
+        uses: tj-actions/changed-files@v36
+
+      - name: Extract Source Branch
+        id: extract-branch
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+              echo "BRANCH=main" >> $GITHUB_OUTPUT
+          else
+              echo "BRANCH=13/merge" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set Environment Variables for Services
+        id: set-env
+        run: |
+          if [[ "${{ steps.changed-files.outputs.all_changed_files }}" =~ "Microservices/user-service/" ]]; then
+            echo "RUN_USERSERVICE_PIPELINE=true" >> $GITHUB_OUTPUT
+          fi
+          if [[ "${{ steps.changed-files.outputs.all_changed_files }}" =~ "Microservices/event-service/" ]]; then
+            echo "RUN_EVENTSERVICE_PIPELINE=true" >> $GITHUB_OUTPUT
+          fi
+          if [[ "${{ steps.changed-files.outputs.all_changed_files }}" =~ "Microservices/email-service/" ]]; then
+            echo "RUN_EMAILSERVICE_PIPELINE=true" >> $GITHUB_OUTPUT
+          fi
+          if [[ "${{ steps.changed-files.outputs.all_changed_files }}" =~ "Microservices/gateway/" ]]; then
+            echo "RUN_GATEWAYSERVICE_PIPELINE=true" >> $GITHUB_OUTPUT
+          fi
+          if [[ "${{ steps.changed-files.outputs.all_changed_files }}" =~ "ClientApp/" ]]; then
+            echo "RUN_CLIENTAPP_PIPELINE=true" >> $GITHUB_OUTPUT
+          fi
+
+  run-pipelines:
+    needs: determine-pipelines
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Dispatch UserService CI/CD Workflow
+        if: ${{ needs.determine-pipelines.outputs.RUN_USERSERVICE_PIPELINE == 'true' }}
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: user-service-ci-cd.yml
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run EventService Pipeline
+        if: ${{ needs.determine-pipelines.outputs.RUN_EVENTSERVICE_PIPELINE == 'true' }}
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: event-service-ci-cd.yml
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run EmailService Pipeline
+        if: ${{ needs.determine-pipelines.outputs.RUN_EMAILSERVICE_PIPELINE == 'true' }}
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: email-service-ci-cd.yml
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run GatewayService Pipeline
+        if: ${{ needs.determine-pipelines.outputs.RUN_GATEWAYSERVICE_PIPELINE == 'true' }}
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: gateway-service-ci-cd.yml
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run ClientApp Pipeline
+        if: ${{ needs.determine-pipelines.outputs.RUN_CLIENTAPP_PIPELINE == 'true' }}
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: frontend-ci-cd.yml
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+          token: ${{ secrets.GITHUB_TOKEN }}
