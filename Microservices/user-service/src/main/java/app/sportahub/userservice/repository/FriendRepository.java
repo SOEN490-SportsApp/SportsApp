@@ -9,7 +9,5 @@ import java.util.Optional;
 @Repository
 public interface FriendRepository extends MongoRepository<Friend, String> {
 
-    Optional<Friend> findFriendByUsername(String username);
-
     Optional<Friend> findFriendById(String id);
 }
