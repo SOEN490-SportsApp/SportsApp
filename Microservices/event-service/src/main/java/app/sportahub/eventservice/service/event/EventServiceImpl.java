@@ -35,8 +35,7 @@ public class EventServiceImpl implements EventService {
      * Returns a specific event with an id matching the provided id.
      *
      * @param id The id of the event we want to return
-     * @return an {@link EventResponse} object representing the event that matched
-     *         the given id
+     * @return an {@link EventResponse} object representing the event that matched the given id
      * @throws EventDoesNotExistException if no event has a matching id
      */
     @Override
@@ -69,8 +68,7 @@ public class EventServiceImpl implements EventService {
      * Creates an event with the provided information found in the {@link EventRequest}.
      *
      * @param eventRequest the new data to create the event with
-     * @return an {@link EventResponse} object representing the event that was
-     *         created
+     * @return an {@link EventResponse} object representing the event that was created
      * @throws EventAlreadyExistsException if an event with the same name is created
      */
     @Override
@@ -92,10 +90,8 @@ public class EventServiceImpl implements EventService {
     }
 
     /**
-     * Updates an existing event with the specified ID. This method performs a full
-     * update,
-     * replacing all fields of the event with those provided in the
-     * {@link EventRequest}.
+     * Updates an existing event with the specified ID. This method performs a full update,
+     * replacing all fields of the event with those provided in the {@link EventRequest}.
      *
      * @param id           the unique identifier of the event to update
      * @param eventRequest the new data to update the event with
@@ -119,10 +115,8 @@ public class EventServiceImpl implements EventService {
     }
 
     /**
-     * Partially updates an existing event with the specified ID. This method
-     * updates only
-     * the fields provided in the {@link EventRequest}, leaving all other fields
-     * unchanged.
+     * Partially updates an existing event with the specified ID. This method updates only
+     * the fields provided in the {@link EventRequest}, leaving all other fields unchanged.
      *
      * @param id           the unique identifier of the event to patch
      * @param eventRequest the partial data to update the event with
@@ -163,8 +157,7 @@ public class EventServiceImpl implements EventService {
      * Deletes an event from the database using the event id
      *
      * @param id The id of the event to be deleted
-     * @throws EventDoesNotExistException if there is no event associated with the
-     *                                    provided id
+     * @throws EventDoesNotExistException if there is no event associated with the provided id
      */
     @Override
     public void deleteEvent(String id) {
@@ -175,54 +168,37 @@ public class EventServiceImpl implements EventService {
     }
 
     /**
-     * Allows a user to join an event if they are eligible and the event is not
-     * full.
+     * Allows a user to join an event if they are eligible and the event is not full.
      *
-     * <p>
-     * This method retrieves the event by its ID and enforces the following checks:
+     * <p>This method retrieves the event by its ID and enforces the following checks:
      * <ul>
-     * <li>Throws an {@link EventDoesNotExistException} if the event with the
-     * specified ID does not exist.</li>
-     * <li>Throws a {@link UserIsNotEventWhitelistedException} if the event is
-     * private and the user is not whitelisted.</li>
-     * <li>Throws an {@link EventRegistrationClosedException} if the event is past
-     * its registration cutoff time.</li>
-     * <li>Throws an {@link EventFullException} if the event has reached its maximum
-     * number of participants.</li>
-     * <li>Throws a {@link UserAlreadyParticipantException} if the user is already
-     * participating in the event.</li>
+     *   <li>Throws an {@link EventDoesNotExistException} if the event with the specified ID does not exist.</li>
+     *   <li>Throws a {@link UserIsNotEventWhitelistedException} if the event is private and the user is not whitelisted.</li>
+     *   <li>Throws an {@link EventRegistrationClosedException} if the event is past its registration cutoff time.</li>
+     *   <li>Throws an {@link EventFullException} if the event has reached its maximum number of participants.</li>
+     *   <li>Throws a {@link UserAlreadyParticipantException} if the user is already participating in the event.</li>
      * </ul>
      *
-     * <p>
-     * If all checks pass, the user is added as a participant to the event, and the
-     * updated event
+     * <p>If all checks pass, the user is added as a participant to the event, and the updated event
      * is saved to the repository.
      *
-     * <p>
-     * <strong>Note:</strong> This method does not currently verify whether the user
-     * exists. User validation will be implemented when inter-service communication
-     * is established.
+     * <p><strong>Note:</strong> This method does not currently verify whether the user
+     * exists. User validation will be implemented when inter-service communication is established.
      *
      * @param id     the unique identifier of the event
      * @param userId the unique identifier of the user attempting to join the event
-     * @throws EventDoesNotExistException         if the event with the specified ID
-     *                                            does not exist
-     * @throws UserIsNotEventWhitelistedException if the event is private and the
-     *                                            user is not whitelisted
-     * @throws EventRegistrationClosedException   if the event is past its
-     *                                            registration cutoff time
-     * @throws EventFullException                 if the event has reached its
-     *                                            maximum number of participants
-     * @throws UserAlreadyParticipantException    if the user is already
-     *                                            participating in the event
+     * @throws EventDoesNotExistException         if the event with the specified ID does not exist
+     * @throws UserIsNotEventWhitelistedException if the event is private and the user is not whitelisted
+     * @throws EventRegistrationClosedException   if the event is past its registration cutoff time
+     * @throws EventFullException                 if the event has reached its maximum number of participants
+     * @throws UserAlreadyParticipantException    if the user is already participating in the event
      */
     @Override
     public ParticipantResponse joinEvent(String id, String userId) {
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new EventDoesNotExistException(id));
 
-        // TODO: Check if user exists, to be implemented once communications between
-        // services are established
+        //TODO: Check if user exists, to be implemented once communications between services are established
 
         if (event.getIsPrivate() && !event.getWhitelistedUsers().contains(userId)) {
             throw new UserIsNotEventWhitelistedException(id, userId);
