@@ -25,8 +25,6 @@ import app.sportahub.userservice.exception.user.friend.InvalidFriendRequestStatu
 import app.sportahub.userservice.exception.user.friend.UserAlreadyInFriendListException;
 import app.sportahub.userservice.exception.user.friend.UserSentFriendRequestToSelfException;
 import app.sportahub.userservice.exception.user.UsernameAlreadyExistsException;
-import app.sportahub.userservice.exception.user.badge.BadgeNotFoundException;
-import app.sportahub.userservice.exception.user.badge.UserAlreadyAssignedBadgeByThisGiverException;
 import app.sportahub.userservice.mapper.user.ProfileMapper;
 import app.sportahub.userservice.mapper.user.UserMapper;
 import app.sportahub.userservice.model.user.*;
