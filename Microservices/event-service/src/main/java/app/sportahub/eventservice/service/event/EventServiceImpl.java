@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -35,6 +37,16 @@ public class EventServiceImpl implements EventService {
     public EventResponse getEventById(String id) {
         return eventMapper.eventToEventResponse(eventRepository.findEventById(id)
                 .orElseThrow(() -> new EventDoesNotExistException(id)));
+    }
+
+    /**
+     * Returns all events in the database.
+     *
+     * @return a List containing an EventResponse object for each event stored in the database.
+     */
+    @Override
+    public List<EventResponse> getAllEvents() {
+        return eventRepository.findAll().stream().map(eventMapper::eventToEventResponse).toList();
     }
 
     /**

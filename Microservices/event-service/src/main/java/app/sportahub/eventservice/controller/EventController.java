@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/event")
 @RequiredArgsConstructor
@@ -25,6 +27,14 @@ public class EventController {
     description = "Fetches an event by their unique identifier.")
     public EventResponse getEventById(@PathVariable String id) {
         return eventService.getEventById(id);
+    }
+
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Retrieve all events",
+    description = "Fetches all events in the database.")
+    public List<EventResponse> getAllEvents() {
+        return eventService.getAllEvents();
     }
 
     @PostMapping

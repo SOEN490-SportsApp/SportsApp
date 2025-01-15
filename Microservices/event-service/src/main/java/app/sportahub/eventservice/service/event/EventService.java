@@ -4,9 +4,13 @@ import app.sportahub.eventservice.dto.request.EventRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.dto.response.ParticipantResponse;
 
+import java.util.List;
+
 public interface EventService {
 
     EventResponse getEventById(String id);
+
+    List<EventResponse> getAllEvents();
 
     EventResponse createEvent(EventRequest eventRequest);
 
