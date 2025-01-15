@@ -490,4 +490,37 @@ public class EventServiceTest {
         // Act & Assert
         assertThrows(EventRegistrationClosedException.class, () -> eventService.joinEvent(testId, testUserId));
     }
+
+    @Test
+    public void getAllEventsShouldReturnSuccess() {
+        // Arrange
+        EventRequest eventRequest = getEventRequest();
+        Optional<Event> event1 = Optional.of(eventMapper.eventRequestToEvent(eventRequest)
+                .toBuilder()
+                .withId("testEventId1")
+                        .withEventName("testEventName1")
+                .build());
+        Optional<Event> event2 = Optional.of(eventMapper.eventRequestToEvent(eventRequest)
+                .toBuilder()
+                .withId("testEventId2")
+                .withEventName("testEventName2")
+                .build());
+
+        List<Event> eventList = new ArrayList<>();
+        eventList.add(event1.orElseThrow());
+        eventList.add(event2.orElseThrow());
+
+        when(eventRepository.findAll()).thenReturn(eventList);
+
+        // Act
+        List<EventResponse> events = eventService.getAllEvents();
+
+        // Assert
+        assertNotNull(events);
+        assertEquals(2, events.size());
+        assertEquals(eventMapper.eventToEventResponse(eventList.getFirst()), events.getFirst());
+        assertEquals(eventMapper.eventToEventResponse(eventList.get(1)), events.get(1));
+        assertEquals(eventMapper.eventToEventResponse(eventList.getFirst()).id(), events.getFirst().id());
+        assertEquals(eventMapper.eventToEventResponse(eventList.get(1)).id(), events.get(1).id());
+    }
 }

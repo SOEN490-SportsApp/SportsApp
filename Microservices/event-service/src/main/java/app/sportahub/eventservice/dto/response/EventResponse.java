@@ -4,13 +4,14 @@ import app.sportahub.eventservice.enums.SkillLevelEnum;
 import app.sportahub.eventservice.model.event.Team;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.EnumSet;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record EventResponse(String id, String eventName, String eventType, String sportType,
+public record EventResponse(String id, Timestamp creationDate, String eventName, String eventType, String sportType,
                             LocationResponse locationResponse, LocalDate date, LocalTime startTime, LocalTime endTime,
                             String duration, Integer maxParticipants, List<ParticipantResponse> participants,
                             String createdBy, List<Team> teams, String cutOffTime, String description,
