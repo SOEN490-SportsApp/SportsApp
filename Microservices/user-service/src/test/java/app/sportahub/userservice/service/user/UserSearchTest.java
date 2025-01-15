@@ -9,6 +9,7 @@ import app.sportahub.userservice.mapper.user.ProfileMapper;
 import app.sportahub.userservice.mapper.user.UserMapper;
 import app.sportahub.userservice.model.user.*;
 import app.sportahub.userservice.repository.BadgeRepository;
+import app.sportahub.userservice.repository.FriendRepository;
 import app.sportahub.userservice.repository.user.SearchingUserRepositoryImpl;
 import app.sportahub.userservice.repository.user.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -61,10 +62,13 @@ public class UserSearchTest {
     @Mock
     private SearchingUserRepositoryImpl searchingUserRepository;
 
+    @Mock
+    private FriendRepository friendRepository;
+
     @BeforeEach
     void setUp() {
         userService = new UserServiceImpl(userRepository, badgeRepository,
-                keycloakApiClient, userMapper, profileMapper);
+                keycloakApiClient, userMapper, profileMapper, friendRepository);
         searchingUserRepository = new SearchingUserRepositoryImpl(mongoTemplate);
     }
 
