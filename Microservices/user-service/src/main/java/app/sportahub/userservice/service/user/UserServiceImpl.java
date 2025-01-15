@@ -228,6 +228,10 @@ public class UserServiceImpl implements UserService {
                 .withUpdatedAt(Timestamp.valueOf(LocalDateTime.now()))
                 .build();
 
+        System.out.println(user.getId());
+        System.out.println(friendUser.getId());
+        System.out.println(friend.getUserId());
+
         if (!friend.getUserId().equals(friendUser.getId())) {
             throw new GivenFriendUserIdDoesNotMatchFriendFoundByIdException(friendUser.getId(), requestId);
         }
@@ -246,6 +250,7 @@ public class UserServiceImpl implements UserService {
             }
 
             isFriendFound1.set(true);
+
 
             if (action.equals(UpdateFriendRequestActionEnum.ACCEPT)) {
                 e.setFriendRequestStatus(FriendRequestStatusEnum.ACCEPTED);
@@ -310,11 +315,12 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findUserById(userId)
                 .orElseThrow(() -> new UserDoesNotExistException(userId));
         List<Friend> friends = user.getFriendList();
+        System.out.println(user.getFriendList());
 
         return friends.stream()
                 .filter(s -> typeList.contains(s.getFriendRequestStatus()) )
                 .map(friend -> new ViewFriendRequestsResponse(
-                        getUserById(friend.getUserId()).username(),friend.getUserId(), friend.getId())).toList();
+                        getUserById(friend.getUserId()).username(),friend.getUserId(), friend.getFriendRequestStatus(), friend.getId())).toList();
     }
 
     @Override
