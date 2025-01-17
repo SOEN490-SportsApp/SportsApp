@@ -226,10 +226,6 @@ public class UserServiceImpl implements UserService {
                 .withUpdatedAt(Timestamp.valueOf(LocalDateTime.now()))
                 .build();
 
-        System.out.println(user.getId());
-        System.out.println(friendUser.getId());
-        System.out.println(friend.getUserId());
-
         if (!friend.getUserId().equals(friendUser.getId())) {
             throw new GivenFriendUserIdDoesNotMatchFriendFoundByIdException(friendUser.getId(), requestId);
         }
@@ -246,9 +242,7 @@ public class UserServiceImpl implements UserService {
                 throw new TryingToAcceptInvalidFriendRequestException(user.getId(),
                         friendUser.getId(), e.getFriendRequestStatus());
             }
-
             isFriendFound1.set(true);
-
 
             if (action.equals(UpdateFriendRequestActionEnum.ACCEPT)) {
                 e.setFriendRequestStatus(FriendRequestStatusEnum.ACCEPTED);
