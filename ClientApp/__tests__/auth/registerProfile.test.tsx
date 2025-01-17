@@ -2,7 +2,7 @@ import React from "react";
 import { Alert } from "react-native";
 import RegisterProfilePage from "@/app/auth/registerProfile";
 import supportedSports from "@/utils/constants/supportedSports";
-import { render, fireEvent, waitFor } from "@testing-library/react-native";
+import { render, fireEvent, waitFor, act } from "@testing-library/react-native";
 import MultiSelectDropdown from "@/components/RegisterProfile/RegisterProfileSports";
 import RegisterProfileSports from "@/components/RegisterProfile/RegisterProfileSports";
 import { Provider } from "react-redux";
@@ -21,6 +21,7 @@ describe("profile preference form test", () => {
   });
 
   it("Shows error when fields are empty", async () => {
+
     const { getByText, getByTestId } = render(
       <Provider store={store}>
         <RegisterProfilePage />
@@ -35,6 +36,40 @@ describe("profile preference form test", () => {
       expect(getByText("Date of birth is required")).toBeTruthy();
     });
   });
+
+  it("Shows no error when fields are empty", async () => {
+    const { getByText, getByTestId, getByPlaceholderText } = render(
+      <Provider store={store}>
+        <RegisterProfilePage />
+      </Provider>
+    );
+      const firstName = getByPlaceholderText("First name");
+      const lastName = getByPlaceholderText("Last name");
+      const poc = getByPlaceholderText("Postal code");
+      const phoneNumber = getByPlaceholderText("Phone number (xxx-xxx-xxxx)");
+      const genderText = getByText("Gender");
+      const dob = getByPlaceholderText('yyyy/mm/dd')
+      fireEvent.press(genderText);
+      const genderPicker = await waitFor(() => getByTestId("genderPickerTest"));
+
+    // Select an option
+      fireEvent.press(genderPicker);
+      fireEvent.press(getByTestId("genderPickerSubmit"))
+      fireEvent.changeText(firstName, "test");
+      fireEvent.changeText(lastName, "test");
+      fireEvent.changeText(phoneNumber, "123-452-6782");
+      fireEvent.changeText(dob, "1999/08/03");
+      fireEvent.changeText(poc, "J0T 2N0")
+
+    fireEvent.press(getByTestId('confirmButton'));
+
+    await waitFor(() => {
+      const step2element = getByText('Add your Favourite Sports')
+      expect(step2element).toBeTruthy()
+    });
+  });
+
+  
 
   it("Shows error when phone number format is invalid", async () => {
     const { getByText, getByPlaceholderText, getByTestId } = render(
@@ -97,43 +132,6 @@ describe("profile preference form test", () => {
   // });
 
 
-  // it("shows no errors when fields are properly inputted", async() => {
-  //   const { getByText, getByTestId, getByPlaceholderText } = render(
-  //     <AuthProvider>
-  //       <RegisterProfilePage />
-  //     </AuthProvider>
-  //   );
-  //   const firstName = getByPlaceholderText("First name");
-  //   const lastName = getByPlaceholderText("Last name");
-  //   const phoneNumber = getByPlaceholderText("Phone number (xxx-xxx-xxxx)");
-  //   const genderText = getByText("Gender");
-  //   const dob = getByPlaceholderText('yyyy/mm/dd')
-  //   const postalCode = getByPlaceholderText("")
-  //   fireEvent.press(genderText); // This triggers the modal to open
-
-  //   // Wait for the picker to appear in the modal
-  //   const genderPicker = await waitFor(() => getByTestId("genderPickerTest"));
-
-  //   // Now interact with the gender picker and select an option
-  //   act(() => {
-  //     fireEvent.press(genderText); // This triggers the modal to open
-  //   });
-
-  //   fireEvent.changeText(dob, '2024-08-03')
-  //   fireEvent.changeText(firstName, "test");
-  //   fireEvent.changeText(lastName, "test");
-  //   fireEvent.changeText(phoneNumber, "819-323-1853");
-  //   fireEvent.changeText(postalCode, "jot2n0")
-  //   await waitFor(() => {
-  //     expect(getByText("First name is required")).toBeFalsy();
-  //     expect(getByText("Last name is required")).toBeFalsy();
-  //     expect(getByText("Date of birth is required")).toBeFalsy();
-  //     expect(getByText("Phone number is required")).toBeFalsy();
-  //     expect(getByText("Postal code is required")).toBeFalsy();
-  //     expect(getByText("Gender is required")).toBeFalsy()
-  //   });
-  // })
-
   it("Shows error when age is less than 16", async () => {
     const { getByText, getByPlaceholderText, getByTestId } = render(
       <Provider store={store}>
@@ -167,5 +165,141 @@ describe("profile preference form test", () => {
       expect(getByText("Enter a valid date")).toBeTruthy();
     });
   });
+
+  it("Go back to info page once on favourite sports page", async () => {
+    const { getByText, getByPlaceholderText, getByTestId } = render(
+      <Provider store={store}>
+        <RegisterProfilePage />
+      </Provider>
+    );
+
+    const doButton = getByTestId("confirmButton");
+    const dob = getByPlaceholderText('   yyyy/mm/dd')
+    fireEvent.changeText(dob, '2000-00-00')
+    fireEvent.press(doButton);
+
+    await waitFor(() => {
+      expect(getByText("Enter a valid date")).toBeTruthy();
+    });
+  });
+
+  it("Open modal", async () => {
+    const mockOnChange = jest.fn();
+    const { getByText, getByPlaceholderText, getByTestId, queryByText } = render(
+      <Provider store={store}>
+        <RegisterProfileSports onChange={mockOnChange} />
+      </Provider>
+    );
+    const soccerButton = getByTestId('Soccer-selection-button')
+    fireEvent.press(soccerButton);
+    const skillOption = getByTestId("intermediate-button")
+    fireEvent.press(skillOption)
+    const modalNotPresent = queryByText("Select your skill level in Soccer") ;
+    expect(modalNotPresent).toBeTruthy()
+  })
+
+  it("Closed modal", async () => {
+    const mockOnChange = jest.fn();
+    const {queryByText } = render(
+      <Provider store={store}>
+        <RegisterProfileSports onChange={mockOnChange} />
+      </Provider>
+    );
+
+    const modalNotPresent = queryByText("Select your skill level in Soccer") ;
+    expect(modalNotPresent).toBeNull()
+  })
+
+  it("selects a sport intermediate skill", async () => {
+    const mockOnChange = jest.fn();
+    const {getByTestId,} = render(
+      <Provider store={store}>
+        <RegisterProfileSports onChange={mockOnChange} />
+      </Provider>
+    );
+    const soccerButton = getByTestId('Soccer-selection-button')
+    fireEvent.press(soccerButton);
+    const skillOption = getByTestId("intermediate-button")
+    fireEvent.press(skillOption)
+    
+    const confirmSport = getByTestId('confirm-sport')
+    fireEvent.press(confirmSport)
+    expect(mockOnChange).toHaveBeenCalledWith([{ranking: 'Intermediate', name:'Soccer'}])
+  })
+
+  it("selects a sport advanced skill", async () => {
+    const mockOnChange = jest.fn();
+    const {getByTestId,} = render(
+      <Provider store={store}>
+        <RegisterProfileSports onChange={mockOnChange} />
+      </Provider>
+    );
+    const soccerButton = getByTestId('Soccer-selection-button')
+    fireEvent.press(soccerButton);
+    const skillOption = getByTestId("advanced-button")
+    fireEvent.press(skillOption)
+    
+    const confirmSport = getByTestId('confirm-sport')
+    fireEvent.press(confirmSport)
+    expect(mockOnChange).toHaveBeenCalledWith([{ranking: 'Advanced', name:'Soccer'}])
+  })
+
+  it("selects a sport beginner skill", async () => {
+    const mockOnChange = jest.fn();
+    const {getByTestId,} = render(
+      <Provider store={store}>
+        <RegisterProfileSports onChange={mockOnChange} />
+      </Provider>
+    );
+    const soccerButton = getByTestId('Soccer-selection-button')
+    fireEvent.press(soccerButton);
+    const skillOption = getByTestId("beginner-button")
+    fireEvent.press(skillOption)
+    
+    const confirmSport = getByTestId('confirm-sport')
+    fireEvent.press(confirmSport)
+    expect(mockOnChange).toHaveBeenCalledWith([{ranking: 'Beginner', name:'Soccer'}])
+  })
+
+  it("Removes a sport", async () => {
+    const mockOnChange = jest.fn();
+    const {getByTestId,} = render(
+      <Provider store={store}>
+        <RegisterProfileSports onChange={mockOnChange} />
+      </Provider>
+    );
+    const soccerButton = getByTestId('Soccer-selection-button')
+    fireEvent.press(soccerButton);
+    
+    const confirmSport = getByTestId('remove-sport')
+    fireEvent.press(confirmSport)
+    expect(mockOnChange).toHaveBeenCalledWith([])
+  })
+
+  it("selects a sport beginner skill then removes it", async () => {
+    const mockOnChange = jest.fn();
+    const {getByTestId,} = render(
+      <Provider store={store}>
+        <RegisterProfileSports onChange={mockOnChange} />
+      </Provider>
+    );
+    const soccerButton = getByTestId('Soccer-selection-button')
+    fireEvent.press(soccerButton);
+    const skillOption = getByTestId("beginner-button")
+    fireEvent.press(skillOption)
+    
+    const confirmSport = getByTestId('confirm-sport')
+    fireEvent.press(confirmSport)
+    expect(mockOnChange).toHaveBeenCalledWith([{ranking: 'Beginner', name:'Soccer'}])
+
+    fireEvent.press(soccerButton);
+    
+    const removeSport = getByTestId('remove-sport')
+    fireEvent.press(removeSport)
+    expect(mockOnChange).toHaveBeenCalledWith([])
+  })
+
+
+
 
 });
