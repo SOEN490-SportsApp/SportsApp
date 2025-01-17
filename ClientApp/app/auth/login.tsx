@@ -118,10 +118,11 @@ const LoginPage: React.FC = () => {
           {errors.password && (<Text style={styles.errorText}>{errors.password.message}</Text>)}
 
           <TouchableOpacity onPress={() => router.push('/auth/resetPassword')}>
-            <Text style={styles.forgotPasswordText}>
+            <Text style={styles.forgotPasswordText} testID="forgot-password">
               Forgot your password?
             </Text>
           </TouchableOpacity>
+          <TouchableOpacity onPress={() => router.push('/auth/registerProfile')}><Text>Register</Text></TouchableOpacity>
 
           <View style={{ height: vs(64) }} />
 

@@ -198,7 +198,7 @@ const RegisterAccountPage: React.FC = () => {
 
       {/* Back to Login */}
       <View style={styles.loginContainer}>
-        <TouchableOpacity onPress={() => router.replace("/auth/login")}>
+        <TouchableOpacity onPress={() => router.replace("/auth/login")} testID="account-already-created">
           <Text style={styles.loginText}>
             Already have an account?{" "}
             <Text style={styles.loginNowText}>Login</Text>

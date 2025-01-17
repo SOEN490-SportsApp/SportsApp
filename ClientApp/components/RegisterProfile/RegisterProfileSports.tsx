@@ -110,6 +110,7 @@ const RegisterProfileSports: React.FC<sportSelection> = ({ onChange }) => {
               <View style={styles.skillSelectionSection}>
                 <TouchableOpacity
                   onPress={() => setRanking("Beginner")}
+                  testID="beginner-button"
                   style={
                     ranking === "Beginner"
                       ? styles.beginnerLevelSelected
@@ -128,6 +129,7 @@ const RegisterProfileSports: React.FC<sportSelection> = ({ onChange }) => {
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => setRanking("Intermediate")}
+                  testID="intermediate-button"
                   style={
                     ranking === "Intermediate"
                       ? styles.intermediateLevelSelected
@@ -145,6 +147,7 @@ const RegisterProfileSports: React.FC<sportSelection> = ({ onChange }) => {
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
+                testID="advanced-button"
                   onPress={() => setRanking("Advanced")}
                   style={
                     ranking === "Advanced"
@@ -165,6 +168,7 @@ const RegisterProfileSports: React.FC<sportSelection> = ({ onChange }) => {
               </View>
               <View style={styles.selectSkillButtonContainer}>
                 <TouchableOpacity
+                testID="remove-sport"
                   onPress={removePick}
                   style={[
                     styles.baseSelectNRemoveButton,
@@ -175,6 +179,7 @@ const RegisterProfileSports: React.FC<sportSelection> = ({ onChange }) => {
                   <Text style={{ color: themeColors.text.grey }}>Remove</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
+                testID="confirm-sport"
                   onPress={handleConfirm}
                   style={[
                     styles.baseSelectNRemoveButton,
@@ -224,7 +229,7 @@ const IconButton = ({
 
   return (
     <View style={styles.iconContainer}>
-      <TouchableOpacity onPress={onPress}>
+      <TouchableOpacity onPress={onPress} testID={name+"-selection-button"}>
         <View style={[styles.iconImageContainer, {backgroundColor: `${isSelected ? rankingColour(sportRank): themeColors.text.light}`,borderColor: `${isSelected ? rankingColour(sportRank): themeColors.text.light}`,}]}>
           <MaterialCommunityIcons
             name={icon as unknown as any}
