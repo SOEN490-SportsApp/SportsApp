@@ -8,6 +8,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -84,5 +88,19 @@ public class EventController {
     @Operation(summary = "Join an event", description = "Enables a user to join an event, provided there are available slots.")
     public ParticipantResponse joinEvent(@PathVariable String id, @RequestParam String userId) {
         return eventService.joinEvent(id, userId);
+    }
+
+    @GetMapping("/patricipant/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Retrieve events by user ID",description = "Retrieve events that a user has participated in")
+    public Page<EventResponse> getEventByUserId(@PathVariable String userId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        return eventService.getEventsByParticipantId(userId, page, size);
+    }
+
+    @GetMapping("created-by/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Retrieve events created by user ID", description = "Retrieve events that a user has created")
+    public Page<EventResponse> getEventsCreatedByUserId(@PathVariable String userId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        return eventService.getEventsCreatedByUserId(userId, page, size);
     }
 }
