@@ -14,7 +14,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import { useForm, Controller, useWatch } from "react-hook-form";
+import { useForm, Controller, useWatch, set } from "react-hook-form";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useRouter } from "expo-router";
 import ConfirmButton from "@/components/Helper Components/ConfirmButton";
@@ -66,6 +66,12 @@ const Create = () => {
   const [showCutOffDatePicker, setShowCutOffDatePicker] = useState(false);
   const [showCutOffTimePicker, setShowCutOffTimePicker] = useState(false);
   const [requiredSkillLevel, setRequiredSkillLevel] = useState<string[]>([]);
+  const [startTime, setStartTime] = useState<Date | null>(null);
+  const [endTime, setEndTime] = useState<Date | null>(null);
+  const [showStartTimePicker, setShowStartTimePicker] = useState(false);
+  const [showEndTimePicker, setShowEndTimePicker] = useState(false);
+
+  const timeFormatRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
 
   const user = useSelector((state: { user: any }) => state.user);
 
@@ -85,8 +91,29 @@ const Create = () => {
 
   const onSubmit = async (data: EventFormData) => {
     try {
-      if (!cutOffDate || !cutOffTime) {
-        Alert.alert("Error", "Cut off date and time are required");
+      if (!cutOffDate || !cutOffTime || !eventDate || !startTime || !endTime) {
+        Alert.alert("Error", "Please select all date and time fields");
+        return;
+      }
+
+      const formattedStartTime = startTime
+        .toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+          hourCycle: "h23",
+        })
+        .replace(/\s?(AM|PM)$/, "");
+
+      const formattedEndTime = endTime
+        .toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+          hourCycle: "h23",
+        })
+        .replace(/\s?(AM|PM)$/, "");
+
+      if (startTime >= endTime) {
+        Alert.alert("Error", "End time must be after start time.");
         return;
       }
 
@@ -116,8 +143,10 @@ const Create = () => {
           longitude: "",
         },
         date: eventDate ? eventDate.toISOString().split("T")[0] : "",
+        startTime: formattedStartTime,
+        endTime: formattedEndTime,
         duration: "",
-        maxParticipants: data.maxParticipants,
+        maxParticipants: parseInt(data.maxParticipants, 10),
         participants: [],
         createdBy: user.id,
         teams: [],
@@ -149,6 +178,8 @@ const Create = () => {
       setCutOffTime(null);
       setRequiredSkillLevel([]);
       setSuccessModalVisible(true);
+      setStartTime(null);
+      setEndTime(null);
     } catch (error) {
       Alert.alert("Error", "Error occurred while creating the event");
       throw error;
@@ -399,7 +430,7 @@ const Create = () => {
               <Text style={styles.errorText}>{errors.province.message}</Text>
             )}
 
-            <Text style={styles.label}>Event Date</Text>
+            <Text style={styles.label}>Event Date and Time</Text>
             <TouchableOpacity
               onPress={() => setShowDatePicker(true)}
               style={styles.input}
@@ -420,6 +451,66 @@ const Create = () => {
               />
             )}
 
+            <TouchableOpacity
+              onPress={() => setShowStartTimePicker(true)}
+              style={styles.input}
+            >
+              <Text>
+                {startTime
+                  ? startTime.toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })
+                  : "Select start time"}
+              </Text>
+            </TouchableOpacity>
+            {showStartTimePicker && (
+              <DateTimePicker
+                value={startTime || new Date()}
+                mode="time"
+                display="default"
+                onChange={(event, selectedTime) => {
+                  setShowStartTimePicker(false);
+                  if (selectedTime) {
+                    const formattedTime = selectedTime.toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    });
+                    if (!timeFormatRegex.test(formattedTime)) {
+                      Alert.alert("Error", "Time must be in HH:MM format.");
+                      return;
+                    }
+                    setStartTime(selectedTime); // Valid time is set
+                  }
+                }}
+              />
+            )}
+
+            <TouchableOpacity
+              onPress={() => setShowEndTimePicker(true)}
+              style={styles.input}
+            >
+              <Text>
+                {endTime
+                  ? endTime.toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })
+                  : "Select end time"}
+              </Text>
+            </TouchableOpacity>
+            {showEndTimePicker && (
+              <DateTimePicker
+                value={endTime || new Date()}
+                mode="time"
+                display="default"
+                onChange={(event, selectedTime) => {
+                  setShowEndTimePicker(false);
+                  if (selectedTime) setEndTime(selectedTime);
+                }}
+              />
+            )}
+
             <Text style={styles.label}>Maximum Number of Participants</Text>
             <Controller
               control={control}
@@ -430,7 +521,7 @@ const Create = () => {
                   const number = parseInt(value, 10);
                   return (
                     (!isNaN(number) && number > 0) ||
-                    "Must be a positive integer"
+                    "Must be a positive integer greater than 0"
                   );
                 },
               }}
