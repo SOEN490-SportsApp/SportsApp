@@ -43,8 +43,6 @@ const EventsList = () => {
   };
 
   const handleEventPress = (eventId: string) => {
-    // FIXME should reroute to the event page once finished
-    eventId = "6782edf7ba257b189946ff27";
     router.push(`/events/${eventId}`);
   };
 
