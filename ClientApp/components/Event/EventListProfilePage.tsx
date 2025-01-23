@@ -1,8 +1,9 @@
 import React, { useRef } from 'react';
-import { FlatList, View, StyleSheet, Alert, Animated, RefreshControl, Text} from 'react-native';
+import { FlatList, View, StyleSheet, Alert, Animated, RefreshControl, Text } from 'react-native';
 import EventCard from './EventCard';
 import { Event } from '@/types/event';
 import { router } from 'expo-router';
+import { mvs } from '@/utils/helpers/uiScaler';
 
 // FIXME Sample event data until we can fetch from an API
 const events: Event[] = [
@@ -362,31 +363,27 @@ const EventsList = () => {
       setRefreshing(false);
     }, 2000);
   };
-  
+
   return (
     <View>
-       <View style={styles.container}>
-      
+      <View style={styles.container}>
+
         {/* TODO Animated.FlatList is a wrapper around FlatList incase i want to add animation to the scroll */}
         <FlatList
-            data={events.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-            <EventCard event={item} onPress={handleEventPress} isForProfile={true}/>
-            )}
-            // Adding pull-to-refresh functionality
-            refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>
-            }
+          data={events.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <EventCard event={item} onPress={handleEventPress} isForProfile={true} />
+          )}
+          // Adding pull-to-refresh functionality
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
         />
-        <View>
-            <Text> hi </Text> 
-        </View> 
+      </View>
     </View>
-    
-    </View>
-    
-    
+
+
   );
 };
 
@@ -395,6 +392,7 @@ export default EventsList;
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#f5f5f5',
-    paddingVertical: 10,
+    paddingVertical: 0,
+    marginBottom: mvs(60)
   },
 });

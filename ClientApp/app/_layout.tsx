@@ -15,11 +15,11 @@ export default function RootLayout() {
                 <Stack.Screen name="auth/login" options={{ headerShown: false }} />
                 <Stack.Screen name="auth/registerAccount" options={{ headerShown: false }} />
                 <Stack.Screen name="auth/registerProfile" options={{ headerShown: false }} />
-                <Stack.Screen name="auth/resetPassword" options={{headerShown:true, headerBackVisible: true, headerBackTitle:'Back', headerTitle:''}} />
+                <Stack.Screen name="auth/resetPassword" options={{ headerShown: true, headerBackVisible: true, headerBackTitle: 'Back', headerTitle: '' }} />
                 <Stack.Screen name="(tabs)" options={{ headerShown: false, }} />
                 <Stack.Screen name="editProfile/index" options={{ headerShown: false }} />
-              <Stack.Screen name="events" options={{ headerShown: false }} />
-      </Stack>
+                <Stack.Screen name="events" options={{ headerShown: false }} />
+            </Stack>
         </Provider>
     );
 }
