@@ -29,9 +29,14 @@ export async function clearTokens() {
 
 
 export async function getAuthHeaders() {
-    const accessToken = await getAccessToken();
-    if (!accessToken) throw new Error('Access token not found');
-    return { Authorization: `Bearer ${accessToken}` };
+    try {
+        const accessToken = await getAccessToken();
+        if (!accessToken) throw new Error('Access token not found');
+        return { Authorization: `Bearer ${accessToken}` };
+    } catch (error) {
+        console.error('Error retrieving access token:', error);
+        throw error;
+    }
 }
 
 export async function refreshAccessToken() {
@@ -78,11 +83,21 @@ export function stopTokenRefresh() {
 
 //#region Helpers
 function decodeJWT(jwt: string): { exp: number } {
-    const payload = JSON.parse(Buffer.from(jwt.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf-8'));
-    if (!payload.exp) {
+    try {
+        const payload = JSON.parse(
+            Buffer.from(
+                jwt.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'),
+                'base64'
+            ).toString('utf-8')
+        );
+        if (!payload.exp) {
+            throw new Error('Token payload does not contain "exp" field.');
+        }
+        return payload;
+    } catch (error) {
+        console.error('Failed to decode JWT:', error);
         throw new Error('Error decoding JWT');
     }
-    return payload;
 }
 
 function splitToken(token: string): { part1: string, part2: string } {
