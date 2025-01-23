@@ -4,13 +4,15 @@ import app.sportahub.userservice.dto.request.user.friend.FriendRequestRequest;
 import app.sportahub.userservice.dto.request.user.friend.UpdateFriendRequestRequest;
 import app.sportahub.userservice.dto.response.user.PublicProfileResponse;
 import app.sportahub.userservice.dto.response.user.friend.FriendRequestResponse;
+import app.sportahub.userservice.dto.response.user.friend.ViewFriendResponse;
+import app.sportahub.userservice.dto.response.user.friendRequest.FriendRequestResponse;
 import app.sportahub.userservice.dto.request.user.ProfileRequest;
 import app.sportahub.userservice.dto.request.user.UserRequest;
 import app.sportahub.userservice.dto.response.user.ProfileResponse;
 import app.sportahub.userservice.dto.response.user.UserResponse;
 import app.sportahub.userservice.dto.response.user.badge.BadgeWithCountResponse;
-import app.sportahub.userservice.dto.response.user.friend.UpdateFriendRequestResponse;
-import app.sportahub.userservice.dto.response.user.friend.ViewFriendRequestsResponse;
+import app.sportahub.userservice.dto.response.user.friendRequest.UpdateFriendRequestResponse;
+import app.sportahub.userservice.dto.response.user.friendRequest.ViewFriendRequestsResponse;
 import app.sportahub.userservice.enums.user.FriendRequestStatusEnum;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,6 +43,8 @@ public interface UserService {
 
     UpdateFriendRequestResponse updateFriendRequest(String userId, String requestId,
                                                     UpdateFriendRequestRequest updateFriendRequestRequest);
+
+    List<ViewFriendResponse> getFriends(String userId);
 
     Page<ProfileResponse> searchUsers(String firstName, String lastName, List<String> sport, List<String> rankings, String gender, String age, Pageable pageable);
 }
