@@ -36,5 +36,8 @@ public class User extends BaseEntity {
     private Preferences preferences = Preferences.builder().build();
 
     @Builder.Default
+    private List<FriendRequest> friendRequestList = new ArrayList<>();
+
+    @Builder.Default
     private List<Friend> friendList = new ArrayList<>();
 }

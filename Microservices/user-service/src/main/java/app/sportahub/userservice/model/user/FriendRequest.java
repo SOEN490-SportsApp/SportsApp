@@ -2,8 +2,6 @@ package app.sportahub.userservice.model.user;
 
 import app.sportahub.userservice.enums.user.FriendRequestStatusEnum;
 import app.sportahub.userservice.model.BaseEntity;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -13,9 +11,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor
-@Document("friend")
+@Document("friendRequest")
 @Data
-public class Friend extends BaseEntity {
+public class FriendRequest extends BaseEntity {
 
     @NotBlank(message = "User id of friend must be provided.")
     private String userId;
