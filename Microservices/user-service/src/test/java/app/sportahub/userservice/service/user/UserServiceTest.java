@@ -31,6 +31,7 @@ import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import reactor.core.publisher.Mono;
 
 import java.sql.Timestamp;
@@ -524,7 +525,7 @@ public class UserServiceTest {
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(keycloakApiClient.deleteUser("keycloak-123"))
-                .thenReturn(Mono.error(new RuntimeException("Keycloak API error")));
+                .thenReturn(Mono.error(new KeycloakCommunicationException(HttpStatus.CONFLICT,"Keycloak API error")));
 
         assertThrows(KeycloakCommunicationException.class, () -> userService.deleteUserById(userId));
 
