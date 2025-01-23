@@ -1,9 +1,9 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
-const Settings =() => {
+const Chats =() => {
     return (
         <Tabs />
     )
 }
 
-export default Settings
+export default Chats
