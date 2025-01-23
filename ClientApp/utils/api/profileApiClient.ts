@@ -19,7 +19,7 @@ export async function getProfile(userId: string) {
     const axiosInstance = getAxiosInstance();
     try{
         const response = await axiosInstance.get<Profile>(API_ENDPOINTS.GET_USER_BY_ID.replace('{id}', userId));
-        return response.data;
+        return response.data
     } catch (error: any){
         console.error('Error fetching profile:', error);
         throw error.response?.data || error;

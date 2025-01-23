@@ -1,10 +1,21 @@
 import React from "react";
 import { useRouter } from "expo-router";
-import { Alert, View, Text, TextInput, TouchableOpacity, Image, ScrollView, StyleSheet, SafeAreaView } from "react-native";
+import {
+  Alert,
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+  StyleSheet,
+  SafeAreaView,
+} from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { updateProfile } from "@/utils/api/profileApiClient";
 import { useUpdateUserToStore } from "@/state/user/actions";
+import { Picker } from "@react-native-picker/picker";
 
 interface EditProfilePageFormData {
   firstName: string;
@@ -33,19 +44,22 @@ const EditProfilePage: React.FC = () => {
 
   const onSubmit = async (data: EditProfilePageFormData) => {
     try {
-        const updatedData = { ...data, sportsOfPreference: user.profile.sportsOfPreference };
-        console.log("Updated Data:", updatedData); // Log to debug
-        const response = await updateProfile(updatedData, user.id);
-        console.log("Profile updated successfully:", response);
-        await updateUserToStore(user.id);
-        router.replace("/(tabs)/profile");
+      const updatedData = {
+        ...data,
+        sportsOfPreference: user.profile.sportsOfPreference,
+      };
+      console.log("Updated Data:", updatedData);
+      const response = await updateProfile(updatedData, user.id);
+      console.log("Profile updated successfully:", response);
+      await updateUserToStore(user.id);
+      router.replace("/(tabs)/profile");
     } catch (error: any) {
-        console.error("Error occurred while updating profile:", error);
-        const errorMessage = error?.message || "An error occurred while updating your profile.";
-        Alert.alert("Error", errorMessage);
+      console.error("Error occurred while updating profile:", error);
+      const errorMessage =
+        error?.message || "An error occurred while updating your profile.";
+      Alert.alert("Error", errorMessage);
     }
-};
-
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -153,12 +167,18 @@ const EditProfilePage: React.FC = () => {
               control={control}
               name="gender"
               render={({ field: { onChange, value } }) => (
-                <TextInput
-                  style={styles.input}
-                  value={value}
-                  onChangeText={onChange}
-                  placeholder="Gender"
-                />
+                <View style={styles.pickerContainer}>
+                  <Picker
+                    selectedValue={value}
+                    onValueChange={(itemValue) => onChange(itemValue)}
+                    style={styles.picker}
+                  >
+                    <Picker.Item label="Select Gender" value="" />
+                    <Picker.Item label="Male" value="Male" />
+                    <Picker.Item label="Female" value="Female" />
+                    <Picker.Item label="Other" value="Other" />
+                  </Picker>
+                </View>
               )}
             />
           </View>
@@ -199,7 +219,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   cancelButton: {
-    color: "#007AFF",
+    color: "#000000",
     fontSize: 16,
   },
   title: {
@@ -260,16 +280,15 @@ const styles = StyleSheet.create({
     color: "#007AFF",
     fontSize: 16,
   },
+  pickerContainer: {
+    flex: 2,
+    borderBottomWidth: 1,
+    borderBottomColor: "#D1D1D1",
+  },
+  picker: {
+    height: 50,
+  },
 });
 
 export default EditProfilePage;
-
-
-
-
-
-
-
-
-
 
