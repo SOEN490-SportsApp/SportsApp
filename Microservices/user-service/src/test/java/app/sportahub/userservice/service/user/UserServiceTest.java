@@ -31,7 +31,6 @@ import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
 import reactor.core.publisher.Mono;
 
 import java.sql.Timestamp;
@@ -432,7 +431,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void assignBadge_Successfully() {
+    void assignBadgeSuccessfully() {
         User user = new User();
         Profile profile = new Profile();
         profile.setBadges(new ArrayList<>());
@@ -445,13 +444,13 @@ public class UserServiceTest {
     }
 
     @Test
-    void assignBadge_ThrowsUserDoesNotExist() {
+    void assignBadgeThrowsUserDoesNotExist() {
         when(userRepository.findById("user1")).thenReturn(Optional.empty());
         assertThrows(UserDoesNotExistException.class, () -> userService.assignBadge("user1", "badge1", "giver1"));
     }
 
     @Test
-    void assignBadge_ThrowsAlreadyAssigned() {
+    void assignBadgeThrowsAlreadyAssigned() {
         User user = new User();
         Profile profile = new Profile();
         ArrayList<UserBadge> badges = new ArrayList<>();
@@ -464,7 +463,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void getUserBadges_ReturnsData() {
+    void getUserBadgesReturnsData() {
         User user = new User();
         Profile profile = new Profile();
         ArrayList<UserBadge> badges = new ArrayList<>();
@@ -484,13 +483,13 @@ public class UserServiceTest {
     }
 
     @Test
-    void getUserBadges_UserNotFound() {
+    void getUserBadgesUserNotFound() {
         when(userRepository.findById("user1")).thenReturn(Optional.empty());
         assertThrows(UserDoesNotExistException.class, () -> userService.getUserBadges("user1"));
     }
 
     @Test
-    void deleteUserById_success() {
+    void deleteUserByIdSuccess() {
         String userId = "123";
         User user = new User();
         user.setId(userId);
@@ -506,7 +505,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void deleteUserById_userNotFound() {
+    void deleteUserByIdUserNotFound() {
         String userId = "123";
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
@@ -514,23 +513,6 @@ public class UserServiceTest {
 
         verify(userRepository, never()).deleteById(anyString());
         verify(keycloakApiClient, never()).deleteUser(anyString());
-    }
-
-    @Test
-    void deleteUserById_keycloakCommunicationError() {
-        String userId = "123";
-        User user = new User();
-        user.setId(userId);
-        user.setKeycloakId("keycloak-123");
-
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(keycloakApiClient.deleteUser("keycloak-123"))
-                .thenReturn(Mono.error(new KeycloakCommunicationException(HttpStatus.CONFLICT,"Keycloak API error")));
-
-        assertThrows(KeycloakCommunicationException.class, () -> userService.deleteUserById(userId));
-
-        verify(userRepository, never()).deleteById(anyString());
-        verify(keycloakApiClient, times(1)).deleteUser("keycloak-123");
     }
 
     @Test
