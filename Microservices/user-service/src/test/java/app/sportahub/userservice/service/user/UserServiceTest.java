@@ -17,13 +17,18 @@ import app.sportahub.userservice.exception.user.*;
 import app.sportahub.userservice.exception.user.badge.BadgeNotFoundException;
 import app.sportahub.userservice.exception.user.badge.UserAlreadyAssignedBadgeByThisGiverException;
 import app.sportahub.userservice.exception.user.friend.*;
-import app.sportahub.userservice.exception.user.keycloak.KeycloakCommunicationException;
+import app.sportahub.userservice.exception.user.friendRequest.FriendNotFoundInFriendRequestListException;
+import app.sportahub.userservice.exception.user.friendRequest.FriendRequestDoesNotExistException;
+import app.sportahub.userservice.exception.user.friendRequest.GivenFriendUserIdDoesNotMatchFriendRequestFoundByIdException;
+import app.sportahub.userservice.exception.user.friendRequest.UserAlreadyInFriendRequestListException;
+import app.sportahub.userservice.mapper.user.FriendMapper;
 import app.sportahub.userservice.mapper.user.ProfileMapper;
 import app.sportahub.userservice.mapper.user.PublicProfileMapper;
 import app.sportahub.userservice.mapper.user.UserMapper;
 import app.sportahub.userservice.model.user.*;
 import app.sportahub.userservice.repository.BadgeRepository;
 import app.sportahub.userservice.repository.FriendRepository;
+import app.sportahub.userservice.repository.FriendRequestRepository;
 import app.sportahub.userservice.repository.user.UserRepository;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -60,10 +65,14 @@ public class UserServiceTest {
     private FriendRepository friendRepository;
 
     @Mock
+    private FriendRequestRepository friendRequestRepository;
+
+    @Mock
     private KeycloakApiClient keycloakApiClient;
 
     private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
     private final ProfileMapper profileMapper = Mappers.getMapper(ProfileMapper.class);
+    private final FriendMapper friendMapper = Mappers.getMapper(FriendMapper.class);
     private final PublicProfileMapper publicProfileMapper = Mappers.getMapper(PublicProfileMapper.class);
 
     @InjectMocks
@@ -73,6 +82,7 @@ public class UserServiceTest {
     void setUp() {
         userService = new UserServiceImpl(userRepository, badgeRepository,
                 keycloakApiClient, userMapper, profileMapper, friendRepository, publicProfileMapper);
+                keycloakApiClient, userMapper, profileMapper, friendMapper, friendRepository, friendRequestRepository);
     }
 
     private UserRequest getUserRequest() {
@@ -97,6 +107,7 @@ public class UserServiceTest {
                 "123",
                 profileRequest,
                 preferences,
+                new ArrayList<>(),
                 new ArrayList<>()
         );
         return userRequest;
@@ -122,7 +133,7 @@ public class UserServiceTest {
                         .build());
     }
 
-    private Optional<User> getUser(String userID, String username, List<Friend> friendList) {
+    private Optional<User> getUser(String userID, String username, List<FriendRequest> friendRequestList) {
         return Optional.of(User.builder()
                 .withId(userID)
                 .withEmail(username +"@email.com")
@@ -139,7 +150,7 @@ public class UserServiceTest {
                                         new SportLevel("Soccer", "Beginner")))
                         .withRanking("100")
                         .build())
-                        .withFriendList(friendList)
+                        .withFriendRequestList(friendRequestList)
                 .build());
     }
 
@@ -402,7 +413,7 @@ public class UserServiceTest {
                 null
         );
 
-        Optional<User> optionalExistingUser = Optional.of(new User("keycloak-123", "test@gmail.com", "testusername", existingProfile, null, null));
+        Optional<User> optionalExistingUser = Optional.of(new User("keycloak-123", "test@gmail.com", "testusername", existingProfile, null, null, null));
         User existingUser = optionalExistingUser.get();
         when(userRepository.findUserById(existingUser.getId())).thenReturn(optionalExistingUser);
         existingUser.getProfile().setDateOfBirth(profileRequest.dateOfBirth());
@@ -553,13 +564,13 @@ public class UserServiceTest {
         User send = sendUser.orElseThrow();
         User receiver = receiverUser.orElseThrow();
         FriendRequestRequest friendRequestRequest = new FriendRequestRequest(receiverUser.get().getId());
-        Friend friend = Friend.builder().withFriendRequestStatus(FriendRequestStatusEnum.SENT)
+        FriendRequest friend = FriendRequest.builder().withFriendRequestStatus(FriendRequestStatusEnum.SENT)
                         .withUserId(receiverId)
                                 .build();
 
         when(userRepository.save(send)).thenReturn(send);
         when(userRepository.save(receiver)).thenReturn(receiver);
-        when(friendRepository.save(any())).thenReturn(friend);
+        when(friendRequestRepository.save(any())).thenReturn(friend);
 
         // Act
         FriendRequestResponse response = userService.sendFriendRequest(sendUser.get().getId(),
@@ -568,10 +579,10 @@ public class UserServiceTest {
         // Assert
         assertNotNull(response);
         assertEquals("Friend request sent successfully.",response.message());
-        assertFalse(send.getFriendList().isEmpty());
-        assertFalse(receiver.getFriendList().isEmpty());
-        assertEquals(FriendRequestStatusEnum.SENT, send.getFriendList().getFirst().getFriendRequestStatus());
-        assertEquals(FriendRequestStatusEnum.RECEIVED, receiver.getFriendList().getFirst().getFriendRequestStatus());
+        assertFalse(send.getFriendRequestList().isEmpty());
+        assertFalse(receiver.getFriendRequestList().isEmpty());
+        assertEquals(FriendRequestStatusEnum.SENT, send.getFriendRequestList().getFirst().getFriendRequestStatus());
+        assertEquals(FriendRequestStatusEnum.RECEIVED, receiver.getFriendRequestList().getFirst().getFriendRequestStatus());
     }
 
     @Test
@@ -591,11 +602,11 @@ public class UserServiceTest {
     void sendFriendRequestShouldThrowUserAlreadyInFriendListException() {
         // Arrange
 
-        List<Friend> senderFriendList = new ArrayList<>();
-        senderFriendList.add(new Friend("receiverId", FriendRequestStatusEnum.SENT));
+        List<FriendRequest> senderFriendList = new ArrayList<>();
+        senderFriendList.add(new FriendRequest("receiverId", FriendRequestStatusEnum.SENT));
 
-        List<Friend> receiverFriendList = new ArrayList<>();
-        receiverFriendList.add(new Friend("senderId", FriendRequestStatusEnum.RECEIVED));
+        List<FriendRequest> receiverFriendList = new ArrayList<>();
+        receiverFriendList.add(new FriendRequest("senderId", FriendRequestStatusEnum.RECEIVED));
 
         String senderId = "senderId";
         String senderUsername = "sender";
@@ -611,13 +622,14 @@ public class UserServiceTest {
         User receiver = receiverUser.orElseThrow();
 
         // Act
-        UserAlreadyInFriendListException exception = assertThrows(UserAlreadyInFriendListException.class,
+        UserAlreadyInFriendRequestListException exception = assertThrows(UserAlreadyInFriendRequestListException.class,
                 () -> userService.sendFriendRequest(sendUser.get().getId(),
                 new FriendRequestRequest(receiverUser.get().getId())));
 
         // Assert
         assertEquals("409 CONFLICT \"User with username: " + receiver.getUsername() + " and status: "
-                + send.getFriendList().getFirst().getFriendRequestStatus() + " already in friend list.\"", exception.getMessage());
+                + send.getFriendRequestList().getFirst().getFriendRequestStatus() + " already in friend request list.\"",
+                exception.getMessage());
     }
 
     @Test
@@ -642,16 +654,16 @@ public class UserServiceTest {
     void updateFriendRequestACCEPTShouldReturnSuccess() {
         // Arrange
 
-        List<Friend> userFriendList = new ArrayList<>();
-        userFriendList.add(new Friend("friendID", FriendRequestStatusEnum.RECEIVED));
-        userFriendList.add(new Friend("otherFriendID", FriendRequestStatusEnum.RECEIVED));
+        List<FriendRequest> userFriendRequestList = new ArrayList<>();
+        userFriendRequestList.add(new FriendRequest("friendID", FriendRequestStatusEnum.RECEIVED));
+        userFriendRequestList.add(new FriendRequest("otherFriendID", FriendRequestStatusEnum.RECEIVED));
 
-        List<Friend> friendFriendList = new ArrayList<>();
-        friendFriendList.add(new Friend("userID", FriendRequestStatusEnum.SENT));
+        List<FriendRequest> friendFriendList = new ArrayList<>();
+        friendFriendList.add(new FriendRequest("userID", FriendRequestStatusEnum.SENT));
 
         String userId = "userID";
         String username = "user";
-        User user = getUser(userId, username, userFriendList).orElseThrow();
+        User user = getUser(userId, username, userFriendRequestList).orElseThrow();
 
         String friendId = "friendID";
         String friendUsername = "friend";
@@ -662,7 +674,7 @@ public class UserServiceTest {
 
         lenient().when(userRepository.findUserById(userId)).thenReturn(Optional.of(user));
         lenient().when(userRepository.findUserById(friendId)).thenReturn(Optional.of(friendUser));
-        when(friendRepository.findFriendById(any())).thenReturn(Optional.of(userFriendList.getFirst()));
+        when(friendRequestRepository.findFriendRequestById(any())).thenReturn(Optional.of(userFriendRequestList.getFirst()));
         lenient().when(userRepository.save(user)).thenReturn(user);
         lenient().when(userRepository.save(friendUser)).thenReturn(friendUser);
 
@@ -683,15 +695,15 @@ public class UserServiceTest {
     void updateFriendRequestDECLINEShouldReturnSuccess() {
         // Arrange
 
-        List<Friend> userFriendList = new ArrayList<>();
-        userFriendList.add(new Friend("friendID", FriendRequestStatusEnum.SENT));
+        List<FriendRequest> userFriendRequestList = new ArrayList<>();
+        userFriendRequestList.add(new FriendRequest("friendID", FriendRequestStatusEnum.SENT));
 
-        List<Friend> friendFriendList = new ArrayList<>();
-        friendFriendList.add(new Friend("userID", FriendRequestStatusEnum.RECEIVED));
+        List<FriendRequest> friendFriendList = new ArrayList<>();
+        friendFriendList.add(new FriendRequest("userID", FriendRequestStatusEnum.RECEIVED));
 
         String userId = "userID";
         String username = "user";
-        User user = getUser(userId, username, userFriendList).orElseThrow();
+        User user = getUser(userId, username, userFriendRequestList).orElseThrow();
 
         String friendId = "friendID";
         String friendUsername = "friend";
@@ -702,7 +714,7 @@ public class UserServiceTest {
 
         lenient().when(userRepository.findUserById(userId)).thenReturn(Optional.of(user));
         lenient().when(userRepository.findUserById(friendId)).thenReturn(Optional.of(friendUser));
-        when(friendRepository.findFriendById(any())).thenReturn(Optional.of(userFriendList.getFirst()));
+        when(friendRequestRepository.findFriendRequestById(any())).thenReturn(Optional.of(userFriendRequestList.getFirst()));
         lenient().when(userRepository.save(user)).thenReturn(user);
         lenient().when(userRepository.save(friendUser)).thenReturn(friendUser);
 
@@ -715,8 +727,8 @@ public class UserServiceTest {
                         + " declined the friend request of user with id: " + friendUser.getId() + " successfully",
                 updateFriendRequestResponse.message());
 
-        assertTrue(user.getFriendList().isEmpty());
-        assertTrue(friendUser.getFriendList().isEmpty());
+        assertTrue(user.getFriendRequestList().isEmpty());
+        assertTrue(friendUser.getFriendRequestList().isEmpty());
     }
 
     @Test
@@ -777,12 +789,12 @@ public class UserServiceTest {
         when(userRepository.findUserById(friendId)).thenReturn(Optional.of(friendUser));
 
         // Act
-        FriendDoesNotExistException exception = assertThrows(FriendDoesNotExistException.class, () ->
+        FriendRequestDoesNotExistException exception = assertThrows(FriendRequestDoesNotExistException.class, () ->
                 userService.updateFriendRequest(userId, requestId,
                         updateFriendRequestRequest));
 
         // Assert
-        assertEquals("404 NOT_FOUND \"Friend with identifier: " + requestId + " does not exist.\"",
+        assertEquals("404 NOT_FOUND \"Friend request with identifier: " + requestId + " does not exist.\"",
                 exception.getMessage());
     }
 
@@ -790,12 +802,12 @@ public class UserServiceTest {
     void updateFriendRequestShouldThrowGivenFriendUsernameDoesNotMatchFriendFoundByIdException() {
         // Arrange
         String requestId = new ObjectId().toHexString();
-        List<Friend> userFriendList = new ArrayList<>();
-        userFriendList.add(new Friend("friendId", FriendRequestStatusEnum.RECEIVED));
+        List<FriendRequest> userFriendRequestList = new ArrayList<>();
+        userFriendRequestList.add(new FriendRequest("friendId", FriendRequestStatusEnum.RECEIVED));
 
         String userId = "userID";
         String username = "user";
-        User user = getUser(userId, username, userFriendList).orElseThrow();
+        User user = getUser(userId, username, userFriendRequestList).orElseThrow();
 
         String wrongUserId = "wrongUserId";
         String wrongUserUsername = "wrongUser";
@@ -806,68 +818,68 @@ public class UserServiceTest {
 
         when(userRepository.findUserById(userId)).thenReturn(Optional.of(user));
         when(userRepository.findUserById(wrongUser.getId())).thenReturn(Optional.of(wrongUser));
-        when(friendRepository.findFriendById(any())).thenReturn(Optional.of(userFriendList.getFirst()));
+        when(friendRequestRepository.findFriendRequestById(any())).thenReturn(Optional.of(userFriendRequestList.getFirst()));
 
         // Act
-        GivenFriendUserIdDoesNotMatchFriendFoundByIdException exception =
-                assertThrows(GivenFriendUserIdDoesNotMatchFriendFoundByIdException.class, () ->
+        GivenFriendUserIdDoesNotMatchFriendRequestFoundByIdException exception =
+                assertThrows(GivenFriendUserIdDoesNotMatchFriendRequestFoundByIdException.class, () ->
                 userService.updateFriendRequest(userId, requestId ,
                         updateFriendRequestRequest));
 
         // Assert
-        assertEquals("409 CONFLICT \"Given friend with the user id: "
-                + wrongUser.getId() + " does not match the friend found with the given request id: "
+        assertEquals("409 CONFLICT \"Given friend request with the user id: "
+                + wrongUser.getId() + " does not match the friend request found with the given request id: "
                 + requestId + "\"", exception.getMessage());
     }
 
     @Test
     void updateFriendRequestShouldThrowFriendNotFoundInFriendListExceptionFromIsFriendFound1() {
         // Arrange
-        List<Friend> userFriendList = new ArrayList<>();
-        Friend userFriend = new Friend("friendID", FriendRequestStatusEnum.RECEIVED);
+        List<FriendRequest> userFriendRequestList = new ArrayList<>();
+        FriendRequest userFriendRequest = new FriendRequest("friendID", FriendRequestStatusEnum.RECEIVED);
 
-        List<Friend> friendFriendList = new ArrayList<>();
-        friendFriendList.add(new Friend("userID", FriendRequestStatusEnum.SENT));
+        List<FriendRequest> friendFriendRequestList = new ArrayList<>();
+        friendFriendRequestList.add(new FriendRequest("userID", FriendRequestStatusEnum.SENT));
 
         String userId = "userID";
         String username = "user";
-        User user = getUser(userId, username, userFriendList).orElseThrow();
+        User user = getUser(userId, username, userFriendRequestList).orElseThrow();
 
         String friendId = "friendID";
         String friendUsername = "friend";
-        User friendUser = getUser(friendId, friendUsername, friendFriendList).orElseThrow();
+        User friendUser = getUser(friendId, friendUsername, friendFriendRequestList).orElseThrow();
 
         UpdateFriendRequestRequest updateFriendRequestRequest = new UpdateFriendRequestRequest(friendId,
                 UpdateFriendRequestActionEnum.DECLINE);
 
         lenient().when(userRepository.findUserById(userId)).thenReturn(Optional.of(user));
         lenient().when(userRepository.findUserById(friendUser.getId())).thenReturn(Optional.of(friendUser));
-        when(friendRepository.findFriendById(any())).thenReturn(Optional.of(userFriend));
+        when(friendRequestRepository.findFriendRequestById(any())).thenReturn(Optional.of(userFriendRequest));
         lenient().when(userRepository.save(user)).thenReturn(user);
         lenient().when(userRepository.save(friendUser)).thenReturn(friendUser);
 
         // Act
-        FriendNotFoundInFriendListException exception = assertThrows(FriendNotFoundInFriendListException.class, () ->
+        FriendNotFoundInFriendRequestListException exception = assertThrows(FriendNotFoundInFriendRequestListException.class, () ->
                 userService.updateFriendRequest(userId, "requestId", updateFriendRequestRequest));
 
         // Assert
         assertEquals("404 NOT_FOUND \"User with identifier: "
-                + user.getId() + " does not have friend with identifier: "
-                + friendUser.getId() + " in their friend list.\"", exception.getMessage());
+                + user.getId() + " does not have friend request with identifier: "
+                + friendUser.getId() + " in their friend request list.\"", exception.getMessage());
     }
 
     @Test
     void updateFriendRequestShouldThrowFriendNotFoundInFriendListExceptionFromIsFriendFound2() {
         // Arrange
-        List<Friend> userFriendList = new ArrayList<>();
-        Friend userFriend = new Friend("friendID", FriendRequestStatusEnum.SENT);
-        userFriendList.add(userFriend);
+        List<FriendRequest> userFriendRequestList = new ArrayList<>();
+        FriendRequest userFriendRequest = new FriendRequest("friendID", FriendRequestStatusEnum.SENT);
+        userFriendRequestList.add(userFriendRequest);
 
-        List<Friend> friendFriendList = new ArrayList<>();
+        List<FriendRequest> friendFriendList = new ArrayList<>();
 
         String userId = "userID";
         String username = "user";
-        User user = getUser(userId, username, userFriendList).orElseThrow();
+        User user = getUser(userId, username, userFriendRequestList).orElseThrow();
 
         String friendId = "friendID";
         String friendUsername = "friend";
@@ -878,44 +890,44 @@ public class UserServiceTest {
 
         lenient().when(userRepository.findUserById(userId)).thenReturn(Optional.of(user));
         lenient().when(userRepository.findUserById(friendUser.getId())).thenReturn(Optional.of(friendUser));
-        when(friendRepository.findFriendById(any())).thenReturn(Optional.of(userFriend));
+        when(friendRequestRepository.findFriendRequestById(any())).thenReturn(Optional.of(userFriendRequest));
         lenient().when(userRepository.save(user)).thenReturn(user);
         lenient().when(userRepository.save(friendUser)).thenReturn(friendUser);
 
         // Act
-        FriendNotFoundInFriendListException exception = assertThrows(FriendNotFoundInFriendListException.class, () ->
+        FriendNotFoundInFriendRequestListException exception = assertThrows(FriendNotFoundInFriendRequestListException.class, () ->
                 userService.updateFriendRequest(userId, "requestId", updateFriendRequestRequest));
 
         // Assert
         assertEquals("404 NOT_FOUND \"User with identifier: "
-                + friendUser.getId() + " does not have friend with identifier: "
-                + user.getId() + " in their friend list.\"", exception.getMessage());
+                + friendUser.getId() + " does not have friend request with identifier: "
+                + user.getId() + " in their friend request list.\"", exception.getMessage());
     }
 
     @Test
     void updateFriendRequestShouldThrowTryingToAcceptInvalidFriendRequestException() {
         // Arrange
 
-        List<Friend> userFriendList = new ArrayList<>();
-        userFriendList.add(new Friend("friendID", FriendRequestStatusEnum.SENT));
+        List<FriendRequest> userFriendRequestList = new ArrayList<>();
+        userFriendRequestList.add(new FriendRequest("friendID", FriendRequestStatusEnum.SENT));
 
-        List<Friend> friendFriendList = new ArrayList<>();
-        friendFriendList.add(new Friend("userID", FriendRequestStatusEnum.RECEIVED));
+        List<FriendRequest> friendFriendRequestList = new ArrayList<>();
+        friendFriendRequestList.add(new FriendRequest("userID", FriendRequestStatusEnum.RECEIVED));
 
         String userId = "userID";
         String username = "user";
-        User user = getUser(userId, username, userFriendList).orElseThrow();
+        User user = getUser(userId, username, userFriendRequestList).orElseThrow();
 
         String friendId = "friendID";
         String friendUsername = "friend";
-        User friendUser = getUser(friendId, friendUsername, friendFriendList).orElseThrow();
+        User friendUser = getUser(friendId, friendUsername, friendFriendRequestList).orElseThrow();
 
         UpdateFriendRequestRequest updateFriendRequestRequest = new UpdateFriendRequestRequest(friendId,
                 UpdateFriendRequestActionEnum.ACCEPT);
 
         lenient().when(userRepository.findUserById(userId)).thenReturn(Optional.of(user));
         lenient().when(userRepository.findUserById(friendUser.getId())).thenReturn(Optional.of(friendUser));
-        when(friendRepository.findFriendById(any())).thenReturn(Optional.of(userFriendList.getFirst()));
+        when(friendRequestRepository.findFriendRequestById(any())).thenReturn(Optional.of(userFriendRequestList.getFirst()));
         lenient().when(userRepository.save(user)).thenReturn(user);
         lenient().when(userRepository.save(friendUser)).thenReturn(friendUser);
 
@@ -927,7 +939,7 @@ public class UserServiceTest {
         // Assert
         assertEquals("409 CONFLICT \"User with identifier: " + user.getId()
                 + " is trying to accept a friend request from: " + friendUser.getId()
-                + " but the status of the friend request is " + user.getFriendList().getFirst().getFriendRequestStatus()
+                + " but the status of the friend request is " + user.getFriendRequestList().getFirst().getFriendRequestStatus()
                 + " instead of RECEIVED.\"", exception.getMessage());
         }
 
@@ -936,16 +948,17 @@ public class UserServiceTest {
         // Arrange
         User user = new User();
         user.setUsername("testUsername");
-        List<Friend> friendList = new ArrayList<>();
-        Friend friend1 = new Friend("senderId", FriendRequestStatusEnum.SENT);
-        friend1.setId("friend1RequestId");
-        friendList.add(friend1);
-        Friend friend2 = new Friend("receiverId", FriendRequestStatusEnum.RECEIVED);
-        friend2.setId("friend2RequestId");
-        friendList.add(friend2);
-        user.setFriendList(friendList);
+        List<FriendRequest> friendRequestList = new ArrayList<>();
+        FriendRequest friendRequest1 = new FriendRequest("senderId", FriendRequestStatusEnum.SENT);
+        friendRequest1.setId("friend1RequestId");
+        friendRequestList.add(friendRequest1);
+        FriendRequest friendRequest2 = new FriendRequest("receiverId", FriendRequestStatusEnum.RECEIVED);
+        friendRequest2.setId("friend2RequestId");
+        friendRequestList.add(friendRequest2);
+        user.setFriendRequestList(friendRequestList);
 
         User receiverUser = new User();
+
         receiverUser.setUsername("receiverUsername");
         receiverUser.setId("receiverId");
 
@@ -960,9 +973,9 @@ public class UserServiceTest {
         // Assert
         assertFalse(listResponse.isEmpty());
         assertEquals(1, listResponse.size());
-        assertEquals("receiverId", listResponse.getFirst().friendUserId());
-        assertEquals("receiverUsername", listResponse.getFirst().friendUsername());
-        assertEquals("friend2RequestId", listResponse.getFirst().id());
+        assertEquals("receiverId", listResponse.getFirst().friendRequestUserId());
+        assertEquals("receiverUsername", listResponse.getFirst().friendRequestUsername());
+        assertEquals("friend2RequestId", listResponse.getFirst().RequestId());
     }
 
     @Test
@@ -985,10 +998,10 @@ public class UserServiceTest {
         // Arrange
         User user = new User();
         user.setUsername("testUsername");
-        List<Friend> friendList = new ArrayList<>();
-        friendList.add(new Friend("sender", FriendRequestStatusEnum.SENT));
-        friendList.add(new Friend("receiver", FriendRequestStatusEnum.RECEIVED));
-        user.setFriendList(friendList);
+        List<FriendRequest> friendRequestList = new ArrayList<>();
+        friendRequestList.add(new FriendRequest("sender", FriendRequestStatusEnum.SENT));
+        friendRequestList.add(new FriendRequest("receiver", FriendRequestStatusEnum.RECEIVED));
+        user.setFriendRequestList(friendRequestList);
         List<FriendRequestStatusEnum> typeList = new ArrayList<>();
         typeList.add(FriendRequestStatusEnum.RECEIVED);
         typeList.add(FriendRequestStatusEnum.SENT);
