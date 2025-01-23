@@ -5,12 +5,14 @@ import app.sportahub.userservice.controller.user.UserController;
 import app.sportahub.userservice.dto.response.user.ProfileResponse;
 import app.sportahub.userservice.dto.response.user.SportLevelResponse;
 import app.sportahub.userservice.exception.user.*;
+import app.sportahub.userservice.mapper.user.FriendMapper;
 import app.sportahub.userservice.mapper.user.ProfileMapper;
 import app.sportahub.userservice.mapper.user.PublicProfileMapper;
 import app.sportahub.userservice.mapper.user.UserMapper;
 import app.sportahub.userservice.model.user.*;
 import app.sportahub.userservice.repository.BadgeRepository;
 import app.sportahub.userservice.repository.FriendRepository;
+import app.sportahub.userservice.repository.FriendRequestRepository;
 import app.sportahub.userservice.repository.user.SearchingUserRepositoryImpl;
 import app.sportahub.userservice.repository.user.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,6 +54,9 @@ public class UserSearchTest {
     private ProfileMapper profileMapper;
 
     @Mock
+    private FriendMapper friendMapper;
+
+    @Mock
     private PublicProfileMapper publicProfileMapper;
 
     @InjectMocks
@@ -69,9 +74,13 @@ public class UserSearchTest {
     @Mock
     private FriendRepository friendRepository;
 
+    @Mock
+    private FriendRequestRepository friendRequestRepository;
+
     @BeforeEach
     void setUp() {
         userService = new UserServiceImpl(userRepository, badgeRepository,
+                keycloakApiClient, userMapper, profileMapper, friendMapper, friendRepository, friendRequestRepository);
                 keycloakApiClient, userMapper, profileMapper, friendRepository, publicProfileMapper);
         searchingUserRepository = new SearchingUserRepositoryImpl(mongoTemplate);
     }
