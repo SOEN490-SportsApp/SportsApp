@@ -1,13 +1,14 @@
 package app.sportahub.eventservice.service.event;
 
-import org.springdoc.core.converters.models.Pageable;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 
 import app.sportahub.eventservice.dto.request.EventRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.dto.response.ParticipantResponse;
-
-import java.util.List;
+import app.sportahub.eventservice.enums.EventSortingField;
+import app.sportahub.eventservice.enums.SortDirection;
 
 public interface EventService {
 
@@ -27,7 +28,7 @@ public interface EventService {
 
     ParticipantResponse joinEvent(String id, String userId);
 
-    Page<EventResponse> getEventsByParticipantId(String userId, int page, int size);
+    Page<EventResponse> getEventsByParticipantId(String userId, int page, int size, SortDirection sort, EventSortingField field);
 
-    Page<EventResponse> getEventsCreatedByUserId(String userId, int page, int size);
+    Page<EventResponse> getEventsCreatedByUserId(String userId, int page, int size, SortDirection sort, EventSortingField field);
 }
