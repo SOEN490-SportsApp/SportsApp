@@ -5,6 +5,7 @@ import app.sportahub.userservice.dto.request.user.*;
 import app.sportahub.userservice.dto.request.user.friend.FriendRequestRequest;
 import app.sportahub.userservice.dto.request.user.friend.UpdateFriendRequestRequest;
 import app.sportahub.userservice.dto.request.user.keycloak.KeycloakRequest;
+import app.sportahub.userservice.dto.response.user.friend.ViewFriendResponse;
 import app.sportahub.userservice.dto.response.user.friendRequest.FriendRequestResponse;
 import app.sportahub.userservice.dto.response.user.ProfileResponse;
 import app.sportahub.userservice.dto.response.user.SportLevelResponse;
@@ -658,8 +659,8 @@ public class UserServiceTest {
         userFriendRequestList.add(new FriendRequest("friendID", FriendRequestStatusEnum.RECEIVED));
         userFriendRequestList.add(new FriendRequest("otherFriendID", FriendRequestStatusEnum.RECEIVED));
 
-        List<FriendRequest> friendFriendList = new ArrayList<>();
-        friendFriendList.add(new FriendRequest("userID", FriendRequestStatusEnum.SENT));
+        List<FriendRequest> friendFriendRequestList = new ArrayList<>();
+        friendFriendRequestList.add(new FriendRequest("userID", FriendRequestStatusEnum.SENT));
 
         String userId = "userID";
         String username = "user";
@@ -667,7 +668,7 @@ public class UserServiceTest {
 
         String friendId = "friendID";
         String friendUsername = "friend";
-        User friendUser = getUser(friendId, friendUsername, friendFriendList).orElseThrow();
+        User friendUser = getUser(friendId, friendUsername, friendFriendRequestList).orElseThrow();
 
         UpdateFriendRequestRequest updateFriendRequestRequest = new UpdateFriendRequestRequest(friendId,
                 UpdateFriendRequestActionEnum.ACCEPT);
@@ -1014,5 +1015,47 @@ public class UserServiceTest {
         // Assert
         assertEquals("400 BAD_REQUEST \"Invalid friend request status type: "
                 + FriendRequestStatusEnum.ACCEPTED + " for this operation.\"", exception.getMessage());
+    }
+
+    @Test
+    void getFriendsShouldReturnSuccess() {
+        // Arrange
+        User user = new User();
+        user.setId("userId");
+
+        User friendUser1 = new User();
+        friendUser1.setId("friend1Id");
+
+        User friendUser2 = new User();
+        friendUser2.setId("friend2Id");
+
+        List<Friend> friendList = new ArrayList<>();
+        friendList.add(new Friend("friend1", FriendRequestStatusEnum.ACCEPTED));
+        friendList.add(new Friend("friend2", FriendRequestStatusEnum.ACCEPTED));
+        user.setFriendList(friendList);
+
+        lenient().when(userRepository.findUserById("userId")).thenReturn(Optional.of(user));
+        lenient().when(userRepository.findUserById("friend1")).thenReturn(Optional.of(friendUser1));
+        lenient().when(userRepository.findUserById("friend2")).thenReturn(Optional.of(friendUser2));
+
+        // Act
+        List<ViewFriendResponse> viewFriendResponseList = userService.getFriends("userId");
+
+        // Assert
+        assertEquals(2, viewFriendResponseList.size());
+        assertEquals("friend1",viewFriendResponseList.getFirst().friendUserId());
+    }
+
+    @Test
+    void getFriendsShouldThrowUserDoesNotExistException() {
+        // Arrange
+        String userId = new ObjectId().toHexString();
+
+        // Act
+        UserDoesNotExistException exception = assertThrows(UserDoesNotExistException.class, () ->
+                userService.getFriends(userId));
+
+        // Assert
+        assertEquals("404 NOT_FOUND \"User with identifier: " + userId + " does not exist.\"", exception.getMessage());
     }
 }
