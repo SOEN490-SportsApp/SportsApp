@@ -11,6 +11,7 @@ import app.sportahub.userservice.exception.user.keycloak.KeycloakCommunicationEx
 import app.sportahub.userservice.exception.user.badge.UserAlreadyAssignedBadgeByThisGiverException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -37,6 +38,15 @@ public class GlobalExceptionHandler {
         response.put("errors", errors);
         return ResponseEntity.badRequest().body(response);
     }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Map<String, Object>> handleAccessDeniedException(AccessDeniedException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("error", ex.getMessage());
+        response.put("status", HttpStatus.FORBIDDEN.value());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+    }
+
 
     @ExceptionHandler(UserDoesNotExistException.class)
     public ResponseEntity<Map<String, Object>> handleUserDoesNotExistException(UserDoesNotExistException ex) {
@@ -116,4 +126,6 @@ public class GlobalExceptionHandler {
         response.put("status", HttpStatus.NOT_ACCEPTABLE.value());
         return ResponseEntity.badRequest().body(response);
     }
+
+
 }
