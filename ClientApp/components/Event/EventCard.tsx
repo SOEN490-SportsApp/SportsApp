@@ -80,7 +80,7 @@ const EventCard: React.FC<EventCardProps> = ({
         timeLeftShown = `${weeksLeft} week${weeksLeft > 1 ? "s" : ""}`;
       }
     } else {
-      if (!isForProfile) return null;
+      // if (!isForProfile) return null;
       canJoin = false;
       if (currentTime.getTime() > new Date(event.cutOffTime).getTime()) {
         eventStarted = true;
