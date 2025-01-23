@@ -111,7 +111,7 @@ public class UserController {
     }
 
     @GetMapping("/search")
-    @ResponseStatus(HttpStatus.FOUND)
+    @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Search for user",
             description = "Allows the search of users based on name, sport, rank, gender, or date of birth.")
     public Page<ProfileResponse> searchUsers(
