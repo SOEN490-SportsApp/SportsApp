@@ -54,15 +54,6 @@ public class EventServiceImpl implements EventService {
         return eventRepository.findAll().stream().map(eventMapper::eventToEventResponse).toList();
     }
 
-    /**
-     * Returns all events in the database.
-     *
-     * @return a List containing an EventResponse object for each event stored in the database.
-     */
-    @Override
-    public List<EventResponse> getAllEvents() {
-        return eventRepository.findAll().stream().map(eventMapper::eventToEventResponse).toList();
-    }
 
     /**
      * Creates an event with the provided information found in the {@link EventRequest}.
