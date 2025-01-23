@@ -23,16 +23,14 @@ import app.sportahub.userservice.dto.request.user.ProfileRequest;
 import app.sportahub.userservice.dto.request.user.UserRequest;
 import app.sportahub.userservice.dto.request.user.friend.FriendRequestRequest;
 import app.sportahub.userservice.dto.request.user.friend.UpdateFriendRequestRequest;
-import app.sportahub.userservice.dto.response.user.PublicProfileResponse;
-import app.sportahub.userservice.dto.response.user.friend.FriendRequestResponse;
+import app.sportahub.userservice.dto.response.user.friendRequest.FriendRequestResponse;
 import app.sportahub.userservice.dto.request.user.ProfileRequest;
 import app.sportahub.userservice.dto.request.user.UserRequest;
 import app.sportahub.userservice.dto.response.user.ProfileResponse;
 import app.sportahub.userservice.dto.response.user.UserResponse;
 import app.sportahub.userservice.dto.response.user.badge.BadgeWithCountResponse;
-import app.sportahub.userservice.dto.response.user.friend.FriendRequestResponse;
-import app.sportahub.userservice.dto.response.user.friend.UpdateFriendRequestResponse;
-import app.sportahub.userservice.dto.response.user.friend.ViewFriendRequestsResponse;
+import app.sportahub.userservice.dto.response.user.friendRequest.UpdateFriendRequestResponse;
+import app.sportahub.userservice.dto.response.user.friendRequest.ViewFriendRequestsResponse;
 import app.sportahub.userservice.enums.user.FriendRequestStatusEnum;
 import app.sportahub.userservice.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -139,6 +137,14 @@ public class UserController {
     description = "Retrieves user's friend requests stored in their friend list based on given type.")
     public List<ViewFriendRequestsResponse> getFriendRequests(@PathVariable String userId, @RequestParam List<FriendRequestStatusEnum> type) {
         return userService.getFriendRequests(userId, type);
+    }
+
+    @GetMapping("/{userId}/friends")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "view accepted friends",
+    description = "Retrieves user's friend list")
+    public List<ViewFriendResponse> getFriends(@PathVariable String userId) {
+        return userService.getFriends(userId);
     }
 
     @GetMapping("/search")

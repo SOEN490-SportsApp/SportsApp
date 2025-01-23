@@ -1,6 +1,7 @@
 package app.sportahub.userservice.dto.request.user;
 
 import app.sportahub.userservice.model.user.Friend;
+import app.sportahub.userservice.model.user.FriendRequest;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Email;
@@ -26,6 +27,8 @@ public record UserRequest(String keycloakId,
 
                           @Nullable
                           PreferencesRequest preferences,
+
+                          @Nullable List<FriendRequest> friendRequestList,
 
                           @Nullable
                           List<Friend> friendList) {
