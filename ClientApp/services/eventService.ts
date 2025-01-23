@@ -14,3 +14,14 @@ export const createEvent = async (eventData: any) => {
     throw error;
   }
 };
+//API_ENDPOINTS.GET_ALL_EVENTS
+export const getAllEvents = async () => {
+  try {
+    const axiosInstance = getAxiosInstance();
+    const response = await axiosInstance.get(API_ENDPOINTS.GET_ALL_EVENTS);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching events:", error);
+    throw error;
+  }
+};
