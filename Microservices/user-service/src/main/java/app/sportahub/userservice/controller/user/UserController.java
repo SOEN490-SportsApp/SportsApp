@@ -94,6 +94,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("#id == authentication.name || hasRole('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete user by ID",
             description = "Deletes a user by their unique identifier.")
@@ -112,6 +113,7 @@ public class UserController {
     }
 
     @PutMapping("/{userId}/friend-requests/{requestId}")
+    @PreAuthorize("#userId == authentication.name || hasRole('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Accept or decline a friend request",
     description = "Allows a user to accept or decline a friend request and returns a success message if successful.")
