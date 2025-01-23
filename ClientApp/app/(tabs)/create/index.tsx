@@ -472,15 +472,7 @@ const Create = () => {
                 onChange={(event, selectedTime) => {
                   setShowStartTimePicker(false);
                   if (selectedTime) {
-                    const formattedTime = selectedTime.toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    });
-                    if (!timeFormatRegex.test(formattedTime)) {
-                      Alert.alert("Error", "Time must be in HH:MM format.");
-                      return;
-                    }
-                    setStartTime(selectedTime); // Valid time is set
+                    setStartTime(selectedTime); // Directly set the time without regex validation
                   }
                 }}
               />
@@ -506,7 +498,9 @@ const Create = () => {
                 display="default"
                 onChange={(event, selectedTime) => {
                   setShowEndTimePicker(false);
-                  if (selectedTime) setEndTime(selectedTime);
+                  if (selectedTime) {
+                    setEndTime(selectedTime); // Directly set the time
+                  }
                 }}
               />
             )}
