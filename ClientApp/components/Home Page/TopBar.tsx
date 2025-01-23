@@ -12,11 +12,6 @@ const TopBar = () => {
             <Icon name="search" type="font-awesome" color="#000" size={20} />
           </View>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.iconButton}>
-          <View style={styles.iconCircle}>
-            <Icon name="comments" type="font-awesome" color="#000" size={20} />
-          </View>
-        </TouchableOpacity>
       </View>
     </View>
   );
