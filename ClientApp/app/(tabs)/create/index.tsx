@@ -192,6 +192,7 @@ const Create = () => {
       transparent={true}
       visible={isSportTypeModalVisible}
       onRequestClose={() => setSportTypeModalVisible(false)}
+      accessibilityLabel="Sport Selection Modal" // Add this line
     >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContainer}>
@@ -303,10 +304,11 @@ const Create = () => {
                   style={styles.input}
                   onBlur={onBlur}
                   onChangeText={onChange}
-                  value={value}
+                  value={value} // Ensure correct value binding
                 />
               )}
             />
+
             {errors.eventName && (
               <Text style={styles.errorText}>{errors.eventName.message}</Text>
             )}
@@ -314,6 +316,7 @@ const Create = () => {
             <Text style={styles.label}>Event Type</Text>
             <View style={styles.radioGroup}>
               <TouchableOpacity
+                testID="event-type-public"
                 onPress={() => setValue("eventType", "public")}
                 style={[
                   styles.radioButton,
@@ -332,6 +335,7 @@ const Create = () => {
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
+                testID="event-type-private"
                 onPress={() => setValue("eventType", "private")}
                 style={[
                   styles.radioButton,
@@ -592,6 +596,7 @@ const Create = () => {
               {["Beginner", "Intermediate", "Advanced"].map((level) => (
                 <TouchableOpacity
                   key={level}
+                  testID={`skill-level-${level}`}
                   style={[
                     styles.skillLevelOption,
                     requiredSkillLevel.includes(level) &&
