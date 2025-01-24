@@ -9,9 +9,10 @@
 export const consoleError = (title: string, message: string, code?: number) => {
   const alertTitle = code ? `${title} ${code}` : title;
   const alertMessage = code ? `${message}` : message;
-  
+
+  // Only log errors in development mode
   if (__DEV__) {
-    console.error(`ERROR: ${alertTitle} - ${alertMessage}`);
+    console.warn(`ERROR: ${alertTitle} - ${alertMessage}`);
   }
 };
 
@@ -41,7 +42,7 @@ export const ALERT_MESSAGES = {
     title: 'Conflict',
     message: 'The request could not be completed due to a conflict with the current state of the resource.',
   },
-  
+
   // Server-side errors
   serverError: {
     title: 'Internal Server Error',
@@ -66,7 +67,7 @@ export const ALERT_MESSAGES = {
     title: 'Service Unreachable',
     message: 'The server is currently unreachable due to DNS issues. Please try again later.',
   },
-  
+
   // Fallback for any other status code
   defaultError: {
     title: 'Error',
