@@ -24,7 +24,13 @@ const EventsList = () => {
     try {
       setLoading(true);
       const eventsData = await getAllEvents();
-      setEvents(eventsData); // Assuming the API returns an array of events
+
+      const validEvents = eventsData.filter((event: Event) => {
+        const cutoffTime = new Date(event.cutOffTime);
+        return !isNaN(cutoffTime.getTime());
+      });
+
+      setEvents(validEvents);
     } catch (error) {
       Alert.alert("Error", "Failed to fetch events. Please try again later.");
     } finally {
