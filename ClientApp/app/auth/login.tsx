@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Alert} from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Alert } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -11,11 +11,12 @@ import { hs, vs, mvs, mhs } from "@/utils/helpers/uiScaler";
 import { loginUser } from "@/services/authService";
 import { useUpdateUserToStore } from '@/state/user/actions';
 import { getUserById } from "@/state/user/api";
+import { ALERT_MESSAGES } from "@/utils/api/errorHandlers"; 
 
 interface LoginPageFormData {
   identifier: string;
   password: string;
-} 
+}
 
 const LoginPage: React.FC = () => {
   const router = useRouter();
@@ -25,21 +26,26 @@ const LoginPage: React.FC = () => {
 
   const onSubmit = async (data: LoginPageFormData) => {
     try {
-      const res = await loginUser(data.identifier, data.password);
-      await updateUserToStore(res.userID);
-      const response = await getUserById(res.userID);
-      const {firstName, lastName} = response.profile
-      if(firstName === '' && lastName === ''){
-        router.push({pathname: '/auth/registerProfile', params: { userID: res.userID }});
-      }else{
-        router.push('/(tabs)/home');
-      }
+        const res = await loginUser(data.identifier, data.password);
+        await updateUserToStore(res.userID);
+        const response = await getUserById(res.userID);
+        const { firstName, lastName } = response.profile;
+        if (firstName === '' && lastName === '') {
+            router.push({ pathname: '/auth/registerProfile', params: { userID: res.userID } });
+        } else {
+            router.push('/(tabs)/home');
+        }
     } catch (error: any) {
-      console.log(error)
-      Alert.alert('Error', error.message);
+        console.log(error);
+
+        // Check for specific error message from the backend
+        if (error.message === "The email or password you entered is incorrect. Please try again.") {
+            Alert.alert('Login Failed', error.message);
+        } else {
+            Alert.alert('Error', 'An unexpected error occurred. Please try again.');
+        }
     }
-  };
-  
+};
   return (
     <View style={styles.container}>
       <View style={styles.mainContent}>
@@ -281,3 +287,4 @@ const styles = StyleSheet.create({
     color: themeColors.primary,
   },
 });
+

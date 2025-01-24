@@ -3,18 +3,26 @@ import { API_ENDPOINTS } from '@/utils/api/endpoints';
 import { clearUser } from '@/state/user/userSlice';
 import { useDispatch } from 'react-redux';
 import { getAxiosInstance } from './axiosInstance';
+import { ALERT_MESSAGES } from '@/utils/api/errorHandlers';
 
 export async function loginUser(identifier: string, password: string) {
   try {
-    const axiosInstance = getAxiosInstance();
-    const response = await axiosInstance.post(API_ENDPOINTS.LOGIN, { identifier, password });
-    const { userID, tokenResponse: { accessToken, refreshToken } } = response.data;
-    await saveTokens(accessToken, refreshToken);
-    startTokenRefresh();
-    return response.data;
+      const axiosInstance = getAxiosInstance();
+      const response = await axiosInstance.post(API_ENDPOINTS.LOGIN, { identifier, password });
+      const { userID, tokenResponse: { accessToken, refreshToken } } = response.data;
+      await saveTokens(accessToken, refreshToken);
+      startTokenRefresh();
+      return response.data;
   } catch (error: any) {
-    console.error('Login failed:', error);
-    throw error.response?.data || error;
+      const serverError = error.response?.data?.error;
+
+      // Check for invalid credentials and throw a user-friendly error
+      if (serverError?.includes("invalid_grant")) {
+          throw new Error(ALERT_MESSAGES.invalidCredentials.message);
+      }
+
+      console.error('Login failed:', error);
+      throw error.response?.data || error;
   }
 }
 

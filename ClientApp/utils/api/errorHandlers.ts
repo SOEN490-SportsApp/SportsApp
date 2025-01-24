@@ -17,6 +17,10 @@ export const consoleError = (title: string, message: string, code?: number) => {
 
 export const ALERT_MESSAGES = {
   // Common client-side errors
+  invalidCredentials: {
+    title: 'Login Failed',
+    message: 'The email or password you entered is incorrect. Please try again.',
+  },
   badRequest: {
     title: 'Bad Request',
     message: 'The server could not understand your request. Please check and try again.',
