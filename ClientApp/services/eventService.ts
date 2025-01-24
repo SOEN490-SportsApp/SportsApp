@@ -25,3 +25,16 @@ export const getAllEvents = async () => {
     throw error;
   }
 };
+//API_ENDPOINTS.DELETE_EVENT_BY_ID
+export const deleteEvent = async (eventId: string) => {
+  try {
+    const axiosInstance = getAxiosInstance();
+    const response = await axiosInstance.delete(
+      API_ENDPOINTS.DELETE_EVENT_BY_ID.replace("{id}", eventId)
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting event:", error);
+    throw error;
+  }
+};
