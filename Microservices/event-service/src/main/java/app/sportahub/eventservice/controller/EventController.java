@@ -79,7 +79,7 @@ public class EventController {
     }
 
     @PostMapping("/{id}/join")
-    @PreAuthorize("authentication.name == #userId|| hasRole('ROLE_ADMIN')")
+    @PreAuthorize("authentication.name == #userId || hasRole('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Join an event", description = "Enables a user to join an event, provided there are available slots.")
     public ParticipantResponse joinEvent(@PathVariable String id, @RequestParam String userId) {
