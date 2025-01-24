@@ -23,6 +23,10 @@ import app.sportahub.userservice.dto.request.user.ProfileRequest;
 import app.sportahub.userservice.dto.request.user.UserRequest;
 import app.sportahub.userservice.dto.request.user.friend.FriendRequestRequest;
 import app.sportahub.userservice.dto.request.user.friend.UpdateFriendRequestRequest;
+import app.sportahub.userservice.dto.response.user.PublicProfileResponse;
+import app.sportahub.userservice.dto.response.user.friend.FriendRequestResponse;
+import app.sportahub.userservice.dto.request.user.ProfileRequest;
+import app.sportahub.userservice.dto.request.user.UserRequest;
 import app.sportahub.userservice.dto.response.user.ProfileResponse;
 import app.sportahub.userservice.dto.response.user.UserResponse;
 import app.sportahub.userservice.dto.response.user.badge.BadgeWithCountResponse;
@@ -60,6 +64,12 @@ public class UserController {
             description = "Creates a new user resource to the database based on the provided user details.")
     public UserResponse createUser(@Valid @RequestBody UserRequest userRequest) {
         return userService.createUser(userRequest);
+    }
+
+    @GetMapping("/{id}/profile")
+    @ResponseStatus(HttpStatus.OK)
+    public PublicProfileResponse getPublicProfile(@PathVariable String id) {
+        return userService.getUserPublicProfile(id);
     }
 
     @PutMapping("/{id}/profile")

@@ -18,6 +18,7 @@ import app.sportahub.userservice.exception.user.badge.UserAlreadyAssignedBadgeBy
 import app.sportahub.userservice.exception.user.friend.*;
 import app.sportahub.userservice.exception.user.keycloak.KeycloakCommunicationException;
 import app.sportahub.userservice.mapper.user.ProfileMapper;
+import app.sportahub.userservice.mapper.user.PublicProfileMapper;
 import app.sportahub.userservice.mapper.user.UserMapper;
 import app.sportahub.userservice.model.user.*;
 import app.sportahub.userservice.repository.BadgeRepository;
@@ -62,6 +63,7 @@ public class UserServiceTest {
 
     private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
     private final ProfileMapper profileMapper = Mappers.getMapper(ProfileMapper.class);
+    private final PublicProfileMapper publicProfileMapper = Mappers.getMapper(PublicProfileMapper.class);
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -69,7 +71,7 @@ public class UserServiceTest {
     @BeforeEach
     void setUp() {
         userService = new UserServiceImpl(userRepository, badgeRepository,
-                keycloakApiClient, userMapper, profileMapper, friendRepository);
+                keycloakApiClient, userMapper, profileMapper, friendRepository, publicProfileMapper);
     }
 
     private UserRequest getUserRequest() {

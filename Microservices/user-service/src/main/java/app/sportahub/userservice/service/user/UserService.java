@@ -2,6 +2,7 @@ package app.sportahub.userservice.service.user;
 
 import app.sportahub.userservice.dto.request.user.friend.FriendRequestRequest;
 import app.sportahub.userservice.dto.request.user.friend.UpdateFriendRequestRequest;
+import app.sportahub.userservice.dto.response.user.PublicProfileResponse;
 import app.sportahub.userservice.dto.response.user.friend.FriendRequestResponse;
 import app.sportahub.userservice.dto.request.user.ProfileRequest;
 import app.sportahub.userservice.dto.request.user.UserRequest;
@@ -21,6 +22,8 @@ public interface UserService {
     UserResponse getUserById(String id);
 
     UserResponse createUser(UserRequest userRequest);
+
+    PublicProfileResponse getUserPublicProfile(String id);
 
     ProfileResponse updateUserProfile(String id, ProfileRequest profileRequest);
 
