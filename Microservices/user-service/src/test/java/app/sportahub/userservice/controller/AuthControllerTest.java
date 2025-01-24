@@ -2,12 +2,13 @@ package app.sportahub.userservice.controller;
 
 import app.sportahub.userservice.config.auth.TestSecurityConfig;
 import app.sportahub.userservice.controller.auth.AuthController;
-import app.sportahub.userservice.dto.request.auth.LoginRequest;
-import app.sportahub.userservice.dto.request.auth.SendPasswordResetEmailRequest;
-import app.sportahub.userservice.dto.request.auth.SendVerificationEmailRequest;
+import app.sportahub.userservice.dto.request.auth.*;
 import app.sportahub.userservice.dto.response.auth.LoginResponse;
 import app.sportahub.userservice.dto.response.auth.TokenResponse;
+import app.sportahub.userservice.dto.response.user.UserResponse;
+import app.sportahub.userservice.exception.user.InvalidCredentialsException;
 import app.sportahub.userservice.exception.user.UserDoesNotExistException;
+import app.sportahub.userservice.exception.user.UserEmailAlreadyExistsException;
 import app.sportahub.userservice.exception.user.UserWithEmailDoesNotExistException;
 import app.sportahub.userservice.service.auth.AuthServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -80,11 +81,38 @@ public class AuthControllerTest {
 
     @SneakyThrows
     @Test
+    public void loginWithNonExistentUserShouldFail() {
+        when(authService.loginUser(any())).thenThrow(new UserDoesNotExistException("nonexistent@user.com"));
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new LoginRequest("nonexistent@user.com", "password"))))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value("User with identifier: nonexistent@user.com does not exist."));
+    }
+
+
+
+    @SneakyThrows
+    @Test
     public void shouldSendVerificationEmailSuccessfully() {
         mockMvc.perform(MockMvcRequestBuilders.put("/auth/send-verification-email")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(sendVerificationEmailRequest)))
                 .andExpect(status().isOk());
+    }
+
+    @SneakyThrows
+    @Test
+    public void sendVerificationEmailToNonExistentUserShouldFail() {
+        SendVerificationEmailRequest request = new SendVerificationEmailRequest("nonexistent@example.com");
+        doThrow(new UserWithEmailDoesNotExistException("nonexistent@example.com"))
+                .when(authService).sendVerificationEmail(any());
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/auth/send-verification-email")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isNotFound());
     }
 
     @SneakyThrows
@@ -107,6 +135,19 @@ public class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(sendPasswordResetEmailRequest)))
                 .andExpect(status().isOk());
+    }
+
+    @SneakyThrows
+    @Test
+    public void sendPasswordResetEmailServerErrorShouldReturnInternalServerError() {
+        doThrow(new RuntimeException("Unexpected error"))
+                .when(authService).sendPasswordResetEmail(any());
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/auth/reset-password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new SendPasswordResetEmailRequest("valid@example.com"))))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.error").value("An unexpected error occurred: Unexpected error"));
     }
 
     @SneakyThrows
@@ -159,5 +200,57 @@ public class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(caseInsensitiveRequest)))
                 .andExpect(status().isOk());
+    }
+
+    @SneakyThrows
+    @Test
+    public void shouldRegisterUserSuccessfully() {
+        RegistrationRequest request = new RegistrationRequest("user@example.com", "username", "password");
+        UserResponse expectedResponse = new UserResponse("1", "keycloakId", "user@example.com", "username", null, null, null);
+        when(authService.registerUser(any())).thenReturn(expectedResponse);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.email").value("user@example.com"));
+    }
+
+    @SneakyThrows
+    @Test
+    public void registerWithExistingEmailShouldFail() {
+        RegistrationRequest request = new RegistrationRequest("user@example.com", "username", "password");
+        when(authService.registerUser(any())).thenThrow(new UserEmailAlreadyExistsException("user@example.com"));
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isConflict());
+    }
+
+    @SneakyThrows
+    @Test
+    public void shouldRefreshTokenSuccessfully() {
+        RefreshTokenRequest request = new RefreshTokenRequest("validRefreshToken");
+        TokenResponse response = new TokenResponse("newAccessToken", "newRefreshToken", true);
+        when(authService.refreshToken(any())).thenReturn(response);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").value("newAccessToken"));
+    }
+
+    @SneakyThrows
+    @Test
+    public void refreshTokenWithInvalidTokenShouldFail() {
+        RefreshTokenRequest request = new RefreshTokenRequest("invalidToken");
+        when(authService.refreshToken(any())).thenThrow(new InvalidCredentialsException());
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isUnauthorized());
     }
 }
