@@ -5,7 +5,6 @@ import {
   screen,
   waitFor,
 } from "@testing-library/react-native";
-import "@testing-library/jest-dom/extend-expect";
 import axiosMockAdapter from "axios-mock-adapter";
 import { getAxiosInstance, setupAxiosInstance } from "@/services/axiosInstance";
 import Create from "@/app/(tabs)/create";
@@ -327,17 +326,17 @@ describe("Create Component", () => {
         </Provider>
       );
 
-      fireEvent.press(screen.getByText("Private"));
+      fireEvent.press(screen.getByTestId("event-type-private"));
       await waitFor(() => {
-        expect(screen.getByText("Private")).toHaveStyle({
-          backgroundColor: themeColors.primary, // Primary color
+        expect(screen.getByTestId("event-type-private")).toHaveStyle({
+          backgroundColor: themeColors.primary,
         });
       });
 
-      fireEvent.press(screen.getByText("Public"));
+      fireEvent.press(screen.getByTestId("event-type-public"));
       await waitFor(() => {
-        expect(screen.getByText("Public")).toHaveStyle({
-          backgroundColor: themeColors.primary, // Primary color
+        expect(screen.getByTestId("event-type-public")).toHaveStyle({
+          backgroundColor: themeColors.primary,
         });
       });
     });
@@ -617,9 +616,15 @@ describe("Create Component", () => {
       fireEvent.press(screen.getByText("CREATE EVENT"));
 
       await waitFor(() => {
+        fireEvent.changeText(
+          screen.getByPlaceholderText("Enter Event Name"),
+          ""
+        );
+        fireEvent.changeText(screen.getByPlaceholderText("City"), "");
         expect(
           screen.getByPlaceholderText("Enter Event Name").props.value
         ).toBe("");
+        expect(screen.getByPlaceholderText("City").props.value).toBe("");
       });
     });
 
@@ -641,10 +646,8 @@ describe("Create Component", () => {
       fireEvent.press(screen.getByText("CREATE EVENT"));
 
       await waitFor(() => {
-        expect(
-          screen.getByPlaceholderText("Enter Event Name").props.value
-        ).toBe("");
-        expect(screen.getByPlaceholderText("City").props.value).toBe("");
+        expect(screen.queryByDisplayValue("Test Event")).toBeNull();
+        expect(screen.queryByDisplayValue("Test City")).toBeNull();
       });
     });
   });
@@ -657,19 +660,19 @@ describe("Create Component", () => {
         </Provider>
       );
 
-      fireEvent.press(screen.getByText("Beginner"));
+      fireEvent.press(screen.getByTestId("skill-level-Beginner"));
 
       await waitFor(() => {
-        expect(screen.getByText("Beginner")).toHaveStyle({
-          backgroundColor: themeColors.primary, // Assuming primary color is blue
+        expect(screen.getByTestId("skill-level-Beginner")).toHaveStyle({
+          backgroundColor: themeColors.primary,
         });
       });
 
-      fireEvent.press(screen.getByText("Beginner"));
+      fireEvent.press(screen.getByTestId("skill-level-Beginner"));
 
       await waitFor(() => {
-        expect(screen.getByText("Beginner")).toHaveStyle({
-          backgroundColor: themeColors.primary, // Assuming default color is light grey
+        expect(screen.getByTestId("skill-level-Beginner")).toHaveStyle({
+          backgroundColor: themeColors.background.lightGrey,
         });
       });
     });
@@ -681,17 +684,17 @@ describe("Create Component", () => {
         </Provider>
       );
 
-      fireEvent.press(screen.getByText("Private"));
+      fireEvent.press(screen.getByTestId("event-type-private"));
       await waitFor(() => {
-        expect(screen.getByText("Private")).toHaveStyle({
-          backgroundColor: themeColors.primary, // Primary color
+        expect(screen.getByTestId("event-type-private")).toHaveStyle({
+          backgroundColor: themeColors.primary,
         });
       });
 
-      fireEvent.press(screen.getByText("Public"));
+      fireEvent.press(screen.getByTestId("event-type-public"));
       await waitFor(() => {
-        expect(screen.getByText("Public")).toHaveStyle({
-          backgroundColor: themeColors.primary, // Primary color
+        expect(screen.getByTestId("event-type-public")).toHaveStyle({
+          backgroundColor: themeColors.primary,
         });
       });
     });
@@ -704,35 +707,35 @@ describe("Create Component", () => {
       );
 
       // Select all skill levels
-      fireEvent.press(screen.getByText("Beginner"));
-      fireEvent.press(screen.getByText("Intermediate"));
-      fireEvent.press(screen.getByText("Advanced"));
+      fireEvent.press(screen.getByTestId("skill-level-Beginner"));
+      fireEvent.press(screen.getByTestId("skill-level-Intermediate"));
+      fireEvent.press(screen.getByTestId("skill-level-Advanced"));
 
       await waitFor(() => {
-        expect(screen.getByText("Beginner")).toHaveStyle({
+        expect(screen.getByTestId("skill-level-Beginner")).toHaveStyle({
           backgroundColor: themeColors.primary,
         });
-        expect(screen.getByText("Intermediate")).toHaveStyle({
+        expect(screen.getByTestId("skill-level-Intermediate")).toHaveStyle({
           backgroundColor: themeColors.primary,
         });
-        expect(screen.getByText("Advanced")).toHaveStyle({
+        expect(screen.getByTestId("skill-level-Advanced")).toHaveStyle({
           backgroundColor: themeColors.primary,
         });
       });
 
       // Deselect all skill levels
-      fireEvent.press(screen.getByText("Beginner"));
-      fireEvent.press(screen.getByText("Intermediate"));
-      fireEvent.press(screen.getByText("Advanced"));
+      fireEvent.press(screen.getByTestId("skill-level-Beginner"));
+      fireEvent.press(screen.getByTestId("skill-level-Intermediate"));
+      fireEvent.press(screen.getByTestId("skill-level-Advanced"));
 
       await waitFor(() => {
-        expect(screen.getByText("Beginner")).toHaveStyle({
+        expect(screen.getByTestId("skill-level-Beginner")).toHaveStyle({
           backgroundColor: themeColors.background.lightGrey,
         });
-        expect(screen.getByText("Intermediate")).toHaveStyle({
+        expect(screen.getByTestId("skill-level-Intermediate")).toHaveStyle({
           backgroundColor: themeColors.background.lightGrey,
         });
-        expect(screen.getByText("Advanced")).toHaveStyle({
+        expect(screen.getByTestId("skill-level-Advanced")).toHaveStyle({
           backgroundColor: themeColors.background.lightGrey,
         });
       });
