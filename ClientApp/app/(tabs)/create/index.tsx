@@ -13,6 +13,7 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { useForm, Controller, useWatch, set } from "react-hook-form";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -192,38 +193,44 @@ const Create = () => {
       transparent={true}
       visible={isSportTypeModalVisible}
       onRequestClose={() => setSportTypeModalVisible(false)}
-      accessibilityLabel="Sport Selection Modal" // Add this line
+      accessibilityLabel="Sport Selection Modal"
     >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContainer}>
-          <FlatList
-            data={supportedSports}
-            keyExtractor={(item) => item.id.toString()}
-            contentContainerStyle={styles.flatListContainer}
-            renderItem={({ item }) => (
+      {/* TouchableWithoutFeedback to capture taps outside the modal */}
+      <TouchableWithoutFeedback
+        testID="modal-overlay"
+        onPress={() => setSportTypeModalVisible(false)} // Dismiss modal on tap
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <FlatList
+              data={supportedSports}
+              keyExtractor={(item) => item.id.toString()}
+              contentContainerStyle={styles.flatListContainer}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.modalItem}
+                  onPress={() => {
+                    setValue("sportType", item.name, { shouldValidate: true });
+                    setSportTypeModalVisible(false); // Dismiss modal after selection
+                  }}
+                >
+                  <Text style={styles.modalItemText}>{item.name}</Text>
+                </TouchableOpacity>
+              )}
+              showsVerticalScrollIndicator={false}
+              style={styles.scrollableList}
+            />
+            <View style={styles.closeButtonContainer}>
               <TouchableOpacity
-                style={styles.modalItem}
-                onPress={() => {
-                  setValue("sportType", item.name, { shouldValidate: true });
-                  setSportTypeModalVisible(false);
-                }}
+                onPress={() => setSportTypeModalVisible(false)} // Dismiss modal on "Close" button
+                style={styles.modalCloseButton}
               >
-                <Text style={styles.modalItemText}>{item.name}</Text>
+                <Text style={styles.modalCloseButtonText}>Close</Text>
               </TouchableOpacity>
-            )}
-            showsVerticalScrollIndicator={false}
-            style={styles.scrollableList}
-          />
-          <View style={styles.closeButtonContainer}>
-            <TouchableOpacity
-              onPress={() => setSportTypeModalVisible(false)}
-              style={styles.modalCloseButton}
-            >
-              <Text style={styles.modalCloseButtonText}>Close</Text>
-            </TouchableOpacity>
+            </View>
           </View>
         </View>
-      </View>
+      </TouchableWithoutFeedback>
     </Modal>
   );
 
@@ -234,7 +241,10 @@ const Create = () => {
       visible={isProvinceModalVisible}
       onRequestClose={() => setProvinceModalVisible(false)}
     >
-      <View style={styles.modalOverlay}>
+      <View
+        style={styles.modalOverlay}
+        testID="modal-overlay" // Add this testID
+      >
         <View style={styles.modalContainer}>
           <FlatList
             data={provinces}
@@ -244,7 +254,7 @@ const Create = () => {
               <TouchableOpacity
                 style={styles.modalItem}
                 onPress={() => {
-                  setValue("province", item.name, { shouldValidate: true }); // Trigger validation
+                  setValue("province", item.name, { shouldValidate: true });
                   setProvinceModalVisible(false);
                 }}
               >

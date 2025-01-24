@@ -592,7 +592,8 @@ describe("Create Component", () => {
         expect(screen.getByText("Soccer")).toBeTruthy();
       });
 
-      fireEvent.press(screen.getByTestId("modal-overlay")); // Assume overlay has a testID of "modal-overlay"
+      fireEvent.press(screen.getByTestId("modal-overlay"));
+
       await waitFor(() => {
         expect(screen.queryByText("Soccer")).toBeNull();
       });
