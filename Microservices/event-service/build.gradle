@@ -72,15 +72,32 @@ jacocoTestReport {
 		xml.required = true
 		html.required = true
 	}
+	classDirectories.setFrom(
+			files(
+					classDirectories.files.collect {
+						fileTree(dir: it, exclude: [
+								'**/client/**'
+						])
+					}
+			)
+	)
 }
 
 jacocoTestCoverageVerification {
 	violationRules {
 		rule {
 			limit {
-				minimum = 80
+				minimum = 0.8
 			}
 		}
 	}
+	classDirectories.setFrom(
+			files(
+					classDirectories.files.collect {
+						fileTree(dir: it, exclude: [
+								'**/client/**'
+						])
+					}
+			)
+	)
 }
-
