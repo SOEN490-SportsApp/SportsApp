@@ -5,8 +5,6 @@ public enum EventSortingField {
     SPORT_TYPE("sportType"),
     DATE("date"),
     START_TIME("startTime"),
-    END_TIME("endTime"),
-    DURATION("duration"),
     MAX_PARTICIPANTS("maxParticipants"),
     CREATED_BY("createdBy");
 
