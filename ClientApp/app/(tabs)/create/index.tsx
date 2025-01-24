@@ -304,7 +304,7 @@ const Create = () => {
                   style={styles.input}
                   onBlur={onBlur}
                   onChangeText={onChange}
-                  value={value} // Ensure correct value binding
+                  value={value || ""}
                 />
               )}
             />
@@ -386,7 +386,7 @@ const Create = () => {
                   style={styles.input}
                   onBlur={onBlur}
                   onChangeText={onChange}
-                  value={value}
+                  value={value || ""}
                 />
               )}
             />
@@ -408,7 +408,7 @@ const Create = () => {
                   style={styles.input}
                   onBlur={onBlur}
                   onChangeText={onChange}
-                  value={value}
+                  value={value || ""}
                 />
               )}
             />
@@ -534,7 +534,7 @@ const Create = () => {
                       onChange(text);
                     }
                   }}
-                  value={value}
+                  value={value || ""}
                   keyboardType="numeric"
                 />
               )}
@@ -629,7 +629,7 @@ const Create = () => {
                   style={[styles.input, styles.textArea]}
                   onBlur={onBlur}
                   onChangeText={onChange}
-                  value={value}
+                  value={value || ""}
                   multiline
                   numberOfLines={4}
                 />

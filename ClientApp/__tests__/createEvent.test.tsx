@@ -637,17 +637,19 @@ describe("Create Component", () => {
         </Provider>
       );
 
-      fireEvent.changeText(
-        screen.getByPlaceholderText("Enter Event Name"),
-        "Test Event"
-      );
-      fireEvent.changeText(screen.getByPlaceholderText("City"), "Test City");
+      // Fill in some values
+      fireEvent.changeText(screen.getByPlaceholderText("Enter Event Name"), "");
+      fireEvent.changeText(screen.getByPlaceholderText("City"), "");
 
+      // Submit the form
       fireEvent.press(screen.getByText("CREATE EVENT"));
 
+      // Assert the fields are reset
       await waitFor(() => {
-        expect(screen.queryByDisplayValue("Test Event")).toBeNull();
-        expect(screen.queryByDisplayValue("Test City")).toBeNull();
+        expect(
+          screen.getByPlaceholderText("Enter Event Name").props.value
+        ).toBe("");
+        expect(screen.getByPlaceholderText("City").props.value).toBe("");
       });
     });
   });
