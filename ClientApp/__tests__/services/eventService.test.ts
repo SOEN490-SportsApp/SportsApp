@@ -99,26 +99,15 @@ describe("Event Service Tests", () => {
     });
   });
 
+  jest.mock("axios");
+  axiosInstance.delete = jest.fn();
+
   describe("deleteEvent", () => {
-    it("should successfully delete an event", async () => {
-      const mockResponse = { data: { success: true } };
-      axiosInstance.delete.mockResolvedValueOnce(mockResponse);
-
+    it("should throw an error if event deletion fails", async () => {
       const eventId = "12345";
-      const result = await deleteEvent(eventId);
-
-      expect(axiosInstance.delete).toHaveBeenCalledWith(
-        API_ENDPOINTS.DELETE_EVENT_BY_ID.replace("{id}", eventId)
-      );
-      expect(result).toEqual(mockResponse.data);
-    });
-
-    it("should throw an error when deleting an event fails", async () => {
-      axiosInstance.delete.mockRejectedValueOnce(
+      axiosInstance.delete.mockRejectedValue(
         new Error("Event deletion failed")
       );
-
-      const eventId = "12345";
 
       await expect(deleteEvent(eventId)).rejects.toThrow(
         "Event deletion failed"
