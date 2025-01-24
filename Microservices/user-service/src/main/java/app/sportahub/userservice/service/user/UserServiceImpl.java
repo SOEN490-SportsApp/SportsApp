@@ -7,6 +7,7 @@ import app.sportahub.userservice.dto.request.user.friend.FriendRequestRequest;
 import app.sportahub.userservice.dto.request.user.friend.UpdateFriendRequestRequest;
 import app.sportahub.userservice.dto.request.user.keycloak.KeycloakRequest;
 import app.sportahub.userservice.dto.response.user.ProfileResponse;
+import app.sportahub.userservice.dto.response.user.PublicProfileResponse;
 import app.sportahub.userservice.dto.response.user.UserResponse;
 import app.sportahub.userservice.dto.response.user.badge.BadgeResponse;
 import app.sportahub.userservice.dto.response.user.badge.BadgeWithCountResponse;
@@ -24,6 +25,7 @@ import app.sportahub.userservice.exception.user.UsernameAlreadyExistsException;
 import app.sportahub.userservice.exception.user.friend.*;
 import app.sportahub.userservice.exception.user.keycloak.KeycloakCommunicationException;
 import app.sportahub.userservice.mapper.user.ProfileMapper;
+import app.sportahub.userservice.mapper.user.PublicProfileMapper;
 import app.sportahub.userservice.mapper.user.UserMapper;
 import app.sportahub.userservice.model.user.*;
 import app.sportahub.userservice.repository.BadgeRepository;
@@ -55,6 +57,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final ProfileMapper profileMapper;
     private final FriendRepository friendRepository;
+    private final PublicProfileMapper publicProfileMapper;
 
     @Override
     public UserResponse createUser(UserRequest userRequest) {
@@ -81,6 +84,13 @@ public class UserServiceImpl implements UserService {
     public UserResponse getUserById(String id) {
         return userMapper.userToUserResponse(userRepository.findUserById(id)
                 .orElseThrow(() -> new UserDoesNotExistException(id)));
+    }
+
+    @Override
+    public PublicProfileResponse getUserPublicProfile(String id) {
+        User user = userRepository.findUserById(id).orElseThrow(() -> new UserDoesNotExistException(id));
+//        return publicProfileMapper.userToPublicProfileResponse(user.getUsername(), profileMapper.profileToProfileResponse(user.getProfile()));
+        return publicProfileMapper.userToPublicProfileResponse(user);
     }
 
     @Override

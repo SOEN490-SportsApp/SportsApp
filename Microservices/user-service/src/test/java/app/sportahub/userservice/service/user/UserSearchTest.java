@@ -6,6 +6,7 @@ import app.sportahub.userservice.dto.response.user.ProfileResponse;
 import app.sportahub.userservice.dto.response.user.SportLevelResponse;
 import app.sportahub.userservice.exception.user.*;
 import app.sportahub.userservice.mapper.user.ProfileMapper;
+import app.sportahub.userservice.mapper.user.PublicProfileMapper;
 import app.sportahub.userservice.mapper.user.UserMapper;
 import app.sportahub.userservice.model.user.*;
 import app.sportahub.userservice.repository.BadgeRepository;
@@ -50,6 +51,9 @@ public class UserSearchTest {
     @Mock
     private ProfileMapper profileMapper;
 
+    @Mock
+    private PublicProfileMapper publicProfileMapper;
+
     @InjectMocks
     private UserServiceImpl userService;
 
@@ -68,7 +72,7 @@ public class UserSearchTest {
     @BeforeEach
     void setUp() {
         userService = new UserServiceImpl(userRepository, badgeRepository,
-                keycloakApiClient, userMapper, profileMapper, friendRepository);
+                keycloakApiClient, userMapper, profileMapper, friendRepository, publicProfileMapper);
         searchingUserRepository = new SearchingUserRepositoryImpl(mongoTemplate);
     }
 
