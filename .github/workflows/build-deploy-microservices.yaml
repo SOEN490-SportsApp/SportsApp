@@ -1,0 +1,117 @@
+name: Build and Deploy Microservices
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'Microservices/**'
+
+jobs:
+  determine_services:
+    name: Determine changed services
+    runs-on: ubuntu-latest
+    outputs:
+      changed_services: ${{ steps.determine.outputs.json_services }}
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for jq tool
+        run: |
+          if ! command -v jq &> /dev/null
+          then
+              echo "jq could not be found"
+              exit 1
+          fi
+          echo "jq is installed."
+
+      - name: Get list of changed files
+        id: git_changes
+        run: |
+          echo "Determining changed files..."
+          CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD)
+          echo "Changed files: $CHANGED_FILES"
+
+          # Make sure changed files are properly formatted for GITHUB_ENV
+          CHANGED_FILES_LIST=$(echo "$CHANGED_FILES" | tr '\n' ',' | sed 's/,$//')  # Comma-separated
+          echo "changed_files=$CHANGED_FILES_LIST" >> $GITHUB_ENV
+
+      - name: Determine changed services
+        id: determine
+        run: |
+          echo "Evaluating changed services..."
+          services=()
+          # Convert changed_files into an array
+          IFS=',' read -ra FILES <<< "${{ env.changed_files }}"
+          for path in "${FILES[@]}"; do
+            if [[ $path == Microservices/* ]]; then
+              service=$(echo "$path" | cut -d'/' -f2)
+              if [[ ! " ${services[@]} " =~ " ${service} " ]]; then
+                services+=("$service")
+              fi
+            fi
+          done
+
+          if [ ${#services[@]} -eq 0 ]; then
+            echo "No changed services detected."
+            json="[]"
+          else
+            json=$(printf '%s\n' "${services[@]}" | jq -R . | jq -s . | jq -c)
+          fi
+
+          # Output the cleaned JSON to GITHUB_OUTPUT
+          echo "Resulting JSON: $json"
+          echo "json_services=$json" >> $GITHUB_OUTPUT
+
+  build_and_deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+    needs: determine_services
+    strategy:
+      matrix:
+        service: ${{ fromJson(needs.determine_services.outputs.changed_services) }}
+    steps:
+      - name: Debug Matrix Value
+        run: |
+          echo "Matrix value: ${{ matrix.service }}"
+
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21 with Corretto
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+
+      - name: Grant execute permissions for gradlew
+        run: chmod +x Microservices/${{ matrix.service }}/gradlew
+
+      - name: Build with Gradle
+        working-directory: Microservices/${{ matrix.service }}
+        run: ./gradlew clean build
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set lowercase repository and service
+        id: lowercase
+        run: |
+          REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          SERVICE_NAME=$(echo "${{ matrix.service }}" | tr '[:upper:]' '[:lower:]')
+          echo "repo_name=$REPO_NAME" >> $GITHUB_ENV
+          echo "service_name=$SERVICE_NAME" >> $GITHUB_ENV
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./Microservices/${{ matrix.service }}
+          file: ./Microservices/${{ matrix.service }}/Dockerfile
+          push: true
+          tags: ghcr.io/${{ env.repo_name }}-${{ env.service_name }}:latest
