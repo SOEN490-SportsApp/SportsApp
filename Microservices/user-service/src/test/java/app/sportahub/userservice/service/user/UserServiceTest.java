@@ -14,6 +14,7 @@ import app.sportahub.userservice.dto.response.user.friend.ViewFriendRequestsResp
 import app.sportahub.userservice.enums.user.FriendRequestStatusEnum;
 import app.sportahub.userservice.enums.user.UpdateFriendRequestActionEnum;
 import app.sportahub.userservice.exception.user.*;
+import app.sportahub.userservice.exception.user.badge.BadgeNotFoundException;
 import app.sportahub.userservice.exception.user.badge.UserAlreadyAssignedBadgeByThisGiverException;
 import app.sportahub.userservice.exception.user.friend.*;
 import app.sportahub.userservice.exception.user.keycloak.KeycloakCommunicationException;
@@ -486,6 +487,25 @@ public class UserServiceTest {
     void getUserBadgesUserNotFound() {
         when(userRepository.findById("user1")).thenReturn(Optional.empty());
         assertThrows(UserDoesNotExistException.class, () -> userService.getUserBadges("user1"));
+    }
+
+    @Test
+    void assignBadgeThrowsBadgeNotFound() {
+        User user = new User();
+        Profile profile = new Profile();
+        ArrayList<UserBadge> badges = new ArrayList<>();
+        badges.add(new UserBadge("badge1", "giver1"));
+        profile.setBadges(badges);
+        user.setProfile(profile);
+
+        Badge badge = new Badge();
+        badge.setName("Achievement");
+        badge.setDescription("Awarded for special achievement");
+        badge.setIconUrl("url_to_icon");
+
+        when(userRepository.findById("user1")).thenReturn(Optional.of(user));
+        when(badgeRepository.findById("badge1")).thenReturn(Optional.empty());
+        assertThrows(BadgeNotFoundException.class, () -> userService.getUserBadges("user1"));
     }
 
     @Test
