@@ -47,7 +47,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
     }
 
-
     @ExceptionHandler(UserDoesNotExistException.class)
     public ResponseEntity<Map<String, Object>> handleUserDoesNotExistException(UserDoesNotExistException ex) {
         Map<String, Object> response = new HashMap<>();
