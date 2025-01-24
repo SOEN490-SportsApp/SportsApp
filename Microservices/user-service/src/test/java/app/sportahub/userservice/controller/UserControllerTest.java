@@ -8,9 +8,13 @@ import app.sportahub.userservice.dto.request.user.friend.FriendRequestRequest;
 import app.sportahub.userservice.dto.request.user.friend.UpdateFriendRequestRequest;
 import app.sportahub.userservice.dto.response.user.ProfileResponse;
 import app.sportahub.userservice.dto.response.user.UserResponse;
+import app.sportahub.userservice.dto.response.user.badge.BadgeResponse;
+import app.sportahub.userservice.dto.response.user.badge.BadgeWithCountResponse;
 import app.sportahub.userservice.dto.response.user.friend.FriendRequestResponse;
 import app.sportahub.userservice.dto.response.user.friend.UpdateFriendRequestResponse;
+import app.sportahub.userservice.dto.response.user.friend.ViewFriendRequestsResponse;
 import app.sportahub.userservice.enums.user.FriendRequestStatusEnum;
+import app.sportahub.userservice.enums.user.UpdateFriendRequestActionEnum;
 import app.sportahub.userservice.exception.user.UserDoesNotExistException;
 import app.sportahub.userservice.service.user.UserServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,6 +32,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -103,6 +108,34 @@ public class UserControllerTest {
 
     @SneakyThrows
     @Test
+    public void shouldPatchProfileSuccessfully() {
+        ProfileRequest profileRequest = new ProfileRequest("John", "Doe", null, "Male", "12345", "555-1234", null, "Amateur");
+        ProfileResponse expectedResponse = new ProfileResponse("John", "Doe", null, "Male", "12345", "555-1234", null, "Amateur");
+        when(userService.patchUserProfile("1", profileRequest)).thenReturn(expectedResponse);
+
+        mockMvc.perform(patch("/user/1/profile")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(profileRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.firstName").value("John"));
+
+    }
+
+    @SneakyThrows
+    @Test
+    public void patchProfileUserNotFound() {
+        ProfileRequest profileRequest = new ProfileRequest("John", "Doe", null, "Male", "12345", "555-1234", null, "Amateur");
+        doThrow(new UserDoesNotExistException("User does not exist"))
+                .when(userService).patchUserProfile("999", profileRequest);
+
+        mockMvc.perform(patch("/user/999/profile")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(profileRequest)))
+                .andExpect(status().isNotFound());
+    }
+
+    @SneakyThrows
+    @Test
     public void assignBadgeSuccessfully() {
         UserResponse userResponse = new UserResponse("1", "keycloakId", "user@example.com", "username", null, null, null);
         when(userService.assignBadge("1", "badgeId", "giverId")).thenReturn(userResponse);
@@ -128,6 +161,20 @@ public class UserControllerTest {
 
     @SneakyThrows
     @Test
+    public void getUserBadgeSuccessfully() {
+        BadgeResponse badge = new BadgeResponse( "Name", "Team PLayer", "url");
+        Integer badgeCount = 1;
+        List<BadgeWithCountResponse> badgeResponses = new ArrayList<>();
+        badgeResponses.add(new BadgeWithCountResponse(badge, badgeCount));
+        when(userService.getUserBadges("999")).thenReturn(badgeResponses);
+
+        mockMvc.perform(get("/user/999/badge"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].badgeCount").value(badgeCount));
+    }
+
+    @SneakyThrows
+    @Test
     public void sendFriendRequestSuccessfully() {
         FriendRequestResponse friendRequestResponse = new FriendRequestResponse("Friend request sent", "req123");
         when(userService.sendFriendRequest("1", new FriendRequestRequest("2"))).thenReturn(friendRequestResponse);
@@ -137,6 +184,56 @@ public class UserControllerTest {
                         .content(objectMapper.writeValueAsString(new FriendRequestRequest("2"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Friend request sent"));
+    }
+
+    @SneakyThrows
+    @Test
+    public void shouldFetchFriendRequestsSuccessfully() {
+        List<FriendRequestStatusEnum> friendRequestStatusEnums = new ArrayList<>();
+        friendRequestStatusEnums.add(FriendRequestStatusEnum.SENT);
+
+        List<ViewFriendRequestsResponse> friendRequestResponse= new ArrayList<>();
+        friendRequestResponse.add(new ViewFriendRequestsResponse("username1", "1", FriendRequestStatusEnum.SENT, "1"));
+
+        when(userService.getFriendRequests("1", friendRequestStatusEnums)).thenReturn(friendRequestResponse);
+
+        mockMvc.perform(get("/user/1/friend-requests")
+                        .param("type", "SENT")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].friendUsername").value("username1"))
+                .andExpect(jsonPath("$[0].status").value("SENT"));
+    }
+
+    @SneakyThrows
+    @Test
+    public void getFriendRequestsUserNotFound() {
+        List<FriendRequestStatusEnum> friendRequestStatusEnums = new ArrayList<>();
+        friendRequestStatusEnums.add(FriendRequestStatusEnum.ACCEPTED);
+
+        doThrow(new UserDoesNotExistException("User does not exist"))
+                .when(userService).getFriendRequests("999", friendRequestStatusEnums);
+
+        mockMvc.perform(get("/user/999/friend-requests")
+                        .param("type", "ACCEPTED")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @SneakyThrows
+    @Test
+    public void shouldUpdateFriendRequestSuccessfully() {
+        UpdateFriendRequestRequest request = new UpdateFriendRequestRequest("1",  UpdateFriendRequestActionEnum.ACCEPT);
+        UpdateFriendRequestResponse response = new UpdateFriendRequestResponse("Request updated successfully");
+        UpdateFriendRequestRequest  updateFriendRequestRequest = new UpdateFriendRequestRequest("1",  UpdateFriendRequestActionEnum.ACCEPT);
+        when(userService.updateFriendRequest("1", "1", updateFriendRequestRequest)).thenReturn(response);
+
+        mockMvc.perform(put("/user/1/friend-requests/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Request updated successfully"));
     }
 
     @SneakyThrows
@@ -171,5 +268,4 @@ public class UserControllerTest {
         mockMvc.perform(delete("/user/999"))
                 .andExpect(status().isNotFound());
     }
-
 }
