@@ -7,7 +7,7 @@ const TopBar = () => {
     <View style={styles.header}>
       <Text style={styles.logoText}>Sporta</Text>
       <View style={styles.iconContainer}>
-        <TouchableOpacity style={styles.iconButton}>
+        <TouchableOpacity testID="search-icon" style={styles.iconButton}>
           <View style={styles.iconCircle}>
             <Icon name="search" type="font-awesome" color="#000" size={20} />
           </View>

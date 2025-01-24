@@ -19,6 +19,10 @@ interface EventCardProps {
   isForProfile?: boolean;
 }
 
+export const  stringToDate = (dateString: string) => {
+  const [year, month, day] = dateString.split('-');
+  return new Date(+year, +month - 1, +day);
+}
 const EventCard: React.FC<EventCardProps> = ({
   event,
   onPress,
@@ -50,45 +54,44 @@ const EventCard: React.FC<EventCardProps> = ({
     "Ping-Pong": "table-tennis",
   };
 
-  const currentTime = new Date();
-  const cutoffTime = new Date(event.cutOffTime);
-  let hoursLeft = 0;
-  let minutesLeft = 0;
-  const timeLeftshown = "";
+const currentTime = new Date();
+const cutoffTime = new Date(event.cutOffTime);
+let hoursLeft = 0;
+let minutesLeft = 0;
 
   // Ensure both currentTime and cutoffTime are valid
   let timeLeftShown = "";
   let eventStarted = false;
   let canJoin = true;
 
-  if (!isNaN(cutoffTime.getTime())) {
-    const timeLeft = cutoffTime.getTime() - currentTime.getTime();
-    if (timeLeft > 1) {
-      // Calculate remaining time in minutes, hours, and days
-      const minutesLeft = Math.floor(timeLeft / (1000 * 60));
-      const hoursLeft = Math.floor(timeLeft / (1000 * 60 * 60));
-      const daysLeft = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-      const weeksLeft = Math.floor(daysLeft / 7);
+if (!isNaN(cutoffTime.getTime())) {
+  const timeLeft = cutoffTime.getTime() - currentTime.getTime();
+  if (timeLeft > 1) {
+    // Calculate remaining time in minutes, hours, and days
+    minutesLeft = Math.floor(timeLeft / (1000 * 60));
+    hoursLeft = Math.floor(timeLeft / (1000 * 60 * 60));
+    const daysLeft = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+    const weeksLeft = Math.floor(daysLeft / 7);
 
-      if (minutesLeft < 60) {
-        timeLeftShown = `${minutesLeft} minutes`;
-      } else if (hoursLeft < 24) {
-        timeLeftShown = `${hoursLeft} hours`;
-      } else if (daysLeft < 7) {
-        timeLeftShown = `${daysLeft} days`;
-      } else {
-        timeLeftShown = `${weeksLeft} week${weeksLeft > 1 ? "s" : ""}`;
-      }
+    if (minutesLeft < 60) {
+      timeLeftShown = `${minutesLeft} minute${minutesLeft > 1 ? "s" : ""}`;
+    } else if (hoursLeft < 24) {
+      timeLeftShown = `${hoursLeft} hour${hoursLeft > 1 ? "s" : ""}`;
+    } else if (daysLeft < 7) {
+      timeLeftShown = `${daysLeft} day${daysLeft > 1 ? "s" : ""}`;
     } else {
-      // if (!isForProfile) return null;
-      canJoin = false;
-      if (currentTime.getTime() > new Date(event.cutOffTime).getTime()) {
-        eventStarted = true;
-      }
+      timeLeftShown = `${weeksLeft} week${weeksLeft > 1 ? "s" : ""}`;
     }
   } else {
-    console.error("Invalid cutoff time format.");
+    if (!isForProfile) return null;
+    canJoin = false;
+    if(currentTime.getTime() > new Date(event.cutOffTime).getTime()) {
+      eventStarted = true;
+    }
   }
+} else {
+  return null;
+}
 
   // Dynamic styling for the card
   const dynamicCardStyle = {
@@ -100,34 +103,28 @@ const EventCard: React.FC<EventCardProps> = ({
     color: canJoin ? "#dc3545" : "#000000", // Red text for expired, black for active
   };
 
-  return (
-    <TouchableOpacity
-      style={[styles.card, dynamicCardStyle]}
-      onPress={() => onPress(event.id)}
-    >
-      <Text style={styles.eventName}>{event.eventName}</Text>
-      {showDetailPreview && (
-        <Text style={styles.eventDetails}>
-          {/*TODO - Add distance calculation after backend does it*/}
-          {showSportType ? `${event.sportType} - X km away` : `X km away`}
-        </Text>
-      )}
-
-      {showSportType && (
-        <View style={styles.sportIconContainer}>
-          <MaterialCommunityIcons
-            name={sportIcons[event.sportType] || "help-circle-outline"} // Fallback icon
-            size={40}
-            color="#94504b"
-          />
-        </View>
-      )}
-
-      {showDate && (
-        <Text style={styles.date}>
-          📅 {new Date(event.date).toDateString()}
-        </Text>
-      )}
+return (
+  <TouchableOpacity testID = 'event-card' style={[styles.card, dynamicCardStyle]} onPress={() => onPress(event.id)}>
+    <Text style={styles.eventName}>{event.eventName}</Text> 
+    {showDetailPreview && 
+    <Text style={styles.eventDetails}>
+      {/*TODO - Add distance calculation after backend does it*/}
+      {showSportType ? `${event.sportType} - X km away` : `X km away`}
+      </Text>}
+    
+    {showSportType && 
+    <View style={styles.sportIconContainer}>
+      <MaterialCommunityIcons
+        name={sportIcons[event.sportType] || 'help-circle-outline'} // Fallback icon
+        size={40}
+        color="#94504b"
+      /> 
+    </View>}
+    
+    {showDate && 
+    <Text style={styles.date}>
+      📅 {new Date(stringToDate(event.date)).toDateString()}
+    </Text>}
 
       {showLocation && (
         <Text style={styles.location}>
