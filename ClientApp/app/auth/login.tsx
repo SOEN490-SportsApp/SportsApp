@@ -128,8 +128,6 @@ const LoginPage: React.FC = () => {
               Forgot your password?
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => router.push('/auth/registerProfile')}><Text>Register</Text></TouchableOpacity>
-
           <View style={{ height: vs(64) }} />
 
           <ConfirmButton
