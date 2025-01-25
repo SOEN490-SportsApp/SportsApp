@@ -126,8 +126,21 @@ const Create = () => {
         cutOffTime.getMinutes()
       );
 
-      console.log("cut off time", cutOffTime);
+      const combinedStartDateTime = new Date(
+        eventDate.getFullYear(),
+        eventDate.getMonth(),
+        eventDate.getDate(),
+        startTime.getHours(),
+        startTime.getMinutes()
+      );
 
+      if (combinedCutOffDateTime >= combinedStartDateTime) {
+        Alert.alert(
+          "Error",
+          "Cutoff time must be before the event start time."
+        );
+        return;
+      }
       const eventRequest = {
         eventName: data.eventName,
         eventType: data.eventType,
