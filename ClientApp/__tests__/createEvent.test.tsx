@@ -548,7 +548,7 @@ describe("Create Component", () => {
       await waitFor(() => {
         expect(screen.queryByTestId("datetimepicker-cutoff-time")).toBeNull();
         expect(screen.getByTestId("cut-off-time-text")).toHaveTextContent(
-          "12:30 p.m."
+          "12:30 PM"
         );
       });
     });
