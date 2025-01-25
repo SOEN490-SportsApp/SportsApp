@@ -12,5 +12,7 @@ export const API_ENDPOINTS = {
   GET_ALL_EVENTS: "event-service/event",
   JOIN_EVENT_BY_ID: "event-service/event/{id}/join",
   DELETE_EVENT_BY_ID: "event-service/event/{id}",
+    GET_ALL_EVENTS_JOINED: 'event-service/event/participant/{userId}',
+    GET_ALL_EVENTS_CREATED_BY: 'event-service/event/created-by/{userId}',
     DELETE_PROFILE: 'user-service/user/{userId}',
 };
