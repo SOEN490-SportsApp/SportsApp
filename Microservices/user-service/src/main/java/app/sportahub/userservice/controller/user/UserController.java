@@ -2,6 +2,7 @@ package app.sportahub.userservice.controller.user;
 
 import java.util.List;
 
+import app.sportahub.userservice.dto.response.user.PublicProfileResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,8 +26,6 @@ import app.sportahub.userservice.dto.request.user.friend.FriendRequestRequest;
 import app.sportahub.userservice.dto.request.user.friend.UpdateFriendRequestRequest;
 import app.sportahub.userservice.dto.response.user.friend.ViewFriendResponse;
 import app.sportahub.userservice.dto.response.user.friendRequest.FriendRequestResponse;
-import app.sportahub.userservice.dto.request.user.ProfileRequest;
-import app.sportahub.userservice.dto.request.user.UserRequest;
 import app.sportahub.userservice.dto.response.user.ProfileResponse;
 import app.sportahub.userservice.dto.response.user.UserResponse;
 import app.sportahub.userservice.dto.response.user.badge.BadgeWithCountResponse;

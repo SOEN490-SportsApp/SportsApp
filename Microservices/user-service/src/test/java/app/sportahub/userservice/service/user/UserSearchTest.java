@@ -79,9 +79,8 @@ public class UserSearchTest {
 
     @BeforeEach
     void setUp() {
-        userService = new UserServiceImpl(userRepository, badgeRepository,
-                keycloakApiClient, userMapper, profileMapper, friendMapper, friendRepository, friendRequestRepository);
-                keycloakApiClient, userMapper, profileMapper, friendRepository, publicProfileMapper);
+        userService = new UserServiceImpl(userRepository, badgeRepository, keycloakApiClient, userMapper,
+                profileMapper, friendMapper, friendRepository, friendRequestRepository, publicProfileMapper);
         searchingUserRepository = new SearchingUserRepositoryImpl(mongoTemplate);
     }
 

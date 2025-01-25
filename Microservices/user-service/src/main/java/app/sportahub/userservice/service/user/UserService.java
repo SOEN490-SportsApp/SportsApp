@@ -3,7 +3,7 @@ package app.sportahub.userservice.service.user;
 import app.sportahub.userservice.dto.request.user.friend.FriendRequestRequest;
 import app.sportahub.userservice.dto.request.user.friend.UpdateFriendRequestRequest;
 import app.sportahub.userservice.dto.response.user.PublicProfileResponse;
-import app.sportahub.userservice.dto.response.user.friend.FriendRequestResponse;
+import app.sportahub.userservice.dto.response.user.friendRequest.FriendRequestResponse;
 import app.sportahub.userservice.dto.response.user.friend.ViewFriendResponse;
 import app.sportahub.userservice.dto.response.user.friendRequest.FriendRequestResponse;
 import app.sportahub.userservice.dto.request.user.ProfileRequest;
