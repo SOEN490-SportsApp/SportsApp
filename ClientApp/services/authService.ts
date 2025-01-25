@@ -6,19 +6,19 @@ import { ALERT_MESSAGES } from '@/utils/api/errorHandlers';
 
 export async function loginUser(identifier: string, password: string) {
   try {
-      const axiosInstance = getAxiosInstance();
-      const response = await axiosInstance.post(API_ENDPOINTS.LOGIN, { identifier, password });
-      const { userID, tokenResponse: { accessToken, refreshToken } } = response.data;
-      await saveTokens(accessToken, refreshToken);
-      startTokenRefresh();
-      return response.data;
+    const axiosInstance = getAxiosInstance();
+    const response = await axiosInstance.post(API_ENDPOINTS.LOGIN, { identifier, password });
+    const { userID, tokenResponse: { accessToken, refreshToken } } = response.data;
+    await saveTokens(accessToken, refreshToken);
+    startTokenRefresh();
+    return response.data;
   } catch (error: any) {
-      const serverError = error.response?.data?.error;
+    const serverError = error.response?.data?.error;
 
-      if (typeof serverError === "string" && serverError.includes("invalid_grant")) {
-          throw new Error(ALERT_MESSAGES.invalidCredentials.message);
-      }
-      throw error.response?.data || error;
+    if (typeof serverError === 'string' && serverError.includes('invalid_grant')) {
+      throw new Error(ALERT_MESSAGES.invalidCredentials.message);
+    }
+    throw error.response?.data || error;
   }
 }
 
@@ -29,7 +29,8 @@ export async function logoutUser(dispatch: any) {
     stopTokenRefresh();
   } catch (error: any) {
     if (__DEV__) {
-        console.error('Error Logging out user:', error.message || error);
+      // Ensure error is logged as an Error object for consistency in tests
+      console.error('Error Logging out user:', error instanceof Error ? error : new Error(String(error)));
     }
     throw error.response?.data || error;
   }
@@ -42,7 +43,7 @@ export async function registerUser(email: string, username: string, password: st
     return response;
   } catch (error: any) {
     if (__DEV__) {
-        console.error("Registration failed:", error.message || error);
+      console.error('Registration failed:', error instanceof Error ? error : new Error(String(error)));
     }
     throw error.response?.data || error;
   }
@@ -55,8 +56,10 @@ export async function resetPassword(email: string) {
     return response;
   } catch (err: any) {
     if (__DEV__) {
-        console.error("Reset password failed:", err.message || err);
+      console.error('Reset password failed:', err instanceof Error ? err : new Error(String(err)));
     }
     throw err.response?.data || err;
   }
 }
+
+
