@@ -89,7 +89,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public PublicProfileResponse getUserPublicProfile(String id) {
         User user = userRepository.findUserById(id).orElseThrow(() -> new UserDoesNotExistException(id));
-//        return publicProfileMapper.userToPublicProfileResponse(user.getUsername(), profileMapper.profileToProfileResponse(user.getProfile()));
         return publicProfileMapper.userToPublicProfileResponse(user);
     }
 
