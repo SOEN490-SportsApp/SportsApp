@@ -9,7 +9,7 @@ const TopBar = () => {
     <View style={styles.header}>
       <Text style={styles.logoText}>Sporta</Text>
       <View style={styles.iconContainer}>
-        <TouchableOpacity style={styles.iconButton} onPress={() => router.push('/(tabs)/home/searchPage')}>
+        <TouchableOpacity style={styles.iconButton} testID="search-icon" onPress={() => router.push('/(tabs)/home/searchPage')}>
           <View style={styles.iconCircle}>
             <Icon name="search" type="font-awesome" color="#000" size={20} />
           </View>

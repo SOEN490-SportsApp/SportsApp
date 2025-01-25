@@ -3,6 +3,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Profile } from "@/types";
 import themeColors from "@/utils/constants/colors";
 import { useState } from "react";
+import { hs, vs } from "@/utils/helpers/uiScaler";
 
 interface FriendCardProp {
   user: Profile;
@@ -71,8 +72,8 @@ const styles = StyleSheet.create({
     borderColor: themeColors.border.light,
     justifyContent: "space-between",
     borderRadius: 10,
-    marginVertical: 5,
-    marginHorizontal: 5,
+    marginVertical: vs(5),
+    marginHorizontal: hs(5),
     backgroundColor: "#ffffff",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
@@ -92,12 +93,12 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "flex-start",
-    marginLeft: 16,
+    marginLeft: vs(16),
   },
   userInfo: {
     fontSize: 14,
     fontWeight: "bold",
-    marginBottom: 5,
+    marginBottom: hs(5),
     color: "#333",
   },
   subUserInfo: {
@@ -108,14 +109,14 @@ const styles = StyleSheet.create({
     flex: 3,
     justifyContent: "center",
     alignItems: "flex-end",
-    marginRight: 8,
+    marginRight: vs(8),
   },
   tagContainer: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingHorizontal: hs(10),
+    paddingVertical: vs(5),
     borderRadius: 15,
-    marginRight: 5,
-    marginBottom: 5,
+    marginRight: vs(5),
+    marginBottom: hs(5),
   },
   tagText: {
     fontSize: 12,
