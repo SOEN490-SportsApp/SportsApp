@@ -573,6 +573,7 @@ const Create = () => {
             </TouchableOpacity>
             {showCutOffDatePicker && (
               <DateTimePicker
+                testID="datetimepicker-cutoff-date"
                 value={cutOffDate || new Date()}
                 mode="date"
                 display="default"
@@ -598,6 +599,7 @@ const Create = () => {
             </TouchableOpacity>
             {showCutOffTimePicker && (
               <DateTimePicker
+                testID="datetimepicker-cutoff-time"
                 value={cutOffTime || new Date()}
                 mode="time"
                 display="default"

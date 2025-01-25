@@ -501,4 +501,54 @@ describe("Create Component", () => {
       });
     });
   });
+  describe("Cut Off Date and Time Selection", () => {
+    it("opens and selects a cut off date", async () => {
+      render(
+        <Provider store={store}>
+          <Create />
+        </Provider>
+      );
+
+      fireEvent.press(screen.getByText("Select cut off date"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("datetimepicker-cutoff-date")).toBeTruthy();
+      });
+
+      const selectedDate = new Date(2025, 0, 15);
+      fireEvent(screen.getByTestId("datetimepicker-cutoff-date"), "onChange", {
+        nativeEvent: { timestamp: selectedDate.getTime() },
+      });
+
+      await waitFor(() => {
+        expect(screen.queryByTestId("datetimepicker-cutoff-date")).toBeNull();
+        expect(screen.getByText("Wed Jan 15 2025")).toBeTruthy();
+      });
+    });
+
+    it("opens and selects a cut off time", async () => {
+      render(
+        <Provider store={store}>
+          <Create />
+        </Provider>
+      );
+
+      fireEvent.press(screen.getByText("Select cut off time (in hours)"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("datetimepicker-cutoff-time")).toBeTruthy();
+      });
+
+      const selectedTime = new Date();
+      selectedTime.setHours(14, 30);
+      fireEvent(screen.getByTestId("datetimepicker-cutoff-time"), "onChange", {
+        nativeEvent: { timestamp: selectedTime.getTime() },
+      });
+
+      await waitFor(() => {
+        expect(screen.queryByTestId("datetimepicker-cutoff-time")).toBeNull();
+        expect(screen.getByText("02:30 p.m.")).toBeTruthy();
+      });
+    });
+  });
 });
