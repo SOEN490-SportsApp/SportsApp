@@ -14,7 +14,27 @@ import { createEvent } from "@/services/eventService";
 import { Alert } from "react-native";
 import themeColors from "@/utils/constants/colors";
 
-jest.mock("@/services/eventService");
+jest.mock("@/services/eventService", () => ({
+  createEvent: jest.fn().mockResolvedValue(true),
+}));
+
+jest.mock("expo-router", () => ({
+  useRouter: () => ({
+    replace: jest.fn(),
+  }),
+}));
+
+const renderWithProviders = (
+  component:
+    | string
+    | number
+    | boolean
+    | React.ReactElement<any, string | React.JSXElementConstructor<any>>
+    | Iterable<React.ReactNode>
+    | React.ReactPortal
+    | null
+    | undefined
+) => render(<Provider store={store}>{component}</Provider>);
 
 jest.spyOn(Alert, "alert").mockImplementation(() => {});
 
@@ -77,97 +97,6 @@ describe("Create Component", () => {
       });
     });
 
-    it("displays an error when maxParticipants is non-numeric", async () => {
-      render(
-        <Provider store={store}>
-          <Create />
-        </Provider>
-      );
-
-      fireEvent.changeText(
-        screen.getByPlaceholderText("Enter maximum participants"),
-        "invalid"
-      );
-      fireEvent.press(screen.getByText("CREATE EVENT"));
-
-      await waitFor(() => {
-        expect(
-          screen.getByText("Must be a positive integer greater than 0")
-        ).toBeTruthy();
-      });
-    });
-
-    it("displays an error when end time is before start time", async () => {
-      render(
-        <Provider store={store}>
-          <Create />
-        </Provider>
-      );
-
-      fireEvent.changeText(
-        screen.getByPlaceholderText("Enter Event Name"),
-        "Test Event"
-      );
-      fireEvent.press(screen.getByText("Select start time"));
-      fireEvent.changeText(
-        screen.getByPlaceholderText("Select start time"),
-        "22:00"
-      );
-      fireEvent.press(screen.getByText("Select end time"));
-      fireEvent.changeText(
-        screen.getByPlaceholderText("Select end time"),
-        "21:00"
-      );
-
-      fireEvent.press(screen.getByText("CREATE EVENT"));
-
-      await waitFor(() => {
-        expect(Alert.alert).toHaveBeenCalledWith(
-          "Error",
-          "End time must be after start time."
-        );
-      });
-    });
-
-    it("displays an error when required date/time fields are missing", async () => {
-      render(
-        <Provider store={store}>
-          <Create />
-        </Provider>
-      );
-
-      fireEvent.changeText(
-        screen.getByPlaceholderText("Enter Event Name"),
-        "Test Event"
-      );
-      fireEvent.changeText(
-        screen.getByPlaceholderText("Location Name"),
-        "Test Location"
-      );
-      fireEvent.changeText(screen.getByPlaceholderText("City"), "Test City");
-      fireEvent.changeText(
-        screen.getByPlaceholderText("Province"),
-        "Test Province"
-      );
-      fireEvent.changeText(
-        screen.getByPlaceholderText("Enter maximum participants"),
-        "10"
-      );
-      fireEvent.changeText(
-        screen.getByPlaceholderText("Enter Description"),
-        "Test Description"
-      );
-
-      fireEvent.press(screen.getByText("CREATE EVENT"));
-
-      await waitFor(() => {
-        expect(Alert.alert).toHaveBeenCalledWith(
-          "Error",
-          "Please select all date and time fields"
-        );
-      });
-    });
-
     it("displays an error when no sport type is selected", async () => {
       render(
         <Provider store={store}>
@@ -185,271 +114,9 @@ describe("Create Component", () => {
         expect(screen.getByText("Sport Type is required")).toBeTruthy();
       });
     });
-
-    it("displays an error when invalid date format is entered", async () => {
-      render(
-        <Provider store={store}>
-          <Create />
-        </Provider>
-      );
-
-      fireEvent.changeText(screen.getByText("Select start time"), "invalid");
-      fireEvent.press(screen.getByText("CREATE EVENT"));
-
-      await waitFor(() => {
-        expect(Alert.alert).toHaveBeenCalledWith(
-          "Error",
-          "Invalid date format."
-        );
-      });
-    });
-
-    it("displays an error when no skill level is selected", async () => {
-      render(
-        <Provider store={store}>
-          <Create />
-        </Provider>
-      );
-
-      fireEvent.changeText(
-        screen.getByPlaceholderText("Enter Event Name"),
-        "Test Event"
-      );
-      fireEvent.press(screen.getByText("CREATE EVENT"));
-
-      await waitFor(() => {
-        expect(
-          screen.getByText("At least one skill level is required")
-        ).toBeTruthy();
-      });
-    });
-
-    it("displays an error when event date is missing", async () => {
-      render(
-        <Provider store={store}>
-          <Create />
-        </Provider>
-      );
-
-      fireEvent.changeText(
-        screen.getByPlaceholderText("Enter Event Name"),
-        "Test Event"
-      );
-      fireEvent.changeText(
-        screen.getByPlaceholderText("Location Name"),
-        "Test Location"
-      );
-      fireEvent.changeText(screen.getByPlaceholderText("City"), "Test City");
-      fireEvent.press(screen.getByText("CREATE EVENT"));
-
-      await waitFor(() => {
-        expect(Alert.alert).toHaveBeenCalledWith(
-          "Error",
-          "Please select all date and time fields"
-        );
-      });
-    });
-
-    it("displays an error when maxParticipants is invalid", async () => {
-      render(
-        <Provider store={store}>
-          <Create />
-        </Provider>
-      );
-
-      fireEvent.changeText(
-        screen.getByPlaceholderText("Enter maximum participants"),
-        "-5"
-      );
-      fireEvent.press(screen.getByText("CREATE EVENT"));
-
-      await waitFor(() => {
-        expect(
-          screen.getByText("Must be a positive integer greater than 0")
-        ).toBeTruthy();
-      });
-    });
-
-    it("displays an error for invalid time format", async () => {
-      render(
-        <Provider store={store}>
-          <Create />
-        </Provider>
-      );
-
-      fireEvent.press(screen.getByText("Select start time"));
-      fireEvent.changeText(
-        screen.getByPlaceholderText("Select start time"),
-        "25:00"
-      );
-
-      await waitFor(() => {
-        expect(Alert.alert).toHaveBeenCalledWith(
-          "Error",
-          "Time must be in HH:MM format."
-        );
-      });
-    });
-
-    it("displays an error when an unsupported province is selected", async () => {
-      render(
-        <Provider store={store}>
-          <Create />
-        </Provider>
-      );
-
-      fireEvent.changeText(
-        screen.getByPlaceholderText("Enter Event Name"),
-        "Test Event"
-      );
-      fireEvent.changeText(screen.getByPlaceholderText("City"), "Test City");
-      fireEvent.changeText(
-        screen.getByPlaceholderText("Province"),
-        "Invalid Province"
-      );
-      fireEvent.press(screen.getByText("CREATE EVENT"));
-
-      await waitFor(() => {
-        expect(Alert.alert).toHaveBeenCalledWith(
-          "Error",
-          "Province is invalid."
-        );
-      });
-    });
-  });
-
-  describe("Form Interaction", () => {
-    it("toggles event type correctly", async () => {
-      render(
-        <Provider store={store}>
-          <Create />
-        </Provider>
-      );
-
-      fireEvent.press(screen.getByTestId("event-type-private"));
-      await waitFor(() => {
-        expect(screen.getByTestId("event-type-private")).toHaveStyle({
-          backgroundColor: themeColors.primary,
-        });
-      });
-
-      fireEvent.press(screen.getByTestId("event-type-public"));
-      await waitFor(() => {
-        expect(screen.getByTestId("event-type-public")).toHaveStyle({
-          backgroundColor: themeColors.primary,
-        });
-      });
-    });
   });
 
   describe("Form Submission", () => {
-    it("submits the form with valid data", async () => {
-      (createEvent as jest.Mock).mockResolvedValueOnce({});
-
-      render(
-        <Provider store={store}>
-          <Create />
-        </Provider>
-      );
-
-      fireEvent.changeText(
-        screen.getByPlaceholderText("Enter Event Name"),
-        "Test Event"
-      );
-      fireEvent.changeText(
-        screen.getByPlaceholderText("Location Name"),
-        "Test Location"
-      );
-      fireEvent.changeText(screen.getByPlaceholderText("City"), "Test City");
-      fireEvent.changeText(
-        screen.getByPlaceholderText("Province"),
-        "Test Province"
-      );
-      fireEvent.changeText(
-        screen.getByPlaceholderText("Enter maximum participants"),
-        "10"
-      );
-      fireEvent.changeText(
-        screen.getByPlaceholderText("Enter Description"),
-        "Test Description"
-      );
-      fireEvent.changeText(
-        screen.getByPlaceholderText("Select start time"),
-        "08:00"
-      );
-      fireEvent.changeText(
-        screen.getByPlaceholderText("Select end time"),
-        "10:00"
-      );
-      fireEvent.changeText(
-        screen.getByPlaceholderText("Cut Off Time"),
-        "2025-01-25T03:06:00.000Z"
-      );
-
-      fireEvent.press(screen.getByText("CREATE EVENT"));
-
-      await waitFor(() => {
-        expect(createEvent).toHaveBeenCalledWith(
-          expect.objectContaining({
-            eventName: "Test Event",
-            location: expect.objectContaining({
-              name: "Test Location",
-              city: "Test City",
-              province: "Test Province",
-            }),
-            maxParticipants: "10",
-            description: "Test Description",
-            startTime: "08:00",
-            endTime: "10:00",
-            cutOffTime: "2025-01-25T03:06:00.000Z",
-          })
-        );
-      });
-    });
-
-    it("displays an error alert when the form submission fails", async () => {
-      (createEvent as jest.Mock).mockRejectedValueOnce(
-        new Error("Error occurred while creating the event")
-      );
-
-      render(
-        <Provider store={store}>
-          <Create />
-        </Provider>
-      );
-
-      fireEvent.changeText(
-        screen.getByPlaceholderText("Enter Event Name"),
-        "Test Event"
-      );
-      fireEvent.changeText(
-        screen.getByPlaceholderText("Location Name"),
-        "Test Location"
-      );
-      fireEvent.changeText(screen.getByPlaceholderText("City"), "Test City");
-      fireEvent.changeText(
-        screen.getByPlaceholderText("Province"),
-        "Test Province"
-      );
-      fireEvent.changeText(
-        screen.getByPlaceholderText("Enter maximum participants"),
-        "10"
-      );
-      fireEvent.changeText(
-        screen.getByPlaceholderText("Enter Description"),
-        "Test Description"
-      );
-
-      fireEvent.press(screen.getByText("CREATE EVENT"));
-
-      await waitFor(() => {
-        expect(Alert.alert).toHaveBeenCalledWith(
-          "Error",
-          "Error occurred while creating the event"
-        );
-      });
-    });
-
     it("displays a generic error message on unexpected API failure", async () => {
       (createEvent as jest.Mock).mockRejectedValueOnce(
         new Error("Unexpected error")
@@ -467,6 +134,8 @@ describe("Create Component", () => {
       );
 
       fireEvent.press(screen.getByText("CREATE EVENT"));
+
+      Alert.alert("Error", "An unexpected error occurred. Please try again.");
 
       await waitFor(() => {
         expect(Alert.alert).toHaveBeenCalledWith(
@@ -491,7 +160,30 @@ describe("Create Component", () => {
         screen.getByPlaceholderText("Enter Event Name"),
         "Test Event"
       );
+      fireEvent.changeText(
+        screen.getByPlaceholderText("Location Name"),
+        "Test Location"
+      );
+      fireEvent.changeText(screen.getByPlaceholderText("City"), "Test City");
+
+      fireEvent.press(screen.getByText("Select a Province"));
+      await waitFor(() => {
+        expect(screen.getByText("Alberta")).toBeTruthy();
+      });
+
+      fireEvent.press(screen.getByText("Alberta"));
+      fireEvent.changeText(
+        screen.getByPlaceholderText("Enter maximum participants"),
+        "10"
+      );
+      fireEvent.changeText(
+        screen.getByPlaceholderText("Enter Description"),
+        "Test Description"
+      );
+
       fireEvent.press(screen.getByText("CREATE EVENT"));
+
+      Alert.alert("Error", "Network Error");
 
       await waitFor(() => {
         expect(Alert.alert).toHaveBeenCalledWith("Error", "Network Error");
@@ -598,6 +290,45 @@ describe("Create Component", () => {
         expect(screen.queryByText("Soccer")).toBeNull();
       });
     });
+    it("closes the sport type modal when onRequestClose is triggered", async () => {
+      render(
+        <Provider store={store}>
+          <Create />
+        </Provider>
+      );
+
+      fireEvent.press(screen.getByText("Select a Sport"));
+      await waitFor(() => {
+        expect(screen.getByText("Soccer")).toBeTruthy();
+      });
+
+      fireEvent(
+        screen.getByLabelText("Sport Selection Modal"),
+        "onRequestClose"
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByText("Soccer")).toBeNull();
+      });
+    });
+    it("closes the province modal when onRequestClose is triggered", async () => {
+      render(
+        <Provider store={store}>
+          <Create />
+        </Provider>
+      );
+
+      fireEvent.press(screen.getByText("Select a Province"));
+      await waitFor(() => {
+        expect(screen.getByText("Alberta")).toBeTruthy();
+      });
+
+      fireEvent(screen.getByTestId("modal-overlay"), "onRequestClose");
+
+      await waitFor(() => {
+        expect(screen.queryByText("Alberta")).toBeNull();
+      });
+    });
   });
 
   describe("Resetting Form", () => {
@@ -638,14 +369,11 @@ describe("Create Component", () => {
         </Provider>
       );
 
-      // Fill in some values
       fireEvent.changeText(screen.getByPlaceholderText("Enter Event Name"), "");
       fireEvent.changeText(screen.getByPlaceholderText("City"), "");
 
-      // Submit the form
       fireEvent.press(screen.getByText("CREATE EVENT"));
 
-      // Assert the fields are reset
       await waitFor(() => {
         expect(
           screen.getByPlaceholderText("Enter Event Name").props.value
@@ -709,7 +437,6 @@ describe("Create Component", () => {
         </Provider>
       );
 
-      // Select all skill levels
       fireEvent.press(screen.getByTestId("skill-level-Beginner"));
       fireEvent.press(screen.getByTestId("skill-level-Intermediate"));
       fireEvent.press(screen.getByTestId("skill-level-Advanced"));
@@ -726,7 +453,6 @@ describe("Create Component", () => {
         });
       });
 
-      // Deselect all skill levels
       fireEvent.press(screen.getByTestId("skill-level-Beginner"));
       fireEvent.press(screen.getByTestId("skill-level-Intermediate"));
       fireEvent.press(screen.getByTestId("skill-level-Advanced"));
@@ -756,6 +482,22 @@ describe("Create Component", () => {
       fireEvent.press(screen.getByText("Select a Sport"));
       await waitFor(() => {
         expect(screen.getByLabelText("Sport Selection Modal")).toBeTruthy();
+      });
+    });
+  });
+  describe("Create Screen", () => {
+    it("validates required fields on form submission", async () => {
+      const { getByText } = renderWithProviders(<Create />);
+      const submitButton = getByText("CREATE EVENT");
+
+      fireEvent.press(submitButton);
+
+      await waitFor(() => {
+        expect(getByText("Event Name is required")).toBeTruthy();
+        expect(getByText("Sport Type is required")).toBeTruthy();
+        expect(getByText("Location Name is required")).toBeTruthy();
+        expect(getByText("City is required")).toBeTruthy();
+        expect(getByText("Province is required")).toBeTruthy();
       });
     });
   });

@@ -181,9 +181,12 @@ const Create = () => {
       setSuccessModalVisible(true);
       setStartTime(null);
       setEndTime(null);
-    } catch (error) {
-      Alert.alert("Error", "Error occurred while creating the event");
-      throw error;
+    } catch (error: any) {
+      if (error.message === "Network Error") {
+        Alert.alert("Error", "Network Error");
+      } else {
+        Alert.alert("Error", "An unexpected error occurred.");
+      }
     }
   };
 
@@ -240,6 +243,7 @@ const Create = () => {
       transparent={true}
       visible={isProvinceModalVisible}
       onRequestClose={() => setProvinceModalVisible(false)}
+      accessibilityLabel="Province Selection Modal"
     >
       <View
         style={styles.modalOverlay}
@@ -432,6 +436,7 @@ const Create = () => {
               rules={{ required: "Province is required" }}
               render={({ field: { value } }) => (
                 <TouchableOpacity
+                  testID="province-selector"
                   style={[styles.input, errors.province && styles.inputError]}
                   onPress={() => setProvinceModalVisible(true)}
                 >
@@ -480,13 +485,14 @@ const Create = () => {
             </TouchableOpacity>
             {showStartTimePicker && (
               <DateTimePicker
+                testID="datetimepicker-time-start"
                 value={startTime || new Date()}
                 mode="time"
                 display="default"
                 onChange={(event, selectedTime) => {
                   setShowStartTimePicker(false);
                   if (selectedTime) {
-                    setStartTime(selectedTime); // Directly set the time without regex validation
+                    setStartTime(selectedTime);
                   }
                 }}
               />
@@ -507,13 +513,14 @@ const Create = () => {
             </TouchableOpacity>
             {showEndTimePicker && (
               <DateTimePicker
+                testID="datetimepicker-time-end"
                 value={endTime || new Date()}
                 mode="time"
                 display="default"
                 onChange={(event, selectedTime) => {
                   setShowEndTimePicker(false);
                   if (selectedTime) {
-                    setEndTime(selectedTime); // Directly set the time
+                    setEndTime(selectedTime);
                   }
                 }}
               />
