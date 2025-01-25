@@ -19,12 +19,12 @@ export const getAxiosInstance = (): AxiosInstance => {
 };
 
 export const setupAxiosInstance = (dispatch: any): AxiosInstance => {
-    if (axiosInstance) {
-        return axiosInstance;
+    if ((global as any).axiosInstance) {
+        return (global as any).axiosInstance;
     }
 
     const config: AxiosRequestConfig = {
-        baseURL: process.env.EXPO_PUBLIC_API_BASE_URL || 'https://default.api.url', // Fallback for baseURL
+        baseURL: process.env.EXPO_PUBLIC_API_BASE_URL, // Fallback for baseURL
         timeout: 5000,
         headers: {
             'Content-Type': 'application/json',
@@ -148,7 +148,7 @@ export const setupAxiosInstance = (dispatch: any): AxiosInstance => {
             return Promise.reject(error);
         }
     );
-
+    (global as any).axiosInstance = axiosInstance;
     return axiosInstance;
 };
 

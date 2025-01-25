@@ -83,10 +83,12 @@ if (!isNaN(cutoffTime.getTime())) {
       timeLeftShown = `${weeksLeft} week${weeksLeft > 1 ? "s" : ""}`;
     }
   } else {
-    return null;
+    eventStarted = true;
+    canJoin = false;
   }
 } else {
-  return null
+  eventStarted = true;
+  canJoin = false;
 }
 
   // Dynamic styling for the card
