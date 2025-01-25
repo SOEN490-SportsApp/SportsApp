@@ -9,7 +9,8 @@ import { useRouter } from 'expo-router';
 import { UserState } from '@/types/user';
 import { calculateAge } from '@/utils/helpers/ageOfUser';
 import { useSelector } from 'react-redux';
-import EventListProfilePage from '@/components/Event/EventListProfilePage';
+import EventListProfilePageJoined from '@/components/Event/EventListProfilePageJoined';
+import EventListProfilePageCreated from '@/components/Event/EventListProfilePageCreated';
 import Ionicons from "react-native-vector-icons/Ionicons"; 
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
@@ -74,7 +75,7 @@ const ActivityTab = () => (
             </View>
         </ScrollView>
         <View>
-            <EventListProfilePage />
+            <EventListProfilePageJoined />
         </View>
     </View>
 );
@@ -104,16 +105,8 @@ const AboutTab: React.FC<{ user: UserState }> = ({ user }) => {
 
     return (
         <View className="p-4 bg-white flex-1">
-            <View className="rounded-lg p-4" style={{ backgroundColor: '#0C9E04' }}>
-                <Text testID="Gender" className="text-black text-base">
-                    Gender: {user.profile.gender || 'Not Provided'}
-                </Text>
-                <Text testID="Age" className="text-black text-base mt-2">
-                    Age: {age}
-                </Text>
-                <Text testID="Phone" className="text-black text-base mt-2">
-                    Phone: {user?.profile.phoneNumber || 'Not Provided'}
-                </Text>
+           <View>
+                <EventListProfilePageCreated />
             </View>
         </View>
     );

@@ -1,12 +1,16 @@
-import { getAxiosInstance } from "@/services/axiosInstance";
-import { API_ENDPOINTS } from "@/utils/api/endpoints";
+import {getAxiosInstance} from '@/services/axiosInstance';
+import { API_ENDPOINTS } from '@/utils/api/endpoints';
+//API_ENDPOINTS.CREATE_EVENT
 export const createEvent = async (eventData: any) => {
   try {
     const axiosInstance = getAxiosInstance();
     console.log("eventData", eventData);
     const response = await axiosInstance.post(
-      API_ENDPOINTS.CREATE_EVENT,
+      
+      API_ENDPOINTS.CREATE_EVENT, 
+     
       eventData
+    
     );
     return response.data;
   } catch (error) {
@@ -33,6 +37,30 @@ export const deleteEvent = async (eventId: string) => {
     return response.data;
   } catch (error) {
     console.error("Error deleting event:", error);
+    throw error;
+  }
+};
+
+//API_ENDPOINTS.GET_ALL_EVENTS_JOINED
+export const getEventsJoined = async () => {
+  try {
+    const axiosInstance = getAxiosInstance();
+    const response = await axiosInstance.get(API_ENDPOINTS.GET_ALL_EVENTS_JOINED);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching joined events:", error);
+    throw error;
+  }
+};
+
+//API_ENDPOINTS.GET_ALL_EVENTS_CREATED_BY
+export const getEventsCreated = async () => {
+  try {
+    const axiosInstance = getAxiosInstance();
+    const response = await axiosInstance.get(API_ENDPOINTS.GET_ALL_EVENTS_CREATED_BY);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching created events:", error);
     throw error;
   }
 };
