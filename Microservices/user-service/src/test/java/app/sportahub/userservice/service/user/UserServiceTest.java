@@ -81,9 +81,8 @@ public class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        userService = new UserServiceImpl(userRepository, badgeRepository,
-                keycloakApiClient, userMapper, profileMapper, friendRepository, publicProfileMapper);
-                keycloakApiClient, userMapper, profileMapper, friendMapper, friendRepository, friendRequestRepository);
+        userService = new UserServiceImpl(userRepository, badgeRepository, keycloakApiClient, userMapper, profileMapper,
+                friendMapper, friendRepository, friendRequestRepository, publicProfileMapper);
     }
 
     private UserRequest getUserRequest() {
