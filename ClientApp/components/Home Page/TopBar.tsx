@@ -1,13 +1,15 @@
 import React from 'react';
+import { useRouter } from 'expo-router';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Icon } from 'react-native-elements';
 
 const TopBar = () => {
+  const router = useRouter()
   return (
     <View style={styles.header}>
       <Text style={styles.logoText}>Sporta</Text>
       <View style={styles.iconContainer}>
-        <TouchableOpacity testID="search-icon" style={styles.iconButton}>
+        <TouchableOpacity style={styles.iconButton} onPress={() => router.push('/(tabs)/home/searchPage')}>
           <View style={styles.iconCircle}>
             <Icon name="search" type="font-awesome" color="#000" size={20} />
           </View>
