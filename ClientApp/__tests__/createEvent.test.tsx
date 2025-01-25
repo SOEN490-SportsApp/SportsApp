@@ -540,14 +540,14 @@ describe("Create Component", () => {
       });
 
       const selectedTime = new Date();
-      selectedTime.setHours(14, 30);
+      selectedTime.setHours(12, 30);
       fireEvent(screen.getByTestId("datetimepicker-cutoff-time"), "onChange", {
         nativeEvent: { timestamp: selectedTime.getTime() },
       });
 
       await waitFor(() => {
         expect(screen.queryByTestId("datetimepicker-cutoff-time")).toBeNull();
-        expect(screen.getByText("02:30 p.m.")).toBeTruthy();
+        expect(screen.getByText("12:30 p.m.")).toBeTruthy();
       });
     });
   });
