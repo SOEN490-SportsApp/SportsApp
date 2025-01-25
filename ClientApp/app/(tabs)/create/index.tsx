@@ -126,6 +126,8 @@ const Create = () => {
         cutOffTime.getMinutes()
       );
 
+      console.log("cut off time", cutOffTime);
+
       const eventRequest = {
         eventName: data.eventName,
         eventType: data.eventType,
@@ -588,7 +590,7 @@ const Create = () => {
               onPress={() => setShowCutOffTimePicker(true)}
               style={styles.input}
             >
-              <Text>
+              <Text testID="cut-off-time-text">
                 {cutOffTime
                   ? cutOffTime.toLocaleTimeString([], {
                       hour: "2-digit",
