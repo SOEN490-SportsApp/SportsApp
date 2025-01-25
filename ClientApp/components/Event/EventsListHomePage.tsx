@@ -52,15 +52,6 @@ const EventsList = () => {
     router.push(`/events/${eventId}`);
   };
 
-  if (loading) {
-    return (
-      <View style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
-        <Text>Loading events...</Text>
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container}>
       <Animated.FlatList
