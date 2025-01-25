@@ -30,12 +30,12 @@ jobs:
       - name: Get list of changed files
         id: git_changes
         run: |
-          echo "Determining changed files..."
-          CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD)
+          echo "Determining changed files across all commits in this push..."
+          CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
           echo "Changed files: $CHANGED_FILES"
-
-          # Make sure changed files are properly formatted for GITHUB_ENV
-          CHANGED_FILES_LIST=$(echo "$CHANGED_FILES" | tr '\n' ',' | sed 's/,$//')  # Comma-separated
+          
+          # Format changed files for environment variable
+          CHANGED_FILES_LIST=$(echo "$CHANGED_FILES" | tr '\n' ',' | sed 's/,$//')
           echo "changed_files=$CHANGED_FILES_LIST" >> $GITHUB_ENV
 
       - name: Determine changed services
