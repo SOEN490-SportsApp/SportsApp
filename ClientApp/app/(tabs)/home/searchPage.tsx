@@ -130,7 +130,12 @@ export default function searchPage() {
             onPress={() => setSearchText("")}
           >
             <View style={styles.iconCircle}>
-              <Text>Cancel</Text>
+            <MaterialCommunityIcons
+              name="window-close"
+              testID="window-close"
+              size={25}
+              color="#aaa"
+            />
             </View>
           </TouchableOpacity>
         )}
@@ -151,14 +156,14 @@ const styles = StyleSheet.create({
     },
   header1: {
     padding: 15,
-    marginTop: 50,
+    marginTop: vs(50),
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
   },
   header: {
-    paddingHorizontal: 15,
-    paddingVertical: 10,
+    paddingHorizontal: hs(15),
+    paddingVertical: vs(10),
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -168,7 +173,7 @@ const styles = StyleSheet.create({
   },
   logoText: {
     color: "#0C9E04",
-    fontSize: 28,
+    fontSize: vs(28),
     fontWeight: "bold",
   },
   iconContainer: {
@@ -178,22 +183,22 @@ const styles = StyleSheet.create({
     borderColor: "#d3d3d3",
   },
   iconButton: {
-    marginLeft: 15,
+    marginLeft: vs(15),
   },
   searchInput: {
     flex: 1,
-    marginHorizontal: 10,
-    height: 40,
+    marginHorizontal: hs(10),
+    height: vs(40),
     borderWidth: 1,
     borderColor: "#d3d3d3",
     borderRadius: 20,
-    paddingHorizontal: 15,
+    paddingHorizontal: hs(15),
     backgroundColor: "#fff",
     color: "000",
   },
   iconCircle: {
-    width: 50,
-    height: 40,
+    width: vs(50),
+    height: hs(40),
     justifyContent: "center",
     alignItems: "center",
   },
