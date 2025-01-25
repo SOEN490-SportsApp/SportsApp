@@ -12,7 +12,7 @@ export const consoleError = (title: string, message: string, code?: number) => {
 
   // Only log errors in development mode
   if (__DEV__) {
-    console.warn(`ERROR: ${alertTitle} - ${alertMessage}`);
+    console.error(`ERROR: ${alertTitle} - ${alertMessage}`);
   }
 };
 
