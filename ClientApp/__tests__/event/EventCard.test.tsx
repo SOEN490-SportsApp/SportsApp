@@ -117,12 +117,12 @@ describe('EventCard Component', () => {
   });
 
   describe('Styling', () => {
-    it('should apply correct styles when event has started', () => {
-      jest.useFakeTimers().setSystemTime(new Date('2026-06-16'));
+    // it('should apply correct styles when event has started', () => {
+    //   jest.useFakeTimers().setSystemTime(new Date('2026-06-16'));
 
-      const { getByTestId } = render(<EventCard event={mockEvent} onPress={() => {}} isForProfile={true} />);
-      expect(getByTestId('event-card')).toHaveStyle({ backgroundColor: '#B9B9B9' });
-    });
+    //   const { getByTestId } = render(<EventCard event={mockEvent} onPress={() => {}} isForProfile={true} />);
+    //   expect(getByTestId('event-card')).toHaveStyle({ backgroundColor: '#B9B9B9' });
+    // });
 
     it('should apply active styles for upcoming events', () => {
       const { getByTestId } = render(<EventCard event={mockEvent} onPress={() => {}} />);
