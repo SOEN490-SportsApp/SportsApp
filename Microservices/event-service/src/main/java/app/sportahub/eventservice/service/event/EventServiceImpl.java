@@ -1,26 +1,11 @@
 package app.sportahub.eventservice.service.event;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.List;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-
 import app.sportahub.eventservice.dto.request.EventRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.dto.response.ParticipantResponse;
 import app.sportahub.eventservice.enums.EventSortingField;
 import app.sportahub.eventservice.enums.SortDirection;
-import app.sportahub.eventservice.exception.event.EventAlreadyExistsException;
-import app.sportahub.eventservice.exception.event.EventDoesNotExistException;
-import app.sportahub.eventservice.exception.event.EventFullException;
-import app.sportahub.eventservice.exception.event.EventRegistrationClosedException;
-import app.sportahub.eventservice.exception.event.UserAlreadyParticipantException;
-import app.sportahub.eventservice.exception.event.UserIsNotEventWhitelistedException;
+import app.sportahub.eventservice.exception.event.*;
 import app.sportahub.eventservice.mapper.event.EventMapper;
 import app.sportahub.eventservice.model.event.Event;
 import app.sportahub.eventservice.model.event.participant.Participant;
@@ -28,6 +13,15 @@ import app.sportahub.eventservice.model.event.participant.ParticipantAttendStatu
 import app.sportahub.eventservice.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Slf4j
 @Service("eventService")
@@ -239,13 +233,13 @@ public class EventServiceImpl implements EventService {
      * @return a {@link Page} of {@link EventResponse} objects representing the events the user is participating in
      */
     @Override
-    public Page<EventResponse> getEventsByParticipantId(String userId, int page, int size, SortDirection sort, EventSortingField field) { 
-        Sort.Direction direction = sort == SortDirection.ASC ? Sort.Direction.ASC : Sort.Direction.DESC; 
+    public Page<EventResponse> getEventsByParticipantId(String userId, int page, int size, SortDirection sort, EventSortingField field) {
+        Sort.Direction direction = sort == SortDirection.ASC ? Sort.Direction.ASC : Sort.Direction.DESC;
         Sort sorting = Sort.by(Sort.Order.by(field.getFieldName()).with(direction).nullsLast());
         Pageable pageable = PageRequest.of(page, size, sorting);
-        Page<Event> events = eventRepository.findByParticipantsUserId(userId, pageable);   
-        log.info("`EventServiceImpl::getEventsByParticipantId: Retrieved {} events that user {} participated in", events.getNumberOfElements(),  userId);
-        return events.map(event-> eventMapper.eventToEventResponse(event));
+        Page<Event> events = eventRepository.findByParticipantsUserId(userId, pageable);
+        log.info("`EventServiceImpl::getEventsByParticipantId: Retrieved {} events that user {} participated in", events.getNumberOfElements(), userId);
+        return events.map(eventMapper::eventToEventResponse);
     }
 
     /**
@@ -260,11 +254,11 @@ public class EventServiceImpl implements EventService {
      */
     @Override
     public Page<EventResponse> getEventsCreatedByUserId(String userId, int page, int size, SortDirection sort, EventSortingField field) {
-        Sort.Direction direction = sort == SortDirection.ASC ? Sort.Direction.ASC : Sort.Direction.DESC; 
+        Sort.Direction direction = sort == SortDirection.ASC ? Sort.Direction.ASC : Sort.Direction.DESC;
         Sort sorting = Sort.by(Sort.Order.by(field.getFieldName()).with(direction).nullsLast());
         Pageable pageable = PageRequest.of(page, size, sorting);
         Page<Event> events = eventRepository.findByCreatedBy(userId, pageable);
         log.info("EventServiceImpl::getEventsCreatedByUserId: Retrieved {} events created by user {}", events.getNumberOfElements(), userId);
-        return events.map(event -> eventMapper.eventToEventResponse(event));
+        return events.map(eventMapper::eventToEventResponse);
     }
 }
