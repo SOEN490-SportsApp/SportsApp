@@ -7,6 +7,7 @@ import app.sportahub.userservice.model.user.keycloak.KeycloakUser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import lombok.Generated;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,7 @@ import java.time.Instant;
  */
 @Slf4j
 @Component
+@Generated
 public class KeycloakApiClient {
 
     private final WebClient webClient;
