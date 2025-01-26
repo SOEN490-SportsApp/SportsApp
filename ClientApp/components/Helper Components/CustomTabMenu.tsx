@@ -45,10 +45,11 @@ import { TabView, TabBar, Route, SceneRendererProps, NavigationState } from 'rea
 
 interface CustomTabMenuProps {
     routes: Route[]; // Array of routes with keys and titles
-    scenes: { [key: string]: React.ReactNode }; // Scenes without swipe control logic
+    scenes: { [key: string]: React.ReactNode };
+    backgroundColor: string | null // Scenes without swipe control logic
 }
 
-const CustomTabMenu: React.FC<CustomTabMenuProps> = ({ routes, scenes }) => {
+const CustomTabMenu: React.FC<CustomTabMenuProps> = ({ routes, scenes, backgroundColor }) => {
     const layout = useWindowDimensions();
     const [index, setIndex] = useState(0);
 
@@ -56,7 +57,7 @@ const CustomTabMenu: React.FC<CustomTabMenuProps> = ({ routes, scenes }) => {
     const renderTabBar = (props: any) => (
         <TabBar
             {...props}
-            style={{ backgroundColor: 'white' }}
+            style={{ backgroundColor }}
             activeColor="black"
             inactiveColor="grey"
             indicatorStyle={{ backgroundColor: 'black', height: 2 }}

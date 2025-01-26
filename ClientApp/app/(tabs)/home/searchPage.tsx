@@ -105,7 +105,7 @@ export default function searchPage() {
     events: <EventsTab />,
   };
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#f5f5f5" }}>
       <Animated.View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
           <View style={styles.iconCircle}>
@@ -141,7 +141,7 @@ export default function searchPage() {
         )}
       </Animated.View>
       <View style={{ flex: 1 }}>
-        <CustomTabMenu routes={routes} scenes={scenes} />
+        <CustomTabMenu routes={routes} scenes={scenes} backgroundColor="#f5f5f5"/>
       </View>
     </SafeAreaView>
   );
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     // borderBottomWidth: 1,
     borderBottomColor: "#e0e0e0",
-    backgroundColor: "#fff",
+    backgroundColor: "#f5f5f5",
   },
   logoText: {
     color: "#0C9E04",
