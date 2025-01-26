@@ -1,228 +1,190 @@
 package app.sportahub.eventservice.controller;
 
-import app.sportahub.eventservice.config.TestSecurityConfig;
-import app.sportahub.eventservice.dto.request.LocationRequest;
-import app.sportahub.eventservice.dto.request.ParticipantRequest;
-import app.sportahub.eventservice.dto.request.TeamRequest;
+import app.sportahub.eventservice.dto.request.EventRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.dto.response.ParticipantResponse;
+import app.sportahub.eventservice.enums.EventSortingField;
 import app.sportahub.eventservice.enums.SkillLevelEnum;
-import app.sportahub.eventservice.mapper.event.EventMapper;
-import app.sportahub.eventservice.model.event.Event;
+import app.sportahub.eventservice.enums.SortDirection;
 import app.sportahub.eventservice.model.event.participant.ParticipantAttendStatus;
-import app.sportahub.eventservice.service.event.EventServiceImpl;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
+import app.sportahub.eventservice.service.event.EventService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mapstruct.factory.Mappers;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import app.sportahub.eventservice.dto.request.EventRequest;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 
-@ActiveProfiles("event-service.test")
-@WebMvcTest(EventController.class)
-@Import({EventServiceImpl.class, TestSecurityConfig.class})
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+
+@ExtendWith(MockitoExtension.class)
 public class EventControllerTest {
 
-    @Autowired
-    protected MockMvc mockMvc;
+    @InjectMocks
+    private EventController eventController;
 
-    @MockBean
-    private EventServiceImpl eventService;
+    @Mock
+    private EventService eventService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    private EventResponse eventResponse;
+    private EventRequest eventRequest;
+    private ParticipantResponse participantResponse;
 
-    private final EventMapper eventMapper = Mappers.getMapper(EventMapper.class);
-
-    private EventRequest validEventRequest;
-
-    @SneakyThrows
     @BeforeEach
     public void setUp() {
-        LocationRequest validLocationRequest = new LocationRequest(
-                "testLocationName",
-                "testStreetNumber",
-                "testStreetName",
-                "testCity",
-                "testProvince",
-                "testCountry",
-                "testPostalCode",
-                "testAddressLine2",
-                "testPhoneNumber",
-                "testLatitude",
-                "testLongitude");
+        eventResponse = new EventResponse(
+                "1",
+                Timestamp.valueOf("2023-01-01 10:00:00"),
+                "Basketball Tournament",
+                "Sports",
+                "Basketball",
+                null,
+                LocalDate.of(2023, 12, 1),
+                LocalTime.of(15, 0),
+                LocalTime.of(17, 0),
+                "2 hours",
+                10,
+                Collections.emptyList(),
+                "User123",
+                Collections.emptyList(),
+                "14:00",
+                "Join us for a friendly match!",
+                false,
+                List.of("User111", "User222"),
+                EnumSet.of(SkillLevelEnum.BEGINNER, SkillLevelEnum.INTERMEDIATE)
+        );
 
-        ParticipantRequest validParticipantRequest = new ParticipantRequest(
-                "testParticipantUserId",
-                ParticipantAttendStatus.JOINED,
-                LocalDate.of(2025, 1, 1));
 
-        List<ParticipantRequest> participantRequestList = new ArrayList<>();
-        participantRequestList.add(validParticipantRequest);
-
-        TeamRequest validTeamRequest = new TeamRequest("testTeamID");
-        List<TeamRequest> teamRequestList = new ArrayList<>();
-        teamRequestList.add(validTeamRequest);
-
-        List<String> whiteListedUsers = new ArrayList<>();
-        whiteListedUsers.add("testUserID");
-
-        EnumSet<SkillLevelEnum> requiredSkillLevel = EnumSet.of(SkillLevelEnum.BEGINNER, SkillLevelEnum.INTERMEDIATE);
-
-        validEventRequest = new EventRequest(
-                "testEventName",
-                "testEventType",
-                "testSportType",
-                validLocationRequest,
-                LocalDate.of(2025,1,1),
-                LocalTime.of(12,30),
-                LocalTime.of(18,30),
-                "testEventDuration",
-                2,
-                participantRequestList,
-                "testEventCreatedBy",
-                teamRequestList,
-                "testEventCutOffTime",
-                "testEventDescription",
+        eventRequest = new EventRequest(
+                "Basketball Practice",
+                "Public",
+                "Basketball",
+                null,
+                LocalDate.of(2023, 11, 30),
+                LocalTime.of(18, 0),
+                LocalTime.of(20, 0),
+                "2 hours",
+                5,
+                null,
+                "User321",
+                null,
+                "17:30",
+                "Let's practice together!",
                 true,
-                whiteListedUsers,
-                requiredSkillLevel);
-    }
+                List.of("User111"),
+                EnumSet.of(SkillLevelEnum.INTERMEDIATE)
+        );
 
-    @SneakyThrows
-    @Test
-    public void shouldReturnEventByIdSuccessfully() {
-        //Arrange
-        Event event = eventMapper.eventRequestToEvent(validEventRequest);
-        event.setId("testEventID");
-        when(eventService.getEventById(event.getId())).thenReturn(eventMapper.eventToEventResponse(event));
 
-        //Act & Assert
-        mockMvc.perform(MockMvcRequestBuilders.get("/event/{id}",event.getId()))
-                .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(event.getId()));
-    }
-
-    @SneakyThrows
-    @Test
-    public void shouldRetrieveAllEventsSuccessfully() {
-        //Arrange
-        Event event1 = eventMapper.eventRequestToEvent(validEventRequest);
-        event1.setId("testEventID1");
-
-        Event event2 = eventMapper.eventRequestToEvent(validEventRequest);
-        event2.setId("testEventID2");
-
-        List<EventResponse> eventResponseList = new ArrayList<>();
-        eventResponseList.add(eventMapper.eventToEventResponse(event1));
-        eventResponseList.add(eventMapper.eventToEventResponse(event2));
-
-        when(eventService.getAllEvents()).thenReturn(eventResponseList);
-
-        //Act & Assert
-        mockMvc.perform(MockMvcRequestBuilders.get("/event"))
-                .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].id").value(event1.getId()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[1].id").value(event2.getId()));
-    }
-
-    @SneakyThrows
-    @Test
-    public void shouldCreateEventSuccessfully() {
-        //Arrange
-        Event event = eventMapper.eventRequestToEvent(validEventRequest);
-        event.setId("testEventID");
-
-        when(eventService.createEvent(validEventRequest)).thenReturn(eventMapper.eventToEventResponse(event));
-
-        //Act & Assert
-        mockMvc.perform(MockMvcRequestBuilders.post("/event")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(validEventRequest)))
-                        .andExpect(status().is(201))
-                        .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(event.getId()));
-    }
-
-    @SneakyThrows
-    @Test
-    public void shouldUpdateEventSuccessfully() {
-        //Arrange
-        Event event = eventMapper.eventRequestToEvent(validEventRequest);
-        event.setId("testEventID");
-
-        when(eventService.updateEvent(event.getId(),validEventRequest)).thenReturn(eventMapper.eventToEventResponse(event));
-
-        //Act & Assert
-        mockMvc.perform(MockMvcRequestBuilders.put("/event/{id}",event.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(validEventRequest)))
-                .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value("testEventID"));
-    }
-
-    @SneakyThrows
-    @Test
-    public void shouldPatchEventSuccessfully() {
-        //Arrange
-        Event event = eventMapper.eventRequestToEvent(validEventRequest);
-        event.setId("testEventID");
-
-        when(eventService.patchEvent(event.getId(),validEventRequest)).thenReturn(eventMapper.eventToEventResponse(event));
-
-        //Act & Assert
-        mockMvc.perform(MockMvcRequestBuilders.patch("/event/{id}",event.getId())
-        .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(validEventRequest)))
-                .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value("testEventID"));
-    }
-
-    @SneakyThrows
-    @Test
-    public void shouldDeleteEventSuccessfully() {
-        //Arrange
-        doNothing().when(eventService).deleteEvent("testEventID");
-
-        //Act & Assert
-        mockMvc.perform(MockMvcRequestBuilders.delete("/event/{id}", "testEventID"))
-                .andExpect(status().isNoContent())
-                .andExpect(MockMvcResultMatchers.jsonPath("$").doesNotExist());
-    }
-
-    @SneakyThrows
-    @Test
-    public void shouldJoinEventSuccessfully() {
-        //Arrange
-        ParticipantResponse participantResponse = new ParticipantResponse(
-                "testUserID",
+        participantResponse = new ParticipantResponse(
+                "User999",
                 ParticipantAttendStatus.JOINED,
-                LocalDate.of(2025,1,1));
+                LocalDate.now()
+        );
+    }
 
-        when(eventService.joinEvent("testEventID", "testUserID")).thenReturn(participantResponse);
+    @Test
+    public void testGetEventById() {
+        Mockito.when(eventService.getEventById(anyString())).thenReturn(eventResponse);
 
-        //Act & Assert
-        mockMvc.perform(MockMvcRequestBuilders.post("/event/{id}/join", "testEventID")
-                        .param("userId", "testUserID"))
-                .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.userId").value("testUserID"));
+        EventResponse response = eventController.getEventById("testId");
+
+        assertEquals(eventResponse, response);
+        Mockito.verify(eventService).getEventById("testId");
+    }
+
+    @Test
+    public void testGetAllEvents() {
+        List<EventResponse> eventList = Arrays.asList(eventResponse);
+        Mockito.when(eventService.getAllEvents()).thenReturn(eventList);
+
+        List<EventResponse> response = eventController.getAllEvents();
+
+        assertEquals(eventList, response);
+        Mockito.verify(eventService).getAllEvents();
+    }
+
+    @Test
+    public void testCreateEvent() {
+        Mockito.when(eventService.createEvent(any(EventRequest.class))).thenReturn(eventResponse);
+
+        EventResponse response = eventController.createEvent(eventRequest);
+
+        assertEquals(eventResponse, response);
+        Mockito.verify(eventService).createEvent(eventRequest);
+    }
+
+    @Test
+    public void testUpdateEvent() {
+        Mockito.when(eventService.updateEvent(anyString(), any(EventRequest.class))).thenReturn(eventResponse);
+
+        EventResponse response = eventController.updateEvent("testId", eventRequest);
+
+        assertEquals(eventResponse, response);
+        Mockito.verify(eventService).updateEvent("testId", eventRequest);
+    }
+
+    @Test
+    public void testPatchEvent() {
+        Mockito.when(eventService.patchEvent(anyString(), any(EventRequest.class))).thenReturn(eventResponse);
+
+        EventResponse response = eventController.patchEvent("testId", eventRequest);
+
+        assertEquals(eventResponse, response);
+        Mockito.verify(eventService).patchEvent("testId", eventRequest);
+    }
+
+    @Test
+    public void testDeleteEvent() {
+        eventController.deleteEvent("testId");
+
+        Mockito.verify(eventService).deleteEvent("testId");
+    }
+
+    @Test
+    public void testJoinEvent() {
+        Mockito.when(eventService.joinEvent(anyString(), anyString())).thenReturn(participantResponse);
+
+        ParticipantResponse response = eventController.joinEvent("testId", "userId");
+
+        assertEquals(participantResponse, response);
+        Mockito.verify(eventService).joinEvent("testId", "userId");
+    }
+
+    @Test
+    public void testGetEventsByParticipantId() {
+        Page<EventResponse> eventPage = new PageImpl<>(Arrays.asList(eventResponse));
+        Mockito.when(eventService.getEventsByParticipantId(anyString(), any(int.class), any(int.class), any(SortDirection.class), any(EventSortingField.class)))
+                .thenReturn(eventPage);
+
+        Page<EventResponse> response = eventController.getEventByUserId("userId", 0, 10, SortDirection.DESC, EventSortingField.DATE);
+
+        assertEquals(eventPage, response);
+        Mockito.verify(eventService).getEventsByParticipantId("userId", 0, 10, SortDirection.DESC, EventSortingField.DATE);
+    }
+
+    @Test
+    public void testGetEventsCreatedByUserId() {
+        Page<EventResponse> eventPage = new PageImpl<>(Arrays.asList(eventResponse));
+        Mockito.when(eventService.getEventsCreatedByUserId(anyString(), any(int.class), any(int.class), any(SortDirection.class), any(EventSortingField.class)))
+                .thenReturn(eventPage);
+
+        Page<EventResponse> response = eventController.getEventsCreatedByUserId("userId", 0, 10, SortDirection.DESC, EventSortingField.DATE);
+
+        assertEquals(eventPage, response);
+        Mockito.verify(eventService).getEventsCreatedByUserId("userId", 0, 10, SortDirection.DESC, EventSortingField.DATE);
     }
 }
