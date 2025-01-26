@@ -5,10 +5,13 @@ import app.sportahub.userservice.dto.response.user.UserResponse;
 import app.sportahub.userservice.model.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(MockitoExtension.class)
 public class UserMapperTest {
 
     private UserMapper userMapper;
