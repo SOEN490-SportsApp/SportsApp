@@ -112,7 +112,7 @@ export default function searchPage() {
             <MaterialCommunityIcons
               name="arrow-left"
               testID="backArrow"
-              size={33}
+              size={30}
               color="#aaa"
             />
           </View>
@@ -133,7 +133,7 @@ export default function searchPage() {
             <MaterialCommunityIcons
               name="window-close"
               testID="window-close"
-              size={25}
+              size={30}
               color="#aaa"
             />
             </View>
@@ -193,11 +193,11 @@ const styles = StyleSheet.create({
     borderColor: "#d3d3d3",
     borderRadius: 20,
     paddingHorizontal: hs(15),
-    backgroundColor: "#fff",
+    backgroundColor: "#f5f5f5",
     color: "000",
   },
   iconCircle: {
-    width: vs(50),
+    width: vs(30),
     height: hs(40),
     justifyContent: "center",
     alignItems: "center",
