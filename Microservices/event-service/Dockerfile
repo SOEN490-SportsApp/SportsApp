@@ -1,4 +1,6 @@
-FROM alpine/java:21-jdk
+FROM amazoncorretto:21-alpine
+
+RUN apk add --no-cache wget
 
 ARG JAR_FILE
 
@@ -17,9 +19,13 @@ ENV SPRING_APPLICATION_NAME=$SPRING_APPLICATION_NAME \
     JWT_ISSUER_URI=$JWT_ISSUER_URI \
     KEYCLOAK_AUTH_SERVER_URL=$KEYCLOAK_AUTH_SERVER_URL \
     KEYCLOAK_REALM=$KEYCLOAK_REALM \
-    MONGODB_URI=$MONGODB_URI \
-    SERVER_PORT=8080
+    MONGODB_URI=$MONGODB_URI
 
 COPY ${JAR_FILE} /app.jar
+
+EXPOSE 8080
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD wget --quiet --spider http://localhost:8080${SERVER_SERVLET_CONTEXT_PATH}/actuator/health || exit 1
 
 ENTRYPOINT ["java", "-jar", "/app.jar", "--server.port=${SERVER_PORT}"]
