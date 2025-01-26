@@ -86,18 +86,36 @@ public class AuthServiceTest {
     @Test
     void registerUserEmailExists() {
         RegistrationRequest request = new RegistrationRequest("email@example.com", "username", "password");
-        when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.of(new User()));
+        when(userRepository.findUserByEmail("email@example.com"))
+                .thenReturn(Optional.of(new User()));
 
-        assertThrows(UserEmailAlreadyExistsException.class, () -> authService.registerUser(request));
+        assertThrows(UserEmailAlreadyExistsException.class, () -> {
+            authService.registerUser(request);
+        });
     }
 
     @Test
     void registerUserUsernameExists() {
         RegistrationRequest request = new RegistrationRequest("email@example.com", "username", "password");
         when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.empty());
-        when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(new User()));
+        when(userRepository.findUserByUsername("username")).thenReturn(Optional.of(new User()));
 
-        assertThrows(UsernameAlreadyExistsException.class, () -> authService.registerUser(request));
+        assertThrows(UsernameAlreadyExistsException.class, () -> {
+            authService.registerUser(request);
+        });
+    }
+
+    @Test
+    void registerUserKeycloakError() {
+        RegistrationRequest request = new RegistrationRequest("email@example.com", "username", "password");
+        when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.empty());
+        when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.empty());
+        when(keycloakApiClient.createUserAndReturnCreatedId(any()))
+                .thenReturn(Mono.error(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Keycloak error")));
+
+        assertThrows(ResponseStatusException.class, () -> {
+            authService.registerUser(request);
+        });
     }
 
     @Test
@@ -167,6 +185,12 @@ public class AuthServiceTest {
         assertDoesNotThrow(() -> authService.sendVerificationEmail("email@example.com"));
     }
 
+    @Test
+    void sendVerificationEmailNotFound() {
+        when(userRepository.findUserByEmail("email@example.com")).thenReturn(Optional.empty());
+
+        assertThrows(UserDoesNotExistException.class, () -> authService.sendVerificationEmail("email@example.com"));
+    }
 
     @Test
     void sendPasswordResetEmailSuccessful() {
@@ -175,6 +199,13 @@ public class AuthServiceTest {
         when(keycloakApiClient.sendPasswordResetEmail("keycloakId")).thenReturn(Mono.empty());
 
         assertDoesNotThrow(() -> authService.sendPasswordResetEmail("email@example.com"));
+    }
+
+    @Test
+    void sendPasswordResetEmailNotFound() {
+        when(userRepository.findUserByEmail("email@example.com")).thenReturn(Optional.empty());
+
+        assertThrows(UserWithEmailDoesNotExistException.class, () -> authService.sendPasswordResetEmail("email@example.com"));
     }
 
 }
