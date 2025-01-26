@@ -11,14 +11,17 @@ import app.sportahub.userservice.exception.user.*;
 import app.sportahub.userservice.mapper.user.UserMapper;
 import app.sportahub.userservice.model.user.User;
 import app.sportahub.userservice.repository.user.UserRepository;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
@@ -30,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 public class AuthServiceTest {
 
     @Mock
@@ -46,11 +50,6 @@ public class AuthServiceTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
-
     private @NotNull String createMockJwtToken() {
         String header = Base64.getUrlEncoder().encodeToString("{\"alg\":\"HS256\",\"typ\":\"JWT\"}".getBytes());
         String payload = Base64.getUrlEncoder().encodeToString("{\"sub\":\"user1\",\"email_verified\":true}".getBytes());
@@ -61,6 +60,7 @@ public class AuthServiceTest {
     @Test
     void registerUserSuccessful() {
         RegistrationRequest request = new RegistrationRequest("email@example.com", "username", "password");
+        JsonNode responseNode = objectMapper.createObjectNode().put("keycloakId", "keycloakId");
         User savedUser = User.builder()
                 .withId("1")
                 .withKeycloakId("keycloakId")
@@ -71,12 +71,10 @@ public class AuthServiceTest {
         when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.empty());
         when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.empty());
 
-        ObjectNode responseNode = objectMapper.createObjectNode();
-        responseNode.put("keycloakId", "keycloakId");
         when(keycloakApiClient.createUserAndReturnCreatedId(any())).thenReturn(Mono.just(responseNode));
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
         when(userMapper.userToUserResponse(any(User.class))).thenReturn(new UserResponse("1", "keycloakId", "email@example.com", "username", null, null, null));
-        when(keycloakApiClient.sendVerificationEmail(anyString())).thenReturn(Mono.empty());  // Correctly mock Mono<Void>
+        when(keycloakApiClient.sendVerificationEmail(anyString())).thenReturn(Mono.empty());
 
         UserResponse result = authService.registerUser(request);
         assertEquals("email@example.com", result.email());
@@ -129,7 +127,6 @@ public class AuthServiceTest {
                 .build();
 
         when(userRepository.findUserByEmail("email@example.com")).thenReturn(Optional.of(foundUser));
-        when(userRepository.findUserByUsername("email@example.com")).thenReturn(Optional.empty());
 
         String mockAccessToken = createMockJwtToken();
         ObjectNode tokenNode = objectMapper.createObjectNode();
