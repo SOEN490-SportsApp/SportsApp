@@ -104,6 +104,20 @@ public class AuthServiceTest {
     }
 
     @Test
+    void registerUserKeycloakIdMissingInResponse() {
+        RegistrationRequest request = new RegistrationRequest("email@example.com", "username", "password");
+        JsonNode responseNode = objectMapper.createObjectNode();
+
+        when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.empty());
+        when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.empty());
+        when(keycloakApiClient.createUserAndReturnCreatedId(any())).thenReturn(Mono.just(responseNode));
+
+        assertThrows(ResponseStatusException.class, () -> {
+            authService.registerUser(request);
+        });
+    }
+
+    @Test
     void registerUserKeycloakError() {
         RegistrationRequest request = new RegistrationRequest("email@example.com", "username", "password");
         when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.empty());
