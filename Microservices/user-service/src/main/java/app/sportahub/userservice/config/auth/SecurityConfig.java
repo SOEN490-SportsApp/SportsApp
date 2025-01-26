@@ -1,5 +1,7 @@
 package app.sportahub.userservice.config.auth;
 
+import app.sportahub.userservice.utils.KeycloakJwtAuthenticationConverter;
+import lombok.SneakyThrows;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -9,9 +11,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
-
-import app.sportahub.userservice.utils.KeycloakJwtAuthenticationConverter;
-import lombok.SneakyThrows;
 
 @Configuration
 @EnableWebSecurity
@@ -38,7 +37,8 @@ public class SecurityConfig {
                                 "/api-docs",
                                 "/api-docs/**",
                                 "/swagger-ui/**",
-                                "/webjars/**")
+                                "/webjars/**",
+                                "/actuator/health/**")
                         .permitAll()
                         .anyRequest().authenticated())
                 .csrf(AbstractHttpConfigurer::disable)
