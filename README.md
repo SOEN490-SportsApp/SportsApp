@@ -1,26 +1,30 @@
 <h1>Release Demos</h1>
 
+[Release 2 Video Presentation](https://drive.google.com/file/d/1nWpURlvlSsaBed25e8k0oZryIKKR7ceT/view?usp=drive_link)  
+
 [Release 1 Video Presentation](https://drive.google.com/file/d/1eRpaNODa4Dt50EICdGhrMVTBgtZf7av6/view?usp=drive_link)
 
 <h1>Important Files</h1>
 
 ### Top 5 most important files:
-| File path with clickable GitHub link | Purpose (1 line description) |
-| ------------------------------------ | -----------------------------|
-| [UserServiceImpl.java](https://github.com/SOEN490-SportsApp/SportsApp/blob/main/Microservices/user-service/src/main/java/app/sportahub/userservice/service/user/UserServiceImpl.java) | Contains the business logic for creating, retrieving, and validation user data |
-| [UserController.java](https://github.com/SOEN490-SportsApp/SportsApp/blob/main/Microservices/user-service/src/main/java/app/sportahub/userservice/controller/user/UserController.java) | Handles HTTP requests for user operations |
-| [KeycloakApiClient.java](https://github.com/SOEN490-SportsApp/SportsApp/blob/main/Microservices/user-service/src/main/java/app/sportahub/userservice/client/KeycloakApiClient.java) | Manages user accounts and handles Keycloak authentication in the project |
-| [GlobalExceptionHandler.java](https://github.com/SOEN490-SportsApp/SportsApp/blob/main/Microservices/user-service/src/main/java/app/sportahub/userservice/exception/GlobalExceptionHandler.java) | Manages and returns error responses for various exceptions in the user service |
-| [AxiosInstance.tsx](https://github.com/SOEN490-SportsApp/SportsApp/blob/main/ClientApp/api/axiosInstance.ts) | Handle the API requests with error handling |
+
+| File path with clickable GitHub link                                                                                                                                                       | Purpose (1 line description)                                                                                   |
+|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------|
+| [build-deploy-microservices.yaml](https://github.com/SOEN490-SportsApp/SportsApp/blob/main/.github/workflows/build-deploy-microservices.yaml)                                              | Detects changes in microservices and rolls out a package update for the affected microservice only             |
+| [EventServiceImpl.java](https://github.com/SOEN490-SportsApp/SportsApp/blob/main/Microservices/event-service/src/main/java/app/sportahub/eventservice/service/event/EventServiceImpl.java) | Implements event creation, event updates, event deletion, and event participation, the core feature of our app |
+| [AuthServiceImpl.java](https://github.com/SOEN490-SportsApp/SportsApp/blob/main/Microservices/user-service/src/main/java/app/sportahub/userservice/service/auth/AuthServiceImpl.java)      | Implements user registration, user login and user authentication                                               |
+| [axios Instance.ts](https://github.com/SOEN490-SportsApp/SportsApp/blob/main/ClientApp/services/axiosInstance.ts)                                                                          | Axios instance that handles api calls with backend to gather information and other logic                       |
+| [eventService.ts](https://github.com/SOEN490-SportsApp/SportsApp/blob/main/ClientApp/services/eventService.ts)                                                                             | Responsible for all event related functions                                                                    |
 
 ### Top 5 most important tests:
-| Test file path with clickable GitHub link | Purpose (1 line description) |
-| ------------------------------------ | -----------------------------|
-| [MogoConfigTest.java](https://github.com/SOEN490-SportsApp/SportsApp/blob/main/Microservices/user-service/src/test/java/app/sportahub/userservice/config/MongoConfigTest.java) | Ensures correct MongoDB client configuration and custom conversions |
-| [UserServiceTest.java](https://github.com/SOEN490-SportsApp/SportsApp/blob/main/Microservices/user-service/src/test/java/app/sportahub/userservice/service/user/UserServiceTest.java) | Tests user creation, error handling for duplicates, and user retrieval |
-| [UserServiceTest.java](https://github.com/SOEN490-SportsApp/SportsApp/blob/main/Microservices/user-service/src/test/java/app/sportahub/userservice/service/user/UserServiceTest.java) | Validates the business logic for user creation, retrieval, validation, and error handling |
-| [frontend-ci-cd.yml](https://github.com/SOEN490-SportsApp/SportsApp/blob/main/.github/workflows/frontend-ci-cd.yml) | Runs Jest tests on frontend code for pull requests and pushes to main, dev, and release branches |
-| [axiosInstance.test.ts](https://github.com/SOEN490-SportsApp/SportsApp/blob/main/ClientApp/__tests__/api/axiosInstance.test.ts) | Perform tests on the axiosInstance.tsx to ensure proper error handling |
+
+| Test file path with clickable GitHub link                                                                                                                                                                                | Purpose (1 line description)                                                                                    |
+|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------|
+| [UserServiceTest.java](https://github.com/SOEN490-SportsApp/SportsApp/blob/main/Microservices/user-service/src/test/java/app/sportahub/userservice/service/user/UserServiceTest.java)                                    | Validates UserService operations, focusing on user management and friend interactions                           |
+| [api.test.ts](https://github.com/SOEN490-SportsApp/SportsApp/blob/main/ClientApp/__tests__/state/user/api.test.ts)                                                                                                       | Tests interactions with api while also including state persistence testing                                      |
+| [EventServiceTest.java](https://github.com/SOEN490-SportsApp/SportsApp/blob/main/Microservices/event-service/src/test/java/app/sportahub/eventservice/service/event/EventServiceTest.java)                               | Tests all logic related to the event handling of the app                                                        |
+| [AuthServiceTest.java](https://github.com/SOEN490-SportsApp/SportsApp/blob/main/Microservices/user-service/src/test/java/app/sportahub/userservice/controller/AuthControllerTest.java)                                   | Validates AuthService operations, and checking for correct exception returns                                    |
+| [SearchingUserRepositoryImplTest.java](https://github.com/SOEN490-SportsApp/SportsApp/blob/main/Microservices/user-service/src/test/java/app/sportahub/userservice/repository/user/SearchingUserRepositoryImplTest.java) | Validates user search and pagination by ensuring accurate and reliable query functionality for the user service |
 
 
 <h1 align="center">Sporta</h1>
@@ -29,6 +33,7 @@
 Sporta connects users who are passionate about playing sports, enabling them to create and join public events for games like soccer, basketball, tennis, and more. Users can register, create profiles with their skill levels, and browse events based on location and availability. The app allows for real-time updates on event participation, skill-based filtering, and in-app messaging to coordinate with others. Sporta enables users to post photos and rate fellow players to foster engagement.
 
 ### Team Members:
+
 | Name                          | Student ID | GitHub ID      | Email Address               |
 |-------------------------------|------------|----------------|-----------------------------|
 | Daniel Duguay	                | 40202775   | DanDuguay      | Duguay9@gmail.com           |
