@@ -140,19 +140,16 @@ const ProfilePage: React.FC = () => {
             <View className="items-center p-4 bg-white">
                 <Image
                     className="w-20 h-20 rounded-full"
-                    source={{ uri: 'https://example.com/profile-image.png' }}
+                    source={require("@/assets/images/avatar-placeholder.png")}
                     defaultSource={require('@/assets/images/Unknown.jpg')}
                 />
                 <Text testID="firstName" className="text-2xl font-bold text-black mt-2">
                     {user?.profile.firstName} {user?.profile.lastName}
                 </Text>
-                <Text className="text-sm text-gray-500">
-                    {user?.profile.postalCode.slice(0,3)}
-                </Text>
             </View>
 
             {/* CustomTabMenu with dynamic routes and scenes */}
-            <CustomTabMenu routes={routes} scenes={scenes} />
+            <CustomTabMenu routes={routes} scenes={scenes} backgroundColor={"#fff"}/>
         </SafeAreaView>
     );
 };
