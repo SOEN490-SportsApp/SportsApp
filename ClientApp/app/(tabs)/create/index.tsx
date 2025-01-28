@@ -166,7 +166,7 @@ const Create = () => {
         participants: [],
         createdBy: user.id,
         teams: [],
-        cutOffTime: combinedCutOffDateTime.toISOString(),
+        cutOffTime: combinedCutOffDateTime.toISOString().slice(0, 19),
         description: data.description,
         isPrivate: data.eventType === "private",
         whiteListedUsers: [],

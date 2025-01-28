@@ -1,16 +1,16 @@
-import { TouchableOpacity, View, Text, StyleSheet } from "react-native";
+import { TouchableOpacity, View, Text, StyleSheet, Image } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Profile } from "@/types";
 import themeColors from "@/utils/constants/colors";
 import { useState } from "react";
-import { hs, vs } from "@/utils/helpers/uiScaler";
+import { hs, mhs, mvs, vs } from "@/utils/helpers/uiScaler";
 
 interface FriendCardProp {
   user: Profile;
 }
 
 function generateRandomFriendsInCommon() {
-  return Math.floor(Math.random() * 50);;
+  return Math.floor(Math.random() * 50);
 }
 
 const FriendCard: React.FC<FriendCardProp> = ({ user }) => {
@@ -22,7 +22,11 @@ const FriendCard: React.FC<FriendCardProp> = ({ user }) => {
       onPress={() => alert("Redirect to profile..")}
     >
       <View style={styles.pictureSection}>
-        <MaterialCommunityIcons name="account" size={50} color="#94504b" />
+        <Image
+          source={require("@/assets/images/avatar-placeholder.png")}
+          style={[styles.participantAvatar]}
+          testID="participant-avatar"
+        />
       </View>
       <View style={styles.infoSection}>
         <View>
@@ -32,7 +36,9 @@ const FriendCard: React.FC<FriendCardProp> = ({ user }) => {
         </View>
 
         <View>
-          <Text style={styles.subUserInfo}>{generateRandomFriendsInCommon()} - friends in common</Text>
+          <Text style={styles.subUserInfo}>
+            {generateRandomFriendsInCommon()} - friends in common
+          </Text>
         </View>
       </View>
       <View style={styles.addFriendSection}>
@@ -122,5 +128,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "bold",
     textTransform: "capitalize",
+  },
+  participantAvatar: {
+    width: mhs(45),
+    height: mvs(45),
+    borderRadius: mhs(30),
   },
 });
