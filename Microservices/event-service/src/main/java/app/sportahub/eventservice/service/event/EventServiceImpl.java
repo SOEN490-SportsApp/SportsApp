@@ -76,11 +76,10 @@ public class EventServiceImpl implements EventService {
             participantRequests = new ArrayList<>();
         participantRequests.add(new ParticipantRequest(eventRequest.createdBy(), ParticipantAttendStatus.JOINED, LocalDate.now()));
 
-        List<Participant> participants = new ArrayList<>();
-        for (ParticipantRequest participantRequest : participantRequests) {
-            participants.add(new Participant(participantRequest.userId(), participantRequest.attendStatus(),
-                    participantRequest.joinedOn()));
-        }
+        List<Participant> participants = participantRequests.stream()
+                .map(participantRequest -> new Participant(participantRequest.userId(),
+                        participantRequest.attendStatus(),
+                         participantRequest.joinedOn())).toList();
 
         Event event = eventMapper.eventRequestToEvent(eventRequest)
                 .toBuilder()
