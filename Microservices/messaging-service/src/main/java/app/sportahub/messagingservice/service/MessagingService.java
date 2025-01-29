@@ -10,7 +10,7 @@ public interface MessagingService {
 
     void processMessage(Message message);
 
-    List<MessageResponse> getMessages(String senderId, String receiverId);
+    List<MessageResponse> getMessages(String senderId, Set<String> receiverIds);
 
     ChatRoomResponse getOrCreateChatroom(String senderId, Set<String> members, boolean createNewIfNotExists);
 }
