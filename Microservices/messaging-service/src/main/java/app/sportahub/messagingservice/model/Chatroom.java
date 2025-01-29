@@ -1,0 +1,45 @@
+package app.sportahub.messagingservice.model;
+
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.FieldType;
+import org.springframework.data.mongodb.core.mapping.MongoId;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+@Document("chatroom")
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+@Builder
+public class Chatroom {
+
+    @MongoId(FieldType.OBJECT_ID)
+    private String chatroomId;
+
+    @NotNull
+    private Timestamp createdAt;
+
+    @NotNull
+    private String createdBy;
+
+    @Builder.Default
+    private List<String> participants = new ArrayList<>();
+
+    @NotEmpty
+    @Size(min = 1, max = 200)
+    private Set<String> members;
+
+    @Builder.Default
+    private List<Message> messages = new ArrayList<>();
+}
