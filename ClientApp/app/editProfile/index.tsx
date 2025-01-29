@@ -120,7 +120,11 @@ const EditProfilePage: React.FC = () => {
             />
           </View>
 
-          <TouchableOpacity style={styles.skillButton}>
+          <TouchableOpacity style={styles.skillButton}
+            onPress={() => router.push("/editProfile/sportsSkills")}
+
+          >
+
             <Text style={styles.skillButtonText}>Sports and Skills</Text>
           </TouchableOpacity>
         </View>
