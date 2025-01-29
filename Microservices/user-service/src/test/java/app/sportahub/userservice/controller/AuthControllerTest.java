@@ -209,7 +209,8 @@ public class AuthControllerTest {
     @Test
     public void shouldRegisterUserSuccessfully() {
         RegistrationRequest request = new RegistrationRequest("user@example.com", "username", "password");
-        UserResponse expectedResponse = new UserResponse("1", "keycloakId", "user@example.com", "username", null, null, null);
+        UserResponse expectedResponse = new UserResponse("1", "keycloakId", "user@example.com",
+                "username", null, null, null, null);
         when(authService.registerUser(any())).thenReturn(expectedResponse);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/auth/register")

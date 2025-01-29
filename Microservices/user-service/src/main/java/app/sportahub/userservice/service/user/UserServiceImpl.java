@@ -259,8 +259,8 @@ public class UserServiceImpl implements UserService {
                 .build();
 
         // Find the user who originally sent the request
-        User friendUser = userRepository.findUserById(updateFriendRequestRequest.friendUserId())
-                .orElseThrow(() -> new UserDoesNotExistException(updateFriendRequestRequest.friendUserId()))
+        User friendUser = userRepository.findUserById(updateFriendRequestRequest.friendRequestUserId())
+                .orElseThrow(() -> new UserDoesNotExistException(updateFriendRequestRequest.friendRequestUserId()))
                 .toBuilder()
                 .withUpdatedAt(Timestamp.valueOf(LocalDateTime.now()))
                 .build();
@@ -294,7 +294,8 @@ public class UserServiceImpl implements UserService {
         List<Friend> friendUserFriendList = friendUser.getFriendList();
 
         // Iterate through the user's friendRequest list to find the relevant friendRequest based on given parameters
-        userFriendRequestList.stream().filter(e -> e.getUserId().equals(friendRequest.getUserId())).findAny().ifPresent(e -> {
+        userFriendRequestList.stream().filter(e -> e.getUserId().equals(friendRequest.getUserId()))
+                .findAny().ifPresent(e -> {
 
             // Make sure the user isn't trying to accept a friend request that's not marked as RECEIVED
             if (!e.getFriendRequestStatus().equals(FriendRequestStatusEnum.RECEIVED) &&
@@ -307,9 +308,9 @@ public class UserServiceImpl implements UserService {
             // If the action is ACCEPT, then we change the status of the friend request and move it to the friend list
             // If the action is DECLINE, we simply remove the friend request from the friend list
             if (action.equals(UpdateFriendRequestActionEnum.ACCEPT)) {
+                userFriendRequestList.remove(e);
                 e.setFriendRequestStatus(FriendRequestStatusEnum.ACCEPTED);
                 userFriendList.add(friendMapper.friendRequestToFriend(e));
-                userFriendRequestList.remove(e);
             } else if (action.equals(UpdateFriendRequestActionEnum.DECLINE)) {
                 userFriendRequestList.remove(e);
             }
@@ -319,8 +320,8 @@ public class UserServiceImpl implements UserService {
                 isFriendFound2.set(true);
                 if (action.equals(UpdateFriendRequestActionEnum.ACCEPT)) {
                     el.setFriendRequestStatus(FriendRequestStatusEnum.ACCEPTED);
-                    friendUserFriendList.add(friendMapper.friendRequestToFriend(e));
-                    friendUserFriendRequestList.remove(e);
+                    friendUserFriendRequestList.remove(el);
+                    friendUserFriendList.add(friendMapper.friendRequestToFriend(el));
                 } else if (action.equals(UpdateFriendRequestActionEnum.DECLINE)) {
                     friendUserFriendRequestList.remove(el);
                 }

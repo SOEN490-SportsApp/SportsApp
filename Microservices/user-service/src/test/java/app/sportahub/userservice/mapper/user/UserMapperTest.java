@@ -23,7 +23,8 @@ public class UserMapperTest {
 
     @Test
     public void shouldMapUserRequestToUser() {
-        UserRequest request = new UserRequest("keycloak123", "john.doe@example.com", "john_doe", "password123", null, null, null);
+        UserRequest request = new UserRequest("keycloak123", "john.doe@example.com", "john_doe",
+                "password123", null, null, null, null);
         User user = userMapper.userRequestToUser(request);
 
         assertNotNull(user);
@@ -62,7 +63,8 @@ public class UserMapperTest {
 
     @Test
     public void shouldMapEmptyUserRequestFields() {
-        UserRequest request = new UserRequest("", "", "", "", null, null, null);
+        UserRequest request = new UserRequest("", "", "", "", null,
+                null, null, null);
         User user = userMapper.userRequestToUser(request);
 
         assertTrue(user.getEmail().isEmpty(), "Email should be empty.");

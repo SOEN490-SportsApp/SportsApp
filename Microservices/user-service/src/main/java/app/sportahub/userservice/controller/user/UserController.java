@@ -140,6 +140,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/friends")
+    @PreAuthorize("#userId == authentication.name || hasRole('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "view accepted friends",
     description = "Retrieves user's friend list")
