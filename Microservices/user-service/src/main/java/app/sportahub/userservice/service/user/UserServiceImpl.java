@@ -211,7 +211,6 @@ public class UserServiceImpl implements UserService {
                 .withFriendRequestStatus(FriendRequestStatusEnum.SENT)
                 .build();
         Friend savedSenderFriend = friendRepository.save(newSenderFriend);
-        System.out.println(savedSenderFriend);
 
         Friend newReceiverFriend = Friend.builder()
                 .withCreatedAt(Timestamp.valueOf(LocalDateTime.now()))
@@ -334,7 +333,6 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findUserById(userId)
                 .orElseThrow(() -> new UserDoesNotExistException(userId));
         List<Friend> friends = user.getFriendList();
-        System.out.println(user.getFriendList());
 
         return friends.stream()
                 .filter(s -> typeList.contains(s.getFriendRequestStatus()))

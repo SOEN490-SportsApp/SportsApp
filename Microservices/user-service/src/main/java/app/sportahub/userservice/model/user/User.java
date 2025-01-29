@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
