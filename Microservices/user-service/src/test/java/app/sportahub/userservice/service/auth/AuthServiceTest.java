@@ -72,6 +72,7 @@ public class AuthServiceTest {
         when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.empty());
 
         when(keycloakApiClient.createUserAndReturnCreatedId(any())).thenReturn(Mono.just(responseNode));
+        when(keycloakApiClient.updateUser(anyString(), any())).thenReturn(Mono.empty());
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
         when(userMapper.userToUserResponse(any(User.class))).thenReturn(new UserResponse("1", "keycloakId",
                 "email@example.com", "username", null, null, null, null));
