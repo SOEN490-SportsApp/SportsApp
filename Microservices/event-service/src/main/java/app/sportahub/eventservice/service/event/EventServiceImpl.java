@@ -72,9 +72,10 @@ public class EventServiceImpl implements EventService {
                 });
 
         List<ParticipantRequest> participantRequests = eventRequest.participants();
-        if (participantRequests == null)
+        if (participantRequests == null) {
             participantRequests = new ArrayList<>();
-        participantRequests.add(new ParticipantRequest(eventRequest.createdBy(), ParticipantAttendStatus.JOINED, LocalDate.now()));
+        }
+        participantRequests.add(new ParticipantRequest(eventRequest.createdBy(), ParticipantAttendStatus.CONFIRMED, LocalDate.now()));
 
         List<Participant> participants = participantRequests.stream()
                 .map(participantRequest -> new Participant(participantRequest.userId(),
