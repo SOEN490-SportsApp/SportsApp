@@ -31,17 +31,22 @@ public class MessagingServiceImpl  implements MessagingService {
 
     @Override
     public void processMessage(Message message) {
+        String chatroomId = getOrCreateChatroom(message.getSenderId(), message.getReceiverIds(),
+                true).chatroomId();
+        message.setChatroomId(chatroomId);
         Message savedMessage = messageRepository.save(message);
-        messagingTemplate.convertAndSendToUser(savedMessage.getReceiverId(),"/queue/messages", savedMessage);
+
+        for (String receiverId : message.getReceiverIds())
+            messagingTemplate.convertAndSendToUser(receiverId,"/queue/messages", savedMessage);
     }
 
     @Override
-    public List<MessageResponse> getMessages(String senderId, String receiverId) {
-        List<Message> messages = messageRepository.findAllBySenderIdAndReceiverId(senderId, receiverId);
+    public List<MessageResponse> getMessages(String senderId, Set<String> receiverIds) {
+        List<Message> messages = messageRepository.findAllBySenderIdAndReceiverIds(senderId, receiverIds);
 
         return messages.stream()
                 .map(message -> new MessageResponse(message.getMessageId(), message.getChatroomId(),
-                        message.getSenderId(), message.getReceiverId(), message.getContent(), message.getCreatedAt()))
+                        message.getSenderId(), message.getReceiverIds(), message.getContent(), message.getCreatedAt()))
                 .toList();
     }
 
@@ -58,8 +63,8 @@ public class MessagingServiceImpl  implements MessagingService {
                                 .createdAt(Timestamp.valueOf(LocalDateTime.now()))
                                 .members(members).build();
 
-                        chatroomRepository.save(chatroom);
-                        return Optional.of(chatroom);
+                        Chatroom savedChatroom = chatroomRepository.save(chatroom);
+                        return Optional.of(savedChatroom);
                     }
                     return Optional.empty();
                 })).orElseThrow());

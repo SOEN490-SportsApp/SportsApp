@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import java.util.Set;
 
 @Controller
 @RequestMapping("/messaging")
@@ -27,12 +28,12 @@ public class MessagingController {
 
     }
 
-    @GetMapping("/messages/{senderId}/{receiverId}")
+    @GetMapping("/messages/{senderId}/{receiverIds}")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Retrieve messages between two users",
     description = "Retrieves messages between two users based on the given path variables.")
     public List<MessageResponse> getMessages(@PathVariable("senderId") String senderId,
-                                             @PathVariable("receiverId") String receiverId) {
-        return messagingService.getMessages(senderId, receiverId);
+                                             @PathVariable("receiverIds") String[] receiverIds) {
+        return messagingService.getMessages(senderId, Set.of(receiverIds));
     }
 }
