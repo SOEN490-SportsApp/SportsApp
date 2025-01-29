@@ -37,7 +37,7 @@ public class Chatroom {
     private List<String> participants = new ArrayList<>();
 
     @NotEmpty
-    @Size(min = 1, max = 200)
+    @Size(min = 1, max = 255)
     private Set<String> members;
 
     @Builder.Default
