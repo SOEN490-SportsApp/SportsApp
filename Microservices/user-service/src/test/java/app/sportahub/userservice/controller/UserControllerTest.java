@@ -10,9 +10,9 @@ import app.sportahub.userservice.dto.response.user.ProfileResponse;
 import app.sportahub.userservice.dto.response.user.UserResponse;
 import app.sportahub.userservice.dto.response.user.badge.BadgeResponse;
 import app.sportahub.userservice.dto.response.user.badge.BadgeWithCountResponse;
-import app.sportahub.userservice.dto.response.user.friend.FriendRequestResponse;
-import app.sportahub.userservice.dto.response.user.friend.UpdateFriendRequestResponse;
-import app.sportahub.userservice.dto.response.user.friend.ViewFriendRequestsResponse;
+import app.sportahub.userservice.dto.response.user.friendRequest.FriendRequestResponse;
+import app.sportahub.userservice.dto.response.user.friendRequest.UpdateFriendRequestResponse;
+import app.sportahub.userservice.dto.response.user.friendRequest.ViewFriendRequestsResponse;
 import app.sportahub.userservice.enums.user.FriendRequestStatusEnum;
 import app.sportahub.userservice.enums.user.UpdateFriendRequestActionEnum;
 import app.sportahub.userservice.exception.user.UserDoesNotExistException;
@@ -61,8 +61,10 @@ public class UserControllerTest {
     @SneakyThrows
     @BeforeEach
     public void setUp() {
-        UserRequest userRequest = new UserRequest("keycloakId", "user@example.com", "username", "password", null, null, null);
-        UserResponse userResponse = new UserResponse("1", "keycloakId", "user@example.com", "username", null, null, null);
+        UserRequest userRequest = new UserRequest("keycloakId", "user@example.com", "username",
+                "password", null, null, null, null);
+        UserResponse userResponse = new UserResponse("1", "keycloakId", "user@example.com",
+                "username", null, null, null, null);
         when(userService.createUser(any())).thenReturn(userResponse);
         when(userService.getUserById("1")).thenReturn(userResponse);
         doThrow(new UserDoesNotExistException("User does not exist")).when(userService).getUserById("999");
@@ -71,7 +73,8 @@ public class UserControllerTest {
     @SneakyThrows
     @Test
     public void shouldCreateUserSuccessfully() {
-        UserRequest userRequest = new UserRequest("keycloakId", "user@example.com", "username", "password", null, null, null);
+        UserRequest userRequest = new UserRequest("keycloakId", "user@example.com", "username",
+                "password", null, null, null, null);
 
         mockMvc.perform(post("/user")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -140,7 +143,8 @@ public class UserControllerTest {
     @SneakyThrows
     @Test
     public void assignBadgeSuccessfully() {
-        UserResponse userResponse = new UserResponse("1", "keycloakId", "user@example.com", "username", null, null, null);
+        UserResponse userResponse = new UserResponse("1", "keycloakId", "user@example.com",
+                "username", null, null, null, null);
         when(userService.assignBadge("1", "badgeId", "giverId")).thenReturn(userResponse);
 
         mockMvc.perform(post("/user/1/badge")
@@ -205,7 +209,7 @@ public class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
-                .andExpect(jsonPath("$[0].friendUsername").value("username1"))
+                .andExpect(jsonPath("$[0].friendRequestUsername").value("username1"))
                 .andExpect(jsonPath("$[0].status").value("SENT"));
     }
 
