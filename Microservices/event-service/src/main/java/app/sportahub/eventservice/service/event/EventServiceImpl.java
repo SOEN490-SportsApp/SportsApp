@@ -1,6 +1,7 @@
 package app.sportahub.eventservice.service.event;
 
 import app.sportahub.eventservice.dto.request.EventRequest;
+import app.sportahub.eventservice.dto.request.ParticipantRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.dto.response.ParticipantResponse;
 import app.sportahub.eventservice.enums.EventSortingField;
@@ -20,7 +21,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -54,7 +57,6 @@ public class EventServiceImpl implements EventService {
         return eventRepository.findAll().stream().map(eventMapper::eventToEventResponse).toList();
     }
 
-
     /**
      * Creates an event with the provided information found in the {@link EventRequest}.
      *
@@ -69,10 +71,22 @@ public class EventServiceImpl implements EventService {
                     throw new EventAlreadyExistsException(eventRequest.eventName());
                 });
 
+        List<ParticipantRequest> participantRequests = eventRequest.participants();
+        if (participantRequests == null)
+            participantRequests = new ArrayList<>();
+        participantRequests.add(new ParticipantRequest(eventRequest.createdBy(), ParticipantAttendStatus.JOINED, LocalDate.now()));
+
+        List<Participant> participants = new ArrayList<>();
+        for (ParticipantRequest participantRequest : participantRequests) {
+            participants.add(new Participant(participantRequest.userId(), participantRequest.attendStatus(),
+                    participantRequest.joinedOn()));
+        }
+
         Event event = eventMapper.eventRequestToEvent(eventRequest)
                 .toBuilder()
                 .withCreationDate(Timestamp.valueOf(LocalDateTime.now()))
                 .withUpdatedAt(Timestamp.valueOf(LocalDateTime.now()))
+                .withParticipants(participants)
                 .build();
 
         Event savedEvent = eventRepository.save(event);
