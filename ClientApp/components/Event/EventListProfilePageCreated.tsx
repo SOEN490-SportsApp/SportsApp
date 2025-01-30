@@ -5,8 +5,10 @@ import { Event } from '@/types/event';
 import { router } from 'expo-router';
 import { mvs } from '@/utils/helpers/uiScaler';
 import { getEventsCreated } from '@/services/eventService';
+import { useSelector } from 'react-redux';
 
 const EventsList = () => {
+  const user = useSelector((state: { user: any }) => state.user);
   const scrollY = useRef(new Animated.Value(0)).current;
   const [refreshing, setRefreshing] = React.useState(false);
   const [events, setEvents] = React.useState<Event[]>([]);
@@ -15,15 +17,15 @@ const EventsList = () => {
   const fetchEvents = async () => {
     try {
       setLoading(true);
-      const eventsData = await getEventsCreated();
+      const eventsData = await getEventsCreated(user.id);
 
       //TODO won't have to use this
-      const validEvents = eventsData.filter((event: Event) => {
-        const cutoffTime = new Date(event.cutOffTime);
-        return !isNaN(cutoffTime.getTime());
-      });
+      // const validEvents = eventsData.filter((event: Event) => {
+      //   const cutoffTime = new Date(event.cutOffTime);
+      //   return !isNaN(cutoffTime.getTime());
+      // });
 
-      setEvents(validEvents);
+      // setEvents(validEvents);
     } catch (error) {
       Alert.alert("Error", "Failed to fetch events. Please try again later.");
     } finally {

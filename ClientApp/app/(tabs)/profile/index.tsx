@@ -67,13 +67,6 @@ const getSkillColor = (ranking: string) => {
 // Activity tab content
 const ActivityTab = () => (
     <View className="p-4 bg-white">
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View className="flex-row gap-x-4">
-                {Array.from({ length: 8 }).map((_, index) => (
-                    <View key={index} className="w-20 h-20 bg-gray-700 rounded-full" />
-                ))}
-            </View>
-        </ScrollView>
         <View>
             <EventListProfilePageJoined />
         </View>
@@ -95,14 +88,6 @@ const FriendsTab = () => (
 
 // About tab content with user data
 const AboutTab: React.FC<{ user: UserState }> = ({ user }) => {
-    let age = 'N/A'; 
-    try {
-        age = calculateAge(user).toString();
-    } catch (error) {
-        console.error("Error calculating age:", error);
-        age = 'Invalid Date of Birth'; 
-    }
-
     return (
         <View className="p-4 bg-white flex-1">
            <View>
