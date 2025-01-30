@@ -2,11 +2,13 @@ import React, { useEffect, useRef } from 'react';
 import { FlatList, View, StyleSheet, Alert, Animated, RefreshControl, Text, ActivityIndicator } from 'react-native';
 import EventCard from './EventCard';
 import { Event } from '@/types/event';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { mvs } from '@/utils/helpers/uiScaler';
 import { getEventsJoined } from '@/services/eventService';
+import { useSelector } from 'react-redux';
 
 const EventsList = () => {
+  const user = useSelector((state: { user: any }) => state.user);
   const scrollY = useRef(new Animated.Value(0)).current;
   const [refreshing, setRefreshing] = React.useState(false);
   const [events, setEvents] = React.useState<Event[]>([]);
@@ -15,15 +17,15 @@ const EventsList = () => {
   const fetchEvents = async () => {
     try {
       setLoading(true);
-      const eventsData = await getEventsJoined();
+      const eventsData = await getEventsJoined(user);
 
       //TODO won't have to use this
-      const validEvents = eventsData.filter((event: Event) => {
-        const cutoffTime = new Date(event.cutOffTime);
-        return !isNaN(cutoffTime.getTime());
-      });
+      // const validEvents = eventsData.filter((event: Event) => {
+      //   const cutoffTime = new Date(event.cutOffTime);
+      //   return !isNaN(cutoffTime.getTime());
+      // });
 
-      setEvents(validEvents);
+      // setEvents(validEvents);
     } catch (error) {
       Alert.alert("Error", "Failed to fetch events. Please try again later.");
     } finally {
