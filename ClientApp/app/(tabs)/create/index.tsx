@@ -25,22 +25,7 @@ import { hs, vs, mhs } from "@/utils/helpers/uiScaler";
 import { createEvent } from "@/services/eventService";
 import { useSelector } from "react-redux";
 import supportedSports from "@/utils/constants/supportedSports";
-
-const provinces = [
-  { id: 1, name: "Alberta" },
-  { id: 2, name: "British Columbia" },
-  { id: 3, name: "Manitoba" },
-  { id: 4, name: "New Brunswick" },
-  { id: 5, name: "Newfoundland and Labrador" },
-  { id: 6, name: "Nova Scotia" },
-  { id: 7, name: "Ontario" },
-  { id: 8, name: "Prince Edward Island" },
-  { id: 9, name: "Quebec" },
-  { id: 10, name: "Saskatchewan" },
-  { id: 11, name: "Northwest Territories" },
-  { id: 12, name: "Nunavut" },
-  { id: 13, name: "Yukon" },
-];
+import GooglePlacesInput from "@/components/Helper Components/GooglePlacesInput";
 
 const Create = () => {
   const {
@@ -51,9 +36,11 @@ const Create = () => {
     reset,
   } = useForm<EventFormData>({
     defaultValues: {
+      eventName: "",
       eventType: "public",
       sportType: "",
-      province: "",
+      maxParticipants: "1",
+      description: "",
     },
   });
   const router = useRouter();
@@ -61,7 +48,6 @@ const Create = () => {
   const [eventDate, setEventDate] = useState<Date | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [isSuccessModalVisible, setSuccessModalVisible] = useState(false);
-  const [isProvinceModalVisible, setProvinceModalVisible] = useState(false);
   const [cutOffDate, setCutOffDate] = useState<Date | null>(null);
   const [cutOffTime, setCutOffTime] = useState<Date | null>(null);
   const [showCutOffDatePicker, setShowCutOffDatePicker] = useState(false);
@@ -71,8 +57,8 @@ const Create = () => {
   const [endTime, setEndTime] = useState<Date | null>(null);
   const [showStartTimePicker, setShowStartTimePicker] = useState(false);
   const [showEndTimePicker, setShowEndTimePicker] = useState(false);
-
-  const timeFormatRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+  const [showLocationPage, setShowLocationPage] = useState(false);
+  const [location, setLocation] = useState(null);
 
   const user = useSelector((state: { user: any }) => state.user);
 
@@ -91,6 +77,11 @@ const Create = () => {
   }
 
   const onSubmit = async (data: EventFormData) => {
+    if (!location) {
+      Alert.alert("Error", "Please select a location.");
+      return;
+    }
+
     try {
       if (!cutOffDate || !cutOffTime || !eventDate || !startTime || !endTime) {
         Alert.alert("Error", "Please select all date and time fields");
@@ -145,19 +136,7 @@ const Create = () => {
         eventName: data.eventName,
         eventType: data.eventType,
         sportType: data.sportType,
-        location: {
-          name: data.locationName,
-          streetNumber: "",
-          streetName: "",
-          city: data.city,
-          province: data.province,
-          country: "Canada",
-          postalCode: "",
-          addressLine2: "",
-          phoneNumber: "",
-          latitude: "",
-          longitude: "",
-        },
+        location,
         date: eventDate ? eventDate.toISOString().split("T")[0] : "",
         startTime: formattedStartTime,
         endTime: formattedEndTime,
@@ -181,10 +160,6 @@ const Create = () => {
         eventName: "",
         eventType: "public",
         sportType: "",
-        locationName: "",
-        city: "",
-        province: "",
-        country: "",
         cutOffTime: "",
         description: "",
         maxParticipants: "",
@@ -196,6 +171,8 @@ const Create = () => {
       setSuccessModalVisible(true);
       setStartTime(null);
       setEndTime(null);
+      Alert.alert("Success", "Event created successfully!");
+      router.replace("/(tabs)/home");
     } catch (error: any) {
       if (error.message === "Network Error") {
         Alert.alert("Error", "Network Error");
@@ -213,10 +190,9 @@ const Create = () => {
       onRequestClose={() => setSportTypeModalVisible(false)}
       accessibilityLabel="Sport Selection Modal"
     >
-      {/* TouchableWithoutFeedback to capture taps outside the modal */}
       <TouchableWithoutFeedback
         testID="modal-overlay"
-        onPress={() => setSportTypeModalVisible(false)} // Dismiss modal on tap
+        onPress={() => setSportTypeModalVisible(false)}
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
@@ -229,7 +205,7 @@ const Create = () => {
                   style={styles.modalItem}
                   onPress={() => {
                     setValue("sportType", item.name, { shouldValidate: true });
-                    setSportTypeModalVisible(false); // Dismiss modal after selection
+                    setSportTypeModalVisible(false);
                   }}
                 >
                   <Text style={styles.modalItemText}>{item.name}</Text>
@@ -240,7 +216,7 @@ const Create = () => {
             />
             <View style={styles.closeButtonContainer}>
               <TouchableOpacity
-                onPress={() => setSportTypeModalVisible(false)} // Dismiss modal on "Close" button
+                onPress={() => setSportTypeModalVisible(false)}
                 style={styles.modalCloseButton}
               >
                 <Text style={styles.modalCloseButtonText}>Close</Text>
@@ -249,50 +225,6 @@ const Create = () => {
           </View>
         </View>
       </TouchableWithoutFeedback>
-    </Modal>
-  );
-
-  const renderProvinceModal = () => (
-    <Modal
-      animationType="slide"
-      transparent={true}
-      visible={isProvinceModalVisible}
-      onRequestClose={() => setProvinceModalVisible(false)}
-      accessibilityLabel="Province Selection Modal"
-    >
-      <View
-        style={styles.modalOverlay}
-        testID="modal-overlay" // Add this testID
-      >
-        <View style={styles.modalContainer}>
-          <FlatList
-            data={provinces}
-            keyExtractor={(item) => item.id.toString()}
-            contentContainerStyle={styles.flatListContainer}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={styles.modalItem}
-                onPress={() => {
-                  setValue("province", item.name, { shouldValidate: true });
-                  setProvinceModalVisible(false);
-                }}
-              >
-                <Text style={styles.modalItemText}>{item.name}</Text>
-              </TouchableOpacity>
-            )}
-            showsVerticalScrollIndicator={false}
-            style={styles.scrollableList}
-          />
-          <View style={styles.closeButtonContainer}>
-            <TouchableOpacity
-              onPress={() => setProvinceModalVisible(false)}
-              style={styles.modalCloseButton}
-            >
-              <Text style={styles.modalCloseButtonText}>Close</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
     </Modal>
   );
 
@@ -307,12 +239,33 @@ const Create = () => {
     setValue("requiredSkillLevel", updatedSkillLevels);
   };
 
+  if (showLocationPage) {
+    return (
+      <SafeAreaView style={{ flex: 1, padding: 20 }}>
+        <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+          Select Location
+        </Text>
+        <GooglePlacesInput setLocation={setLocation} />
+        <ConfirmButton
+          text="Create Event"
+          onPress={handleSubmit(onSubmit)}
+          icon={undefined}
+          iconPlacement={null}
+        />
+
+        <TouchableOpacity onPress={() => setShowLocationPage(false)}>
+          <Text style={{ color: "blue", marginTop: 10 }}>Back</Text>
+        </TouchableOpacity>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"} // Adjust for iOS and Android
-        keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0} // Adjust offset for iOS
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
       >
         <View
           style={[
@@ -401,67 +354,6 @@ const Create = () => {
             {renderSportTypeModal()}
             {errors.sportType && (
               <Text style={styles.errorText}>{errors.sportType.message}</Text>
-            )}
-
-            <Text style={styles.label}>Location</Text>
-            <Controller
-              control={control}
-              name="locationName"
-              rules={{ required: "Location Name is required" }}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <TextInput
-                  placeholder="Location Name"
-                  placeholderTextColor={themeColors.text.placeholder}
-                  style={styles.input}
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                  value={value || ""}
-                />
-              )}
-            />
-            {errors.locationName &&
-              typeof errors.locationName.message === "string" && (
-                <Text style={styles.errorText}>
-                  {errors.locationName.message}
-                </Text>
-              )}
-
-            <Controller
-              control={control}
-              name="city"
-              rules={{ required: "City is required" }}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <TextInput
-                  placeholder="City"
-                  placeholderTextColor={themeColors.text.placeholder}
-                  style={styles.input}
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                  value={value || ""}
-                />
-              )}
-            />
-            {errors.city && typeof errors.city.message === "string" && (
-              <Text style={styles.errorText}>{errors.city.message}</Text>
-            )}
-
-            <Controller
-              control={control}
-              name="province"
-              rules={{ required: "Province is required" }}
-              render={({ field: { value } }) => (
-                <TouchableOpacity
-                  testID="province-selector"
-                  style={[styles.input, errors.province && styles.inputError]}
-                  onPress={() => setProvinceModalVisible(true)}
-                >
-                  <Text>{value || "Select a Province"}</Text>
-                </TouchableOpacity>
-              )}
-            />
-            {renderProvinceModal()}
-            {errors.province && (
-              <Text style={styles.errorText}>{errors.province.message}</Text>
             )}
 
             <Text style={styles.label}>Event Date and Time</Text>
@@ -676,37 +568,12 @@ const Create = () => {
                 </Text>
               )}
           </ScrollView>
-          <View style={styles.footer}>
-            <ConfirmButton
-              text="CREATE EVENT"
-              onPress={handleSubmit(onSubmit)}
-              icon={null}
-              iconPlacement={IconPlacement.left}
-            />
-          </View>
-          <Modal
-            animationType="fade"
-            transparent={true}
-            visible={isSuccessModalVisible}
-            onRequestClose={() => setSuccessModalVisible(false)}
+          <TouchableOpacity
+            style={styles.nextButton}
+            onPress={() => setShowLocationPage(true)}
           >
-            <View style={styles.modalOverlay}>
-              <View style={styles.successModal}>
-                <Text style={styles.successText}>
-                  🎉 Event Created Successfully! 🎉
-                </Text>
-                <TouchableOpacity
-                  style={styles.successButton}
-                  onPress={() => {
-                    setSuccessModalVisible(false);
-                    router.replace("/(tabs)/home");
-                  }}
-                >
-                  <Text style={styles.successButtonText}>Done</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </Modal>
+            <Text style={styles.nextButtonText}>Next</Text>
+          </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -881,7 +748,27 @@ const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
-    backgroundColor: themeColors.background.light, // Use your background color
+    backgroundColor: themeColors.background.light,
+  },
+  nextButton: {
+    backgroundColor: themeColors.primary,
+    paddingVertical: 15,
+    borderRadius: 25,
+    alignItems: "center",
+    marginTop: 20,
+    marginBottom: 20,
+    width: "50%",
+    alignSelf: "center",
+  },
+  nextButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  backButton: {
+    color: "blue",
+    marginTop: 10,
+    textAlign: "center",
   },
 });
 
