@@ -18,9 +18,9 @@ ENV KEYCLOAK_CLIENT_ID=$KEYCLOAK_CLIENT_ID \
 
 COPY ${JAR_FILE} /app.jar
 
-EXPOSE 8080
+EXPOSE 80
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
-    CMD wget --quiet --spider http://localhost:8080/actuator/health || exit 1
+    CMD wget --quiet --spider http://localhost/actuator/health || exit 1
 
-ENTRYPOINT ["java", "-jar", "/app.jar", "--server.port=${SERVER_PORT}"]
+ENTRYPOINT ["java", "-jar", "/app.jar"]
