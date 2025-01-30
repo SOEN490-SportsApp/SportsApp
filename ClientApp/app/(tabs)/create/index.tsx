@@ -15,11 +15,10 @@ import {
   Platform,
   TouchableWithoutFeedback,
 } from "react-native";
-import { useForm, Controller, useWatch, set } from "react-hook-form";
+import { useForm, Controller, useWatch } from "react-hook-form";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useRouter } from "expo-router";
 import ConfirmButton from "@/components/Helper Components/ConfirmButton";
-import { IconPlacement } from "@/utils/constants/enums";
 import themeColors from "@/utils/constants/colors";
 import { hs, vs, mhs } from "@/utils/helpers/uiScaler";
 import { createEvent } from "@/services/eventService";
@@ -59,7 +58,7 @@ const Create = () => {
   const [showEndTimePicker, setShowEndTimePicker] = useState(false);
   const [showLocationPage, setShowLocationPage] = useState(false);
   const [location, setLocation] = useState(null);
-  const [buttonPressed, setButtonPressed] = useState(false);
+  const [clearLocationTrigger, setClearLocationTrigger] = useState(false);
 
   const user = useSelector((state: { user: any }) => state.user);
 
@@ -172,6 +171,9 @@ const Create = () => {
       setSuccessModalVisible(true);
       setStartTime(null);
       setEndTime(null);
+      setLocation(null);
+      setClearLocationTrigger((prev) => !prev);
+      setShowLocationPage(false);
       Alert.alert("Success", "Event created successfully!");
       router.replace("/(tabs)/home");
     } catch (error: any) {
@@ -246,7 +248,10 @@ const Create = () => {
         <Text style={{ fontSize: 18, fontWeight: "bold" }}>
           Select Location
         </Text>
-        <GooglePlacesInput setLocation={setLocation} />
+        <GooglePlacesInput
+          setLocation={setLocation}
+          clearTrigger={clearLocationTrigger}
+        />
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => setShowLocationPage(false)}

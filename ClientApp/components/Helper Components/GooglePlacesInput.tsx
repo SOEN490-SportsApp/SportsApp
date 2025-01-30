@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, TouchableOpacity, Text } from "react-native";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import "react-native-get-random-values";
 
 interface GooglePlacesInputProps {
   setLocation: (location: any) => void;
+  clearTrigger: boolean;
 }
 
 interface LocationData {
@@ -21,10 +22,18 @@ interface LocationData {
 
 const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
   setLocation,
+  clearTrigger,
 }) => {
   const [selectedLocation, setSelectedLocation] = useState<LocationData | null>(
     null
   );
+
+  useEffect(() => {
+    if (clearTrigger) {
+      setSelectedLocation(null);
+    }
+  }, [clearTrigger]);
+
   const GOOGLE_PLACES_API_KEY = "AIzaSyCIQzQHX5obH2Ev4jIX1qVy5i2zDn8nrYI";
 
   return (
