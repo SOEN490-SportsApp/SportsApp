@@ -59,6 +59,7 @@ const Create = () => {
   const [showEndTimePicker, setShowEndTimePicker] = useState(false);
   const [showLocationPage, setShowLocationPage] = useState(false);
   const [location, setLocation] = useState(null);
+  const [buttonPressed, setButtonPressed] = useState(false);
 
   const user = useSelector((state: { user: any }) => state.user);
 
@@ -246,16 +247,18 @@ const Create = () => {
           Select Location
         </Text>
         <GooglePlacesInput setLocation={setLocation} />
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => setShowLocationPage(false)}
+        >
+          <Text style={styles.backButtonText}>Back</Text>
+        </TouchableOpacity>
         <ConfirmButton
           text="Create Event"
           onPress={handleSubmit(onSubmit)}
           icon={undefined}
           iconPlacement={null}
         />
-
-        <TouchableOpacity onPress={() => setShowLocationPage(false)}>
-          <Text style={{ color: "blue", marginTop: 10 }}>Back</Text>
-        </TouchableOpacity>
       </SafeAreaView>
     );
   }
@@ -751,24 +754,35 @@ const styles = StyleSheet.create({
     backgroundColor: themeColors.background.light,
   },
   nextButton: {
-    backgroundColor: themeColors.primary,
-    paddingVertical: 15,
-    borderRadius: 25,
-    alignItems: "center",
-    marginTop: 20,
-    marginBottom: 20,
-    width: "50%",
     alignSelf: "center",
+    marginBottom: 20,
+    marginTop: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 25,
+    borderWidth: 1,
+    borderColor: themeColors.primary,
+    backgroundColor: themeColors.background.lightGrey,
   },
   nextButtonText: {
-    color: "#fff",
+    color: themeColors.primary,
     fontSize: 16,
     fontWeight: "bold",
   },
   backButton: {
-    color: "blue",
-    marginTop: 10,
-    textAlign: "center",
+    alignSelf: "center",
+    marginBottom: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 25,
+    borderWidth: 1,
+    borderColor: themeColors.primary,
+    backgroundColor: themeColors.background.lightGrey,
+  },
+  backButtonText: {
+    color: themeColors.primary,
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
 
