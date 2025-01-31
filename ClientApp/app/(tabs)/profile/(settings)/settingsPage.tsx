@@ -1,13 +1,16 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Linking, Modal, TouchableWithoutFeedback } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import themeColors from "@/utils/constants/colors";
 import { hs, vs, mvs, mhs } from "@/utils/helpers/uiScaler";
 import { useDispatch } from 'react-redux';
 import { logoutUser } from '@/services/authService';
+import QRCode from 'react-native-qrcode-svg'
 
 const settingsPage: React.FC = () => {
+  const [modalVisible, setModalVisible] = useState(false)
+  const logo = require("@/assets/images/sporta_logo.png");
   const dispatch = useDispatch();
   const handleLogout = () => {
     logoutUser(dispatch);
@@ -20,6 +23,41 @@ const settingsPage: React.FC = () => {
     <View style={styles.container}>
       {/* Scrollable Content */}
       <ScrollView contentContainerStyle={styles.content}>
+      <TouchableOpacity
+          style={styles.option}
+          onPress={() => setModalVisible(true)}
+        >
+          <Ionicons
+            name="qr-code-outline"
+            size={mvs(24)}
+            color="black"
+            style={styles.icon}
+          />
+          <Text style={styles.text}>Show QR Code</Text>
+        </TouchableOpacity>
+        <Modal
+          visible={modalVisible}
+          animationType="slide"
+          transparent={true}
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
+            <View style={styles.modalOverlay}>
+              <View style={styles.modalContent}>
+                <QRCode
+                  value="myapp://app/events/679bce4675517d529e582b09"
+                  size={250}
+                  logo={logo}
+                />
+                <View style={styles.closeButton}>
+                  <Text style={styles.closeButtonText}>Share your profile with friends</Text>
+                </View>
+              </View>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
+
+
         {/* Notification Settings */}
         <TouchableOpacity style={styles.option} onPress={() => router.push('/(tabs)/profile/(settings)/notificationsPage')}>
           <Ionicons name="notifications-outline" size={mvs(24)} color="black" style={styles.icon} />
