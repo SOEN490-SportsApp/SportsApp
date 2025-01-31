@@ -1,5 +1,6 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { UserState, SportPreference } from "@/types"; 
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { UserState } from '@/types';
+import { RootState } from '@/state/store'; 
 
 const initialState: UserState = {
   id: "",
@@ -23,30 +24,25 @@ const initialState: UserState = {
 };
 
 const userSlice = createSlice({
-  name: "user",
+  name: 'user',
   initialState,
   reducers: {
     setUser(state, action: PayloadAction<UserState>) {
+      console.log("Redux Updated with:", action.payload);
       return action.payload;
     },
     clearUser() {
       return initialState;
     },
-    updateUserSports(state, action: PayloadAction<SportPreference>) { 
-      const { name, ranking } = action.payload; 
-
-      // Check if the sport already exists, update ranking if needed
-      const existingSport = state.profile.sportsOfPreference.find((s) => s.name === name);
-      if (existingSport) {
-        existingSport.ranking = ranking;
-      } else {
-        state.profile.sportsOfPreference.push({ name, ranking });
-      }
-    },
   },
 });
 
-export const { setUser, clearUser, updateUserSports } = userSlice.actions;
+export const { setUser, clearUser } = userSlice.actions;
 export default userSlice.reducer;
+
+// Add Selector Function to Access User in Redux
+export const selectUser = (state: RootState) => state.user;
+
+
 
 

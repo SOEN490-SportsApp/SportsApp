@@ -20,7 +20,7 @@ import EventListProfilePage from "@/components/Event/EventListProfilePage";
 const screenHeight = Dimensions.get("window").height;
 const maxHeight = screenHeight * 0.5;
 
-// Activity tab content hardcoded
+// Activity tab content
 const ActivityTab = () => (
   <View className="p-4 bg-white">
     <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -36,7 +36,7 @@ const ActivityTab = () => (
   </View>
 );
 
-// Friends tab content hardcoded
+// Friends tab content
 const FriendsTab = () => (
   <View className="p-4 bg-white flex-1">
     <ScrollView className="pt-3 space-y-4" style={{ maxHeight }}>
@@ -87,20 +87,9 @@ const ProfilePage: React.FC = () => {
   const [isPressed, setIsPressed] = useState(false); // Track button press state
 
   useEffect(() => {
-    const getUserFromStore = async () => {
-      try {
-        if (!user) {
-          throw new Error("User not found");
-        }
-      } catch (error) {
-        console.error("Error getting profile from store:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getUserFromStore();
-  }, []);
+    console.log("Updated Redux User Data:", user);
+    setLoading(false);
+  }, [user]);
 
   if (loading) {
     return (
@@ -110,7 +99,14 @@ const ProfilePage: React.FC = () => {
     );
   }
 
-  // CustomTabMenu links for titles and content
+  // Extract and format sports preferences
+  const formattedSports = user?.profile?.sportsOfPreference?.length
+    ? user.profile.sportsOfPreference
+        .map((sport: { name: string; ranking: string }) => `${sport.name} - ${sport.ranking}`)
+        .join(", ")
+    : "None";
+
+  // CustomTabMenu links
   const routes = [
     { key: "activity", title: "Activity", testID: "Activity" },
     { key: "friends", title: "Friends", testID: "Friends" },
@@ -160,12 +156,19 @@ const ProfilePage: React.FC = () => {
         <Text className="text-sm text-gray-500">
           {user?.profile.postalCode.slice(0, 3)}
         </Text>
+
+        {/* Added Favorite Sports */}
+        <View className="mt-4">
+          <Text className="text-lg font-semibold text-black">Favorite Sports</Text>
+          <Text className="text-md text-gray-600">{formattedSports}</Text>
+        </View>
       </View>
 
       {/* CustomTabMenu with dynamic routes and scenes */}
-      <CustomTabMenu routes={routes} scenes={scenes} backgroundColor={"#fff"}/>
+      <CustomTabMenu routes={routes} scenes={scenes} backgroundColor={"#fff"} />
     </SafeAreaView>
   );
 };
 
 export default ProfilePage;
+
