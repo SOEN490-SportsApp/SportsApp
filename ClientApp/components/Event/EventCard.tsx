@@ -95,6 +95,7 @@ if (!isNaN(cutoffTime.getTime())) {
   const dynamicCardStyle = {
     backgroundColor: eventStarted && isForProfile ? "#B9B9B9" : "#ffffff", // Light red for expired, white for active
     borderColor: canJoin ? "#f5c2c7" : "#cccccc", // Red border for expired, grey for active
+    padding: isForProfile ? 7 : 15,
   };
 
   const dynamicTimeLeftStyle = {
