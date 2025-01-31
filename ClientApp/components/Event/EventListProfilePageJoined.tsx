@@ -17,15 +17,15 @@ const EventsList = () => {
   const fetchEvents = async () => {
     try {
       setLoading(true);
-      const eventsData = await getEventsJoined(user);
-
+      const response = await getEventsJoined(user.id);
+      const eventsData = response.data.content;
       //TODO won't have to use this
-      // const validEvents = eventsData.filter((event: Event) => {
-      //   const cutoffTime = new Date(event.cutOffTime);
-      //   return !isNaN(cutoffTime.getTime());
-      // });
+      const validEvents = eventsData.filter((event: Event) => {
+        const cutoffTime = new Date(event.cutOffTime);
+        return !isNaN(cutoffTime.getTime());
+      });
 
-      // setEvents(validEvents);
+      setEvents(validEvents);
     } catch (error) {
       Alert.alert("Error", "Failed to fetch events. Please try again later.");
     } finally {

@@ -60,7 +60,7 @@ export const getEventsCreated = async (userId: string) => {
     const axiosInstance = getAxiosInstance();
     console.log(API_ENDPOINTS.GET_ALL_EVENTS_CREATED_BY.replace("{userId}", userId));
     const response = await axiosInstance.get(API_ENDPOINTS.GET_ALL_EVENTS_CREATED_BY.replace("{userId}", userId));
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error fetching created events:", error);
     throw error;
