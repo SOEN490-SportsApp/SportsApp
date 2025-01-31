@@ -79,7 +79,6 @@ const EventDetails = () => {
   const isUserParticipant = event.participants.some(
     (participant) => participant.userId === user.id
   );
-
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* Event Header */}
@@ -124,15 +123,15 @@ const EventDetails = () => {
         <View style={styles.participantsHeader}>
           <Text style={styles.sectionTitle}>Participants</Text>
           <Text style={styles.participantsCount}>
-            {event.participants.filter((p) => p.attendStatus === null).length}/
+            {event.participants.filter((p) => p.attendStatus === "JOINED").length}/
             {event.maxParticipants}
           </Text>
         </View>
         <View style={styles.participantsContainer}>
-          {event.participants.filter((p) => p.attendStatus === null).length >
+          {event.participants.filter((p) => p.attendStatus === "JOINED").length >
             0 ? (
             event.participants
-              .filter((p) => p.attendStatus === null)
+              .filter((p) => p.attendStatus === "JOINED")
               .map((participant) => (
                 <View
                   key={participant.userId}
