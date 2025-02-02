@@ -123,15 +123,15 @@ const EventDetails = () => {
         <View style={styles.participantsHeader}>
           <Text style={styles.sectionTitle}>Participants</Text>
           <Text style={styles.participantsCount}>
-            {event.participants.filter((p) => p.attendStatus === "JOINED").length}/
+            {event.participants.filter((p) => p.attendStatus === "JOINED" || p.attendStatus === "CONFIRMED").length}/
             {event.maxParticipants}
           </Text>
         </View>
         <View style={styles.participantsContainer}>
-          {event.participants.filter((p) => p.attendStatus === "JOINED").length >
+          {event.participants.filter((p) => p.attendStatus === "JOINED" || p.attendStatus === "CONFIRMED").length >
             0 ? (
             event.participants
-              .filter((p) => p.attendStatus === "JOINED")
+              .filter((p) => p.attendStatus === "JOINED" || p.attendStatus === "CONFIRMED")
               .map((participant) => (
                 <View
                   key={participant.userId}
