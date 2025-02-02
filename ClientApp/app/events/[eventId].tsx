@@ -26,8 +26,20 @@ const EventDetails = () => {
         null,
         { params: { userId: user.id } }
       );
+      setEvent((prevEvent) => {
+        if (!prevEvent) return prevEvent;
+        return {
+          ...prevEvent,
+          participants: [
+            ...prevEvent.participants,
+            {
+              userId: user.id,
+              attendStatus: "JOINED",
+            },
+          ],
+        };
+      });
       alert("Successfully joined the event!");
-      router.back();
     } catch (err) {
       console.error(err);
       setError("Failed to join the event.");
@@ -139,7 +151,7 @@ const EventDetails = () => {
                 >
                   <Image
                     source={require("@/assets/images/avatar-placeholder.png")}
-                    style={[styles.participantAvatar, participant.userId === user.id && styles.currentUserBorder ]}
+                    style={[styles.participantAvatar, participant.userId === user.id && styles.currentUserBorder]}
                     testID="participant-avatar"
                   />
                   {participant.userId === user.id && (
