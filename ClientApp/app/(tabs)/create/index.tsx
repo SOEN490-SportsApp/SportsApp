@@ -88,6 +88,11 @@ const Create = () => {
         return;
       }
 
+      if (data.description.length === 0) {
+        Alert.alert("Oops..", "Description is required");
+        return;
+      }
+
       const formattedStartTime = startTime
         .toLocaleTimeString([], {
           hour: "2-digit",

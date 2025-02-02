@@ -3,6 +3,7 @@ import { API_ENDPOINTS } from "@/utils/api/endpoints";
 export const createEvent = async (eventData: any) => {
   try {
     const axiosInstance = getAxiosInstance();
+    console.log("eventData", eventData);
     const response = await axiosInstance.post(
       API_ENDPOINTS.CREATE_EVENT,
       eventData
