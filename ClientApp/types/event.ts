@@ -10,7 +10,7 @@ export interface Event {
     maxParticipants: number;
     participants: {
       userId: string; 
-      attendStatus: "JOINED" | "PENDING" | "DECLINED" | null; 
+      attendStatus: "JOINED" | "CONFIRMED" | "PENDING" | "DECLINED" | null; 
       joinedOn?: string; 
     }[];
     locationResponse: {
