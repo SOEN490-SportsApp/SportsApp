@@ -1,6 +1,5 @@
 import { getAxiosInstance } from "@/services/axiosInstance";
 import { API_ENDPOINTS } from "@/utils/api/endpoints";
-//API_ENDPOINTS.CREATE_EVENT
 export const createEvent = async (eventData: any) => {
   try {
     const axiosInstance = getAxiosInstance();
@@ -14,7 +13,6 @@ export const createEvent = async (eventData: any) => {
     throw error;
   }
 };
-//API_ENDPOINTS.GET_ALL_EVENTS
 export const getAllEvents = async () => {
   try {
     const axiosInstance = getAxiosInstance();
@@ -25,7 +23,6 @@ export const getAllEvents = async () => {
     throw error;
   }
 };
-//API_ENDPOINTS.DELETE_EVENT_BY_ID
 export const deleteEvent = async (eventId: string) => {
   try {
     const axiosInstance = getAxiosInstance();
