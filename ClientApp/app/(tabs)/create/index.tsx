@@ -38,7 +38,7 @@ const Create = () => {
       eventName: "",
       eventType: "public",
       sportType: "",
-      maxParticipants: "1",
+      maxParticipants: "",
       description: "",
     },
   });

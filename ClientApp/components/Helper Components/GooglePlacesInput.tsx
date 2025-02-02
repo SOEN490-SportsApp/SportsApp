@@ -34,8 +34,6 @@ const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
     }
   }, [clearTrigger]);
 
-  const GOOGLE_PLACES_API_KEY = "AIzaSyCIQzQHX5obH2Ev4jIX1qVy5i2zDn8nrYI";
-
   return (
     <View style={{ flex: 1 }}>
       <GooglePlacesAutocomplete
@@ -79,7 +77,7 @@ const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
           }
         }}
         query={{
-          key: GOOGLE_PLACES_API_KEY,
+          key: process.env.EXPO_PUBLIC_API_GOOGLE_PLACES_API_KEY,
           language: "en",
         }}
         styles={{
