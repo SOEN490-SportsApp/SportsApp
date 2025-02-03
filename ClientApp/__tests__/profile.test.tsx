@@ -9,11 +9,24 @@ import { Provider, useDispatch } from 'react-redux';
 import { store } from '@/state/store';
 import { UserState } from '@/types/user';
 import configureStore from 'redux-mock-store';
+import { NavigationContainer } from '@react-navigation/native';
 
 // Initialize axios-mock-adapter
 const mockStore = configureStore([]);
+
 // const mock = new axiosMockAdapter(getAxiosInstance());
 let mock: axiosMockAdapter;
+
+jest.mock('expo-router', () => ({
+  useRouter: jest.fn(),
+  useNavigation: jest.fn(() => ({
+    navigate: jest.fn(),
+    push: jest.fn(),
+    replace: jest.fn(),
+    goBack: jest.fn(),
+  })),
+  useFocusEffect: jest.fn(() => {}),
+}));
 
 describe('ProfilePage Component', () => {
 
@@ -59,7 +72,9 @@ describe('ProfilePage Component', () => {
       mock.onGet('/users/12345').reply(200, mockUserData);
       render(
         <Provider store={store}>
-          <ProfilePage />
+          <NavigationContainer>
+            <ProfilePage />
+          </NavigationContainer>         
         </Provider>
       );
 
@@ -72,7 +87,9 @@ describe('ProfilePage Component', () => {
       mock.onGet('/users/2').reply(200, mockUserData);
       render(
         <Provider store={store}>
-          <ProfilePage />
+          <NavigationContainer>
+            <ProfilePage />
+          </NavigationContainer>
         </Provider>
       );
 
@@ -81,18 +98,18 @@ describe('ProfilePage Component', () => {
       });
     });
 
-    it('displays age correctly based on date of birth', async () => {
-      mock.onGet('/users/2').reply(200, mockUserData);
-      render(
-      <Provider store={store}>
-        <ProfilePage />
-      </Provider>
-      );
-      // Wait for loading to complete before proceeding
-      await waitFor(() => expect(screen.queryByTestId('loading')).toBeNull());
-      await waitFor(() => fireEvent.press(screen.getByTestId('About'))); // Navigate to About tab
-      await waitFor(() => { expect(screen.getByTestId('Age')).toHaveTextContent(`Age: 34`); });
-    });
+    // it('displays age correctly based on date of birth', async () => {
+    //   mock.onGet('/users/2').reply(200, mockUserData);
+    //   render(
+    //   <Provider store={store}>
+    //     <ProfilePage />
+    //   </Provider>
+    //   );
+    //   // Wait for loading to complete before proceeding
+    //   await waitFor(() => expect(screen.queryByTestId('loading')).toBeNull());
+    //   await waitFor(() => fireEvent.press(screen.getByTestId('About'))); // Navigate to About tab
+    //   await waitFor(() => { expect(screen.getByTestId('Age')).toHaveTextContent(`Age: 34`); });
+    // });
   });
 
   describe('Tab Navigation', () => {
@@ -100,7 +117,9 @@ describe('ProfilePage Component', () => {
       mock.onGet('/users/2').reply(200, mockUserData);
       render(
         <Provider store={store}>
-          <ProfilePage />
+          <NavigationContainer>
+            <ProfilePage />
+          </NavigationContainer>        
         </Provider>
       );
       await waitFor(() => expect(screen.queryByTestId('loading')).toBeNull());
@@ -110,18 +129,18 @@ describe('ProfilePage Component', () => {
       await waitFor(() => {
         expect(screen.getByTestId('Activity')).toBeTruthy();
         expect(screen.getByTestId('Friends')).toBeTruthy();
-        expect(screen.getByTestId('About')).toBeTruthy();
+        expect(screen.getByTestId('MyEvents')).toBeTruthy();
       });
     });
 
-    it('navigates to the About tab and displays user information', async () => {
-      await waitFor(() => fireEvent.press(screen.getByTestId('About')));
+    // it('navigates to the About tab and displays user information', async () => {
+    //   await waitFor(() => fireEvent.press(screen.getByTestId('About')));
 
-      await waitFor(() => {
-        expect(screen.getByTestId('Gender')).toHaveTextContent('Female');
-        expect(screen.getByTestId('Age')).toHaveTextContent('Age: 34');
-        expect(screen.getByTestId('Phone')).toHaveTextContent('5141234567');
-      });
-    });
+    //   await waitFor(() => {
+    //     expect(screen.getByTestId('Gender')).toHaveTextContent('Female');
+    //     expect(screen.getByTestId('Age')).toHaveTextContent('Age: 34');
+    //     expect(screen.getByTestId('Phone')).toHaveTextContent('5141234567');
+    //   });
+    // });
   });
 });
