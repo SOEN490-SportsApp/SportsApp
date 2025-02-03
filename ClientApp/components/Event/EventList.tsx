@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { FlatList, View, StyleSheet, Text, Animated, RefreshControl, ActivityIndicator } from 'react-native';
 import EventCard from './EventCard';
 import { Event } from '@/types/event';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { useSelector } from 'react-redux';
 import usePagination from '@/app/hooks/usePagination';
 
@@ -28,6 +28,13 @@ const EventsList: React.FC<userEventsListProps> = ({ fetchEventsFunction }) => {
     router.push(`/events/${eventId}`);
   };
 
+  // Auto-refresh when user visits the screen
+  useFocusEffect(
+    useCallback(() => {
+      handleRefresh();
+    }, [])
+  );
+  
   if (initialLoader) {
     return (
       <View style={styles.loaderContainer}>
@@ -40,8 +47,8 @@ const EventsList: React.FC<userEventsListProps> = ({ fetchEventsFunction }) => {
   return (
     <View style={styles.container}>
       {events.length === 0 ? (
-        <View style={styles.noActivityContainer}>
-          <Text style={styles.noActivityText}>You don't have any activity yet.</Text>
+        <View style = {styles.noActivityContainer}>
+          <Text style={styles.noActivityText}>You Don't Have Any Events Yet!</Text>
         </View>
       ) : (
         <FlatList
@@ -83,7 +90,7 @@ export default EventsList;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#FFFFFF',
     paddingVertical: 0,
   },
   loaderContainer: {
@@ -102,10 +109,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   noActivityContainer: {
-    flex: 1,
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
+    backgroundColor: "#FFFFFF",
   },
   loadingMoreText: {
     fontSize: 14,
