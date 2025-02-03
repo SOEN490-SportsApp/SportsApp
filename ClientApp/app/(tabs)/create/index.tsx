@@ -512,12 +512,14 @@ const Create = () => {
                 setLocation={setLocation}
                 clearTrigger={clearLocationTrigger}
               />
-              <ConfirmButton
-                text="Create Event"
-                onPress={handleSubmit(onSubmit)}
-                icon={undefined}
-                iconPlacement={null}
-              />
+              <View style={styles.createEventContainer}>
+                <ConfirmButton
+                  text="Create Event"
+                  onPress={handleSubmit(onSubmit)}
+                  icon={undefined}
+                  iconPlacement={null}
+                />
+              </View>
             </>
           )}
           <View style={styles.navigationContainer}>
@@ -759,6 +761,10 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   navigationContainer: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -777,6 +783,11 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: themeColors.primary,
     marginHorizontal: 5,
+  },
+  createEventContainer: {
+    paddingHorizontal: 16,
+    paddingBottom: 80,
+    backgroundColor: themeColors.background.light,
   },
 });
 
