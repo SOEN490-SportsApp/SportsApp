@@ -4,7 +4,6 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  ScrollView,
   StyleSheet,
   Modal,
   FlatList,
@@ -16,7 +15,6 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import { useForm, Controller, useWatch } from "react-hook-form";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import { useRouter } from "expo-router";
 import ConfirmButton from "@/components/Helper Components/ConfirmButton";
 import themeColors from "@/utils/constants/colors";
@@ -47,17 +45,12 @@ const Create = () => {
   const router = useRouter();
   const [isSportTypeModalVisible, setSportTypeModalVisible] = useState(false);
   const [eventDate, setEventDate] = useState<Date | null>(null);
-  const [showDatePicker, setShowDatePicker] = useState(false);
   const [isSuccessModalVisible, setSuccessModalVisible] = useState(false);
   const [cutOffDate, setCutOffDate] = useState<Date | null>(null);
   const [cutOffTime, setCutOffTime] = useState<Date | null>(null);
-  const [showCutOffDatePicker, setShowCutOffDatePicker] = useState(false);
-  const [showCutOffTimePicker, setShowCutOffTimePicker] = useState(false);
   const [requiredSkillLevel, setRequiredSkillLevel] = useState<string[]>([]);
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [endTime, setEndTime] = useState<Date | null>(null);
-  const [showStartTimePicker, setShowStartTimePicker] = useState(false);
-  const [showEndTimePicker, setShowEndTimePicker] = useState(false);
   const [showLocationPage, setShowLocationPage] = useState(false);
   const [location, setLocation] = useState(null);
   const [clearLocationTrigger, setClearLocationTrigger] = useState(false);
@@ -564,9 +557,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: themeColors.background.light,
   },
-  scrollContent: {
-    padding: hs(16),
-  },
   label: {
     fontSize: mhs(16),
     fontWeight: "600",
@@ -611,10 +601,6 @@ const styles = StyleSheet.create({
   selectedText: {
     color: themeColors.text.light,
     fontWeight: "bold",
-  },
-  footer: {
-    padding: hs(16),
-    backgroundColor: themeColors.background.lightGrey,
   },
   modalOverlay: {
     flex: 1,
@@ -667,36 +653,6 @@ const styles = StyleSheet.create({
     marginTop: vs(4),
     marginBottom: vs(8),
   },
-  successModal: {
-    backgroundColor: "white",
-    padding: hs(24),
-    borderRadius: mhs(12),
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  successText: {
-    fontSize: mhs(18),
-    fontWeight: "bold",
-    color: themeColors.primary,
-    textAlign: "center",
-  },
-  successButton: {
-    marginTop: vs(16),
-    paddingVertical: vs(10),
-    paddingHorizontal: hs(20),
-    backgroundColor: themeColors.primary,
-    borderRadius: mhs(8),
-  },
-  successButtonText: {
-    color: themeColors.text.light,
-    fontWeight: "bold",
-    textAlign: "center",
-    fontSize: mhs(16),
-  },
   inputError: {
     borderWidth: 1,
     borderColor: themeColors.text.error,
@@ -728,22 +684,6 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: themeColors.background.light,
-  },
-  nextButton: {
-    alignSelf: "center",
-    marginBottom: 20,
-    marginTop: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 25,
-    borderWidth: 1,
-    borderColor: themeColors.primary,
-    backgroundColor: themeColors.background.lightGrey,
-  },
-  nextButtonText: {
-    color: themeColors.primary,
-    fontSize: 16,
-    fontWeight: "bold",
   },
   backButton: {
     alignSelf: "center",
