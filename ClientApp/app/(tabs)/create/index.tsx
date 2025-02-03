@@ -25,6 +25,7 @@ import { createEvent } from "@/services/eventService";
 import { useSelector } from "react-redux";
 import supportedSports from "@/utils/constants/supportedSports";
 import GooglePlacesInput from "@/components/Helper Components/GooglePlacesInput";
+import CustomDateTimePicker from "@/components/Helper Components/CustomDateTimePicker";
 
 const Create = () => {
   const {
@@ -370,81 +371,26 @@ const Create = () => {
             )}
 
             <Text style={styles.label}>Event Date and Time</Text>
-            <TouchableOpacity
-              onPress={() => setShowDatePicker(true)}
-              style={styles.input}
-            >
-              <Text>
-                {eventDate ? eventDate.toDateString() : "Select event date"}
-              </Text>
-            </TouchableOpacity>
-            {showDatePicker && (
-              <DateTimePicker
-                value={eventDate || new Date()}
-                mode="date"
-                display="default"
-                onChange={(event, selectedDate) => {
-                  setShowDatePicker(false);
-                  if (selectedDate) setEventDate(selectedDate);
-                }}
-              />
-            )}
+            <CustomDateTimePicker
+              value={eventDate}
+              mode="date"
+              label="Event Date"
+              onChange={(selectedDate) => setEventDate(selectedDate)}
+            />
 
-            <TouchableOpacity
-              onPress={() => setShowStartTimePicker(true)}
-              style={styles.input}
-            >
-              <Text>
-                {startTime
-                  ? startTime.toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })
-                  : "Select start time"}
-              </Text>
-            </TouchableOpacity>
-            {showStartTimePicker && (
-              <DateTimePicker
-                testID="datetimepicker-time-start"
-                value={startTime || new Date()}
-                mode="time"
-                display="default"
-                onChange={(event, selectedTime) => {
-                  setShowStartTimePicker(false);
-                  if (selectedTime) {
-                    setStartTime(selectedTime);
-                  }
-                }}
-              />
-            )}
+            <CustomDateTimePicker
+              value={startTime}
+              mode="time"
+              label="Start Time"
+              onChange={(selectedTime) => setStartTime(selectedTime)}
+            />
 
-            <TouchableOpacity
-              onPress={() => setShowEndTimePicker(true)}
-              style={styles.input}
-            >
-              <Text>
-                {endTime
-                  ? endTime.toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })
-                  : "Select end time"}
-              </Text>
-            </TouchableOpacity>
-            {showEndTimePicker && (
-              <DateTimePicker
-                testID="datetimepicker-time-end"
-                value={endTime || new Date()}
-                mode="time"
-                display="default"
-                onChange={(event, selectedTime) => {
-                  setShowEndTimePicker(false);
-                  if (selectedTime) {
-                    setEndTime(selectedTime);
-                  }
-                }}
-              />
-            )}
+            <CustomDateTimePicker
+              value={endTime}
+              mode="time"
+              label="End Time"
+              onChange={(selectedTime) => setEndTime(selectedTime)}
+            />
 
             <Text style={styles.label}>Maximum Number of Participants</Text>
             <Controller
@@ -483,52 +429,19 @@ const Create = () => {
             )}
 
             <Text style={styles.label}>Cut Off Time</Text>
-            <TouchableOpacity
-              onPress={() => setShowCutOffDatePicker(true)}
-              style={styles.input}
-            >
-              <Text>
-                {cutOffDate ? cutOffDate.toDateString() : "Select cut off date"}
-              </Text>
-            </TouchableOpacity>
-            {showCutOffDatePicker && (
-              <DateTimePicker
-                testID="datetimepicker-cutoff-date"
-                value={cutOffDate || new Date()}
-                mode="date"
-                display="default"
-                onChange={(event, selectedDate) => {
-                  setShowCutOffDatePicker(false);
-                  if (selectedDate) setCutOffDate(selectedDate);
-                }}
-              />
-            )}
+            <CustomDateTimePicker
+              value={cutOffDate}
+              mode="date"
+              label="Cutoff Date"
+              onChange={(selectedDate) => setCutOffDate(selectedDate)}
+            />
 
-            <TouchableOpacity
-              onPress={() => setShowCutOffTimePicker(true)}
-              style={styles.input}
-            >
-              <Text testID="cut-off-time-text">
-                {cutOffTime
-                  ? cutOffTime.toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })
-                  : "Select cut off time (in hours)"}
-              </Text>
-            </TouchableOpacity>
-            {showCutOffTimePicker && (
-              <DateTimePicker
-                testID="datetimepicker-cutoff-time"
-                value={cutOffTime || new Date()}
-                mode="time"
-                display="default"
-                onChange={(event, selectedTime) => {
-                  setShowCutOffTimePicker(false);
-                  if (selectedTime) setCutOffTime(selectedTime);
-                }}
-              />
-            )}
+            <CustomDateTimePicker
+              value={cutOffTime}
+              mode="time"
+              label="Cutoff Time"
+              onChange={(selectedTime) => setCutOffTime(selectedTime)}
+            />
 
             <Text style={styles.label}>Required Skill Level</Text>
             <View style={styles.skillLevelGroup}>
