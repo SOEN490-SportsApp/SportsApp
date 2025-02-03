@@ -26,6 +26,7 @@ import { useSelector } from "react-redux";
 import supportedSports from "@/utils/constants/supportedSports";
 import GooglePlacesInput from "@/components/Helper Components/GooglePlacesInput";
 import CustomDateTimePicker from "@/components/Helper Components/CustomDateTimePicker";
+import { Ionicons } from "@expo/vector-icons";
 
 const Create = () => {
   const {
@@ -60,6 +61,7 @@ const Create = () => {
   const [showLocationPage, setShowLocationPage] = useState(false);
   const [location, setLocation] = useState(null);
   const [clearLocationTrigger, setClearLocationTrigger] = useState(false);
+  const [step, setStep] = useState(1);
 
   const user = useSelector((state: { user: any }) => state.user);
 
@@ -79,13 +81,13 @@ const Create = () => {
 
   const onSubmit = async (data: EventFormData) => {
     if (!location) {
-      Alert.alert("Error", "Please select a location.");
+      Alert.alert("Oops..", "Please select a location.");
       return;
     }
 
     try {
       if (!cutOffDate || !cutOffTime || !eventDate || !startTime || !endTime) {
-        Alert.alert("Error", "Please select all date and time fields");
+        Alert.alert("Oops..", "Please select all date and time fields");
         return;
       }
 
@@ -111,7 +113,7 @@ const Create = () => {
         .replace(/\s?(AM|PM)$/, "");
 
       if (startTime >= endTime) {
-        Alert.alert("Error", "End time must be after start time.");
+        Alert.alert("Oops..", "End time must be after start time.");
         return;
       }
 
@@ -133,7 +135,7 @@ const Create = () => {
 
       if (combinedCutOffDateTime >= combinedStartDateTime) {
         Alert.alert(
-          "Error",
+          "Oops..",
           "Cutoff time must be before the event start time."
         );
         return;
@@ -287,219 +289,268 @@ const Create = () => {
             { paddingTop: StatusBar.currentHeight || vs(24) },
           ]}
         >
-          <ScrollView contentContainerStyle={styles.scrollContent}>
-            <Text style={styles.label}>Event Name</Text>
-            <Controller
-              control={control}
-              name="eventName"
-              rules={{ required: "Event Name is required" }}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <TextInput
-                  placeholder="Enter Event Name"
-                  placeholderTextColor={themeColors.text.placeholder}
-                  style={styles.input}
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                  value={value || ""}
-                />
+          {step === 1 && (
+            <>
+              <Text style={styles.label}>Event Name</Text>
+              <Controller
+                control={control}
+                name="eventName"
+                rules={{ required: "Event Name is required" }}
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <TextInput
+                    placeholder="Enter Event Name"
+                    placeholderTextColor={themeColors.text.placeholder}
+                    style={styles.input}
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value || ""}
+                  />
+                )}
+              />
+
+              {errors.eventName && (
+                <Text style={styles.errorText}>{errors.eventName.message}</Text>
               )}
-            />
 
-            {errors.eventName && (
-              <Text style={styles.errorText}>{errors.eventName.message}</Text>
-            )}
-
-            <Text style={styles.label}>Event Type</Text>
-            <View style={styles.radioGroup}>
-              <TouchableOpacity
-                testID="event-type-public"
-                onPress={() => setValue("eventType", "public")}
-                style={[
-                  styles.radioButton,
-                  watch.eventType === "public"
-                    ? styles.radioButtonSelected
-                    : null,
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.radioText,
-                    watch.eventType === "public" && styles.selectedText,
-                  ]}
-                >
-                  Public
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                testID="event-type-private"
-                onPress={() => setValue("eventType", "private")}
-                style={[
-                  styles.radioButton,
-                  watch.eventType === "private"
-                    ? styles.radioButtonSelected
-                    : null,
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.radioText,
-                    watch.eventType === "private" && styles.selectedText,
-                  ]}
-                >
-                  Private
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            <Text style={styles.label}>Sport Type</Text>
-            <Controller
-              control={control}
-              name="sportType"
-              rules={{ required: "Sport Type is required" }}
-              render={({ field: { value } }) => (
+              <Text style={styles.label}>Event Type</Text>
+              <View style={styles.radioGroup}>
                 <TouchableOpacity
-                  style={[styles.input, errors.sportType && styles.inputError]}
-                  onPress={() => setSportTypeModalVisible(true)}
-                >
-                  <Text>{value || "Select a Sport"}</Text>
-                </TouchableOpacity>
-              )}
-            />
-            {renderSportTypeModal()}
-            {errors.sportType && (
-              <Text style={styles.errorText}>{errors.sportType.message}</Text>
-            )}
-
-            <Text style={styles.label}>Event Date and Time</Text>
-            <CustomDateTimePicker
-              value={eventDate}
-              mode="date"
-              label="Event Date"
-              onChange={(selectedDate) => setEventDate(selectedDate)}
-            />
-
-            <CustomDateTimePicker
-              value={startTime}
-              mode="time"
-              label="Start Time"
-              onChange={(selectedTime) => setStartTime(selectedTime)}
-            />
-
-            <CustomDateTimePicker
-              value={endTime}
-              mode="time"
-              label="End Time"
-              onChange={(selectedTime) => setEndTime(selectedTime)}
-            />
-
-            <Text style={styles.label}>Maximum Number of Participants</Text>
-            <Controller
-              control={control}
-              name="maxParticipants"
-              rules={{
-                required: "Maximum number of participants is required",
-                validate: (value) => {
-                  const number = parseInt(value, 10);
-                  return (
-                    (!isNaN(number) && number > 0) ||
-                    "Must be a positive integer greater than 0"
-                  );
-                },
-              }}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <TextInput
-                  placeholder="Enter maximum participants"
-                  placeholderTextColor={themeColors.text.placeholder}
-                  style={styles.input}
-                  onBlur={onBlur}
-                  onChangeText={(text) => {
-                    if (/^\d*$/.test(text)) {
-                      onChange(text);
-                    }
-                  }}
-                  value={value || ""}
-                  keyboardType="numeric"
-                />
-              )}
-            />
-            {errors.maxParticipants && (
-              <Text style={styles.errorText}>
-                {errors.maxParticipants.message}
-              </Text>
-            )}
-
-            <Text style={styles.label}>Cut Off Time</Text>
-            <CustomDateTimePicker
-              value={cutOffDate}
-              mode="date"
-              label="Cutoff Date"
-              onChange={(selectedDate) => setCutOffDate(selectedDate)}
-            />
-
-            <CustomDateTimePicker
-              value={cutOffTime}
-              mode="time"
-              label="Cutoff Time"
-              onChange={(selectedTime) => setCutOffTime(selectedTime)}
-            />
-
-            <Text style={styles.label}>Required Skill Level</Text>
-            <View style={styles.skillLevelGroup}>
-              {["Beginner", "Intermediate", "Advanced"].map((level) => (
-                <TouchableOpacity
-                  key={level}
-                  testID={`skill-level-${level}`}
+                  testID="event-type-public"
+                  onPress={() => setValue("eventType", "public")}
                   style={[
-                    styles.skillLevelOption,
-                    requiredSkillLevel.includes(level) &&
-                      styles.skillLevelSelected,
+                    styles.radioButton,
+                    watch.eventType === "public"
+                      ? styles.radioButtonSelected
+                      : null,
                   ]}
-                  onPress={() => toggleSkillLevel(level)}
                 >
                   <Text
                     style={[
-                      styles.skillLevelText,
-                      requiredSkillLevel.includes(level) &&
-                        styles.skillLevelTextSelected,
+                      styles.radioText,
+                      watch.eventType === "public" && styles.selectedText,
                     ]}
                   >
-                    {level}
+                    Public
                   </Text>
                 </TouchableOpacity>
-              ))}
-            </View>
+                <TouchableOpacity
+                  testID="event-type-private"
+                  onPress={() => setValue("eventType", "private")}
+                  style={[
+                    styles.radioButton,
+                    watch.eventType === "private"
+                      ? styles.radioButtonSelected
+                      : null,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.radioText,
+                      watch.eventType === "private" && styles.selectedText,
+                    ]}
+                  >
+                    Private
+                  </Text>
+                </TouchableOpacity>
+              </View>
 
-            <Text style={styles.label}>Description</Text>
-            <Controller
-              control={control}
-              name="description"
-              rules={{ required: "Description is required" }}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <TextInput
-                  placeholder="Enter Description"
-                  placeholderTextColor={themeColors.text.placeholder}
-                  style={[styles.input, styles.textArea]}
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                  value={value || ""}
-                  multiline
-                  numberOfLines={4}
-                />
+              <Text style={styles.label}>Sport Type</Text>
+              <Controller
+                control={control}
+                name="sportType"
+                rules={{ required: "Sport Type is required" }}
+                render={({ field: { value } }) => (
+                  <TouchableOpacity
+                    style={[
+                      styles.input,
+                      errors.sportType && styles.inputError,
+                    ]}
+                    onPress={() => setSportTypeModalVisible(true)}
+                  >
+                    <Text>{value || "Select a Sport"}</Text>
+                  </TouchableOpacity>
+                )}
+              />
+              {renderSportTypeModal()}
+              {errors.sportType && (
+                <Text style={styles.errorText}>{errors.sportType.message}</Text>
               )}
-            />
-            {errors.description &&
-              typeof errors.description.message === "string" && (
+
+              <Text style={styles.label}>Maximum Number of Participants</Text>
+              <Controller
+                control={control}
+                name="maxParticipants"
+                rules={{
+                  required: "Maximum number of participants is required",
+                  validate: (value) => {
+                    const number = parseInt(value, 10);
+                    return (
+                      (!isNaN(number) && number > 0) ||
+                      "Must be a positive integer greater than 0"
+                    );
+                  },
+                }}
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <TextInput
+                    placeholder="Enter maximum participants"
+                    placeholderTextColor={themeColors.text.placeholder}
+                    style={styles.input}
+                    onBlur={onBlur}
+                    onChangeText={(text) => {
+                      if (/^\d*$/.test(text)) {
+                        onChange(text);
+                      }
+                    }}
+                    value={value || ""}
+                    keyboardType="numeric"
+                  />
+                )}
+              />
+              {errors.maxParticipants && (
                 <Text style={styles.errorText}>
-                  {errors.description.message}
+                  {errors.maxParticipants.message}
                 </Text>
               )}
-          </ScrollView>
-          <TouchableOpacity
-            style={styles.nextButton}
-            onPress={() => setShowLocationPage(true)}
-          >
-            <Text style={styles.nextButtonText}>Next</Text>
-          </TouchableOpacity>
+
+              <Text style={styles.label}>Required Skill Level</Text>
+              <View style={styles.skillLevelGroup}>
+                {["Beginner", "Intermediate", "Advanced"].map((level) => (
+                  <TouchableOpacity
+                    key={level}
+                    testID={`skill-level-${level}`}
+                    style={[
+                      styles.skillLevelOption,
+                      requiredSkillLevel.includes(level) &&
+                        styles.skillLevelSelected,
+                    ]}
+                    onPress={() => toggleSkillLevel(level)}
+                  >
+                    <Text
+                      style={[
+                        styles.skillLevelText,
+                        requiredSkillLevel.includes(level) &&
+                          styles.skillLevelTextSelected,
+                      ]}
+                    >
+                      {level}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <Text style={styles.label}>Description</Text>
+              <Controller
+                control={control}
+                name="description"
+                rules={{ required: "Description is required" }}
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <TextInput
+                    placeholder="Enter Description"
+                    placeholderTextColor={themeColors.text.placeholder}
+                    style={[styles.input, styles.textArea]}
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value || ""}
+                    multiline
+                    numberOfLines={4}
+                  />
+                )}
+              />
+              {errors.description &&
+                typeof errors.description.message === "string" && (
+                  <Text style={styles.errorText}>
+                    {errors.description.message}
+                  </Text>
+                )}
+            </>
+          )}
+
+          {step === 2 && (
+            <>
+              <Text style={styles.label}>Event Date and Time</Text>
+              <CustomDateTimePicker
+                value={eventDate}
+                mode="date"
+                label="Event Date"
+                onChange={(selectedDate) => setEventDate(selectedDate)}
+              />
+
+              <CustomDateTimePicker
+                value={startTime}
+                mode="time"
+                label="Start Time"
+                onChange={(selectedTime) => setStartTime(selectedTime)}
+              />
+
+              <CustomDateTimePicker
+                value={endTime}
+                mode="time"
+                label="End Time"
+                onChange={(selectedTime) => setEndTime(selectedTime)}
+              />
+
+              <Text style={styles.label}>Cut Off Time</Text>
+              <CustomDateTimePicker
+                value={cutOffDate}
+                mode="date"
+                label="Cutoff Date"
+                onChange={(selectedDate) => setCutOffDate(selectedDate)}
+              />
+
+              <CustomDateTimePicker
+                value={cutOffTime}
+                mode="time"
+                label="Cutoff Time"
+                onChange={(selectedTime) => setCutOffTime(selectedTime)}
+              />
+            </>
+          )}
+
+          {step === 3 && (
+            <>
+              <GooglePlacesInput
+                setLocation={setLocation}
+                clearTrigger={clearLocationTrigger}
+              />
+              <ConfirmButton
+                text="Create Event"
+                onPress={handleSubmit(onSubmit)}
+                icon={undefined}
+                iconPlacement={null}
+              />
+            </>
+          )}
+          <View style={styles.navigationContainer}>
+            {step > 1 ? (
+              <TouchableOpacity
+                onPress={() => setStep(step - 1)}
+                style={styles.navButton}
+              >
+                <Ionicons
+                  name="arrow-back-circle"
+                  size={32}
+                  color={themeColors.primary}
+                />
+                <Text style={styles.navButtonText}>Back</Text>
+              </TouchableOpacity>
+            ) : (
+              <View style={{ flex: 1 }} />
+            )}
+
+            {step < 3 && (
+              <TouchableOpacity
+                onPress={() => setStep(step + 1)}
+                style={styles.navButton}
+              >
+                <Text style={styles.navButtonText}>Next</Text>
+                <Ionicons
+                  name="arrow-forward-circle"
+                  size={32}
+                  color={themeColors.primary}
+                />
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -706,6 +757,26 @@ const styles = StyleSheet.create({
     color: themeColors.primary,
     fontSize: 16,
     fontWeight: "bold",
+  },
+  navigationContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    backgroundColor: themeColors.background.lightGrey,
+    borderTopWidth: 1,
+    borderColor: "#ddd",
+  },
+  navButton: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  navButtonText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: themeColors.primary,
+    marginHorizontal: 5,
   },
 });
 
