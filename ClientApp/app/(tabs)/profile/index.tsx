@@ -6,11 +6,9 @@ import {
 import Icon from 'react-native-vector-icons/Ionicons'; 
 import CustomTabMenu from '@/components/Helper Components/CustomTabMenu';
 import { useRouter } from 'expo-router';
-import { UserState } from '@/types/user';
-import { calculateAge } from '@/utils/helpers/ageOfUser';
 import { useSelector } from 'react-redux';
-import EventListProfilePageJoined from '@/components/Event/EventListProfilePageJoined';
-import EventListProfilePageCreated from '@/components/Event/EventListProfilePageCreated';
+import EventList from '@/components/Event/EventList';
+import { getEventsCreated, getEventsJoined } from '@/services/eventService';
 import Ionicons from "react-native-vector-icons/Ionicons"; 
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
@@ -64,14 +62,17 @@ const getSkillColor = (ranking: string) => {
     }
 };
 
-// Activity tab content
-const ActivityTab = () => (
-    <View className="p-4 bg-white">
+const ActivityTab = () => {
+    const user = useSelector((state: { user: any }) => state.user);
+  
+    return (
+      <View className="p-4 bg-white">
         <View>
-            <EventListProfilePageJoined />
+          <EventList fetchEventsFunction={(page, size) => getEventsJoined(user.id, page, size)} />
         </View>
-    </View>
-);
+      </View>
+    );
+  };
 
 // Friends tab content
 const FriendsTab = () => (
@@ -87,13 +88,15 @@ const FriendsTab = () => (
 );
 
 // About tab content with user data
-const AboutTab: React.FC<{ user: UserState }> = ({ user }) => {
+const MyEvents = () => {
+    const user = useSelector((state: { user: any }) => state.user);
+  
     return (
-        <View className="p-4 bg-white flex-1">
-           <View>
-                <EventListProfilePageCreated />
-            </View>
+      <View className="p-4 bg-white">
+        <View>
+          <EventList fetchEventsFunction={(page, size) => getEventsCreated(user.id, page, size)} />
         </View>
+      </View>
     );
 };
 
@@ -118,12 +121,12 @@ const ProfilePage: React.FC = () => {
     const routes = [
         { key: 'activity', title: 'Activity', testID: 'Activity' },
         { key: 'friends', title: 'Friends', testID: 'Friends' },
-        { key: 'about', title: 'My Events', testID: 'About' },
+        { key: 'MyEvents', title: 'My Events', testID: 'About'},
     ];
     const scenes = {
         activity: <ActivityTab />,
         friends: <FriendsTab />,
-        about: <AboutTab user={user} />,
+        MyEvents: <MyEvents />,
     };
 
     return (

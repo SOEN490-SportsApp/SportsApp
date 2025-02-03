@@ -41,12 +41,13 @@ export const deleteEvent = async (eventId: string) => {
   }
 };
 
-//API_ENDPOINTS.GET_ALL_EVENTS_JOINED
-export const getEventsJoined = async (userId: string) => {
+// API function that fetches paginated events
+export const getEventsJoined = async (userId: string, page: number = 0, size: number = 5) => {
   try {
     const axiosInstance = getAxiosInstance();
-    console.log(API_ENDPOINTS.GET_ALL_EVENTS_JOINED.replace("{userId}", userId));
-    const response = await axiosInstance.get(API_ENDPOINTS.GET_ALL_EVENTS_JOINED.replace("{userId}", userId));
+    const endpoint = API_ENDPOINTS.GET_ALL_EVENTS_JOINED.replace("{userId}", userId);
+    const url = `${endpoint}?page=${page}&size=${size}`;
+    const response = await axiosInstance.get(url);
     return response;
   } catch (error) {
     console.error("Error fetching joined events:", error);
@@ -54,12 +55,14 @@ export const getEventsJoined = async (userId: string) => {
   }
 };
 
+
 //API_ENDPOINTS.GET_ALL_EVENTS_CREATED_BY
-export const getEventsCreated = async (userId: string) => {
+export const getEventsCreated = async (userId: string, page: number = 0, size: number = 5) => {
   try {
     const axiosInstance = getAxiosInstance();
-    console.log(API_ENDPOINTS.GET_ALL_EVENTS_CREATED_BY.replace("{userId}", userId));
-    const response = await axiosInstance.get(API_ENDPOINTS.GET_ALL_EVENTS_CREATED_BY.replace("{userId}", userId));
+    const endpoint = API_ENDPOINTS.GET_ALL_EVENTS_JOINED.replace("{userId}", userId);
+    const url = `${endpoint}?page=${page}&size=${size}`;
+    const response = await axiosInstance.get(url);    
     return response;
   } catch (error) {
     console.error("Error fetching created events:", error);
