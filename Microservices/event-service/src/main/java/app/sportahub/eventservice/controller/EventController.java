@@ -91,7 +91,7 @@ public class EventController {
         return eventService.joinEvent(id, userId);
     }
 
-    @GetMapping("/patricipant/{userId}")
+    @GetMapping("/participant/{userId}")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Retrieve events by user ID",description = "Retrieve events that a user has participated in")
     public Page<EventResponse> getEventByUserId(@PathVariable String userId, 
