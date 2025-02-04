@@ -3,6 +3,7 @@ package app.sportahub.userservice.controller.user;
 import java.util.List;
 
 import app.sportahub.userservice.dto.response.user.PublicProfileResponse;
+import app.sportahub.userservice.dto.response.user.UserProfileResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -152,7 +153,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Search for user",
             description = "Allows the search of users based on name, sport, rank, gender, or date of birth.")
-    public Page<ProfileResponse> searchUsers(
+    public Page<UserProfileResponse> searchUsers(
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String lastName,
             @RequestParam(required = false) List<String> sports,

@@ -3,6 +3,7 @@ package app.sportahub.userservice.service.user;
 import app.sportahub.userservice.client.KeycloakApiClient;
 import app.sportahub.userservice.dto.request.user.friend.FriendRequestRequest;
 import app.sportahub.userservice.dto.request.user.friend.UpdateFriendRequestRequest;
+import app.sportahub.userservice.dto.response.user.UserProfileResponse;
 import app.sportahub.userservice.dto.response.user.friend.ViewFriendResponse;
 import app.sportahub.userservice.dto.response.user.friendRequest.FriendRequestResponse;
 import app.sportahub.userservice.dto.request.user.ProfileRequest;
@@ -46,6 +47,7 @@ import app.sportahub.userservice.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -411,13 +413,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<ProfileResponse> searchUsers(String firstName, String lastName, List<String> sport, List<String> rankings, String gender, String age, Pageable pageable) {
+    public Page<UserProfileResponse> searchUsers(String firstName, String lastName, List<String> sport, List<String> rankings, String gender, String age, Pageable pageable) {
         if (firstName == null & lastName == null & sport == null && rankings == null && gender == null && age == null) {
             throw new NoSearchCriteriaProvidedException();
         }
         log.info("UserServiceImpl::searchUsers: User created a search query");
         Page<User> users = userRepository.searchUsers(firstName, lastName, sport, rankings, gender, age, pageable);
 
-        return users.map(user -> profileMapper.profileToProfileResponse(user.getProfile()));
+        List<UserProfileResponse> userProfileResponses = users.stream()
+                .map(user -> new UserProfileResponse(user.getKeycloakId(), profileMapper.profileToProfileResponse(user.getProfile())))
+                .collect(Collectors.toList());
+        return new PageImpl<>(userProfileResponses, users.getPageable(), users.getTotalElements());
     }
 }

@@ -3,6 +3,7 @@ package app.sportahub.userservice.service.user;
 import app.sportahub.userservice.dto.request.user.friend.FriendRequestRequest;
 import app.sportahub.userservice.dto.request.user.friend.UpdateFriendRequestRequest;
 import app.sportahub.userservice.dto.response.user.PublicProfileResponse;
+import app.sportahub.userservice.dto.response.user.UserProfileResponse;
 import app.sportahub.userservice.dto.response.user.friendRequest.FriendRequestResponse;
 import app.sportahub.userservice.dto.response.user.friend.ViewFriendResponse;
 import app.sportahub.userservice.dto.response.user.friendRequest.FriendRequestResponse;
@@ -46,5 +47,5 @@ public interface UserService {
 
     List<ViewFriendResponse> getFriends(String userId);
 
-    Page<ProfileResponse> searchUsers(String firstName, String lastName, List<String> sport, List<String> rankings, String gender, String age, Pageable pageable);
+    Page<UserProfileResponse> searchUsers(String firstName, String lastName, List<String> sport, List<String> rankings, String gender, String age, Pageable pageable);
 }
