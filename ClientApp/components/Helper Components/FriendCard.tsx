@@ -4,6 +4,7 @@ import { Profile } from "@/types";
 import themeColors from "@/utils/constants/colors";
 import { useState } from "react";
 import { hs, mhs, mvs, vs } from "@/utils/helpers/uiScaler";
+import { useRouter } from "expo-router";
 
 interface FriendCardProp {
   user: Profile;
@@ -14,12 +15,14 @@ function generateRandomFriendsInCommon() {
 }
 
 const FriendCard: React.FC<FriendCardProp> = ({ user }) => {
+  const router = useRouter();
   const [requestSent, setRequestSent] = useState(false);
+  const userId = "679cf7bd6dfc9749eedcf82c";
 
   return (
     <TouchableOpacity
       style={styles.cardHolder}
-      onPress={() => alert("Redirect to profile..")}
+      onPress={() => router.push({pathname: `/userProfiles/${userId}`, params: {userId: userId}})}
     >
       <View style={styles.pictureSection}>
         <Image

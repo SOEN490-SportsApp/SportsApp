@@ -41,3 +41,25 @@ export async function updateProfile(profile: Profile, userId: string) {
         throw error.response?.data || error;
     }
 }
+
+export async function getOtherUserProfile(userId: string) {
+    const axiosInstance = getAxiosInstance();
+    try {
+        const response = await axiosInstance.get(API_ENDPOINTS.GET_USER_PROFILE.replace('{id}', userId));
+        return response.data;
+    } catch (error: any) {
+        console.error('Error fetching other user profile:', error);
+        throw error.response?.data || error;
+    }
+}
+
+export async function getEventsByUserId(userId: string) {
+    const axiosInstance = getAxiosInstance();
+    try {
+        const response = await axiosInstance.get(API_ENDPOINTS.GET_EVETNS_BY_USER_ID.replace("{userId}", userId));
+        return response.data;
+    } catch (error: any) {
+        console.error("Error fetching events:", error);
+        throw error.response?.data || error;
+    }
+}
