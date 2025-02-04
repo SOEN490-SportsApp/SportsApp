@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import app.sportahub.kafkevents.BaseEvent;
+import app.sportahub.kafkevents.ForgotPasswordRequestedEvent;
 import app.sportahub.userservice.client.KeycloakApiClient;
 import app.sportahub.userservice.dto.request.auth.LoginRequest;
 import app.sportahub.userservice.dto.request.auth.RefreshTokenRequest;
@@ -30,7 +32,16 @@ import app.sportahub.userservice.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
+
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -40,6 +51,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final KeycloakApiClient keycloakApiClient;
     private final UserMapper userMapper;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @SneakyThrows
     @Override
@@ -141,6 +153,19 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findUserByEmail(email).orElseThrow(() -> new UserDoesNotExistException(email));
         keycloakApiClient.sendVerificationEmail(user.getKeycloakId()).block();
         log.info("AuthServiceImpl::sendVerificationEmail: verification email sent to {}", email);
+    }
+
+    @Override
+    public void sendPasswordResetEmailUsingKafka(String email) {
+        BaseEvent baseEvent = new BaseEvent(
+                UUID.randomUUID().toString(),
+                "request",
+                "user-service",
+                Instant.now(),
+                UUID.randomUUID().toString());
+        ForgotPasswordRequestedEvent forgotPasswordRequestedEvent = new ForgotPasswordRequestedEvent(baseEvent, email);
+        kafkaTemplate.send("forgot-password.request", forgotPasswordRequestedEvent);
+        log.info("AuthServiceImpl::sendPasswordResetEmail: forgot password reset email sent to 'forgot-password.request' topic");
     }
 
     @Override
