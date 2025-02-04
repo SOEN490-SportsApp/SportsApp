@@ -7,6 +7,7 @@ import app.sportahub.userservice.dto.request.user.UserRequest;
 import app.sportahub.userservice.dto.request.user.friend.FriendRequestRequest;
 import app.sportahub.userservice.dto.request.user.friend.UpdateFriendRequestRequest;
 import app.sportahub.userservice.dto.response.user.ProfileResponse;
+import app.sportahub.userservice.dto.response.user.UserProfileResponse;
 import app.sportahub.userservice.dto.response.user.UserResponse;
 import app.sportahub.userservice.dto.response.user.badge.BadgeResponse;
 import app.sportahub.userservice.dto.response.user.badge.BadgeWithCountResponse;
@@ -246,8 +247,11 @@ public class UserControllerTest {
     @SneakyThrows
     @Test
     public void searchUsersSuccessfully() {
-        List<ProfileResponse> profiles = List.of(new ProfileResponse("John", "Doe", null, "Male", "12345", "555-1234", null, "Amateur"));
-        Page<ProfileResponse> page = new PageImpl<>(profiles);
+        ProfileResponse profileResponse = new ProfileResponse("John", "Doe", null, "Male", "12345", "555-1234", null, "Amateur");
+
+        List<UserProfileResponse> userProfiles = List.of(new UserProfileResponse("123abc", profileResponse));
+        Page<UserProfileResponse> page = new PageImpl<>(userProfiles);
+
         when(userService.searchUsers("John", null, null, null, null, null, PageRequest.of(0, 10)))
                 .thenReturn(page);
 
@@ -256,7 +260,8 @@ public class UserControllerTest {
                         .param("page", "0")
                         .param("size", "10"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].firstName").value("John"));
+                .andExpect(jsonPath("$.content[0].userId").value("123abc"))
+                .andExpect(jsonPath("$.content[0].profileResponse.firstName").value("John"));
     }
 
     @SneakyThrows
