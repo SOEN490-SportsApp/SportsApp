@@ -179,8 +179,7 @@ const ProfilePage: React.FC = () => {
             </View>
 
             {/* Favorite Sports Badges */}
-            <View className="mt-4 items-center">
-                <Text className="text-lg font-semibold text-black">Favorite Sports</Text>
+            <View className="mt-0 items-center">
                 <View className="flex-row flex-wrap gap-2 mt-2 justify-center">
                     {user?.profile?.sportsOfPreference?.length ? (
                         user.profile.sportsOfPreference.map((sport: { name: string; ranking: string }, index: number) => (

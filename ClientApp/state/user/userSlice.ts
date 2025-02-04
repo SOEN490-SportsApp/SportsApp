@@ -28,7 +28,7 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     setUser(state, action: PayloadAction<UserState>) {
-      console.log("Redux Updated with:", action.payload);
+      //console.log("Redux Updated with:", action.payload);
       return action.payload;
     },
     clearUser() {
