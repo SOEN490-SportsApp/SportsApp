@@ -13,6 +13,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   TouchableWithoutFeedback,
+  ScrollView,
 } from "react-native";
 import { useForm, Controller, useWatch } from "react-hook-form";
 import { useRouter } from "expo-router";
@@ -52,7 +53,14 @@ const Create = () => {
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [endTime, setEndTime] = useState<Date | null>(null);
   const [showLocationPage, setShowLocationPage] = useState(false);
-  const [location, setLocation] = useState(null);
+  interface Location {
+    name: string;
+    city: string;
+    province: string;
+    country: string;
+  }
+
+  const [location, setLocation] = useState<Location | null>(null);
   const [clearLocationTrigger, setClearLocationTrigger] = useState(false);
   const [step, setStep] = useState(1);
 
@@ -268,6 +276,18 @@ const Create = () => {
       </SafeAreaView>
     );
   }
+
+  const SummaryItem: React.FC<{
+    label: string;
+    value: string | undefined;
+    icon: string;
+  }> = ({ label, value, icon }) => (
+    <View style={styles.summaryItem}>
+      <Ionicons name={icon as any} size={20} color={themeColors.primary} />
+      <Text style={styles.summaryLabel}>{label}:</Text>
+      <Text style={styles.summaryValue}>{value}</Text>
+    </View>
+  );
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -505,7 +525,102 @@ const Create = () => {
                 setLocation={setLocation}
                 clearTrigger={clearLocationTrigger}
               />
-              <View style={styles.createEventContainer}>
+            </>
+          )}
+
+          {step === 4 && (
+            <View style={{ flex: 1 }}>
+              <ScrollView contentContainerStyle={styles.summaryContainer}>
+                <Text style={styles.summaryTitle}>Event Summary</Text>
+
+                <View style={styles.card}>
+                  <Text style={styles.sectionTitle}>General Information</Text>
+                  <SummaryItem
+                    label="Event Name"
+                    value={watch.eventName}
+                    icon="calendar-outline"
+                  />
+                  <SummaryItem
+                    label="Event Type"
+                    value={watch.eventType}
+                    icon="people-outline"
+                  />
+                  <SummaryItem
+                    label="Sport Type"
+                    value={watch.sportType}
+                    icon="football-outline"
+                  />
+                  <SummaryItem
+                    label="Max Participants"
+                    value={watch.maxParticipants}
+                    icon="people-circle-outline"
+                  />
+                  <SummaryItem
+                    label="Required Skill Level"
+                    value={requiredSkillLevel.join(", ") || "None"}
+                    icon="ribbon-outline"
+                  />
+                </View>
+
+                <View style={styles.card}>
+                  <Text style={styles.sectionTitle}>Date & Time</Text>
+                  <SummaryItem
+                    label="Event Date"
+                    value={eventDate?.toDateString()}
+                    icon="calendar"
+                  />
+                  <SummaryItem
+                    label="Start Time"
+                    value={startTime?.toLocaleTimeString()}
+                    icon="time-outline"
+                  />
+                  <SummaryItem
+                    label="End Time"
+                    value={endTime?.toLocaleTimeString()}
+                    icon="time-outline"
+                  />
+                  <SummaryItem
+                    label="Cutoff Time"
+                    value={cutOffTime?.toLocaleTimeString()}
+                    icon="time-outline"
+                  />
+                </View>
+
+                <View style={styles.card}>
+                  <Text style={styles.sectionTitle}>Location</Text>
+                  <SummaryItem
+                    label="Address"
+                    value={location?.name || "Not Selected"}
+                    icon="location-outline"
+                  />
+                  <SummaryItem
+                    label="City"
+                    value={location?.city || "Not Selected"}
+                    icon="business-outline"
+                  />
+                  <SummaryItem
+                    label="Province"
+                    value={location?.province || "Not Selected"}
+                    icon="map-outline"
+                  />
+                  <SummaryItem
+                    label="Country"
+                    value={location?.country || "Not Selected"}
+                    icon="earth-outline"
+                  />
+                </View>
+
+                <View style={styles.descriptionCard}>
+                  <Text style={styles.sectionTitle}>Description</Text>
+                  <ScrollView style={styles.descriptionBox}>
+                    <Text style={styles.descriptionText}>
+                      {watch.description || "No description provided"}
+                    </Text>
+                  </ScrollView>
+                </View>
+              </ScrollView>
+
+              <View style={styles.buttonContainer}>
                 <ConfirmButton
                   text="Create Event"
                   onPress={handleSubmit(onSubmit)}
@@ -513,8 +628,9 @@ const Create = () => {
                   iconPlacement={null}
                 />
               </View>
-            </>
+            </View>
           )}
+
           <View style={styles.navigationContainer}>
             {step > 1 ? (
               <TouchableOpacity
@@ -532,7 +648,7 @@ const Create = () => {
               <View style={{ flex: 1 }} />
             )}
 
-            {step < 3 && (
+            {step < 4 && (
               <TouchableOpacity
                 onPress={() => setStep(step + 1)}
                 style={styles.navButton}
@@ -728,6 +844,88 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 80,
     backgroundColor: themeColors.background.light,
+  },
+  summaryText: { fontSize: 16, marginBottom: 5 },
+  summaryTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: themeColors.primary,
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  card: {
+    backgroundColor: "#fff",
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 15,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: themeColors.text.dark,
+    marginBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+    paddingBottom: 5,
+  },
+  summaryItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  summaryLabel: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: themeColors.text.dark,
+    marginLeft: 8,
+  },
+  summaryValue: {
+    fontSize: 16,
+    color: themeColors.text.dark,
+    marginLeft: 4,
+  },
+  descriptionCard: {
+    backgroundColor: "#fff",
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 15,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  descriptionBox: {
+    maxHeight: 120,
+    borderRadius: 8,
+    padding: 10,
+    backgroundColor: "#f9f9f9",
+  },
+  descriptionText: {
+    fontSize: 16,
+    color: themeColors.text.dark,
+  },
+  summaryContainer: {
+    padding: 20,
+    paddingBottom: 100,
+    backgroundColor: themeColors.background.light,
+  },
+  buttonContainer: {
+    position: "absolute",
+    bottom: 20,
+    left: 50,
+    right: 50,
+    paddingVertical: 30,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
 });
 
