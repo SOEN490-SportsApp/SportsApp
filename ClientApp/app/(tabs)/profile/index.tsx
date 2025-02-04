@@ -10,39 +10,46 @@ import { UserState } from '@/types/user';
 import { calculateAge } from '@/utils/helpers/ageOfUser';
 import { useSelector } from 'react-redux';
 import EventListProfilePage from '@/components/Event/EventListProfilePage';
+import Ionicons from "react-native-vector-icons/Ionicons"; 
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+
 
 const screenHeight = Dimensions.get('window').height;
 const maxHeight = screenHeight * 0.5;
 
-
-// Helper function to determine the correct icon for each sport
 const getSportIcon = (sportName: string) => {
-  switch (sportName.toLowerCase()) {
-    case "football":
-      return "football";
-    case "soccer":
-      return "soccer"; 
-    case "basketball":
-      return "basketball"; 
-    case "baseball":
-      return "baseball"; 
-    case "cycling":
-      return "bike"; 
-    case "ping-pong":
-    case "table-tennis":
-      return "table-tennis"; 
-    case "rugby":
-      return "rugby";  
-    case "golf":
-      return "golf";  
-    default:
-      return "help-circle"; // ❌ Default icon for unknown sports
-  }
-};
-
-
-
-// Helper function to assign color based on skill level
+    switch (sportName.toLowerCase()) {
+      case "football":
+        return { name: "american-football", type: "Ionicons" }; 
+      case "soccer":
+        return { name: "soccer", type: "MaterialCommunityIcons" }; 
+      case "basketball":
+        return { name: "basketball", type: "Ionicons" }; 
+      case "baseball":
+        return { name: "baseball", type: "MaterialCommunityIcons" }; 
+      case "cycling":
+        return { name: "bike", type: "MaterialCommunityIcons" }; 
+      case "ping-pong":
+      case "table-tennis":
+        return { name: "table-tennis", type: "MaterialCommunityIcons" }; 
+      case "tennis":
+        return { name: "tennis", type: "MaterialCommunityIcons" }; 
+      case "rugby":
+        return { name: "rugby", type: "MaterialCommunityIcons" }; 
+      case "golf":
+        return { name: "golf-tee", type: "MaterialCommunityIcons" }; 
+      case "hockey":
+        return { name: "hockey-sticks", type: "MaterialCommunityIcons" }; 
+      case "boxing":
+        return { name: "boxing-glove", type: "MaterialCommunityIcons" }; 
+        case "hiking":
+            return { name: "hiking", type: "MaterialCommunityIcons" };
+      default:
+        return { name: "help-circle", type: "Ionicons" }; 
+    }
+  };
+  
+  // Helper function to assign color based on skill level
 const getSkillColor = (ranking: string) => {
     switch (ranking.toLowerCase()) {
         case "beginner":
@@ -52,7 +59,7 @@ const getSkillColor = (ranking: string) => {
         case "advanced":
             return "#FF0000"; 
         default:
-            return "#808080"; // Gray for unknown skill level
+            return "#808080"; 
     }
 };
 
@@ -182,12 +189,11 @@ const ProfilePage: React.FC = () => {
                                 className="px-3 py-1 rounded-full border border-gray-300 flex-row items-center"
                                 style={{ backgroundColor: "white", minWidth: 100, margin: 4 }}
                             >
-                                <Icon 
-                                    name={getSportIcon(sport.name)} 
-                                    size={16} 
-                                    color={getSkillColor(sport.ranking)} 
-                                    style={{ marginRight: 4 }} 
-                                />
+                                {["soccer", "baseball", "bike", "table-tennis", "tennis", "rugby", "golf-tee", "hockey-sticks", "boxing-glove","hiking"].includes(getSportIcon(sport.name).name) ? (
+                                <MaterialCommunityIcons name={getSportIcon(sport.name).name} size={16} color={getSkillColor(sport.ranking)} style={{ marginRight: 4 }} />
+                                ) : (
+                                 <Ionicons name={getSportIcon(sport.name).name} size={16} color={getSkillColor(sport.ranking)} style={{ marginRight: 4 }} />
+                                )}
                                 <Text className="text-black text-sm">{sport.name}</Text>
                             </View>
                         ))
