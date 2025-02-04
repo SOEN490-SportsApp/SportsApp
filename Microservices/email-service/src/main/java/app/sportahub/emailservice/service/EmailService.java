@@ -1,7 +1,7 @@
 package app.sportahub.emailservice.service;
 
-import app.sportahub.emailservice.dto.request.EmailRequest;
+import org.springframework.messaging.MessagingException;
 
 public interface EmailService {
-    void sendEmail(EmailRequest emailRequest);
+    void sendForgotPasswordEmail(String email) throws MessagingException, jakarta.mail.MessagingException;
 }
