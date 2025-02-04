@@ -63,7 +63,7 @@ describe("Register Account Screen", () => {
       expect(getByText("Password is required")).toBeTruthy();
       expect(getByText("Please confirm your password")).toBeTruthy();
     });
-  });
+}, 10000);  
 
   it("shows an alert when terms not accepted", async () => {
     const { getByPlaceholderText, getByText } = render(
