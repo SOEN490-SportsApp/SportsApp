@@ -8,6 +8,7 @@ plugins {
 }
 
 group = 'app.sportahub'
+version = '0.0.1-SNAPSHOT'
 
 java {
 	toolchain {
@@ -27,6 +28,9 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'app.sportahub.kafkevents:kafka-events:1.0.2'
+	implementation 'org.apache.kafka:kafka-streams'
+	implementation 'org.springframework.kafka:spring-kafka'
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
@@ -56,6 +60,8 @@ dependencies {
 	testImplementation 'org.mockito:mockito-core:5.11.0'
 	testImplementation 'org.mockito:mockito-junit-jupiter:5.11.0'
 	testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+	testImplementation 'org.springframework.kafka:spring-kafka-test'
+	testImplementation 'org.testcontainers:kafka'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
