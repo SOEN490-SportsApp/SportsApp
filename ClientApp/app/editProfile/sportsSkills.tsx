@@ -40,7 +40,7 @@ const SportsSkillsPage: React.FC = () => {
         { sportsOfPreference: sports }
       );
 
-      console.log("Profile updated successfully:", sports);
+      //console.log("Profile updated successfully:", sports);
 
       // Update Redux immediately after saving
       dispatch(setUser({ ...user, profile: { ...user.profile, sportsOfPreference: sports } }));
@@ -72,9 +72,6 @@ const SportsSkillsPage: React.FC = () => {
           <Icon name="chevron-back" size={24} color={themeColors.text.dark} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Edit Profile</Text>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.cancelText}>Cancel</Text>
-        </TouchableOpacity>
       </View>
 
       {/* Title Section */}
@@ -104,12 +101,16 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "center",
     alignItems: "center",
-    paddingVertical: vs(12),
+    paddingVertical: vs(20),
+    position: "relative",
   },
   backButton: {
     padding: hs(8),
+    position: "absolute",  
+  left: hs(8),
+  top: vs(12),
   },
   headerTitle: {
     fontSize: vs(18),
