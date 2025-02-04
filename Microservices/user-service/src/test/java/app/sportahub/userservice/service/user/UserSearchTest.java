@@ -4,6 +4,7 @@ import app.sportahub.userservice.client.KeycloakApiClient;
 import app.sportahub.userservice.controller.user.UserController;
 import app.sportahub.userservice.dto.response.user.ProfileResponse;
 import app.sportahub.userservice.dto.response.user.SportLevelResponse;
+import app.sportahub.userservice.dto.response.user.UserProfileResponse;
 import app.sportahub.userservice.exception.user.*;
 import app.sportahub.userservice.mapper.user.FriendMapper;
 import app.sportahub.userservice.mapper.user.ProfileMapper;
@@ -115,6 +116,7 @@ public class UserSearchTest {
                 Arrays.asList("Soccer"), Arrays.asList("Pro"), "Male", "20-30", pageable))
                 .thenReturn(mockUserPage);
 
+        // Mock ProfileResponse (to be returned by the profileMapper)
         ProfileResponse profileResponse = new ProfileResponse(
                 "John",
                 "Doe",
@@ -127,19 +129,19 @@ public class UserSearchTest {
         );
         when(profileMapper.profileToProfileResponse(profile)).thenReturn(profileResponse);
 
-        // Call the service method
-        Page<ProfileResponse> result = userService.searchUsers("John", "Doe",
+        Page<UserProfileResponse> result = userService.searchUsers("John", "Doe",
                 Arrays.asList("Soccer"), Arrays.asList("Pro"), "Male", "20-30", pageable);
 
         // Assertions
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
-        assertEquals("John", result.getContent().get(0).firstName());
-        assertEquals("Doe", result.getContent().get(0).lastName());
-        assertEquals("Male", result.getContent().get(0).gender());
-        assertEquals(LocalDate.of(1995, 5, 15), result.getContent().get(0).dateOfBirth());
-        assertEquals("Soccer", result.getContent().get(0).sportsOfPreference().get(0).name());
-        assertEquals("Intermediate", result.getContent().get(0).sportsOfPreference().get(0).ranking());
+        assertEquals("1234", result.getContent().getFirst().userId());
+        assertEquals("John", result.getContent().getFirst().profileResponse().firstName());
+        assertEquals("Doe", result.getContent().getFirst().profileResponse().lastName());
+        assertEquals("Male", result.getContent().getFirst().profileResponse().gender());
+        assertEquals(LocalDate.of(1995, 5, 15), result.getContent().getFirst().profileResponse().dateOfBirth());
+        assertEquals("Soccer", result.getContent().getFirst().profileResponse().sportsOfPreference().getFirst().name());
+        assertEquals("Intermediate", result.getContent().getFirst().profileResponse().sportsOfPreference().getFirst().ranking());
 
         // Verify interactions
         verify(userRepository, times(1)).searchUsers("John", "Doe",
@@ -187,7 +189,7 @@ public class UserSearchTest {
         when(userRepository.searchUsers("John", "Doe", null, null, "Male", "25", pageable))
                 .thenReturn(userPage);
 
-        Page<ProfileResponse> result = userService.searchUsers("John", "Doe", null, null, "Male", "25", pageable);
+        Page<UserProfileResponse> result = userService.searchUsers("John", "Doe", null, null, "Male", "25", pageable);
 
         assertNotNull(result);
         verify(userRepository, times(1)).searchUsers("John", "Doe", null, null, "Male", "25", pageable);
