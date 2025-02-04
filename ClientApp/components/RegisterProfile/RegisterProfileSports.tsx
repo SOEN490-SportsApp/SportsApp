@@ -14,11 +14,12 @@ interface sportSelection {
   onChange: (selectedSports: SportPreference[]) => void;
 }
 
-const RegisterProfileSports: React.FC<sportSelection> = ({ selectedSports, onChange }) => {
-  const [selectedIcons, setSelectedIcons] = useState<number[]>(selectedSports.map(sport => {
+ const RegisterProfileSports: React.FC<sportSelection> = ({ selectedSports = [], onChange }) => {
+ const [selectedIcons, setSelectedIcons] = useState<number[]>(selectedSports ? selectedSports.map(sport => {
     const matchingSport = supportedSports.find(s => s.name === sport.name);
     return matchingSport ? matchingSport.id : -1;
-  }));
+}) : []);
+
 
   const [modalVisible, setModalVisible] = useState(false);
   const [currentSport, setCurrentSport] = useState<{ id: number; name: string } | null>(null);
