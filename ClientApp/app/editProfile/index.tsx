@@ -16,6 +16,8 @@ import { useSelector } from "react-redux";
 import { updateProfile } from "@/utils/api/profileApiClient";
 import { useUpdateUserToStore } from "@/state/user/actions";
 import { Picker } from "@react-native-picker/picker";
+import { Platform } from "react-native";
+import { ActionSheetIOS } from "react-native";
 
 interface EditProfilePageFormData {
   firstName: string;
@@ -48,13 +50,13 @@ const EditProfilePage: React.FC = () => {
         ...data,
         sportsOfPreference: user.profile.sportsOfPreference,
       };
-      console.log("Updated Data:", updatedData);
+      //console.log("Updated Data:", updatedData);
       const response = await updateProfile(updatedData, user.id);
-      console.log("Profile updated successfully:", response);
+     // console.log("Profile updated successfully:", response);
       await updateUserToStore(user.id);
       router.replace("/(tabs)/profile");
     } catch (error: any) {
-      console.error("Error occurred while updating profile:", error);
+     // console.error("Error occurred while updating profile:", error);
       const errorMessage =
         error?.message || "An error occurred while updating your profile.";
       Alert.alert("Error", errorMessage);
@@ -164,29 +166,48 @@ const EditProfilePage: React.FC = () => {
               )}
             />
           </View>
-
           <View style={styles.inputRow}>
-            <Text style={styles.label}>Gender</Text>
-            <Controller
-              control={control}
-              name="gender"
-              render={({ field: { onChange, value } }) => (
-                <View style={styles.pickerContainer}>
-                  <Picker
-                    selectedValue={value}
-                    onValueChange={(itemValue) => onChange(itemValue)}
-                    style={styles.picker}
-                  >
-                    <Picker.Item label="Select Gender" value="" />
-                    <Picker.Item label="Male" value="Male" />
-                    <Picker.Item label="Female" value="Female" />
-                    <Picker.Item label="Other" value="Other" />
-                  </Picker>
-                </View>
-              )}
-            />
-          </View>
-
+          <Text style={styles.label}>Gender</Text>
+          <Controller
+            control={control}
+            name="gender"
+            render={({ field: { onChange, value } }) => (
+             Platform.OS === "ios" ? (
+          <TouchableOpacity
+          style={styles.iosPickerButton}
+          onPress={() => {
+            ActionSheetIOS.showActionSheetWithOptions(
+              {
+                options: ["Cancel", "Male", "Female", "Other"],
+                cancelButtonIndex: 0,
+              },
+              (buttonIndex) => {
+                if (buttonIndex === 1) onChange("Male");
+                else if (buttonIndex === 2) onChange("Female");
+                else if (buttonIndex === 3) onChange("Other");
+              }
+            );
+          }}
+        >
+          <Text style={styles.iosPickerText}>{value || "Select Gender"}</Text>
+        </TouchableOpacity>
+      ) : (
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={value}
+            onValueChange={(itemValue) => onChange(itemValue)}
+            style={styles.picker}
+          >
+            <Picker.Item label="Select Gender" value="" />
+            <Picker.Item label="Male" value="Male" />
+            <Picker.Item label="Female" value="Female" />
+            <Picker.Item label="Other" value="Other" />
+          </Picker>
+        </View>
+          )
+        )}
+      />
+       </View>
           <View style={styles.inputRow}>
             <Text style={styles.label}>Date of Birth</Text>
             <Controller
@@ -292,6 +313,17 @@ const styles = StyleSheet.create({
   picker: {
     height: 50,
   },
+  iosPickerButton: {
+    flex: 2,
+    borderBottomWidth: 1,
+    borderBottomColor: "#D1D1D1",
+    paddingVertical: 12,
+    justifyContent: "center",
+  },
+  iosPickerText: {
+    fontSize: 16,
+    color: "#000",
+  },  
 });
 
 export default EditProfilePage;
