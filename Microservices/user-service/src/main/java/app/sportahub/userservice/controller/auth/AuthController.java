@@ -59,6 +59,7 @@ public class AuthController {
                description = "Sends an email to the specified user containing a temporary token to be used to update the password.")
     public void sendPasswordResetEmail(@Valid @RequestBody SendPasswordResetEmailRequest sendPasswordResetEmail){
         authService.sendPasswordResetEmail(sendPasswordResetEmail.email());
+        authService.sendPasswordResetEmailUsingKafka(sendPasswordResetEmail.email());
     }
 }
 
