@@ -4,22 +4,29 @@ import { View, Text, TouchableOpacity, FlatList, Modal,Dimensions, StyleSheet, T
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { vs,hs,} from "@/utils/helpers/uiScaler";
 import themeColors from "@/utils/constants/colors";
+
+interface SportPreference {
+  name: string;
+  ranking: string;
+}
 interface sportSelection {
-  onChange: (SelectedSport: { name: string; ranking: string }[]) => void;
+  selectedSports: SportPreference[];
+  onChange: (selectedSports: SportPreference[]) => void;
 }
 
-const RegisterProfileSports: React.FC<sportSelection> = ({ onChange }) => {
-  const [selectedIcons, setSelectedIcons] = useState<number[]>([]);
-  const [selectedSports, setSelectedSports] = useState<{name: string,ranking:string}[] | null>([])
+const RegisterProfileSports: React.FC<sportSelection> = ({ selectedSports, onChange }) => {
+  const [selectedIcons, setSelectedIcons] = useState<number[]>(selectedSports.map(sport => {
+    const matchingSport = supportedSports.find(s => s.name === sport.name);
+    return matchingSport ? matchingSport.id : -1;
+  }));
+
   const [modalVisible, setModalVisible] = useState(false);
   const [currentSport, setCurrentSport] = useState<{ id: number; name: string } | null>(null);
   const [ranking, setRanking] = useState<string>("");
 
-
-
   const toggleIconSelection = (item: any) => {
     setCurrentSport(item);
-    setRanking('Beginner')
+    setRanking("Beginner");
     setModalVisible(true);
   };
 
@@ -27,25 +34,26 @@ const RegisterProfileSports: React.FC<sportSelection> = ({ onChange }) => {
     if (currentSport) {
       setSelectedIcons((prevState) => {
         const newSelectedIcons = prevState.includes(currentSport.id)
-          ? selectedIcons
+          ? prevState
           : [...prevState, currentSport.id];
-  
-        const selectedNames = supportedSports.filter((icon) => newSelectedIcons.includes(icon.id)).map((icon) => {
-          const existingSport = selectedSports?.find(sport => sport.name === icon.name);
-          return {
-            name: icon.name,
-            ranking: icon.id === currentSport.id ? ranking : existingSport?.ranking || "",
-          };
-        });
-  
+
+        const selectedNames = supportedSports
+          .filter((icon) => newSelectedIcons.includes(icon.id))
+          .map((icon) => {
+            const existingSport = selectedSports.find(sport => sport.name === icon.name);
+            return {
+              name: icon.name,
+              ranking: icon.id === currentSport.id ? ranking : existingSport?.ranking || "Beginner",
+            };
+          });
+
         onChange(selectedNames);
-        setSelectedSports(selectedNames);
         return newSelectedIcons;
       });
-      setRanking(""); // Reset ranking input
     }
     setModalVisible(false);
   };
+
 
   const removePick = () => {
     if (currentSport) {
