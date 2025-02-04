@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, ActivityIndicator, SafeAreaView, ScrollView, Dimensions, FlatList, RefreshControl } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import CustomTabMenu from '@/components/Helper Components/CustomTabMenu';
 import { getOtherUserProfile } from '@/utils/api/profileApiClient';
-import { Profile } from '@/types/user';
 import { calculateAge } from '@/utils/helpers/ageOfUser';
 import { getEventsByUserId } from '@/utils/api/profileApiClient';
 import EventCard from '@/components/Event/EventCard';
@@ -47,7 +46,8 @@ const ActivityTab = ({ userId }: { userId: string }) => {
                     data={(events ?? []).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())}
                     keyExtractor={(item) => item.id}
                     renderItem={({ item }: { item: Event }) => (
-                        <EventCard event={item} isForProfile={true} onPress={() => { }} />
+                        <EventCard event={item} isForProfile={true} onPress={() => { router.push(`/events/${item.id}`);
+                    }} />
                     )}
                     refreshControl={<RefreshControl refreshing={refreshing} onRefresh={fetchEvents} />}
                 />

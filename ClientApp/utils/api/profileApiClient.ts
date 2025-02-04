@@ -5,11 +5,11 @@ import { mapProfiletoApiRequest } from "../mappers/apiMappers";
 
 export async function registerProfile(profile: Profile, userId: string) {
     const axiosInstance = getAxiosInstance();
-    try{
+    try {
         const data = mapProfiletoApiRequest(profile);
         const response = await axiosInstance.patch(API_ENDPOINTS.UPDATE_PROFILE.replace('{userId}', userId), data);
         return response;
-    } catch (error: any){
+    } catch (error: any) {
         console.error('Error updating profile:', error);
         throw error.response?.data || error;
     }
@@ -17,10 +17,10 @@ export async function registerProfile(profile: Profile, userId: string) {
 
 export async function getProfile(userId: string) {
     const axiosInstance = getAxiosInstance();
-    try{
+    try {
         const response = await axiosInstance.get<Profile>(API_ENDPOINTS.GET_USER_BY_ID.replace('{id}', userId));
         return response.data
-    } catch (error: any){
+    } catch (error: any) {
         console.error('Error fetching profile:', error);
         throw error.response?.data || error;
     }
@@ -34,7 +34,7 @@ export async function updateProfile(profile: Profile, userId: string) {
             API_ENDPOINTS.UPDATE_PROFILE.replace('{userId}', userId),
             data
         );
-        console.log("API Response:", response.data); 
+        console.log("API Response:", response.data);
         return response;
     } catch (error: any) {
         console.error("Error updating profile:", error);
@@ -60,6 +60,17 @@ export async function getEventsByUserId(userId: string) {
         return response.data;
     } catch (error: any) {
         console.error("Error fetching events:", error);
+        throw error.response?.data || error;
+    }
+}
+
+export async function sendFriendRequest(senderUserId: string, receiverUserId: string) {
+    const axiosInstance = getAxiosInstance();
+    try {
+        const response = await axiosInstance.post(API_ENDPOINTS.SEND_FRIEND_REQUEST.replace("{userId}", senderUserId), { receiverUserId });
+        return response.data;
+    } catch (error: any) {
+        console.error("Error sending friend request:", error);
         throw error.response?.data || error;
     }
 }
