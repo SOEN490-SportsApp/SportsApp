@@ -26,6 +26,7 @@ import supportedSports from "@/utils/constants/supportedSports";
 import GooglePlacesInput from "@/components/Helper Components/GooglePlacesInput";
 import CustomDateTimePicker from "@/components/Helper Components/CustomDateTimePicker";
 import { Ionicons } from "@expo/vector-icons";
+import EventLocationMap from "@/components/Helper Components/EventLocationMap";
 
 const Create = () => {
   const {
@@ -58,6 +59,8 @@ const Create = () => {
     city: string;
     province: string;
     country: string;
+    latitude: string;
+    longitude: string;
   }
 
   const [location, setLocation] = useState<Location | null>(null);
@@ -520,12 +523,25 @@ const Create = () => {
           )}
 
           {step === 3 && (
-            <>
+            <View style={{ flex: 1, paddingHorizontal: 20, paddingTop: 10 }}>
+              <Text style={styles.label}>Select Location</Text>
               <GooglePlacesInput
                 setLocation={setLocation}
                 clearTrigger={clearLocationTrigger}
               />
-            </>
+
+              {location?.latitude && location?.longitude && (
+                <View
+                  key={`${location.latitude}-${location.longitude}`}
+                  style={styles.mapContainer}
+                >
+                  <EventLocationMap
+                    latitude={parseFloat(location.latitude)}
+                    longitude={parseFloat(location.longitude)}
+                  />
+                </View>
+              )}
+            </View>
           )}
 
           {step === 4 && (
@@ -926,6 +942,12 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
+  },
+  mapContainer: {
+    marginTop: 10,
+    marginBottom: 100,
+    borderRadius: 10,
+    overflow: "hidden",
   },
 });
 
