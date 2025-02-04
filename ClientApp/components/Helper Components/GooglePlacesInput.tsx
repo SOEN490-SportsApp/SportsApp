@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, TouchableOpacity, Text } from "react-native";
+import { View } from "react-native";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import "react-native-get-random-values";
 
@@ -103,30 +103,6 @@ const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
           },
         }}
       />
-
-      {selectedLocation && (
-        <TouchableOpacity
-          style={{
-            marginTop: 20,
-            padding: 10,
-            borderWidth: 1,
-            backgroundColor: "#fff",
-          }}
-          onPress={() => setSelectedLocation(null)}
-        >
-          <Text style={{ fontWeight: "bold" }}>Selected Location:</Text>
-          <Text>{selectedLocation.name}</Text>
-          <Text>
-            {selectedLocation.streetNumber} {selectedLocation.streetName}
-          </Text>
-          <Text>
-            {selectedLocation.city}, {selectedLocation.province}
-          </Text>
-          <Text>
-            {selectedLocation.country} - {selectedLocation.postalCode}
-          </Text>
-        </TouchableOpacity>
-      )}
     </View>
   );
 };
