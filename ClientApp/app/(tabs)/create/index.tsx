@@ -14,6 +14,7 @@ import {
   Platform,
   TouchableWithoutFeedback,
   ScrollView,
+  Keyboard,
 } from "react-native";
 import { useForm, Controller, useWatch } from "react-hook-form";
 import { useRouter } from "expo-router";
@@ -197,51 +198,56 @@ const Create = () => {
     }
   };
 
-  const renderSportTypeModal = () => (
-    <Modal
-      animationType="slide"
-      transparent={true}
-      visible={isSportTypeModalVisible}
-      onRequestClose={() => setSportTypeModalVisible(false)}
-      accessibilityLabel="Sport Selection Modal"
-    >
-      <TouchableWithoutFeedback
-        testID="modal-overlay"
-        onPress={() => setSportTypeModalVisible(false)}
+  const renderSportTypeModal = () => {
+    return (
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isSportTypeModalVisible}
+        onRequestClose={() => setSportTypeModalVisible(false)}
+        accessibilityLabel="Sport Selection Modal"
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <FlatList
-              data={supportedSports}
-              keyExtractor={(item) => item.id.toString()}
-              contentContainerStyle={styles.flatListContainer}
-              renderItem={({ item }) => (
+        <TouchableWithoutFeedback
+          testID="modal-overlay"
+          onPress={() => setSportTypeModalVisible(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContainer}>
+              <FlatList
+                data={supportedSports}
+                keyExtractor={(item) => item.id.toString()}
+                contentContainerStyle={styles.flatListContainer}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={styles.modalItem}
+                    onPress={() => {
+                      console.log(`Selected Sport: ${item.name}`); // Debugging Log
+                      setValue("sportType", item.name, {
+                        shouldValidate: true,
+                      });
+                      setSportTypeModalVisible(false);
+                    }}
+                  >
+                    <Text style={styles.modalItemText}>{item.name}</Text>
+                  </TouchableOpacity>
+                )}
+                showsVerticalScrollIndicator={false}
+                style={styles.scrollableList}
+              />
+              <View style={styles.closeButtonContainer}>
                 <TouchableOpacity
-                  style={styles.modalItem}
-                  onPress={() => {
-                    setValue("sportType", item.name, { shouldValidate: true });
-                    setSportTypeModalVisible(false);
-                  }}
+                  onPress={() => setSportTypeModalVisible(false)}
+                  style={styles.modalCloseButton}
                 >
-                  <Text style={styles.modalItemText}>{item.name}</Text>
+                  <Text style={styles.modalCloseButtonText}>Close</Text>
                 </TouchableOpacity>
-              )}
-              showsVerticalScrollIndicator={false}
-              style={styles.scrollableList}
-            />
-            <View style={styles.closeButtonContainer}>
-              <TouchableOpacity
-                onPress={() => setSportTypeModalVisible(false)}
-                style={styles.modalCloseButton}
-              >
-                <Text style={styles.modalCloseButtonText}>Close</Text>
-              </TouchableOpacity>
+              </View>
             </View>
           </View>
-        </View>
-      </TouchableWithoutFeedback>
-    </Modal>
-  );
+        </TouchableWithoutFeedback>
+      </Modal>
+    );
+  };
 
   const watch = useWatch({ control });
 
@@ -287,402 +293,396 @@ const Create = () => {
   );
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View
-        style={[
-          styles.container,
-          { paddingTop: StatusBar.currentHeight || vs(24) },
-        ]}
-      >
-        {step === 1 && (
-          <>
-            <Text style={styles.label}>Event Name</Text>
-            <Controller
-              control={control}
-              name="eventName"
-              rules={{ required: "Event Name is required" }}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <TextInput
-                  placeholder="Enter Event Name"
-                  placeholderTextColor={themeColors.text.placeholder}
-                  style={styles.input}
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                  value={value || ""}
-                />
-              )}
-            />
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <SafeAreaView style={styles.safeArea}>
+        <View
+          style={[
+            styles.container,
+            { paddingTop: StatusBar.currentHeight || vs(24) },
+          ]}
+        >
+          {step === 1 && (
+            <>
+              <View style={styles.sectionContainer}>
+                <Text style={styles.sectionTitle}>General Information</Text>
 
-            {errors.eventName && (
-              <Text style={styles.errorText}>{errors.eventName.message}</Text>
-            )}
-
-            <Text style={styles.label}>Event Type</Text>
-            <View style={styles.radioGroup}>
-              <TouchableOpacity
-                testID="event-type-public"
-                onPress={() => setValue("eventType", "public")}
-                style={[
-                  styles.radioButton,
-                  watch.eventType === "public"
-                    ? styles.radioButtonSelected
-                    : null,
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.radioText,
-                    watch.eventType === "public" && styles.selectedText,
-                  ]}
-                >
-                  Public
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                testID="event-type-private"
-                onPress={() => setValue("eventType", "private")}
-                style={[
-                  styles.radioButton,
-                  watch.eventType === "private"
-                    ? styles.radioButtonSelected
-                    : null,
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.radioText,
-                    watch.eventType === "private" && styles.selectedText,
-                  ]}
-                >
-                  Private
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            <Text style={styles.label}>Sport Type</Text>
-            <Controller
-              control={control}
-              name="sportType"
-              rules={{ required: "Sport Type is required" }}
-              render={({ field: { value } }) => (
-                <TouchableOpacity
-                  style={[styles.input, errors.sportType && styles.inputError]}
-                  onPress={() => setSportTypeModalVisible(true)}
-                >
-                  <Text>{value || "Select a Sport"}</Text>
-                </TouchableOpacity>
-              )}
-            />
-            {renderSportTypeModal()}
-            {errors.sportType && (
-              <Text style={styles.errorText}>{errors.sportType.message}</Text>
-            )}
-
-            <Text style={styles.label}>Maximum Number of Participants</Text>
-            <Controller
-              control={control}
-              name="maxParticipants"
-              rules={{
-                required: "Maximum number of participants is required",
-                validate: (value) => {
-                  const number = parseInt(value, 10);
-                  return (
-                    (!isNaN(number) && number > 0) ||
-                    "Must be a positive integer greater than 0"
-                  );
-                },
-              }}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <TextInput
-                  placeholder="Enter maximum participants"
-                  placeholderTextColor={themeColors.text.placeholder}
-                  style={styles.input}
-                  onBlur={onBlur}
-                  onChangeText={(text) => {
-                    if (/^\d*$/.test(text)) {
-                      onChange(text);
-                    }
-                  }}
-                  value={value || ""}
-                  keyboardType="numeric"
-                />
-              )}
-            />
-            {errors.maxParticipants && (
-              <Text style={styles.errorText}>
-                {errors.maxParticipants.message}
-              </Text>
-            )}
-
-            <Text style={styles.label}>Required Skill Level</Text>
-            <View style={styles.skillLevelGroup}>
-              {["Beginner", "Intermediate", "Advanced"].map((level) => (
-                <TouchableOpacity
-                  key={level}
-                  testID={`skill-level-${level}`}
-                  style={[
-                    styles.skillLevelOption,
-                    requiredSkillLevel.includes(level) &&
-                      styles.skillLevelSelected,
-                  ]}
-                  onPress={() => toggleSkillLevel(level)}
-                >
-                  <Text
-                    style={[
-                      styles.skillLevelText,
-                      requiredSkillLevel.includes(level) &&
-                        styles.skillLevelTextSelected,
-                    ]}
-                  >
-                    {level}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-
-            <Text style={styles.label}>Description</Text>
-            <KeyboardAvoidingView
-              behavior={Platform.OS === "ios" ? "padding" : "height"}
-              keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
-            >
-              <Controller
-                control={control}
-                name="description"
-                rules={{ required: "Description is required" }}
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <TextInput
-                    placeholder="Enter Description"
-                    placeholderTextColor={themeColors.text.placeholder}
-                    style={[styles.input, styles.textArea]}
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value || ""}
-                    multiline
-                    numberOfLines={4}
-                  />
-                )}
-              />
-            </KeyboardAvoidingView>
-            {errors.description &&
-              typeof errors.description.message === "string" && (
-                <Text style={styles.errorText}>
-                  {errors.description.message}
-                </Text>
-              )}
-          </>
-        )}
-
-        {step === 2 && (
-          <>
-            <Text style={styles.label}>Event Date and Time</Text>
-            <CustomDateTimePicker
-              value={eventDate}
-              mode="date"
-              label="Event Date"
-              onChange={(selectedDate) => setEventDate(selectedDate)}
-            />
-
-            <CustomDateTimePicker
-              value={startTime}
-              mode="time"
-              label="Start Time"
-              onChange={(selectedTime) => setStartTime(selectedTime)}
-            />
-
-            <CustomDateTimePicker
-              value={endTime}
-              mode="time"
-              label="End Time"
-              onChange={(selectedTime) => setEndTime(selectedTime)}
-            />
-
-            <Text style={styles.label}>Cut Off Time</Text>
-            <CustomDateTimePicker
-              value={cutOffDate}
-              mode="date"
-              label="Cutoff Date"
-              onChange={(selectedDate) => setCutOffDate(selectedDate)}
-            />
-
-            <CustomDateTimePicker
-              value={cutOffTime}
-              mode="time"
-              label="Cutoff Time"
-              onChange={(selectedTime) => setCutOffTime(selectedTime)}
-            />
-          </>
-        )}
-
-        {step === 3 && (
-          <View style={{ flex: 1, paddingHorizontal: 20, paddingTop: 10 }}>
-            <Text style={styles.label}>Select Location</Text>
-            <GooglePlacesInput
-              setLocation={setLocation}
-              clearTrigger={clearLocationTrigger}
-            />
-
-            {location?.latitude && location?.longitude && (
-              <View
-                key={`${location.latitude}-${location.longitude}`}
-                style={styles.mapContainer}
-              >
-                <EventLocationMap
-                  latitude={parseFloat(location.latitude)}
-                  longitude={parseFloat(location.longitude)}
-                />
-              </View>
-            )}
-          </View>
-        )}
-
-        {step === 4 && (
-          <View style={{ flex: 1 }}>
-            <ScrollView contentContainerStyle={styles.summaryContainer}>
-              <View style={styles.summaryHeader}>
-                <TouchableOpacity
-                  onPress={() => setStep(step - 1)}
-                  style={styles.summaryBackButton}
-                >
+                <View style={styles.inputContainer}>
                   <Ionicons
-                    name="arrow-back"
-                    size={24}
+                    name="calendar-outline"
+                    size={20}
                     color={themeColors.primary}
                   />
-                </TouchableOpacity>
-                <Text style={styles.summaryTitle}>Event Summary</Text>
-              </View>
-              <View style={styles.card}>
-                <Text style={styles.sectionTitle}>General Information</Text>
-                <SummaryItem
-                  label="Event Name:"
-                  value={watch.eventName}
-                  icon="calendar-outline"
-                />
-                <SummaryItem
-                  label="Event Type:"
-                  value={watch.eventType}
-                  icon="people-outline"
-                />
-                <SummaryItem
-                  label="Sport:"
-                  value={watch.sportType}
-                  icon="football-outline"
-                />
-                <SummaryItem
-                  label="Participants:"
-                  value={watch.maxParticipants}
-                  icon="people-circle-outline"
-                />
-                <SummaryItem
-                  label="Skill Level:"
-                  value={requiredSkillLevel.join(", ") || "None"}
-                  icon="ribbon-outline"
-                />
-              </View>
+                  <Controller
+                    control={control}
+                    name="eventName"
+                    rules={{ required: "Event Name is required" }}
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <TextInput
+                        placeholder="Enter Event Name"
+                        placeholderTextColor={themeColors.text.placeholder}
+                        style={styles.inputField}
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        value={value || ""}
+                      />
+                    )}
+                  />
+                </View>
+                {errors.eventName && (
+                  <Text style={styles.errorText}>
+                    {errors.eventName.message}
+                  </Text>
+                )}
 
-              <View style={styles.card}>
-                <Text style={styles.sectionTitle}>Time & Location</Text>
-                <SummaryItem
-                  label=""
-                  value={eventDate?.toDateString()}
-                  icon="calendar"
-                />
-                <SummaryItem
-                  label=""
-                  value={
-                    startTime && endTime
-                      ? `From ${startTime.toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })} 
+                <Text style={styles.label}>Event Type</Text>
+                <View style={styles.segmentedControl}>
+                  {["public", "private"].map((type) => (
+                    <TouchableOpacity
+                      key={type}
+                      onPress={() => setValue("eventType", type)}
+                      style={[
+                        styles.segmentButton,
+                        watch.eventType === type &&
+                          styles.segmentButtonSelected,
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.segmentButtonText,
+                          watch.eventType === type &&
+                            styles.segmentButtonTextSelected,
+                        ]}
+                      >
+                        {type.charAt(0).toUpperCase() + type.slice(1)}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+
+                {/* Sport Type & Maximum Participants - Side by Side */}
+                <View style={styles.rowContainer}>
+                  {/* Sport Type */}
+                  <View style={styles.inputHalfContainer}>
+                    <Text style={styles.label}>Sport Type</Text>
+                    <TouchableOpacity
+                      style={[styles.inputContainer, styles.equalHeightInput]}
+                      onPress={() => {
+                        console.log("Opening Sport Type Modal...");
+                        setSportTypeModalVisible(true);
+                      }}
+                    >
+                      <Ionicons
+                        name="football-outline"
+                        size={20}
+                        color={themeColors.primary}
+                      />
+                      <Text style={styles.inputField}>
+                        {watch.sportType || "Select a Sport"}
+                      </Text>
+                    </TouchableOpacity>
+                    {errors.sportType && (
+                      <Text style={styles.errorText}>
+                        {errors.sportType.message}
+                      </Text>
+                    )}
+                  </View>
+
+                  {/* Maximum Participants */}
+                  <View style={styles.inputHalfContainer}>
+                    <Text style={styles.label}>Max Participants</Text>
+                    <View
+                      style={[styles.inputContainer, styles.equalHeightInput]}
+                    >
+                      <Ionicons
+                        name="people-outline"
+                        size={20}
+                        color={themeColors.primary}
+                      />
+                      <Controller
+                        control={control}
+                        name="maxParticipants"
+                        rules={{
+                          required: "Required",
+                          validate: (v) => parseInt(v, 10) > 0 || "Must be > 0",
+                        }}
+                        render={({ field: { onChange, value } }) => (
+                          <TextInput
+                            placeholder="Enter max"
+                            placeholderTextColor={themeColors.text.placeholder}
+                            style={[
+                              styles.inputField,
+                              {
+                                height: 40,
+                                textAlignVertical: "center",
+                                paddingVertical: 5,
+                              },
+                            ]}
+                            onChangeText={onChange}
+                            value={value || ""}
+                            keyboardType="numeric"
+                          />
+                        )}
+                      />
+                    </View>
+                    {errors.maxParticipants && (
+                      <Text style={styles.errorText}>
+                        {errors.maxParticipants.message}
+                      </Text>
+                    )}
+                  </View>
+                </View>
+
+                {/* Render Sport Type Modal */}
+                {isSportTypeModalVisible && renderSportTypeModal()}
+
+                <Text style={styles.label}>Description</Text>
+                <View
+                  style={[styles.inputContainer, styles.descriptionContainer]}
+                >
+                  <Ionicons
+                    name="chatbox-ellipses-outline"
+                    size={20}
+                    color={themeColors.primary}
+                  />
+                  <Controller
+                    control={control}
+                    name="description"
+                    rules={{ required: "Description is required" }}
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <TextInput
+                        placeholder="Enter Description"
+                        placeholderTextColor={themeColors.text.placeholder}
+                        style={styles.descriptionField}
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        value={value || ""}
+                        multiline
+                        numberOfLines={4}
+                      />
+                    )}
+                  />
+                </View>
+                {errors.description && (
+                  <Text style={styles.errorText}>
+                    {errors.description.message}
+                  </Text>
+                )}
+              </View>
+            </>
+          )}
+
+          {step === 2 && (
+            <>
+              <Text style={styles.label}>Event Date and Time</Text>
+              <CustomDateTimePicker
+                value={eventDate}
+                mode="date"
+                label="Event Date"
+                onChange={(selectedDate) => setEventDate(selectedDate)}
+              />
+
+              <CustomDateTimePicker
+                value={startTime}
+                mode="time"
+                label="Start Time"
+                onChange={(selectedTime) => setStartTime(selectedTime)}
+              />
+
+              <CustomDateTimePicker
+                value={endTime}
+                mode="time"
+                label="End Time"
+                onChange={(selectedTime) => setEndTime(selectedTime)}
+              />
+
+              <Text style={styles.label}>Cut Off Time</Text>
+              <CustomDateTimePicker
+                value={cutOffDate}
+                mode="date"
+                label="Cutoff Date"
+                onChange={(selectedDate) => setCutOffDate(selectedDate)}
+              />
+
+              <CustomDateTimePicker
+                value={cutOffTime}
+                mode="time"
+                label="Cutoff Time"
+                onChange={(selectedTime) => setCutOffTime(selectedTime)}
+              />
+            </>
+          )}
+
+          {step === 3 && (
+            <View style={{ flex: 1, paddingHorizontal: 20, paddingTop: 10 }}>
+              <Text style={styles.label}>Select Location</Text>
+              <GooglePlacesInput
+                setLocation={setLocation}
+                clearTrigger={clearLocationTrigger}
+              />
+
+              {location?.latitude && location?.longitude && (
+                <View
+                  key={`${location.latitude}-${location.longitude}`}
+                  style={styles.mapContainer}
+                >
+                  <EventLocationMap
+                    latitude={parseFloat(location.latitude)}
+                    longitude={parseFloat(location.longitude)}
+                  />
+                </View>
+              )}
+            </View>
+          )}
+
+          {step === 4 && (
+            <View style={{ flex: 1 }}>
+              <ScrollView contentContainerStyle={styles.summaryContainer}>
+                <View style={styles.summaryHeader}>
+                  <TouchableOpacity
+                    onPress={() => setStep(step - 1)}
+                    style={styles.summaryBackButton}
+                  >
+                    <Ionicons
+                      name="arrow-back"
+                      size={24}
+                      color={themeColors.primary}
+                    />
+                  </TouchableOpacity>
+                  <Text style={styles.summaryTitle}>Event Summary</Text>
+                </View>
+                <View style={styles.card}>
+                  <Text style={styles.sectionTitle}>General Information</Text>
+                  <SummaryItem
+                    label="Event Name:"
+                    value={watch.eventName}
+                    icon="calendar-outline"
+                  />
+                  <SummaryItem
+                    label="Event Type:"
+                    value={watch.eventType}
+                    icon="people-outline"
+                  />
+                  <SummaryItem
+                    label="Sport:"
+                    value={watch.sportType}
+                    icon="football-outline"
+                  />
+                  <SummaryItem
+                    label="Participants:"
+                    value={watch.maxParticipants}
+                    icon="people-circle-outline"
+                  />
+                  <SummaryItem
+                    label="Skill Level:"
+                    value={requiredSkillLevel.join(", ") || "None"}
+                    icon="ribbon-outline"
+                  />
+                </View>
+
+                <View style={styles.card}>
+                  <Text style={styles.sectionTitle}>Time & Location</Text>
+                  <SummaryItem
+                    label=""
+                    value={eventDate?.toDateString()}
+                    icon="calendar"
+                  />
+                  <SummaryItem
+                    label=""
+                    value={
+                      startTime && endTime
+                        ? `From ${startTime.toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })} 
               to ${endTime.toLocaleTimeString([], {
                 hour: "2-digit",
                 minute: "2-digit",
               })}`
-                      : "Not selected"
-                  }
-                  icon="time-outline"
-                />
-                <SummaryItem
-                  label=""
-                  value={
-                    startTime && endTime
-                      ? `Register by ${cutOffDate?.toDateString()} at ${cutOffTime?.toLocaleTimeString(
-                          [],
-                          {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          }
-                        )}`
-                      : "Not selected"
-                  }
-                  icon="time-outline"
-                />
-                <SummaryItem
-                  label=""
-                  value={
-                    location
-                      ? `${location.name}, ${location.city}, ${location.province}`
-                      : "Not Selected"
-                  }
-                  icon="location-outline"
-                />
-              </View>
+                        : "Not selected"
+                    }
+                    icon="time-outline"
+                  />
+                  <SummaryItem
+                    label=""
+                    value={
+                      startTime && endTime
+                        ? `Register by ${cutOffDate?.toDateString()} at ${cutOffTime?.toLocaleTimeString(
+                            [],
+                            {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            }
+                          )}`
+                        : "Not selected"
+                    }
+                    icon="time-outline"
+                  />
+                  <SummaryItem
+                    label=""
+                    value={
+                      location
+                        ? `${location.name}, ${location.city}, ${location.province}`
+                        : "Not Selected"
+                    }
+                    icon="location-outline"
+                  />
+                </View>
 
-              <View style={styles.descriptionCard}>
-                <Text style={styles.sectionTitle}>Description</Text>
-                <ScrollView style={styles.descriptionBox}>
-                  <Text style={styles.descriptionText}>
-                    {watch.description || "No description provided"}
-                  </Text>
-                </ScrollView>
-              </View>
+                <View style={styles.descriptionCard}>
+                  <Text style={styles.sectionTitle}>Description</Text>
+                  <ScrollView style={styles.descriptionBox}>
+                    <Text style={styles.descriptionText}>
+                      {watch.description || "No description provided"}
+                    </Text>
+                  </ScrollView>
+                </View>
 
-              <View style={styles.buttonContainer}>
-                <ConfirmButton
-                  text="Create Event"
-                  onPress={handleSubmit(onSubmit)}
-                  icon={undefined}
-                  iconPlacement={null}
+                <View style={styles.buttonContainer}>
+                  <ConfirmButton
+                    text="Create Event"
+                    onPress={handleSubmit(onSubmit)}
+                    icon={undefined}
+                    iconPlacement={null}
+                  />
+                </View>
+              </ScrollView>
+            </View>
+          )}
+
+          <View style={styles.navigationContainer}>
+            {step > 1 && step !== 4 ? (
+              <TouchableOpacity
+                onPress={() => setStep(step - 1)}
+                style={styles.navButton}
+              >
+                <Ionicons
+                  name="arrow-back-circle"
+                  size={32}
+                  color={themeColors.primary}
                 />
-              </View>
-            </ScrollView>
+                <Text style={styles.navButtonText}>Back</Text>
+              </TouchableOpacity>
+            ) : (
+              <View style={{ flex: 1 }} />
+            )}
+
+            {step < 4 && (
+              <TouchableOpacity
+                onPress={() => setStep(step + 1)}
+                style={styles.navButton}
+              >
+                <Text style={styles.navButtonText}>Next</Text>
+                <Ionicons
+                  name="arrow-forward-circle"
+                  size={32}
+                  color={themeColors.primary}
+                />
+              </TouchableOpacity>
+            )}
           </View>
-        )}
-
-        <View style={styles.navigationContainer}>
-          {step > 1 && step !== 4 ? (
-            <TouchableOpacity
-              onPress={() => setStep(step - 1)}
-              style={styles.navButton}
-            >
-              <Ionicons
-                name="arrow-back-circle"
-                size={32}
-                color={themeColors.primary}
-              />
-              <Text style={styles.navButtonText}>Back</Text>
-            </TouchableOpacity>
-          ) : (
-            <View style={{ flex: 1 }} />
-          )}
-
-          {step < 4 && (
-            <TouchableOpacity
-              onPress={() => setStep(step + 1)}
-              style={styles.navButton}
-            >
-              <Text style={styles.navButtonText}>Next</Text>
-              <Ionicons
-                name="arrow-forward-circle"
-                size={32}
-                color={themeColors.primary}
-              />
-            </TouchableOpacity>
-          )}
         </View>
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -781,12 +781,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
   },
-  errorText: {
-    color: themeColors.text.error,
-    fontSize: mhs(12),
-    marginTop: vs(4),
-    marginBottom: vs(8),
-  },
   inputError: {
     borderWidth: 1,
     borderColor: themeColors.text.error,
@@ -874,15 +868,6 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: themeColors.text.dark,
-    marginBottom: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
-    paddingBottom: 5,
-  },
   summaryItem: {
     flexDirection: "row",
     alignItems: "center",
@@ -958,6 +943,105 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: themeColors.primary,
     textAlign: "center",
+  },
+  sectionContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: themeColors.text.dark,
+    marginBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+    paddingBottom: 5,
+  },
+
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: themeColors.background.lightGrey,
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: "#ddd",
+  },
+
+  inputField: {
+    flex: 1,
+    marginLeft: 10,
+    fontSize: 16,
+    color: themeColors.text.dark,
+  },
+
+  descriptionContainer: {
+    alignItems: "flex-start",
+  },
+
+  descriptionField: {
+    flex: 1,
+    marginLeft: 10,
+    fontSize: 16,
+    color: themeColors.text.dark,
+    textAlignVertical: "top",
+    height: 100,
+  },
+
+  segmentedControl: {
+    flexDirection: "row",
+    backgroundColor: "#f5f5f5",
+    borderRadius: 10,
+    padding: 5,
+    marginBottom: 15,
+  },
+
+  segmentButton: {
+    flex: 1,
+    alignItems: "center",
+    paddingVertical: 10,
+    borderRadius: 10,
+  },
+
+  segmentButtonSelected: {
+    backgroundColor: themeColors.primary,
+  },
+
+  segmentButtonText: {
+    fontSize: 16,
+    color: themeColors.text.dark,
+  },
+
+  segmentButtonTextSelected: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+
+  errorText: {
+    color: themeColors.text.error,
+    fontSize: 12,
+    marginTop: 4,
+  },
+  rowContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: vs(10),
+  },
+  inputHalfContainer: {
+    flex: 1,
+    marginHorizontal: hs(5),
+  },
+  equalHeightInput: {
+    height: 48,
   },
 });
 
