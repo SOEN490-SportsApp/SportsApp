@@ -149,6 +149,15 @@ public class UserController {
         return userService.getFriends(userId);
     }
 
+    @DeleteMapping("/{userId}/friends")
+    @PreAuthorize("#userId == authentication.name || hasRole('ROLE_ADMIN')")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "remove a friend",
+    description = "Remove a friend from the user's friendList.")
+    public void removeFriend(@PathVariable String userId, @RequestParam String friendId) {
+        userService.deleteFriend(userId, friendId);
+    }
+
     @GetMapping("/search")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Search for user",

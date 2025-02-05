@@ -313,19 +313,23 @@ public class UserServiceImpl implements UserService {
                 userFriendRequestList.remove(e);
                 e.setFriendRequestStatus(FriendRequestStatusEnum.ACCEPTED);
                 userFriendList.add(friendMapper.friendRequestToFriend(e));
+                friendRequestRepository.deleteById(e.getId());
             } else if (action.equals(UpdateFriendRequestActionEnum.DECLINE)) {
                 userFriendRequestList.remove(e);
+                friendRequestRepository.deleteById(e.getId());
             }
 
             // If the operation was successful for the user, we repeat the process for the user who original sent the friend request
             friendUserFriendRequestList.stream().filter(el -> el.getUserId().equals(user.getId())).findAny().ifPresent(el -> {
                 isFriendFound2.set(true);
                 if (action.equals(UpdateFriendRequestActionEnum.ACCEPT)) {
-                    el.setFriendRequestStatus(FriendRequestStatusEnum.ACCEPTED);
                     friendUserFriendRequestList.remove(el);
+                    el.setFriendRequestStatus(FriendRequestStatusEnum.ACCEPTED);
                     friendUserFriendList.add(friendMapper.friendRequestToFriend(el));
+                    friendRequestRepository.deleteById(el.getId());
                 } else if (action.equals(UpdateFriendRequestActionEnum.DECLINE)) {
                     friendUserFriendRequestList.remove(el);
+                    friendRequestRepository.deleteById(el.getId());
                 }
             });
         });
@@ -410,6 +414,19 @@ public class UserServiceImpl implements UserService {
         return friendList.stream()
                 .map(friend -> new ViewFriendResponse(getUserById(friend.getUserId()).username(), friend.getUserId(),
                         friend.getId())).toList();
+    }
+
+    @Override
+    public void deleteFriend(String userId, String friendId) {
+        User user = userRepository.findUserById(userId)
+                .orElseThrow(() -> new UserDoesNotExistException(userId));
+        List<Friend> friendList = user.getFriendList();
+
+        friendList.stream().filter(friend -> friend.getId().equals(friendId)).findAny()
+                .ifPresentOrElse(friend -> {
+                    friendRepository.deleteById(friendId);
+                }, () -> {
+                    throw new FriendDoesNotExistException(friendId);});
     }
 
     @Override
