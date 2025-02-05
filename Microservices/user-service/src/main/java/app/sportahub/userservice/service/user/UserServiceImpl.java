@@ -312,7 +312,9 @@ public class UserServiceImpl implements UserService {
             if (action.equals(UpdateFriendRequestActionEnum.ACCEPT)) {
                 userFriendRequestList.remove(e);
                 e.setFriendRequestStatus(FriendRequestStatusEnum.ACCEPTED);
-                userFriendList.add(friendMapper.friendRequestToFriend(e));
+                Friend friend1 = friendMapper.friendRequestToFriend(e);
+                userFriendList.add(friend1);
+                friendRepository.save(friend1);
                 friendRequestRepository.deleteById(e.getId());
             } else if (action.equals(UpdateFriendRequestActionEnum.DECLINE)) {
                 userFriendRequestList.remove(e);
@@ -325,7 +327,9 @@ public class UserServiceImpl implements UserService {
                 if (action.equals(UpdateFriendRequestActionEnum.ACCEPT)) {
                     friendUserFriendRequestList.remove(el);
                     el.setFriendRequestStatus(FriendRequestStatusEnum.ACCEPTED);
-                    friendUserFriendList.add(friendMapper.friendRequestToFriend(el));
+                    Friend friend2 = friendMapper.friendRequestToFriend(el);
+                    friendUserFriendList.add(friend2);
+                    friendRepository.save(friend2);
                     friendRequestRepository.deleteById(el.getId());
                 } else if (action.equals(UpdateFriendRequestActionEnum.DECLINE)) {
                     friendUserFriendRequestList.remove(el);
@@ -349,8 +353,6 @@ public class UserServiceImpl implements UserService {
         friendUser.setFriendRequestList(friendUserFriendRequestList);
         userRepository.save(friendUser);
 
-        friendRequestRepository.save(friendRequest);
-        friendRepository.save(friendMapper.friendRequestToFriend(friendRequest));
         String responseMessage;
 
         if (action.equals(UpdateFriendRequestActionEnum.ACCEPT)) {
@@ -418,13 +420,38 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteFriend(String userId, String friendId) {
-        User user = userRepository.findUserById(userId)
+        User user1 = userRepository.findUserById(userId)
                 .orElseThrow(() -> new UserDoesNotExistException(userId));
-        List<Friend> friendList = user.getFriendList();
+        List<Friend> user1FriendList = user1.getFriendList();
 
-        friendList.stream().filter(friend -> friend.getId().equals(friendId)).findAny()
-                .ifPresentOrElse(friend -> {
-                    friendRepository.deleteById(friendId);
+        user1FriendList.stream().filter(friend1 -> friend1.getId().equals(friendId)).findAny()
+                .ifPresentOrElse(friend1 -> {
+
+                    User user2 = userRepository.findUserById(friend1.getUserId())
+                            .orElseThrow(() -> new UserDoesNotExistException(friend1.getUserId()));
+                    List<Friend> user2FriendList = user2.getFriendList();
+
+                    user2FriendList.stream().filter(friend2 -> friend2.getUserId().equals(user1.getId())).findAny()
+                                    .ifPresentOrElse( friend2 -> {
+
+                                        user1FriendList.remove(friend1);
+                                        user2FriendList.remove(friend2);
+
+                                        friendRepository.deleteById(friend1.getId());
+                                        friendRepository.deleteById(friend2.getId());
+
+                                        user1.setFriendList(user1FriendList);
+                                        user2.setFriendList(user2FriendList);
+
+                                        userRepository.save(user1);
+                                        userRepository.save(user2);
+
+                                        log.info("deleteFriend: Friend with id: {} was successfully deleted", friend1.getId());
+                                        log.info("deleteFriend: Friend with id: {} was successfully deleted", friend2.getId());
+
+                                    }, () -> {
+                                        throw new FriendNotFoundInFriendListException(user2.getId(), user1.getId());
+                                    });
                 }, () -> {
                     throw new FriendDoesNotExistException(friendId);});
     }
