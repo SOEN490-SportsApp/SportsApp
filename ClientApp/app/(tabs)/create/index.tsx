@@ -288,167 +288,163 @@ const Create = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
+      <View
+        style={[
+          styles.container,
+          { paddingTop: StatusBar.currentHeight || vs(24) },
+        ]}
       >
-        <View
-          style={[
-            styles.container,
-            { paddingTop: StatusBar.currentHeight || vs(24) },
-          ]}
-        >
-          {step === 1 && (
-            <>
-              <Text style={styles.label}>Event Name</Text>
-              <Controller
-                control={control}
-                name="eventName"
-                rules={{ required: "Event Name is required" }}
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <TextInput
-                    placeholder="Enter Event Name"
-                    placeholderTextColor={themeColors.text.placeholder}
-                    style={styles.input}
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value || ""}
-                  />
-                )}
-              />
-
-              {errors.eventName && (
-                <Text style={styles.errorText}>{errors.eventName.message}</Text>
+        {step === 1 && (
+          <>
+            <Text style={styles.label}>Event Name</Text>
+            <Controller
+              control={control}
+              name="eventName"
+              rules={{ required: "Event Name is required" }}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  placeholder="Enter Event Name"
+                  placeholderTextColor={themeColors.text.placeholder}
+                  style={styles.input}
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value || ""}
+                />
               )}
+            />
 
-              <Text style={styles.label}>Event Type</Text>
-              <View style={styles.radioGroup}>
-                <TouchableOpacity
-                  testID="event-type-public"
-                  onPress={() => setValue("eventType", "public")}
+            {errors.eventName && (
+              <Text style={styles.errorText}>{errors.eventName.message}</Text>
+            )}
+
+            <Text style={styles.label}>Event Type</Text>
+            <View style={styles.radioGroup}>
+              <TouchableOpacity
+                testID="event-type-public"
+                onPress={() => setValue("eventType", "public")}
+                style={[
+                  styles.radioButton,
+                  watch.eventType === "public"
+                    ? styles.radioButtonSelected
+                    : null,
+                ]}
+              >
+                <Text
                   style={[
-                    styles.radioButton,
-                    watch.eventType === "public"
-                      ? styles.radioButtonSelected
-                      : null,
+                    styles.radioText,
+                    watch.eventType === "public" && styles.selectedText,
                   ]}
                 >
-                  <Text
-                    style={[
-                      styles.radioText,
-                      watch.eventType === "public" && styles.selectedText,
-                    ]}
-                  >
-                    Public
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  testID="event-type-private"
-                  onPress={() => setValue("eventType", "private")}
-                  style={[
-                    styles.radioButton,
-                    watch.eventType === "private"
-                      ? styles.radioButtonSelected
-                      : null,
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.radioText,
-                      watch.eventType === "private" && styles.selectedText,
-                    ]}
-                  >
-                    Private
-                  </Text>
-                </TouchableOpacity>
-              </View>
-
-              <Text style={styles.label}>Sport Type</Text>
-              <Controller
-                control={control}
-                name="sportType"
-                rules={{ required: "Sport Type is required" }}
-                render={({ field: { value } }) => (
-                  <TouchableOpacity
-                    style={[
-                      styles.input,
-                      errors.sportType && styles.inputError,
-                    ]}
-                    onPress={() => setSportTypeModalVisible(true)}
-                  >
-                    <Text>{value || "Select a Sport"}</Text>
-                  </TouchableOpacity>
-                )}
-              />
-              {renderSportTypeModal()}
-              {errors.sportType && (
-                <Text style={styles.errorText}>{errors.sportType.message}</Text>
-              )}
-
-              <Text style={styles.label}>Maximum Number of Participants</Text>
-              <Controller
-                control={control}
-                name="maxParticipants"
-                rules={{
-                  required: "Maximum number of participants is required",
-                  validate: (value) => {
-                    const number = parseInt(value, 10);
-                    return (
-                      (!isNaN(number) && number > 0) ||
-                      "Must be a positive integer greater than 0"
-                    );
-                  },
-                }}
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <TextInput
-                    placeholder="Enter maximum participants"
-                    placeholderTextColor={themeColors.text.placeholder}
-                    style={styles.input}
-                    onBlur={onBlur}
-                    onChangeText={(text) => {
-                      if (/^\d*$/.test(text)) {
-                        onChange(text);
-                      }
-                    }}
-                    value={value || ""}
-                    keyboardType="numeric"
-                  />
-                )}
-              />
-              {errors.maxParticipants && (
-                <Text style={styles.errorText}>
-                  {errors.maxParticipants.message}
+                  Public
                 </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                testID="event-type-private"
+                onPress={() => setValue("eventType", "private")}
+                style={[
+                  styles.radioButton,
+                  watch.eventType === "private"
+                    ? styles.radioButtonSelected
+                    : null,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.radioText,
+                    watch.eventType === "private" && styles.selectedText,
+                  ]}
+                >
+                  Private
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.label}>Sport Type</Text>
+            <Controller
+              control={control}
+              name="sportType"
+              rules={{ required: "Sport Type is required" }}
+              render={({ field: { value } }) => (
+                <TouchableOpacity
+                  style={[styles.input, errors.sportType && styles.inputError]}
+                  onPress={() => setSportTypeModalVisible(true)}
+                >
+                  <Text>{value || "Select a Sport"}</Text>
+                </TouchableOpacity>
               )}
+            />
+            {renderSportTypeModal()}
+            {errors.sportType && (
+              <Text style={styles.errorText}>{errors.sportType.message}</Text>
+            )}
 
-              <Text style={styles.label}>Required Skill Level</Text>
-              <View style={styles.skillLevelGroup}>
-                {["Beginner", "Intermediate", "Advanced"].map((level) => (
-                  <TouchableOpacity
-                    key={level}
-                    testID={`skill-level-${level}`}
+            <Text style={styles.label}>Maximum Number of Participants</Text>
+            <Controller
+              control={control}
+              name="maxParticipants"
+              rules={{
+                required: "Maximum number of participants is required",
+                validate: (value) => {
+                  const number = parseInt(value, 10);
+                  return (
+                    (!isNaN(number) && number > 0) ||
+                    "Must be a positive integer greater than 0"
+                  );
+                },
+              }}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  placeholder="Enter maximum participants"
+                  placeholderTextColor={themeColors.text.placeholder}
+                  style={styles.input}
+                  onBlur={onBlur}
+                  onChangeText={(text) => {
+                    if (/^\d*$/.test(text)) {
+                      onChange(text);
+                    }
+                  }}
+                  value={value || ""}
+                  keyboardType="numeric"
+                />
+              )}
+            />
+            {errors.maxParticipants && (
+              <Text style={styles.errorText}>
+                {errors.maxParticipants.message}
+              </Text>
+            )}
+
+            <Text style={styles.label}>Required Skill Level</Text>
+            <View style={styles.skillLevelGroup}>
+              {["Beginner", "Intermediate", "Advanced"].map((level) => (
+                <TouchableOpacity
+                  key={level}
+                  testID={`skill-level-${level}`}
+                  style={[
+                    styles.skillLevelOption,
+                    requiredSkillLevel.includes(level) &&
+                      styles.skillLevelSelected,
+                  ]}
+                  onPress={() => toggleSkillLevel(level)}
+                >
+                  <Text
                     style={[
-                      styles.skillLevelOption,
+                      styles.skillLevelText,
                       requiredSkillLevel.includes(level) &&
-                        styles.skillLevelSelected,
+                        styles.skillLevelTextSelected,
                     ]}
-                    onPress={() => toggleSkillLevel(level)}
                   >
-                    <Text
-                      style={[
-                        styles.skillLevelText,
-                        requiredSkillLevel.includes(level) &&
-                          styles.skillLevelTextSelected,
-                      ]}
-                    >
-                      {level}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
+                    {level}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
 
-              <Text style={styles.label}>Description</Text>
+            <Text style={styles.label}>Description</Text>
+            <KeyboardAvoidingView
+              behavior={Platform.OS === "ios" ? "padding" : "height"}
+              keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
+            >
               <Controller
                 control={control}
                 name="description"
@@ -466,226 +462,226 @@ const Create = () => {
                   />
                 )}
               />
-              {errors.description &&
-                typeof errors.description.message === "string" && (
-                  <Text style={styles.errorText}>
-                    {errors.description.message}
-                  </Text>
-                )}
-            </>
-          )}
-
-          {step === 2 && (
-            <>
-              <Text style={styles.label}>Event Date and Time</Text>
-              <CustomDateTimePicker
-                value={eventDate}
-                mode="date"
-                label="Event Date"
-                onChange={(selectedDate) => setEventDate(selectedDate)}
-              />
-
-              <CustomDateTimePicker
-                value={startTime}
-                mode="time"
-                label="Start Time"
-                onChange={(selectedTime) => setStartTime(selectedTime)}
-              />
-
-              <CustomDateTimePicker
-                value={endTime}
-                mode="time"
-                label="End Time"
-                onChange={(selectedTime) => setEndTime(selectedTime)}
-              />
-
-              <Text style={styles.label}>Cut Off Time</Text>
-              <CustomDateTimePicker
-                value={cutOffDate}
-                mode="date"
-                label="Cutoff Date"
-                onChange={(selectedDate) => setCutOffDate(selectedDate)}
-              />
-
-              <CustomDateTimePicker
-                value={cutOffTime}
-                mode="time"
-                label="Cutoff Time"
-                onChange={(selectedTime) => setCutOffTime(selectedTime)}
-              />
-            </>
-          )}
-
-          {step === 3 && (
-            <View style={{ flex: 1, paddingHorizontal: 20, paddingTop: 10 }}>
-              <Text style={styles.label}>Select Location</Text>
-              <GooglePlacesInput
-                setLocation={setLocation}
-                clearTrigger={clearLocationTrigger}
-              />
-
-              {location?.latitude && location?.longitude && (
-                <View
-                  key={`${location.latitude}-${location.longitude}`}
-                  style={styles.mapContainer}
-                >
-                  <EventLocationMap
-                    latitude={parseFloat(location.latitude)}
-                    longitude={parseFloat(location.longitude)}
-                  />
-                </View>
+            </KeyboardAvoidingView>
+            {errors.description &&
+              typeof errors.description.message === "string" && (
+                <Text style={styles.errorText}>
+                  {errors.description.message}
+                </Text>
               )}
-            </View>
-          )}
+          </>
+        )}
 
-          {step === 4 && (
-            <View style={{ flex: 1 }}>
-              <ScrollView contentContainerStyle={styles.summaryContainer}>
-                <View style={styles.summaryHeader}>
-                  <TouchableOpacity
-                    onPress={() => setStep(step - 1)}
-                    style={styles.summaryBackButton}
-                  >
-                    <Ionicons
-                      name="arrow-back"
-                      size={24}
-                      color={themeColors.primary}
-                    />
-                  </TouchableOpacity>
-                  <Text style={styles.summaryTitle}>Event Summary</Text>
-                </View>
-                <View style={styles.card}>
-                  <Text style={styles.sectionTitle}>General Information</Text>
-                  <SummaryItem
-                    label="Event Name:"
-                    value={watch.eventName}
-                    icon="calendar-outline"
-                  />
-                  <SummaryItem
-                    label="Event Type:"
-                    value={watch.eventType}
-                    icon="people-outline"
-                  />
-                  <SummaryItem
-                    label="Sport:"
-                    value={watch.sportType}
-                    icon="football-outline"
-                  />
-                  <SummaryItem
-                    label="Participants:"
-                    value={watch.maxParticipants}
-                    icon="people-circle-outline"
-                  />
-                  <SummaryItem
-                    label="Skill Level:"
-                    value={requiredSkillLevel.join(", ") || "None"}
-                    icon="ribbon-outline"
-                  />
-                </View>
+        {step === 2 && (
+          <>
+            <Text style={styles.label}>Event Date and Time</Text>
+            <CustomDateTimePicker
+              value={eventDate}
+              mode="date"
+              label="Event Date"
+              onChange={(selectedDate) => setEventDate(selectedDate)}
+            />
 
-                <View style={styles.card}>
-                  <Text style={styles.sectionTitle}>Time & Location</Text>
-                  <SummaryItem
-                    label=""
-                    value={eventDate?.toDateString()}
-                    icon="calendar"
+            <CustomDateTimePicker
+              value={startTime}
+              mode="time"
+              label="Start Time"
+              onChange={(selectedTime) => setStartTime(selectedTime)}
+            />
+
+            <CustomDateTimePicker
+              value={endTime}
+              mode="time"
+              label="End Time"
+              onChange={(selectedTime) => setEndTime(selectedTime)}
+            />
+
+            <Text style={styles.label}>Cut Off Time</Text>
+            <CustomDateTimePicker
+              value={cutOffDate}
+              mode="date"
+              label="Cutoff Date"
+              onChange={(selectedDate) => setCutOffDate(selectedDate)}
+            />
+
+            <CustomDateTimePicker
+              value={cutOffTime}
+              mode="time"
+              label="Cutoff Time"
+              onChange={(selectedTime) => setCutOffTime(selectedTime)}
+            />
+          </>
+        )}
+
+        {step === 3 && (
+          <View style={{ flex: 1, paddingHorizontal: 20, paddingTop: 10 }}>
+            <Text style={styles.label}>Select Location</Text>
+            <GooglePlacesInput
+              setLocation={setLocation}
+              clearTrigger={clearLocationTrigger}
+            />
+
+            {location?.latitude && location?.longitude && (
+              <View
+                key={`${location.latitude}-${location.longitude}`}
+                style={styles.mapContainer}
+              >
+                <EventLocationMap
+                  latitude={parseFloat(location.latitude)}
+                  longitude={parseFloat(location.longitude)}
+                />
+              </View>
+            )}
+          </View>
+        )}
+
+        {step === 4 && (
+          <View style={{ flex: 1 }}>
+            <ScrollView contentContainerStyle={styles.summaryContainer}>
+              <View style={styles.summaryHeader}>
+                <TouchableOpacity
+                  onPress={() => setStep(step - 1)}
+                  style={styles.summaryBackButton}
+                >
+                  <Ionicons
+                    name="arrow-back"
+                    size={24}
+                    color={themeColors.primary}
                   />
-                  <SummaryItem
-                    label=""
-                    value={
-                      startTime && endTime
-                        ? `From ${startTime.toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })} 
+                </TouchableOpacity>
+                <Text style={styles.summaryTitle}>Event Summary</Text>
+              </View>
+              <View style={styles.card}>
+                <Text style={styles.sectionTitle}>General Information</Text>
+                <SummaryItem
+                  label="Event Name:"
+                  value={watch.eventName}
+                  icon="calendar-outline"
+                />
+                <SummaryItem
+                  label="Event Type:"
+                  value={watch.eventType}
+                  icon="people-outline"
+                />
+                <SummaryItem
+                  label="Sport:"
+                  value={watch.sportType}
+                  icon="football-outline"
+                />
+                <SummaryItem
+                  label="Participants:"
+                  value={watch.maxParticipants}
+                  icon="people-circle-outline"
+                />
+                <SummaryItem
+                  label="Skill Level:"
+                  value={requiredSkillLevel.join(", ") || "None"}
+                  icon="ribbon-outline"
+                />
+              </View>
+
+              <View style={styles.card}>
+                <Text style={styles.sectionTitle}>Time & Location</Text>
+                <SummaryItem
+                  label=""
+                  value={eventDate?.toDateString()}
+                  icon="calendar"
+                />
+                <SummaryItem
+                  label=""
+                  value={
+                    startTime && endTime
+                      ? `From ${startTime.toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })} 
               to ${endTime.toLocaleTimeString([], {
                 hour: "2-digit",
                 minute: "2-digit",
               })}`
-                        : "Not selected"
-                    }
-                    icon="time-outline"
-                  />
-                  <SummaryItem
-                    label=""
-                    value={
-                      startTime && endTime
-                        ? `Register by ${cutOffDate?.toDateString()} at ${cutOffTime?.toLocaleTimeString(
-                            [],
-                            {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            }
-                          )}`
-                        : "Not selected"
-                    }
-                    icon="time-outline"
-                  />
-                  <SummaryItem
-                    label=""
-                    value={
-                      location
-                        ? `${location.name}, ${location.city}, ${location.province}`
-                        : "Not Selected"
-                    }
-                    icon="location-outline"
-                  />
-                </View>
+                      : "Not selected"
+                  }
+                  icon="time-outline"
+                />
+                <SummaryItem
+                  label=""
+                  value={
+                    startTime && endTime
+                      ? `Register by ${cutOffDate?.toDateString()} at ${cutOffTime?.toLocaleTimeString(
+                          [],
+                          {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          }
+                        )}`
+                      : "Not selected"
+                  }
+                  icon="time-outline"
+                />
+                <SummaryItem
+                  label=""
+                  value={
+                    location
+                      ? `${location.name}, ${location.city}, ${location.province}`
+                      : "Not Selected"
+                  }
+                  icon="location-outline"
+                />
+              </View>
 
-                <View style={styles.descriptionCard}>
-                  <Text style={styles.sectionTitle}>Description</Text>
-                  <ScrollView style={styles.descriptionBox}>
-                    <Text style={styles.descriptionText}>
-                      {watch.description || "No description provided"}
-                    </Text>
-                  </ScrollView>
-                </View>
+              <View style={styles.descriptionCard}>
+                <Text style={styles.sectionTitle}>Description</Text>
+                <ScrollView style={styles.descriptionBox}>
+                  <Text style={styles.descriptionText}>
+                    {watch.description || "No description provided"}
+                  </Text>
+                </ScrollView>
+              </View>
 
-                <View style={styles.buttonContainer}>
-                  <ConfirmButton
-                    text="Create Event"
-                    onPress={handleSubmit(onSubmit)}
-                    icon={undefined}
-                    iconPlacement={null}
-                  />
-                </View>
-              </ScrollView>
-            </View>
+              <View style={styles.buttonContainer}>
+                <ConfirmButton
+                  text="Create Event"
+                  onPress={handleSubmit(onSubmit)}
+                  icon={undefined}
+                  iconPlacement={null}
+                />
+              </View>
+            </ScrollView>
+          </View>
+        )}
+
+        <View style={styles.navigationContainer}>
+          {step > 1 && step !== 4 ? (
+            <TouchableOpacity
+              onPress={() => setStep(step - 1)}
+              style={styles.navButton}
+            >
+              <Ionicons
+                name="arrow-back-circle"
+                size={32}
+                color={themeColors.primary}
+              />
+              <Text style={styles.navButtonText}>Back</Text>
+            </TouchableOpacity>
+          ) : (
+            <View style={{ flex: 1 }} />
           )}
 
-          <View style={styles.navigationContainer}>
-            {step > 1 && step !== 4 ? (
-              <TouchableOpacity
-                onPress={() => setStep(step - 1)}
-                style={styles.navButton}
-              >
-                <Ionicons
-                  name="arrow-back-circle"
-                  size={32}
-                  color={themeColors.primary}
-                />
-                <Text style={styles.navButtonText}>Back</Text>
-              </TouchableOpacity>
-            ) : (
-              <View style={{ flex: 1 }} />
-            )}
-
-            {step < 4 && (
-              <TouchableOpacity
-                onPress={() => setStep(step + 1)}
-                style={styles.navButton}
-              >
-                <Text style={styles.navButtonText}>Next</Text>
-                <Ionicons
-                  name="arrow-forward-circle"
-                  size={32}
-                  color={themeColors.primary}
-                />
-              </TouchableOpacity>
-            )}
-          </View>
+          {step < 4 && (
+            <TouchableOpacity
+              onPress={() => setStep(step + 1)}
+              style={styles.navButton}
+            >
+              <Text style={styles.navButtonText}>Next</Text>
+              <Ionicons
+                name="arrow-forward-circle"
+                size={32}
+                color={themeColors.primary}
+              />
+            </TouchableOpacity>
+          )}
         </View>
-      </KeyboardAvoidingView>
+      </View>
     </SafeAreaView>
   );
 };
