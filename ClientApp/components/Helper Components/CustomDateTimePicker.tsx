@@ -28,7 +28,7 @@ const CustomDateTimePicker: React.FC<CustomDateTimePickerProps> = ({
 
   return (
     <View>
-      <Text style={styles.label}>{label}</Text>
+      {/* <Text style={styles.label}>{label}</Text> */}
       <TouchableOpacity onPress={showPicker} style={styles.input}>
         <Text style={styles.inputText}>
           {value
