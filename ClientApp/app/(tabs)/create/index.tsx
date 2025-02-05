@@ -270,12 +270,6 @@ const Create = () => {
         >
           <Text style={styles.backButtonText}>Back</Text>
         </TouchableOpacity>
-        <ConfirmButton
-          text="Create Event"
-          onPress={handleSubmit(onSubmit)}
-          icon={undefined}
-          iconPlacement={null}
-        />
       </SafeAreaView>
     );
   }
@@ -287,7 +281,7 @@ const Create = () => {
   }> = ({ label, value, icon }) => (
     <View style={styles.summaryItem}>
       <Ionicons name={icon as any} size={20} color={themeColors.primary} />
-      <Text style={styles.summaryLabel}>{label}:</Text>
+      <Text style={styles.summaryLabel}>{label}</Text>
       <Text style={styles.summaryValue}>{value}</Text>
     </View>
   );
@@ -547,82 +541,94 @@ const Create = () => {
           {step === 4 && (
             <View style={{ flex: 1 }}>
               <ScrollView contentContainerStyle={styles.summaryContainer}>
-                <Text style={styles.summaryTitle}>Event Summary</Text>
-
+                <View style={styles.summaryHeader}>
+                  <TouchableOpacity
+                    onPress={() => setStep(step - 1)}
+                    style={styles.summaryBackButton}
+                  >
+                    <Ionicons
+                      name="arrow-back"
+                      size={24}
+                      color={themeColors.primary}
+                    />
+                  </TouchableOpacity>
+                  <Text style={styles.summaryTitle}>Event Summary</Text>
+                </View>
                 <View style={styles.card}>
                   <Text style={styles.sectionTitle}>General Information</Text>
                   <SummaryItem
-                    label="Event Name"
+                    label="Event Name:"
                     value={watch.eventName}
                     icon="calendar-outline"
                   />
                   <SummaryItem
-                    label="Event Type"
+                    label="Event Type:"
                     value={watch.eventType}
                     icon="people-outline"
                   />
                   <SummaryItem
-                    label="Sport Type"
+                    label="Sport:"
                     value={watch.sportType}
                     icon="football-outline"
                   />
                   <SummaryItem
-                    label="Max Participants"
+                    label="Participants:"
                     value={watch.maxParticipants}
                     icon="people-circle-outline"
                   />
                   <SummaryItem
-                    label="Required Skill Level"
+                    label="Skill Level:"
                     value={requiredSkillLevel.join(", ") || "None"}
                     icon="ribbon-outline"
                   />
                 </View>
 
                 <View style={styles.card}>
-                  <Text style={styles.sectionTitle}>Date & Time</Text>
+                  <Text style={styles.sectionTitle}>Time & Location</Text>
                   <SummaryItem
-                    label="Event Date"
+                    label=""
                     value={eventDate?.toDateString()}
                     icon="calendar"
                   />
                   <SummaryItem
-                    label="Start Time"
-                    value={startTime?.toLocaleTimeString()}
+                    label=""
+                    value={
+                      startTime && endTime
+                        ? `From ${startTime.toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })} 
+              to ${endTime.toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}`
+                        : "Not selected"
+                    }
                     icon="time-outline"
                   />
                   <SummaryItem
-                    label="End Time"
-                    value={endTime?.toLocaleTimeString()}
+                    label=""
+                    value={
+                      startTime && endTime
+                        ? `Register by ${cutOffDate?.toDateString()} at ${cutOffTime?.toLocaleTimeString(
+                            [],
+                            {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            }
+                          )}`
+                        : "Not selected"
+                    }
                     icon="time-outline"
                   />
                   <SummaryItem
-                    label="Cutoff Time"
-                    value={cutOffTime?.toLocaleTimeString()}
-                    icon="time-outline"
-                  />
-                </View>
-
-                <View style={styles.card}>
-                  <Text style={styles.sectionTitle}>Location</Text>
-                  <SummaryItem
-                    label="Address"
-                    value={location?.name || "Not Selected"}
+                    label=""
+                    value={
+                      location
+                        ? `${location.name}, ${location.city}, ${location.province}`
+                        : "Not Selected"
+                    }
                     icon="location-outline"
-                  />
-                  <SummaryItem
-                    label="City"
-                    value={location?.city || "Not Selected"}
-                    icon="business-outline"
-                  />
-                  <SummaryItem
-                    label="Province"
-                    value={location?.province || "Not Selected"}
-                    icon="map-outline"
-                  />
-                  <SummaryItem
-                    label="Country"
-                    value={location?.country || "Not Selected"}
-                    icon="earth-outline"
                   />
                 </View>
 
@@ -634,21 +640,21 @@ const Create = () => {
                     </Text>
                   </ScrollView>
                 </View>
-              </ScrollView>
 
-              <View style={styles.buttonContainer}>
-                <ConfirmButton
-                  text="Create Event"
-                  onPress={handleSubmit(onSubmit)}
-                  icon={undefined}
-                  iconPlacement={null}
-                />
-              </View>
+                <View style={styles.buttonContainer}>
+                  <ConfirmButton
+                    text="Create Event"
+                    onPress={handleSubmit(onSubmit)}
+                    icon={undefined}
+                    iconPlacement={null}
+                  />
+                </View>
+              </ScrollView>
             </View>
           )}
 
           <View style={styles.navigationContainer}>
-            {step > 1 ? (
+            {step > 1 && step !== 4 ? (
               <TouchableOpacity
                 onPress={() => setStep(step - 1)}
                 style={styles.navButton}
@@ -842,8 +848,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 16,
     paddingVertical: 10,
-    backgroundColor: themeColors.background.lightGrey,
-    borderTopWidth: 1,
+    backgroundColor: themeColors.background.light,
     borderColor: "#ddd",
   },
   navButton: {
@@ -862,13 +867,6 @@ const styles = StyleSheet.create({
     backgroundColor: themeColors.background.light,
   },
   summaryText: { fontSize: 16, marginBottom: 5 },
-  summaryTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: themeColors.primary,
-    marginBottom: 10,
-    textAlign: "center",
-  },
   card: {
     backgroundColor: "#fff",
     padding: 15,
@@ -933,7 +931,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     position: "absolute",
-    bottom: 20,
+    bottom: 1,
     left: 50,
     right: 50,
     paddingVertical: 30,
@@ -948,6 +946,22 @@ const styles = StyleSheet.create({
     marginBottom: 100,
     borderRadius: 10,
     overflow: "hidden",
+  },
+  summaryHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    backgroundColor: themeColors.background.light,
+  },
+  summaryBackButton: {
+    marginRight: 60,
+  },
+  summaryTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: themeColors.primary,
+    textAlign: "center",
   },
 });
 
