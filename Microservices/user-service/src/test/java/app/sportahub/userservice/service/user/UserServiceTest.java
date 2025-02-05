@@ -116,27 +116,7 @@ public class UserServiceTest {
     private Optional<User> getUser(String userID, String username) {
         return Optional.of(User.builder()
                 .withId(userID)
-                .withEmail(username +"@email.com")
-                        .withUsername(username)
-                .withProfile(Profile.builder()
-                        .withFirstName("John")
-                        .withLastName("Doe")
-                        .withDateOfBirth(LocalDate.of(1990, 1, 1))
-                        .withGender("Male")
-                        .withPostalCode("12345")
-                        .withPhoneNumber("1234567890")
-                        .withSportsOfPreference(
-                                List.of(new SportLevel("Basketball", "Intermediate"),
-                                        new SportLevel("Soccer", "Beginner")))
-                        .withRanking("100")
-                        .build())
-                        .build());
-    }
-
-    private Optional<User> getUser(String userID, String username, List<FriendRequest> friendRequestList) {
-        return Optional.of(User.builder()
-                .withId(userID)
-                .withEmail(username +"@email.com")
+                .withEmail(username + "@email.com")
                 .withUsername(username)
                 .withProfile(Profile.builder()
                         .withFirstName("John")
@@ -150,7 +130,27 @@ public class UserServiceTest {
                                         new SportLevel("Soccer", "Beginner")))
                         .withRanking("100")
                         .build())
-                        .withFriendRequestList(friendRequestList)
+                .build());
+    }
+
+    private Optional<User> getUser(String userID, String username, List<FriendRequest> friendRequestList) {
+        return Optional.of(User.builder()
+                .withId(userID)
+                .withEmail(username + "@email.com")
+                .withUsername(username)
+                .withProfile(Profile.builder()
+                        .withFirstName("John")
+                        .withLastName("Doe")
+                        .withDateOfBirth(LocalDate.of(1990, 1, 1))
+                        .withGender("Male")
+                        .withPostalCode("12345")
+                        .withPhoneNumber("1234567890")
+                        .withSportsOfPreference(
+                                List.of(new SportLevel("Basketball", "Intermediate"),
+                                        new SportLevel("Soccer", "Beginner")))
+                        .withRanking("100")
+                        .build())
+                .withFriendRequestList(friendRequestList)
                 .build());
     }
 
@@ -238,7 +238,8 @@ public class UserServiceTest {
 
         UsernameAlreadyExistsException exception = assertThrows(UsernameAlreadyExistsException.class,
                 () -> userService.createUser(userRequest));
-        assertEquals("409 CONFLICT \"User with this username:testUser already exists.\"", exception.getMessage());
+        assertEquals("409 CONFLICT \"User with this username:testUser already exists.\"",
+                exception.getMessage());
 
         verify(userRepository, times(1)).findUserByEmail(userRequest.email());
         verify(userRepository, times(1)).findUserByUsername(userRequest.username());
@@ -413,7 +414,8 @@ public class UserServiceTest {
                 null
         );
 
-        Optional<User> optionalExistingUser = Optional.of(new User("keycloak-123", "test@gmail.com", "testusername", existingProfile, null, null, null));
+        Optional<User> optionalExistingUser = Optional.of(new User("keycloak-123", "test@gmail.com",
+                "testusername", existingProfile, null, null, null));
         User existingUser = optionalExistingUser.get();
         when(userRepository.findUserById(existingUser.getId())).thenReturn(optionalExistingUser);
         existingUser.getProfile().setDateOfBirth(profileRequest.dateOfBirth());
@@ -431,7 +433,8 @@ public class UserServiceTest {
 
     @Test
     public void patchUserProfileShouldThrowUserNotFound() {
-        ProfileRequest profileRequest = new ProfileRequest("John", null, null, null, null, null, null, null);
+        ProfileRequest profileRequest = new ProfileRequest("John", null, null, null,
+                null, null, null, null);
 
         when(userRepository.findUserById("1")).thenReturn(Optional.empty());
 
@@ -460,7 +463,8 @@ public class UserServiceTest {
     @Test
     void assignBadgeThrowsUserDoesNotExist() {
         when(userRepository.findById("user1")).thenReturn(Optional.empty());
-        assertThrows(UserDoesNotExistException.class, () -> userService.assignBadge("user1", "badge1", "giver1"));
+        assertThrows(UserDoesNotExistException.class,
+                () -> userService.assignBadge("user1", "badge1", "giver1"));
     }
 
     @Test
@@ -473,7 +477,8 @@ public class UserServiceTest {
         user.setProfile(profile);
 
         when(userRepository.findById("user1")).thenReturn(Optional.of(user));
-        assertThrows(UserAlreadyAssignedBadgeByThisGiverException.class, () -> userService.assignBadge("user1", "badge1", "giver1"));
+        assertThrows(UserAlreadyAssignedBadgeByThisGiverException.class,
+                () -> userService.assignBadge("user1", "badge1", "giver1"));
     }
 
     @Test
@@ -565,8 +570,8 @@ public class UserServiceTest {
         User receiver = receiverUser.orElseThrow();
         FriendRequestRequest friendRequestRequest = new FriendRequestRequest(receiverUser.get().getId());
         FriendRequest friend = FriendRequest.builder().withFriendRequestStatus(FriendRequestStatusEnum.SENT)
-                        .withUserId(receiverId)
-                                .build();
+                .withUserId(receiverId)
+                .build();
 
         when(userRepository.save(send)).thenReturn(send);
         when(userRepository.save(receiver)).thenReturn(receiver);
@@ -578,11 +583,12 @@ public class UserServiceTest {
 
         // Assert
         assertNotNull(response);
-        assertEquals("Friend request sent successfully.",response.message());
+        assertEquals("Friend request sent successfully.", response.message());
         assertFalse(send.getFriendRequestList().isEmpty());
         assertFalse(receiver.getFriendRequestList().isEmpty());
         assertEquals(FriendRequestStatusEnum.SENT, send.getFriendRequestList().getFirst().getFriendRequestStatus());
-        assertEquals(FriendRequestStatusEnum.RECEIVED, receiver.getFriendRequestList().getFirst().getFriendRequestStatus());
+        assertEquals(FriendRequestStatusEnum.RECEIVED, receiver.getFriendRequestList().getFirst()
+                .getFriendRequestStatus());
     }
 
     @Test
@@ -592,10 +598,11 @@ public class UserServiceTest {
 
         // Act
         UserDoesNotExistException exception = assertThrows(UserDoesNotExistException.class,
-                () -> userService.sendFriendRequest(userId, new FriendRequestRequest("test") ));
+                () -> userService.sendFriendRequest(userId, new FriendRequestRequest("test")));
 
         // Assert
-        assertEquals("404 NOT_FOUND \"User with identifier: " + userId + " does not exist.\"", exception.getMessage());
+        assertEquals("404 NOT_FOUND \"User with identifier: " + userId + " does not exist.\"",
+                exception.getMessage());
     }
 
     @Test
@@ -624,11 +631,11 @@ public class UserServiceTest {
         // Act
         UserAlreadyInFriendRequestListException exception = assertThrows(UserAlreadyInFriendRequestListException.class,
                 () -> userService.sendFriendRequest(sendUser.get().getId(),
-                new FriendRequestRequest(receiverUser.get().getId())));
+                        new FriendRequestRequest(receiverUser.get().getId())));
 
         // Assert
         assertEquals("409 CONFLICT \"User with username: " + receiver.getUsername() + " and status: "
-                + send.getFriendRequestList().getFirst().getFriendRequestStatus() + " already in friend request list.\"",
+                        + send.getFriendRequestList().getFirst().getFriendRequestStatus() + " already in friend request list.\"",
                 exception.getMessage());
     }
 
@@ -674,17 +681,18 @@ public class UserServiceTest {
 
         lenient().when(userRepository.findUserById(userId)).thenReturn(Optional.of(user));
         lenient().when(userRepository.findUserById(friendId)).thenReturn(Optional.of(friendUser));
-        when(friendRequestRepository.findFriendRequestById(any())).thenReturn(Optional.of(userFriendRequestList.getFirst()));
+        when(friendRequestRepository.findFriendRequestById(any()))
+                .thenReturn(Optional.of(userFriendRequestList.getFirst()));
         lenient().when(userRepository.save(user)).thenReturn(user);
         lenient().when(userRepository.save(friendUser)).thenReturn(friendUser);
 
         // Act
         UpdateFriendRequestResponse updateFriendRequestResponse = userService
-                .updateFriendRequest(userId, "requestID", updateFriendRequestRequest );
+                .updateFriendRequest(userId, "requestID", updateFriendRequestRequest);
 
         // Assert
         assertEquals("User with id: " + user.getId()
-                + " accepted the friend request of user with id: " + friendUser.getId() + " successfully",
+                        + " accepted the friend request of user with id: " + friendUser.getId() + " successfully",
                 updateFriendRequestResponse.message());
 
         assertEquals(FriendRequestStatusEnum.ACCEPTED, user.getFriendList().getFirst().getFriendRequestStatus());
@@ -714,13 +722,14 @@ public class UserServiceTest {
 
         lenient().when(userRepository.findUserById(userId)).thenReturn(Optional.of(user));
         lenient().when(userRepository.findUserById(friendId)).thenReturn(Optional.of(friendUser));
-        when(friendRequestRepository.findFriendRequestById(any())).thenReturn(Optional.of(userFriendRequestList.getFirst()));
+        when(friendRequestRepository.findFriendRequestById(any()))
+                .thenReturn(Optional.of(userFriendRequestList.getFirst()));
         lenient().when(userRepository.save(user)).thenReturn(user);
         lenient().when(userRepository.save(friendUser)).thenReturn(friendUser);
 
         // Act
         UpdateFriendRequestResponse updateFriendRequestResponse = userService
-                .updateFriendRequest(userId, "requestID", updateFriendRequestRequest );
+                .updateFriendRequest(userId, "requestID", updateFriendRequestRequest);
 
         // Assert
         assertEquals("User with id: " + user.getId()
@@ -738,9 +747,9 @@ public class UserServiceTest {
 
         // Act
         UserDoesNotExistException exception = assertThrows(UserDoesNotExistException.class, () ->
-                        userService.updateFriendRequest(userId, "requestId",
-                                new UpdateFriendRequestRequest("friendUsername",
-                                        UpdateFriendRequestActionEnum.ACCEPT)));
+                userService.updateFriendRequest(userId, "requestId",
+                        new UpdateFriendRequestRequest("friendUsername",
+                                UpdateFriendRequestActionEnum.ACCEPT)));
 
         // Assert
         assertEquals("404 NOT_FOUND \"User with identifier: " + userId + " does not exist.\"",
@@ -818,13 +827,14 @@ public class UserServiceTest {
 
         when(userRepository.findUserById(userId)).thenReturn(Optional.of(user));
         when(userRepository.findUserById(wrongUser.getId())).thenReturn(Optional.of(wrongUser));
-        when(friendRequestRepository.findFriendRequestById(any())).thenReturn(Optional.of(userFriendRequestList.getFirst()));
+        when(friendRequestRepository.findFriendRequestById(any()))
+                .thenReturn(Optional.of(userFriendRequestList.getFirst()));
 
         // Act
         GivenFriendUserIdDoesNotMatchFriendRequestFoundByIdException exception =
                 assertThrows(GivenFriendUserIdDoesNotMatchFriendRequestFoundByIdException.class, () ->
-                userService.updateFriendRequest(userId, requestId ,
-                        updateFriendRequestRequest));
+                        userService.updateFriendRequest(userId, requestId,
+                                updateFriendRequestRequest));
 
         // Assert
         assertEquals("409 CONFLICT \"Given friend request with the user id: "
@@ -859,8 +869,9 @@ public class UserServiceTest {
         lenient().when(userRepository.save(friendUser)).thenReturn(friendUser);
 
         // Act
-        FriendNotFoundInFriendRequestListException exception = assertThrows(FriendNotFoundInFriendRequestListException.class, () ->
-                userService.updateFriendRequest(userId, "requestId", updateFriendRequestRequest));
+        FriendNotFoundInFriendRequestListException exception =
+                assertThrows(FriendNotFoundInFriendRequestListException.class, () ->
+                        userService.updateFriendRequest(userId, "requestId", updateFriendRequestRequest));
 
         // Assert
         assertEquals("404 NOT_FOUND \"User with identifier: "
@@ -895,8 +906,9 @@ public class UserServiceTest {
         lenient().when(userRepository.save(friendUser)).thenReturn(friendUser);
 
         // Act
-        FriendNotFoundInFriendRequestListException exception = assertThrows(FriendNotFoundInFriendRequestListException.class, () ->
-                userService.updateFriendRequest(userId, "requestId", updateFriendRequestRequest));
+        FriendNotFoundInFriendRequestListException exception =
+                assertThrows(FriendNotFoundInFriendRequestListException.class, () ->
+                        userService.updateFriendRequest(userId, "requestId", updateFriendRequestRequest));
 
         // Assert
         assertEquals("404 NOT_FOUND \"User with identifier: "
@@ -927,21 +939,23 @@ public class UserServiceTest {
 
         lenient().when(userRepository.findUserById(userId)).thenReturn(Optional.of(user));
         lenient().when(userRepository.findUserById(friendUser.getId())).thenReturn(Optional.of(friendUser));
-        when(friendRequestRepository.findFriendRequestById(any())).thenReturn(Optional.of(userFriendRequestList.getFirst()));
+        when(friendRequestRepository.findFriendRequestById(any())).thenReturn(Optional.of(userFriendRequestList.
+                getFirst()));
         lenient().when(userRepository.save(user)).thenReturn(user);
         lenient().when(userRepository.save(friendUser)).thenReturn(friendUser);
 
         // Act
         TryingToAcceptInvalidFriendRequestException exception = assertThrows(
                 TryingToAcceptInvalidFriendRequestException.class, () -> userService
-                        .updateFriendRequest(userId, "requestID", updateFriendRequestRequest)) ;
+                        .updateFriendRequest(userId, "requestID", updateFriendRequestRequest));
 
         // Assert
         assertEquals("409 CONFLICT \"User with identifier: " + user.getId()
                 + " is trying to accept a friend request from: " + friendUser.getId()
-                + " but the status of the friend request is " + user.getFriendRequestList().getFirst().getFriendRequestStatus()
+                + " but the status of the friend request is " + user.getFriendRequestList()
+                .getFirst().getFriendRequestStatus()
                 + " instead of RECEIVED.\"", exception.getMessage());
-        }
+    }
 
     @Test
     void getFriendRequestsShouldReturnSuccess() {
@@ -990,7 +1004,8 @@ public class UserServiceTest {
                 () -> userService.getFriendRequests(userId, typeList));
 
         // Assert
-        assertEquals("404 NOT_FOUND \"User with identifier: " + userId + " does not exist.\"", exception.getMessage());
+        assertEquals("404 NOT_FOUND \"User with identifier: " + userId + " does not exist.\"",
+                exception.getMessage());
     }
 
     @Test
@@ -1042,7 +1057,7 @@ public class UserServiceTest {
 
         // Assert
         assertEquals(2, viewFriendResponseList.size());
-        assertEquals("friend1",viewFriendResponseList.getFirst().friendUserId());
+        assertEquals("friend1", viewFriendResponseList.getFirst().friendUserId());
     }
 
     @Test
@@ -1055,6 +1070,167 @@ public class UserServiceTest {
                 userService.getFriends(userId));
 
         // Assert
-        assertEquals("404 NOT_FOUND \"User with identifier: " + userId + " does not exist.\"", exception.getMessage());
+        assertEquals("404 NOT_FOUND \"User with identifier: " + userId + " does not exist.\"",
+                exception.getMessage());
+    }
+
+    @Test
+    void deleteFriendSuccess() {
+        // Arrange
+        User user1 = new User();
+        user1.setId("userId1");
+
+        User user2 = new User();
+        user2.setId("userId2");
+
+        Friend friend1 = new Friend(user2.getId(), FriendRequestStatusEnum.ACCEPTED);
+        friend1.setId("friend1Id");
+
+        Friend friend2 = new Friend(user1.getId(), FriendRequestStatusEnum.ACCEPTED);
+        friend2.setId("friend2Id");
+
+        List<Friend> user1FriendList = new ArrayList<>();
+        user1FriendList.add(friend1);
+        user1.setFriendList(user1FriendList);
+
+        List<Friend> user2FriendList = new ArrayList<>();
+        user2FriendList.add(friend2);
+        user2.setFriendList(user2FriendList);
+
+        lenient().when(userRepository.findUserById(user1.getId())).thenReturn(Optional.of(user1));
+        lenient().when(userRepository.findUserById(user2.getId())).thenReturn(Optional.of(user2));
+        doNothing().when(friendRepository).deleteById(friend1.getId());
+        doNothing().when(friendRepository).deleteById(friend2.getId());
+        lenient().when(userRepository.save(user1)).thenReturn(user1);
+        lenient().when(userRepository.save(user2)).thenReturn(user2);
+
+        // Act
+        userService.deleteFriend(user1.getId(), friend1.getId());
+
+        // Assert
+        assertEquals(0, user1.getFriendList().size());
+        assertEquals(0, user2.getFriendList().size());
+        verify(friendRepository, times(1)).deleteById(friend1.getId());
+        verify(friendRepository, times(1)).deleteById(friend2.getId());
+        verify(userRepository, times(1)).save(user1);
+        verify(userRepository, times(1)).save(user2);
+    }
+
+    @Test
+    void deleteFriendShouldThrowUser1DoesNotExistException() {
+        // Arrange
+        String userId = new ObjectId().toHexString();
+
+        // Act
+        UserDoesNotExistException exception = assertThrows(UserDoesNotExistException.class, () ->
+                userService.deleteFriend(userId, "friend1Id"));
+
+        // Assert
+        assertEquals("404 NOT_FOUND \"User with identifier: " + userId + " does not exist.\"",
+                exception.getMessage());
+    }
+
+    @Test
+    void deleteFriendShouldThrowUser2DoesNotExistException() {
+        // Arrange
+        User user1 = new User();
+        user1.setId("userId1");
+
+        User user2 = new User();
+        String userId2 = new ObjectId().toHexString();
+        user2.setId(userId2);
+
+        Friend friend1 = new Friend(userId2, FriendRequestStatusEnum.ACCEPTED);
+        friend1.setId("friend1Id");
+
+        Friend friend2 = new Friend(user1.getId(), FriendRequestStatusEnum.ACCEPTED);
+        friend2.setId("friend2Id");
+
+        List<Friend> user1FriendList = new ArrayList<>();
+        user1FriendList.add(friend1);
+        user1.setFriendList(user1FriendList);
+
+        List<Friend> user2FriendList = new ArrayList<>();
+        user2FriendList.add(friend2);
+        user2.setFriendList(user2FriendList);
+
+        when(userRepository.findUserById(user1.getId())).thenReturn(Optional.of(user1));
+
+        // Act
+        UserDoesNotExistException exception = assertThrows(UserDoesNotExistException.class, () ->
+                userService.deleteFriend(user1.getId(), friend1.getId()));
+
+        // Assert
+        assertEquals("404 NOT_FOUND \"User with identifier: " + userId2 + " does not exist.\"",
+                exception.getMessage());
+    }
+
+    @Test
+    void deleteFriendShouldReturnFriendDoesNotExistException() {
+        // Arrange
+        String wrongId = new ObjectId().toHexString();
+
+        User user1 = new User();
+        user1.setId("userId1");
+
+        User user2 = new User();
+        user2.setId("userId2");
+
+        Friend friend1 = new Friend(user2.getId(), FriendRequestStatusEnum.ACCEPTED);
+        friend1.setId("friend1Id");
+
+        Friend friend2 = new Friend(user1.getId(), FriendRequestStatusEnum.ACCEPTED);
+        friend2.setId("friend2Id");
+
+        List<Friend> user1FriendList = new ArrayList<>();
+        user1FriendList.add(friend1);
+        user1.setFriendList(user1FriendList);
+
+        List<Friend> user2FriendList = new ArrayList<>();
+        user2FriendList.add(friend2);
+        user2.setFriendList(user2FriendList);
+
+        lenient().when(userRepository.findUserById(user1.getId())).thenReturn(Optional.of(user1));
+        lenient().when(userRepository.findUserById(user2.getId())).thenReturn(Optional.of(user2));
+
+        // Act
+        FriendDoesNotExistException exception = assertThrows(FriendDoesNotExistException.class, () ->
+                userService.deleteFriend(user1.getId(), wrongId));
+
+        // Assert
+        assertEquals("404 NOT_FOUND \"Friend with identifier: " + wrongId + " does not exist.\"",
+                exception.getMessage());
+    }
+
+    @Test
+    void deleteFriendShouldReturnFriendNotFoundInFriendListException() {
+        // Arrange
+        User user1 = new User();
+        user1.setId("userId1");
+
+        User user2 = new User();
+        user2.setId("userId2");
+
+        Friend friend1 = new Friend(user2.getId(), FriendRequestStatusEnum.ACCEPTED);
+        friend1.setId("friend1Id");
+
+        Friend friend2 = new Friend(user2.getId(), FriendRequestStatusEnum.ACCEPTED);
+        friend2.setId("friend2Id");
+
+        List<Friend> user1FriendList = new ArrayList<>();
+        user1FriendList.add(friend1);
+        user1.setFriendList(user1FriendList);
+
+        lenient().when(userRepository.findUserById(user1.getId())).thenReturn(Optional.of(user1));
+        lenient().when(userRepository.findUserById(user2.getId())).thenReturn(Optional.of(user2));
+
+        // Act
+        FriendNotFoundInFriendListException exception = assertThrows(FriendNotFoundInFriendListException.class, () ->
+                userService.deleteFriend(user1.getId(), friend1.getId()));
+
+        // Assert
+        assertEquals("404 NOT_FOUND \"User with identifier: " + user2.getId()
+                        + " does not have friend with identifier: " + user1.getId() + " in their friend list.\"",
+                exception.getMessage());
     }
 }
