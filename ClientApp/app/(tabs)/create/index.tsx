@@ -305,7 +305,7 @@ const Create = () => {
             <>
               <View style={styles.sectionContainer}>
                 <Text style={styles.sectionTitle}>General Information</Text>
-
+                <Text style={styles.inputLabel}>Event Name</Text>
                 <View style={styles.inputContainer}>
                   <Ionicons
                     name="calendar-outline"
@@ -334,7 +334,7 @@ const Create = () => {
                   </Text>
                 )}
 
-                <Text style={styles.label}>Event Type</Text>
+                <Text style={styles.inputLabel}>Event Type</Text>
                 <View style={styles.segmentedControl}>
                   {["public", "private"].map((type) => (
                     <TouchableOpacity
@@ -359,11 +359,9 @@ const Create = () => {
                   ))}
                 </View>
 
-                {/* Sport Type & Maximum Participants - Side by Side */}
                 <View style={styles.rowContainer}>
-                  {/* Sport Type */}
                   <View style={styles.inputHalfContainer}>
-                    <Text style={styles.label}>Sport Type</Text>
+                    <Text style={styles.inputLabel}>Sport Type</Text>
                     <TouchableOpacity
                       style={[styles.inputContainer, styles.equalHeightInput]}
                       onPress={() => {
@@ -387,9 +385,8 @@ const Create = () => {
                     )}
                   </View>
 
-                  {/* Maximum Participants */}
                   <View style={styles.inputHalfContainer}>
-                    <Text style={styles.label}>Max Participants</Text>
+                    <Text style={styles.inputLabel}>Max Participants</Text>
                     <View
                       style={[styles.inputContainer, styles.equalHeightInput]}
                     >
@@ -432,10 +429,9 @@ const Create = () => {
                   </View>
                 </View>
 
-                {/* Render Sport Type Modal */}
                 {isSportTypeModalVisible && renderSportTypeModal()}
 
-                <Text style={styles.label}>Description</Text>
+                <Text style={styles.inputLabel}>Description</Text>
                 <View
                   style={[styles.inputContainer, styles.descriptionContainer]}
                 >
@@ -472,44 +468,123 @@ const Create = () => {
           )}
 
           {step === 2 && (
-            <>
-              <Text style={styles.label}>Event Date and Time</Text>
-              <CustomDateTimePicker
-                value={eventDate}
-                mode="date"
-                label="Event Date"
-                onChange={(selectedDate) => setEventDate(selectedDate)}
-              />
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionTitle}>Event Date & Time</Text>
 
-              <CustomDateTimePicker
-                value={startTime}
-                mode="time"
-                label="Start Time"
-                onChange={(selectedTime) => setStartTime(selectedTime)}
-              />
+              {/* Event Date */}
+              <Text style={styles.inputLabel}>Event Date</Text>
+              <View style={styles.inputContainer}>
+                <Ionicons
+                  name="calendar-outline"
+                  size={16}
+                  color={themeColors.primary}
+                />
+                <CustomDateTimePicker
+                  value={eventDate}
+                  mode="date"
+                  label=""
+                  onChange={(selectedDate) => setEventDate(selectedDate)}
+                />
+              </View>
 
-              <CustomDateTimePicker
-                value={endTime}
-                mode="time"
-                label="End Time"
-                onChange={(selectedTime) => setEndTime(selectedTime)}
-              />
+              {/* Start & End Time Side by Side with Separate Labels */}
+              <View style={styles.sideBySideContainer}>
+                {/* Start Time */}
+                <View style={styles.inputHalfContainer}>
+                  <Text style={styles.inputLabel}>Start Time</Text>
+                  <View style={styles.inputHalf}>
+                    <Ionicons
+                      name="time-outline"
+                      size={16}
+                      color={themeColors.primary}
+                    />
+                    <CustomDateTimePicker
+                      value={startTime}
+                      mode="time"
+                      label=""
+                      onChange={(selectedTime) => setStartTime(selectedTime)}
+                    />
+                  </View>
+                </View>
 
-              <Text style={styles.label}>Cut Off Time</Text>
-              <CustomDateTimePicker
-                value={cutOffDate}
-                mode="date"
-                label="Cutoff Date"
-                onChange={(selectedDate) => setCutOffDate(selectedDate)}
-              />
+                {/* End Time */}
+                <View style={styles.inputHalfContainer}>
+                  <Text style={styles.inputLabel}>End Time</Text>
+                  <View style={styles.inputHalf}>
+                    <Ionicons
+                      name="time-outline"
+                      size={16}
+                      color={themeColors.primary}
+                    />
+                    <CustomDateTimePicker
+                      value={endTime}
+                      mode="time"
+                      label=""
+                      onChange={(selectedTime) => setEndTime(selectedTime)}
+                    />
+                  </View>
+                </View>
+              </View>
 
-              <CustomDateTimePicker
-                value={cutOffTime}
-                mode="time"
-                label="Cutoff Time"
-                onChange={(selectedTime) => setCutOffTime(selectedTime)}
-              />
-            </>
+              {/* Cutoff Date */}
+              <Text style={styles.inputLabel}>Cutoff Date</Text>
+              <View style={styles.inputContainer}>
+                <Ionicons
+                  name="calendar-outline"
+                  size={16}
+                  color={themeColors.primary}
+                />
+                <CustomDateTimePicker
+                  value={cutOffDate}
+                  mode="date"
+                  label=""
+                  onChange={(selectedDate) => setCutOffDate(selectedDate)}
+                />
+              </View>
+
+              {/* Cutoff Time */}
+              <Text style={styles.inputLabel}>Cutoff Time</Text>
+              <View style={styles.inputHalfCutoffTime}>
+                <Ionicons
+                  name="time-outline"
+                  size={16}
+                  color={themeColors.primary}
+                />
+                <CustomDateTimePicker
+                  value={cutOffTime}
+                  mode="time"
+                  label=""
+                  onChange={(selectedTime) => setCutOffTime(selectedTime)}
+                />
+              </View>
+
+              {/* Navigation Buttons */}
+              <View style={styles.navigationContainer}>
+                <TouchableOpacity
+                  onPress={() => setStep(step - 1)}
+                  style={styles.navButton}
+                >
+                  <Ionicons
+                    name="arrow-back-circle"
+                    size={28}
+                    color={themeColors.primary}
+                  />
+                  <Text style={styles.navButtonText}>Back</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() => setStep(step + 1)}
+                  style={styles.navButton}
+                >
+                  <Text style={styles.navButtonText}>Next</Text>
+                  <Ionicons
+                    name="arrow-forward-circle"
+                    size={28}
+                    color={themeColors.primary}
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
           )}
 
           {step === 3 && (
@@ -945,25 +1020,9 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   sectionContainer: {
-    backgroundColor: "#fff",
-    borderRadius: 10,
+    backgroundColor: themeColors.background.light,
     padding: 15,
-    marginBottom: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: themeColors.text.dark,
-    marginBottom: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
-    paddingBottom: 5,
+    flex: 1,
   },
 
   inputContainer: {
@@ -971,8 +1030,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: themeColors.background.lightGrey,
     borderRadius: 8,
-    padding: 12,
-    marginBottom: 10,
+    paddingVertical: 6, // Reduced padding
+    paddingHorizontal: 10,
+    marginBottom: 8,
     borderWidth: 1,
     borderColor: "#ddd",
   },
@@ -1042,6 +1102,59 @@ const styles = StyleSheet.create({
   },
   equalHeightInput: {
     height: 48,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: themeColors.primary,
+    marginBottom: 10,
+  },
+  inputRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: themeColors.background.lightGrey,
+    borderRadius: 8,
+    paddingVertical: 2,
+    paddingHorizontal: 12,
+    marginBottom: 1,
+  },
+  sideBySideContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 8,
+  },
+  inputHalf: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: themeColors.background.lightGrey,
+    borderRadius: 6,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+    borderWidth: 1,
+    borderColor: "#ddd",
+  },
+  inputHalfCutoffTime: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: themeColors.background.lightGrey,
+    borderRadius: 6,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+    borderWidth: 1,
+    width: "48%",
+    borderColor: "#ddd",
+    marginLeft: 5,
+  },
+  datePicker: {
+    flex: 1,
+    marginLeft: 8,
+  },
+  inputLabel: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: themeColors.primary,
+    marginBottom: 5,
+    marginLeft: 5,
   },
 });
 
