@@ -47,5 +47,7 @@ public interface UserService {
 
     List<ViewFriendResponse> getFriends(String userId);
 
+    void deleteFriend(String userId, String friendId);
+
     Page<UserProfileResponse> searchUsers(String firstName, String lastName, List<String> sport, List<String> rankings, String gender, String age, Pageable pageable);
 }
