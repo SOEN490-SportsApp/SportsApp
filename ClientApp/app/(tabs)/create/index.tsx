@@ -287,8 +287,10 @@ const Create = () => {
   }> = ({ label, value, icon }) => (
     <View style={styles.summaryItem}>
       <Ionicons name={icon as any} size={20} color={themeColors.primary} />
-      <Text style={styles.summaryLabel}>{label}</Text>
-      <Text style={styles.summaryValue}>{value}</Text>
+      {label ? <Text style={styles.summaryLabel}>{label}</Text> : null}
+      <Text style={styles.summaryValue} numberOfLines={1} ellipsizeMode="tail">
+        {value}
+      </Text>
     </View>
   );
 
@@ -589,7 +591,7 @@ const Create = () => {
 
           {step === 3 && (
             <View style={{ flex: 1, paddingHorizontal: 20, paddingTop: 10 }}>
-              <Text style={styles.label}>Select Location</Text>
+              <Text style={styles.inputLabel}>Select Location</Text>
               <GooglePlacesInput
                 setLocation={setLocation}
                 clearTrigger={clearLocationTrigger}
@@ -668,11 +670,12 @@ const Create = () => {
                         ? `From ${startTime.toLocaleTimeString([], {
                             hour: "2-digit",
                             minute: "2-digit",
-                          })} 
-              to ${endTime.toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}`
+                            hour12: true,
+                          })} to ${endTime.toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: true,
+                          })}`
                         : "Not selected"
                     }
                     icon="time-outline"
@@ -953,11 +956,15 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: themeColors.text.dark,
     marginLeft: 8,
+    flexWrap: "nowrap", // Ensure the text stays on one line
   },
   summaryValue: {
     fontSize: 16,
     color: themeColors.text.dark,
     marginLeft: 4,
+    flex: 1, // Allow text to take full available space
+    flexShrink: 1, // Prevent unnecessary wrapping
+    textAlign: "left",
   },
   descriptionCard: {
     backgroundColor: "#fff",
