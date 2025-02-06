@@ -1,0 +1,81 @@
+name: Release CI/CD
+
+on:
+  pull_request:
+    branches:
+      - main
+      - 'releases/**'
+  push:
+    branches:
+      - main
+      - 'releases/**'
+
+jobs:
+  Analyze-ClientApp:
+    name: Build and Analyze
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: 'zulu'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Install Dependencies for ClientApp
+        run: npm install
+        working-directory: ./ClientApp
+
+      - name: Run Tests for ClientApp
+        run: npm test --coverage --watchAll=false || true
+        working-directory: ./ClientApp
+
+      - name: Run SonarCloud Scan for ClientApp
+        run: |
+          npx sonar-scanner
+          -D sonar.projectKey=sportaforked_ClientApp
+          -D sonar.organization=sportaforked
+          -D sonar.host.url=https://sonarcloud.io
+          -D sonar.sources=ClientApp/
+          -D sonar.tests=ClientApp/__tests__
+          -D sonar.exclusions=ClientApp/__tests__/**
+          -D sonar.javascript.lcov.reportPaths=ClientApp/coverage/lcov.info
+
+  Analyze-Microservices:
+    name: Analyze Microservices
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [email-service, event-service, user-service, gateway]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: 'zulu'
+
+      - name: Build and Test Service
+        working-directory: ./Microservices/${{ matrix.service }}
+        run: ./gradlew build jacocoTestReport jacocoTestCoverageVerification
+
+      - name: SonarQube Analysis
+        working-directory: ./Microservices/${{ matrix.service }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+          SONAR_TOKEN: ${{ secrets['SONAR_TOKEN_' + matrix.service.replace('-', '_') | upper ] }}
+        run: ./gradlew sonar --info

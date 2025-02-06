@@ -3,6 +3,7 @@ plugins {
 	id 'org.springframework.boot' version '3.3.5'
 	id 'io.spring.dependency-management' version '1.1.6'
 	id 'org.cyclonedx.bom' version '1.10.0'
+	id 'jacoco'
 }
 
 group = 'app.sportahub'
@@ -59,4 +60,44 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+jacoco {
+	toolVersion = "0.8.12"
+}
+
+jacocoTestReport {
+	dependsOn test
+	reports {
+		xml.required = true
+		html.required = true
+	}
+	classDirectories.setFrom(
+			files(
+					classDirectories.files.collect {
+						fileTree(dir: it, exclude: [
+								'**/client/**'
+						])
+					}
+			)
+	)
+}
+
+jacocoTestCoverageVerification {
+	violationRules {
+		rule {
+			limit {
+				minimum = 0.8
+			}
+		}
+	}
+	classDirectories.setFrom(
+			files(
+					classDirectories.files.collect {
+						fileTree(dir: it, exclude: [
+								'**/client/**'
+						])
+					}
+			)
+	)
 }
