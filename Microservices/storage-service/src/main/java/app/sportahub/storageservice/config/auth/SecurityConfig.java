@@ -27,15 +27,13 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         return http
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-
                         .requestMatchers(
                                 "/swagger-ui.html",
                                 "/api-docs",
                                 "/api-docs/**",
                                 "/swagger-ui/**",
                                 "/webjars/**",
-                                "/actuator/health/**",
-                                "/objects/**")
+                                "/actuator/health/**")
                         .permitAll()
                         .anyRequest().authenticated())
                 .csrf(AbstractHttpConfigurer::disable)
