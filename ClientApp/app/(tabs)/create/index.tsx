@@ -187,6 +187,7 @@ const Create = () => {
       setLocation(null);
       setClearLocationTrigger((prev) => !prev);
       setShowLocationPage(false);
+      setStep(1);
       Alert.alert("Success", "Event created successfully!");
       router.replace("/(tabs)/home");
     } catch (error: any) {
@@ -293,6 +294,64 @@ const Create = () => {
       </Text>
     </View>
   );
+
+  const validateStep = async (currentStep: number) => {
+    try {
+      await handleSubmit(() => {})(); // Ensures react-hook-form validation runs
+    } catch (e) {
+      return false; // Prevent moving to next step if validation fails
+    }
+
+    const formValues = watch; // Get all form values
+
+    switch (currentStep) {
+      case 1:
+        if (
+          !formValues.eventName ||
+          !formValues.eventType ||
+          !formValues.sportType ||
+          !formValues.maxParticipants ||
+          !formValues.description
+        ) {
+          Alert.alert("Oops!", "Please complete all fields before proceeding.");
+          return false;
+        }
+        break;
+
+      case 2:
+        if (
+          !eventDate ||
+          !startTime ||
+          !endTime ||
+          !cutOffDate ||
+          !cutOffTime
+        ) {
+          Alert.alert("Oops!", "Please select all date and time fields.");
+          return false;
+        }
+        if (startTime >= endTime) {
+          Alert.alert("Oops!", "End time must be after start time.");
+          return false;
+        }
+        if (cutOffDate.getTime() >= eventDate.getTime()) {
+          Alert.alert("Oops!", "Cutoff date must be before the event date.");
+          return false;
+        }
+        break;
+
+      case 3:
+        if (!location) {
+          Alert.alert("Oops!", "Please select a location.");
+          return false;
+        }
+        break;
+
+      default:
+        return true;
+    }
+
+    return true;
+  };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -746,7 +805,12 @@ const Create = () => {
 
             {step < 4 && (
               <TouchableOpacity
-                onPress={() => setStep(step + 1)}
+                onPress={async () => {
+                  const isValid = await validateStep(step);
+                  if (isValid) {
+                    setStep(step + 1);
+                  }
+                }}
                 style={styles.navButton}
               >
                 <Text style={styles.navButtonText}>Next</Text>
