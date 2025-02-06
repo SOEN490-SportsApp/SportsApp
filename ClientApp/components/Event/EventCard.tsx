@@ -19,37 +19,6 @@ interface EventCardProps {
   isForProfile?: boolean;
 }
 
-//Dummy comment to test pipeline 
-// good luck on the work
-//test pipeline
-//test pipeline
-//test pipeline
-//test pipeline
-//test pipeline
-//test pipeline
-//test pipeline
-//test pipeline
-//test pipeline
-//test pipeline
-//test pipeline
-//test pipeline
-//test pipeline
-//test pipeline
-//test pipeline
-//test pipeline
-//test pipeline
-//test pipeline
-//test pipeline
-//test pipeline
-//test pipeline
-//test pipeline
-//test pipeline
-//test pipeline
-//test pipeline
-//test pipeline
-//test pipeline
-//test pipeline
-//test pipeline
 export const  stringToDate = (dateString: string) => {
   const [year, month, day] = dateString.split('-');
   return new Date(+year, +month - 1, +day);
@@ -171,6 +140,46 @@ return (
       )}
 
       {showSkillTags && (
+        <View style={styles.skillLevelContainer}>
+          {event.requiredSkillLevel.map((level, index) => (
+            <SkillTag key={index} level={level} />
+          ))}
+        </View>
+      )}
+
+{showSkillTags && (
+        <View style={styles.skillLevelContainer}>
+          {event.requiredSkillLevel.map((level, index) => (
+            <SkillTag key={index} level={level} />
+          ))}
+        </View>
+      )}
+
+{showSkillTags && (
+        <View style={styles.skillLevelContainer}>
+          {event.requiredSkillLevel.map((level, index) => (
+            <SkillTag key={index} level={level} />
+          ))}
+        </View>
+      )}
+
+{showSkillTags && (
+        <View style={styles.skillLevelContainer}>
+          {event.requiredSkillLevel.map((level, index) => (
+            <SkillTag key={index} level={level} />
+          ))}
+        </View>
+      )}
+
+{showSkillTags && (
+        <View style={styles.skillLevelContainer}>
+          {event.requiredSkillLevel.map((level, index) => (
+            <SkillTag key={index} level={level} />
+          ))}
+        </View>
+      )}
+
+{showSkillTags && (
         <View style={styles.skillLevelContainer}>
           {event.requiredSkillLevel.map((level, index) => (
             <SkillTag key={index} level={level} />
