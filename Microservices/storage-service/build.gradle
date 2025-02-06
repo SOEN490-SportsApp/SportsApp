@@ -24,6 +24,7 @@ repositories {
 }
 
 dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
@@ -36,6 +37,7 @@ dependencies {
 	implementation 'org.keycloak:keycloak-spring-boot-starter:24.0.4'
 	implementation 'org.mapstruct:mapstruct:1.6.2'
 	implementation 'org.springframework.kafka:spring-kafka:3.3.0'
+	implementation 'io.minio:minio:8.3.4'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
