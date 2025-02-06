@@ -70,7 +70,7 @@ jobs:
         with:
           workflow: user-service-ci-cd.yml
           ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN }}
 
       - name: Run EventService Pipeline
         if: ${{ needs.determine-pipelines.outputs.RUN_EVENTSERVICE_PIPELINE == 'true' }}
@@ -78,7 +78,7 @@ jobs:
         with:
           workflow: event-service-ci-cd.yml
           ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN }}
 
       - name: Run EmailService Pipeline
         if: ${{ needs.determine-pipelines.outputs.RUN_EMAILSERVICE_PIPELINE == 'true' }}
@@ -86,7 +86,7 @@ jobs:
         with:
           workflow: email-service-ci-cd.yml
           ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN }}
 
       - name: Run GatewayService Pipeline
         if: ${{ needs.determine-pipelines.outputs.RUN_GATEWAYSERVICE_PIPELINE == 'true' }}
@@ -94,7 +94,7 @@ jobs:
         with:
           workflow: gateway-service-ci-cd.yml
           ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN }}
 
       - name: Run ClientApp Pipeline
         if: ${{ needs.determine-pipelines.outputs.RUN_CLIENTAPP_PIPELINE == 'true' }}
@@ -102,4 +102,4 @@ jobs:
         with:
           workflow: frontend-ci-cd.yml
           ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN }}
