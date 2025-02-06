@@ -18,13 +18,11 @@ jobs:
           node-version: '16'
 
       - name: Install dependencies
-        run: |
-          npm install
+        run: npx expo install
         working-directory: ./ClientApp
 
       - name: Run tests and generate coverage
-        run: |
-          npm run generate-report
+        run: npm run generate-report
         working-directory: ./ClientApp
 
       - name: SonarCloud Scan
