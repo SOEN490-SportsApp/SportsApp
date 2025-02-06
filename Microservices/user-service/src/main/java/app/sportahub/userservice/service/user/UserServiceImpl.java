@@ -418,42 +418,38 @@ public class UserServiceImpl implements UserService {
                         friend.getId())).toList();
     }
 
+    @Transactional
     @Override
     public void deleteFriend(String userId, String friendId) {
-        User user1 = userRepository.findUserById(userId)
+        User requester = userRepository.findUserById(userId)
                 .orElseThrow(() -> new UserDoesNotExistException(userId));
-        List<Friend> user1FriendList = user1.getFriendList();
+        List<Friend> requesterFriendList = requester.getFriendList();
 
-        user1FriendList.stream().filter(friend1 -> friend1.getId().equals(friendId)).findAny()
-                .ifPresentOrElse(friend1 -> {
+        Friend requesterFriend = requesterFriendList.stream().filter(f -> f.getId().equals(friendId))
+                .findFirst().orElseThrow(() -> new FriendNotFoundInFriendListException(userId,friendId));
 
-                    User user2 = userRepository.findUserById(friend1.getUserId())
-                            .orElseThrow(() -> new UserDoesNotExistException(friend1.getUserId()));
-                    List<Friend> user2FriendList = user2.getFriendList();
+        User friend = userRepository.findUserById(requesterFriend.getUserId())
+                        .orElseThrow(() -> new UserDoesNotExistException(requesterFriend.getUserId()));
+        List<Friend> friendFriendList = friend.getFriendList();
 
-                    user2FriendList.stream().filter(friend2 -> friend2.getUserId().equals(user1.getId())).findAny()
-                                    .ifPresentOrElse( friend2 -> {
+        Friend friendFriend = friendFriendList.stream().filter(friendF -> friendF.getUserId().equals(requester.getId()))
+                        .findFirst().orElseThrow(() -> new FriendNotFoundInFriendListException(friend.getId(), requester.getId()));
 
-                                        user1FriendList.remove(friend1);
-                                        user2FriendList.remove(friend2);
+        requesterFriendList.remove(requesterFriend);
+        friendFriendList.remove(friendFriend);
 
-                                        friendRepository.deleteById(friend1.getId());
-                                        friendRepository.deleteById(friend2.getId());
+        friendRepository.deleteById(requesterFriend.getId());
+        friendRepository.deleteById(friendFriend.getId());
 
-                                        user1.setFriendList(user1FriendList);
-                                        user2.setFriendList(user2FriendList);
+        requester.setFriendList(requesterFriendList);
+        friend.setFriendList(friendFriendList);
 
-                                        userRepository.save(user1);
-                                        userRepository.save(user2);
+        userRepository.save(requester);
+        userRepository.save(friend);
 
-                                        log.info("deleteFriend: Friend with id: {} was successfully deleted", friend1.getId());
-                                        log.info("deleteFriend: Friend with id: {} was successfully deleted", friend2.getId());
+        log.info("deleteFriend: Friend with id: {} was successfully deleted", requesterFriend.getId());
+        log.info("deleteFriend: Friend with id: {} was successfully deleted", friendFriend.getId());
 
-                                    }, () -> {
-                                        throw new FriendNotFoundInFriendListException(user2.getId(), user1.getId());
-                                    });
-                }, () -> {
-                    throw new FriendDoesNotExistException(friendId);});
     }
 
     @Override

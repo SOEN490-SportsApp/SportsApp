@@ -1077,47 +1077,47 @@ public class UserServiceTest {
     @Test
     void deleteFriendSuccess() {
         // Arrange
-        User user1 = new User();
-        user1.setId("userId1");
+        User requester = new User();
+        requester.setId("userId1");
 
-        User user2 = new User();
-        user2.setId("userId2");
+        User friend = new User();
+        friend.setId("userId2");
 
-        Friend friend1 = new Friend(user2.getId(), FriendRequestStatusEnum.ACCEPTED);
-        friend1.setId("friend1Id");
+        Friend requesterFriend = new Friend(friend.getId(), FriendRequestStatusEnum.ACCEPTED);
+        requesterFriend.setId("friend1Id");
 
-        Friend friend2 = new Friend(user1.getId(), FriendRequestStatusEnum.ACCEPTED);
-        friend2.setId("friend2Id");
+        Friend friendFriend = new Friend(requester.getId(), FriendRequestStatusEnum.ACCEPTED);
+        friendFriend.setId("friend2Id");
 
-        List<Friend> user1FriendList = new ArrayList<>();
-        user1FriendList.add(friend1);
-        user1.setFriendList(user1FriendList);
+        List<Friend> requesterFriendList = new ArrayList<>();
+        requesterFriendList.add(requesterFriend);
+        requester.setFriendList(requesterFriendList);
 
-        List<Friend> user2FriendList = new ArrayList<>();
-        user2FriendList.add(friend2);
-        user2.setFriendList(user2FriendList);
+        List<Friend> friendFriendList = new ArrayList<>();
+        friendFriendList.add(friendFriend);
+        friend.setFriendList(friendFriendList);
 
-        lenient().when(userRepository.findUserById(user1.getId())).thenReturn(Optional.of(user1));
-        lenient().when(userRepository.findUserById(user2.getId())).thenReturn(Optional.of(user2));
-        doNothing().when(friendRepository).deleteById(friend1.getId());
-        doNothing().when(friendRepository).deleteById(friend2.getId());
-        lenient().when(userRepository.save(user1)).thenReturn(user1);
-        lenient().when(userRepository.save(user2)).thenReturn(user2);
+        lenient().when(userRepository.findUserById(requester.getId())).thenReturn(Optional.of(requester));
+        lenient().when(userRepository.findUserById(friend.getId())).thenReturn(Optional.of(friend));
+        doNothing().when(friendRepository).deleteById(requesterFriend.getId());
+        doNothing().when(friendRepository).deleteById(friendFriend.getId());
+        lenient().when(userRepository.save(requester)).thenReturn(requester);
+        lenient().when(userRepository.save(friend)).thenReturn(friend);
 
         // Act
-        userService.deleteFriend(user1.getId(), friend1.getId());
+        userService.deleteFriend(requester.getId(), requesterFriend.getId());
 
         // Assert
-        assertEquals(0, user1.getFriendList().size());
-        assertEquals(0, user2.getFriendList().size());
-        verify(friendRepository, times(1)).deleteById(friend1.getId());
-        verify(friendRepository, times(1)).deleteById(friend2.getId());
-        verify(userRepository, times(1)).save(user1);
-        verify(userRepository, times(1)).save(user2);
+        assertEquals(0, requester.getFriendList().size());
+        assertEquals(0, friend.getFriendList().size());
+        verify(friendRepository, times(1)).deleteById(requesterFriend.getId());
+        verify(friendRepository, times(1)).deleteById(friendFriend.getId());
+        verify(userRepository, times(1)).save(requester);
+        verify(userRepository, times(1)).save(friend);
     }
 
     @Test
-    void deleteFriendShouldThrowUser1DoesNotExistException() {
+    void deleteFriendShouldThrowRequesterUserDoesNotExistException() {
         // Arrange
         String userId = new ObjectId().toHexString();
 
@@ -1131,106 +1131,106 @@ public class UserServiceTest {
     }
 
     @Test
-    void deleteFriendShouldThrowUser2DoesNotExistException() {
+    void deleteFriendShouldThrowFriendUserDoesNotExistException() {
         // Arrange
-        User user1 = new User();
-        user1.setId("userId1");
+        User requester = new User();
+        requester.setId("userId1");
 
-        User user2 = new User();
-        String userId2 = new ObjectId().toHexString();
-        user2.setId(userId2);
+        User friend = new User();
+        String friendFriendUserId = new ObjectId().toHexString();
+        friend.setId(friendFriendUserId);
 
-        Friend friend1 = new Friend(userId2, FriendRequestStatusEnum.ACCEPTED);
-        friend1.setId("friend1Id");
+        Friend requesterFriend = new Friend(friendFriendUserId, FriendRequestStatusEnum.ACCEPTED);
+        requesterFriend.setId("friend1Id");
 
-        Friend friend2 = new Friend(user1.getId(), FriendRequestStatusEnum.ACCEPTED);
-        friend2.setId("friend2Id");
+        Friend friendFriend = new Friend(requester.getId(), FriendRequestStatusEnum.ACCEPTED);
+        friendFriend.setId("friend2Id");
 
-        List<Friend> user1FriendList = new ArrayList<>();
-        user1FriendList.add(friend1);
-        user1.setFriendList(user1FriendList);
+        List<Friend> requesterFriendList = new ArrayList<>();
+        requesterFriendList.add(requesterFriend);
+        requester.setFriendList(requesterFriendList);
 
-        List<Friend> user2FriendList = new ArrayList<>();
-        user2FriendList.add(friend2);
-        user2.setFriendList(user2FriendList);
+        List<Friend> friendFriendList = new ArrayList<>();
+        friendFriendList.add(friendFriend);
+        friend.setFriendList(friendFriendList);
 
-        when(userRepository.findUserById(user1.getId())).thenReturn(Optional.of(user1));
+        when(userRepository.findUserById(requester.getId())).thenReturn(Optional.of(requester));
 
         // Act
         UserDoesNotExistException exception = assertThrows(UserDoesNotExistException.class, () ->
-                userService.deleteFriend(user1.getId(), friend1.getId()));
+                userService.deleteFriend(requester.getId(), requesterFriend.getId()));
 
         // Assert
-        assertEquals("404 NOT_FOUND \"User with identifier: " + userId2 + " does not exist.\"",
+        assertEquals("404 NOT_FOUND \"User with identifier: " + friendFriendUserId + " does not exist.\"",
                 exception.getMessage());
     }
 
     @Test
-    void deleteFriendShouldReturnFriendDoesNotExistException() {
+    void deleteFriendShouldReturnRequesterFriendNotFoundInFriendListException() {
         // Arrange
         String wrongId = new ObjectId().toHexString();
 
-        User user1 = new User();
-        user1.setId("userId1");
+        User requester = new User();
+        requester.setId("userId1");
 
-        User user2 = new User();
-        user2.setId("userId2");
+        User friend = new User();
+        friend.setId("userId2");
 
-        Friend friend1 = new Friend(user2.getId(), FriendRequestStatusEnum.ACCEPTED);
-        friend1.setId("friend1Id");
+        Friend requesterFriend = new Friend(friend.getId(), FriendRequestStatusEnum.ACCEPTED);
+        requesterFriend.setId("friend1Id");
 
-        Friend friend2 = new Friend(user1.getId(), FriendRequestStatusEnum.ACCEPTED);
-        friend2.setId("friend2Id");
+        Friend friendFriend = new Friend(requester.getId(), FriendRequestStatusEnum.ACCEPTED);
+        friendFriend.setId("friend2Id");
 
-        List<Friend> user1FriendList = new ArrayList<>();
-        user1FriendList.add(friend1);
-        user1.setFriendList(user1FriendList);
+        List<Friend> requesterFriendList = new ArrayList<>();
+        requesterFriendList.add(requesterFriend);
+        requester.setFriendList(requesterFriendList);
 
-        List<Friend> user2FriendList = new ArrayList<>();
-        user2FriendList.add(friend2);
-        user2.setFriendList(user2FriendList);
+        List<Friend> friendFriendList = new ArrayList<>();
+        friendFriendList.add(friendFriend);
+        friend.setFriendList(friendFriendList);
 
-        lenient().when(userRepository.findUserById(user1.getId())).thenReturn(Optional.of(user1));
-        lenient().when(userRepository.findUserById(user2.getId())).thenReturn(Optional.of(user2));
+        lenient().when(userRepository.findUserById(requester.getId())).thenReturn(Optional.of(requester));
+        lenient().when(userRepository.findUserById(friend.getId())).thenReturn(Optional.of(friend));
 
         // Act
-        FriendDoesNotExistException exception = assertThrows(FriendDoesNotExistException.class, () ->
-                userService.deleteFriend(user1.getId(), wrongId));
+        FriendNotFoundInFriendListException exception = assertThrows(FriendNotFoundInFriendListException.class, () ->
+                userService.deleteFriend(requester.getId(), wrongId));
 
         // Assert
-        assertEquals("404 NOT_FOUND \"Friend with identifier: " + wrongId + " does not exist.\"",
+        assertEquals("404 NOT_FOUND \"User with identifier: " + requester.getId() + " does not have friend with identifier: " + wrongId + " in their friend list.\"",
                 exception.getMessage());
     }
 
     @Test
-    void deleteFriendShouldReturnFriendNotFoundInFriendListException() {
+    void deleteFriendShouldReturnFriendFriendNotFoundInFriendListException() {
         // Arrange
-        User user1 = new User();
-        user1.setId("userId1");
+        User requester = new User();
+        requester.setId("userId1");
 
-        User user2 = new User();
-        user2.setId("userId2");
+        User friend = new User();
+        friend.setId("userId2");
 
-        Friend friend1 = new Friend(user2.getId(), FriendRequestStatusEnum.ACCEPTED);
-        friend1.setId("friend1Id");
+        Friend requesterFriend = new Friend(friend.getId(), FriendRequestStatusEnum.ACCEPTED);
+        requesterFriend.setId("friend1Id");
 
-        Friend friend2 = new Friend(user2.getId(), FriendRequestStatusEnum.ACCEPTED);
-        friend2.setId("friend2Id");
+        Friend friendFriend = new Friend(friend.getId(), FriendRequestStatusEnum.ACCEPTED);
+        friendFriend.setId("friend2Id");
 
-        List<Friend> user1FriendList = new ArrayList<>();
-        user1FriendList.add(friend1);
-        user1.setFriendList(user1FriendList);
+        List<Friend> requesterFriendList = new ArrayList<>();
+        requesterFriendList.add(requesterFriend);
+        requester.setFriendList(requesterFriendList);
 
-        lenient().when(userRepository.findUserById(user1.getId())).thenReturn(Optional.of(user1));
-        lenient().when(userRepository.findUserById(user2.getId())).thenReturn(Optional.of(user2));
+        lenient().when(userRepository.findUserById(requester.getId())).thenReturn(Optional.of(requester));
+        lenient().when(userRepository.findUserById(friend.getId())).thenReturn(Optional.of(friend));
 
         // Act
         FriendNotFoundInFriendListException exception = assertThrows(FriendNotFoundInFriendListException.class, () ->
-                userService.deleteFriend(user1.getId(), friend1.getId()));
+                userService.deleteFriend(requester.getId(), requesterFriend.getId()));
 
         // Assert
-        assertEquals("404 NOT_FOUND \"User with identifier: " + user2.getId()
-                        + " does not have friend with identifier: " + user1.getId() + " in their friend list.\"",
+        assertEquals("404 NOT_FOUND \"User with identifier: " + friend.getId()
+                        + " does not have friend with identifier: " + requester.getId() + " in their friend list.\"",
                 exception.getMessage());
     }
 }
