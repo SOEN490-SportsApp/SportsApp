@@ -32,20 +32,16 @@ public class ObjectServiceImpl implements ObjectService {
     @Override
     public Object storeFile(MultipartFile file) {
         String fileName = System.currentTimeMillis() + "-" + file.getOriginalFilename();
-        try {
             minioClient.putObject(
-                    PutObjectArgs.builder().bucket(BUCKET_NAME).object(fileName).stream(
-                                    file.getInputStream(), file.getSize(), -1)
-                            .contentType(file.getContentType())
-                            .build());
-            return Object.builder()
-                    .withFileName(fileName)
-                    .withContentType(file.getContentType())
-                    .withSize(file.getSize())
-                    .build();
-        } catch (MinioException | java.io.IOException e) {
-            throw new StorageException("Failed to store file", e);
-        }
+                PutObjectArgs.builder().bucket(BUCKET_NAME).object(fileName).stream(
+                                file.getInputStream(), file.getSize(), -1)
+                        .contentType(file.getContentType())
+                        .build());
+        return Object.builder()
+                .withFileName(fileName)
+                .withContentType(file.getContentType())
+                .withSize(file.getSize())
+                .build();
     }
 
     /**
@@ -59,25 +55,21 @@ public class ObjectServiceImpl implements ObjectService {
     @SneakyThrows
     @Override
     public Object retrieveFile(String fileName) {
-        try {
-            GetObjectArgs args = GetObjectArgs.builder()
-                    .bucket(BUCKET_NAME)
-                    .object(fileName)
-                    .build();
+        GetObjectArgs args = GetObjectArgs.builder()
+                .bucket(BUCKET_NAME)
+                .object(fileName)
+                .build();
 
-            InputStream stream = minioClient.getObject(args);
+        InputStream stream = minioClient.getObject(args);
 
-            Object objectInfo = Object.builder()
-                    .withFileName(fileName)
-                    .withContentType("application/octet-stream")
-                    .withSize(stream.available())
-                    .withContentStream(stream)
-                    .build();
+        Object objectInfo = Object.builder()
+                .withFileName(fileName)
+                .withContentType("application/octet-stream")
+                .withSize(stream.available())
+                .withContentStream(stream)
+                .build();
 
-            return objectInfo;
-        } catch (MinioException | java.io.IOException e) {
-            throw new StorageException("Failed to retrieve file: " + fileName, e);
-        }
+        return objectInfo;
     }
 
     @Override
