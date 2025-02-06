@@ -18,7 +18,9 @@ jobs:
           node-version: '16'
 
       - name: Install dependencies
-        run: npx expo install
+        run: |
+          npm install
+          npx expo install
         working-directory: ./ClientApp
 
       - name: Run tests and generate coverage
