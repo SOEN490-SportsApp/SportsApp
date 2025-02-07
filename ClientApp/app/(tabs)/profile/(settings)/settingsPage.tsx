@@ -1,15 +1,18 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Linking, Modal, TouchableWithoutFeedback } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Modal, TouchableWithoutFeedback } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import themeColors from "@/utils/constants/colors";
 import { hs, vs, mvs, mhs } from "@/utils/helpers/uiScaler";
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { logoutUser } from '@/services/authService';
 import QRCode from 'react-native-qrcode-svg'
+import * as Linking from "expo-linking";
 
 const settingsPage: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false)
+  const [canOpenProfile, setCanOpenProfile] = useState(false)
+  const user = useSelector((state: { user: any }) => state.user);
   const logo = require("@/assets/images/sporta_logo.png");
   const dispatch = useDispatch();
   const handleLogout = () => {
@@ -18,6 +21,11 @@ const settingsPage: React.FC = () => {
   };
 
   const router = useRouter();
+  useEffect(() => {
+    Linking.canOpenURL("myapp://").then(result => setCanOpenProfile(true))
+  },[])
+
+  const userURL = `myapp://events/${user.id}`
 
   return (
     <View style={styles.container}>
@@ -34,6 +42,9 @@ const settingsPage: React.FC = () => {
             style={styles.icon}
           />
           <Text style={styles.text}>Show QR Code</Text>
+        <TouchableOpacity onPress={() => Linking.openURL("myapp://events/67a2c78b6cb4b06b5018d1dd")}>
+          <Text>Redirect me</Text>
+        </TouchableOpacity>
         </TouchableOpacity>
         <Modal
           visible={modalVisible}
@@ -45,7 +56,7 @@ const settingsPage: React.FC = () => {
             <View style={styles.modalOverlay}>
               <View style={styles.modalContent}>
                 <QRCode
-                  value="myapp://app/events/679bce4675517d529e582b09"
+                  value={`myapp://events/${user.id}`}
                   size={250}
                   logo={logo}
                 />
