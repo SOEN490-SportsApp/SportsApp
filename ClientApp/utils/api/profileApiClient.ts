@@ -34,7 +34,6 @@ export async function updateProfile(profile: Profile, userId: string) {
             API_ENDPOINTS.UPDATE_PROFILE.replace('{userId}', userId),
             data
         );
-        console.log("API Response:", response.data);
         return response;
     } catch (error: any) {
         console.error("Error updating profile:", error);
@@ -56,7 +55,7 @@ export async function getOtherUserProfile(userId: string) {
 export async function getEventsByUserId(userId: string) {
     const axiosInstance = getAxiosInstance();
     try {
-        const response = await axiosInstance.get(API_ENDPOINTS.GET_EVETNS_BY_USER_ID.replace("{userId}", userId));
+        const response = await axiosInstance.get(API_ENDPOINTS.GET_EVENTS_BY_USER_ID.replace("{userId}", userId));
         return response.data;
     } catch (error: any) {
         console.error("Error fetching events:", error);

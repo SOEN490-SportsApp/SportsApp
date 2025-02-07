@@ -7,7 +7,7 @@ import { hs, mhs, mvs, vs } from "@/utils/helpers/uiScaler";
 import { useRouter } from "expo-router";
 
 interface FriendCardProp {
-  user: Profile;
+  user: any;
 }
 
 function generateRandomFriendsInCommon() {
@@ -17,12 +17,11 @@ function generateRandomFriendsInCommon() {
 const FriendCard: React.FC<FriendCardProp> = ({ user }) => {
   const router = useRouter();
   const [requestSent, setRequestSent] = useState(false);
-  const userId = "679cf7bd6dfc9749eedcf82c";
-
+  const userId = user.userId;
   return (
     <TouchableOpacity
       style={styles.cardHolder}
-      onPress={() => router.push({pathname: `/userProfiles/${userId}`, params: {userId: userId}})}
+      onPress={() => router.push({pathname: `/userProfiles/[id]`, params: {id: userId}})}
     >
       <View style={styles.pictureSection}>
         <Image
@@ -34,7 +33,7 @@ const FriendCard: React.FC<FriendCardProp> = ({ user }) => {
       <View style={styles.infoSection}>
         <View>
           <Text style={styles.userInfo}>
-            {user.firstName + " " + user.lastName}{" "}
+            {user.profileResponse.firstName + " " + user.profileResponse.lastName}{" "}
           </Text>
         </View>
 

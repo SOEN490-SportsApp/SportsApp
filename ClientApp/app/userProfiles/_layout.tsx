@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { router, Stack } from "expo-router";
+import { router, Stack, useLocalSearchParams } from "expo-router";
 import { Menu, Provider } from "react-native-paper";
 import { Alert, TouchableOpacity } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -10,7 +10,7 @@ import { sendFriendRequest } from "@/utils/api/profileApiClient";
 export default function UserProfilesLayout() {
     const [menuVisible, setMenuVisible] = useState(false);
     const user = useSelector((state: { user: any }) => state.user);
-    const visitingUserId = "679cf7bd6dfc9749eedcf82c"; // Hardcoded for now
+    const { id: visitingUserId } = useLocalSearchParams<{ id: string }>();
 
     const openMenu = () => setMenuVisible(true);
     const closeMenu = () => setMenuVisible(false);
