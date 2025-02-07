@@ -1,4 +1,4 @@
-import { registerProfile, getProfile, updateProfile } from '@/utils/api/profileApiClient';
+import { registerProfile, getProfile, updateProfile, getEventsByUserId, getOtherUserProfile, sendFriendRequest } from '@/utils/api/profileApiClient';
 import { getAxiosInstance } from '@/services/axiosInstance';
 import { API_ENDPOINTS } from '@/utils/api/endpoints';
 import { mapProfiletoApiRequest } from '@/utils/mappers/apiMappers';
@@ -14,6 +14,7 @@ jest.mock('@/utils/mappers/apiMappers', () => ({
 
 describe('Profile Service Tests', () => {
     const mockUserId = '123';
+    const mockOtherUserId = '456';
     const mockProfile: Profile = {
         firstName: 'John',
         lastName: 'Doe',
@@ -27,6 +28,7 @@ describe('Profile Service Tests', () => {
 
     const mockMappedProfileData = { ...mockProfile, role: 'User' };
     const mockApiResponse = { data: { ...mockProfile } };
+    const mockEventsResponse = { data: [{ id: 'event1', name: 'Soccer Match' }] };
 
     describe('registerProfile', () => {
         it('should successfully register a profile', async () => {
@@ -61,6 +63,18 @@ describe('Profile Service Tests', () => {
                 API_ENDPOINTS.UPDATE_PROFILE.replace('{userId}', mockUserId),
                 mockMappedProfileData
             );
+        });
+
+        it('should throw a generic error when profile registration fails without response', async () => {
+            // Arrange
+            const mockError = new Error('Unexpected Error');
+            const mockAxiosInstance = {
+                patch: jest.fn().mockRejectedValue(mockError),
+            };
+            (getAxiosInstance as jest.Mock).mockReturnValue(mockAxiosInstance);
+
+            // Act & Assert
+            await expect(registerProfile(mockProfile, mockUserId)).rejects.toThrow('Unexpected Error');
         });
     });
 
@@ -109,7 +123,6 @@ describe('Profile Service Tests', () => {
                 API_ENDPOINTS.GET_USER_BY_ID.replace('{id}', mockUserId)
             );
         });
-
     });
 
     describe('updateProfile', () => {
@@ -145,6 +158,94 @@ describe('Profile Service Tests', () => {
                 API_ENDPOINTS.UPDATE_PROFILE.replace('{userId}', mockUserId),
                 mockMappedProfileData
             );
+        });
+
+        it('should throw a generic error when updating profile fails without response', async () => {
+            // Arrange
+            const mockError = new Error('Unexpected Error');
+            const mockAxiosInstance = {
+                patch: jest.fn().mockRejectedValue(mockError),
+            };
+            (getAxiosInstance as jest.Mock).mockReturnValue(mockAxiosInstance);
+
+            // Act & Assert
+            await expect(updateProfile(mockProfile, mockUserId)).rejects.toThrow('Unexpected Error');
+        });
+    });
+
+    describe('getOtherUserProfile', () => {
+        it('should return other user profile data when fetching successfully', async () => {
+            const mockAxiosInstance = {
+                get: jest.fn().mockResolvedValue(mockApiResponse),
+            };
+            (getAxiosInstance as jest.Mock).mockReturnValue(mockAxiosInstance);
+
+            const result = await getOtherUserProfile(mockOtherUserId);
+
+            expect(mockAxiosInstance.get).toHaveBeenCalledWith(
+                API_ENDPOINTS.GET_USER_PROFILE.replace('{id}', mockOtherUserId)
+            );
+            expect(result).toEqual(mockApiResponse.data);
+        });
+
+        it('should throw an error when fetching other user profile fails', async () => {
+            const mockAxiosInstance = {
+                get: jest.fn().mockRejectedValue({ response: { data: 'Error fetching other user profile' } }),
+            };
+            (getAxiosInstance as jest.Mock).mockReturnValue(mockAxiosInstance);
+
+            await expect(getOtherUserProfile(mockOtherUserId)).rejects.toEqual('Error fetching other user profile');
+        });
+    });
+
+    describe('getEventsByUserId', () => {
+        it('should return events when fetching successfully', async () => {
+            const mockAxiosInstance = {
+                get: jest.fn().mockResolvedValue(mockEventsResponse),
+            };
+            (getAxiosInstance as jest.Mock).mockReturnValue(mockAxiosInstance);
+
+            const result = await getEventsByUserId(mockUserId);
+
+            expect(mockAxiosInstance.get).toHaveBeenCalledWith(
+                API_ENDPOINTS.GET_EVENTS_BY_USER_ID.replace('{userId}', mockUserId)
+            );
+            expect(result).toEqual(mockEventsResponse.data);
+        });
+
+        it('should throw an error when fetching events fails', async () => {
+            const mockAxiosInstance = {
+                get: jest.fn().mockRejectedValue({ response: { data: 'Error fetching events' } }),
+            };
+            (getAxiosInstance as jest.Mock).mockReturnValue(mockAxiosInstance);
+
+            await expect(getEventsByUserId(mockUserId)).rejects.toEqual('Error fetching events');
+        });
+    });
+
+    describe('sendFriendRequest', () => {
+        it('should successfully send a friend request', async () => {
+            const mockAxiosInstance = {
+                post: jest.fn().mockResolvedValue({ data: 'Friend request sent' }),
+            };
+            (getAxiosInstance as jest.Mock).mockReturnValue(mockAxiosInstance);
+
+            const result = await sendFriendRequest(mockUserId, mockOtherUserId);
+
+            expect(mockAxiosInstance.post).toHaveBeenCalledWith(
+                API_ENDPOINTS.SEND_FRIEND_REQUEST.replace('{userId}', mockUserId),
+                { receiverUserId: mockOtherUserId }
+            );
+            expect(result).toEqual('Friend request sent');
+        });
+
+        it('should throw an error when sending a friend request fails', async () => {
+            const mockAxiosInstance = {
+                post: jest.fn().mockRejectedValue({ response: { data: 'Error sending friend request' } }),
+            };
+            (getAxiosInstance as jest.Mock).mockReturnValue(mockAxiosInstance);
+
+            await expect(sendFriendRequest(mockUserId, mockOtherUserId)).rejects.toEqual('Error sending friend request');
         });
     });
 });
