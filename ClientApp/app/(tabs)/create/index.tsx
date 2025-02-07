@@ -10,8 +10,6 @@ import {
   StatusBar,
   Alert,
   SafeAreaView,
-  KeyboardAvoidingView,
-  Platform,
   TouchableWithoutFeedback,
   ScrollView,
   Keyboard,
@@ -117,11 +115,6 @@ const Create = () => {
         })
         .replace(/\s?(AM|PM)$/, "");
 
-      if (startTime >= endTime) {
-        Alert.alert("Oops..", "End time must be after start time.");
-        return;
-      }
-
       const combinedCutOffDateTime = new Date(
         cutOffDate.getFullYear(),
         cutOffDate.getMonth(),
@@ -222,7 +215,6 @@ const Create = () => {
                   <TouchableOpacity
                     style={styles.modalItem}
                     onPress={() => {
-                      console.log(`Selected Sport: ${item.name}`); // Debugging Log
                       setValue("sportType", item.name, {
                         shouldValidate: true,
                       });
@@ -297,12 +289,12 @@ const Create = () => {
 
   const validateStep = async (currentStep: number) => {
     try {
-      await handleSubmit(() => {})(); // Ensures react-hook-form validation runs
+      await handleSubmit(() => {})();
     } catch (e) {
-      return false; // Prevent moving to next step if validation fails
+      return false;
     }
 
-    const formValues = watch; // Get all form values
+    const formValues = watch;
 
     switch (currentStep) {
       case 1:
@@ -329,10 +321,7 @@ const Create = () => {
           Alert.alert("Oops!", "Please select all date and time fields.");
           return false;
         }
-        if (startTime >= endTime) {
-          Alert.alert("Oops!", "End time must be after start time.");
-          return false;
-        }
+
         if (cutOffDate.getTime() >= eventDate.getTime()) {
           Alert.alert("Oops!", "Cutoff date must be before the event date.");
           return false;
@@ -426,7 +415,6 @@ const Create = () => {
                     <TouchableOpacity
                       style={[styles.inputContainer, styles.equalHeightInput]}
                       onPress={() => {
-                        console.log("Opening Sport Type Modal...");
                         setSportTypeModalVisible(true);
                       }}
                     >
@@ -532,7 +520,6 @@ const Create = () => {
             <View style={styles.sectionContainer}>
               <Text style={styles.sectionTitle}>Event Date & Time</Text>
 
-              {/* Event Date */}
               <Text style={styles.inputLabel}>Event Date</Text>
               <View style={styles.inputContainer}>
                 <Ionicons
@@ -548,9 +535,7 @@ const Create = () => {
                 />
               </View>
 
-              {/* Start & End Time Side by Side with Separate Labels */}
               <View style={styles.sideBySideContainer}>
-                {/* Start Time */}
                 <View style={styles.inputHalfContainer}>
                   <Text style={styles.inputLabel}>Start Time</Text>
                   <View style={styles.inputHalf}>
@@ -568,7 +553,6 @@ const Create = () => {
                   </View>
                 </View>
 
-                {/* End Time */}
                 <View style={styles.inputHalfContainer}>
                   <Text style={styles.inputLabel}>End Time</Text>
                   <View style={styles.inputHalf}>
@@ -587,7 +571,6 @@ const Create = () => {
                 </View>
               </View>
 
-              {/* Cutoff Date */}
               <Text style={styles.inputLabel}>Cutoff Date</Text>
               <View style={styles.inputContainer}>
                 <Ionicons
@@ -603,7 +586,6 @@ const Create = () => {
                 />
               </View>
 
-              {/* Cutoff Time */}
               <Text style={styles.inputLabel}>Cutoff Time</Text>
               <View style={styles.inputHalfCutoffTime}>
                 <Ionicons
@@ -619,7 +601,6 @@ const Create = () => {
                 />
               </View>
 
-              {/* Navigation Buttons */}
               <View style={styles.navigationContainer}>
                 <TouchableOpacity
                   onPress={() => setStep(step - 1)}
@@ -833,51 +814,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: themeColors.background.light,
   },
-  label: {
-    fontSize: mhs(16),
-    fontWeight: "600",
-    color: themeColors.text.dark,
-    marginBottom: vs(8),
-  },
-  input: {
-    backgroundColor: themeColors.background.lightGrey,
-    borderRadius: mhs(8),
-    padding: hs(12),
-    fontSize: mhs(16),
-    color: themeColors.text.dark,
-    marginBottom: vs(4),
-  },
-  textArea: {
-    height: vs(100),
-    textAlignVertical: "top",
-  },
-  radioGroup: {
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: hs(30),
-    marginBottom: vs(16),
-  },
-  radioButton: {
-    paddingVertical: vs(8),
-    paddingHorizontal: hs(20),
-    borderRadius: mhs(25),
-    borderWidth: 1,
-    borderColor: themeColors.border.light,
-    backgroundColor: themeColors.background.lightGrey,
-  },
-  radioButtonSelected: {
-    backgroundColor: themeColors.primary,
-    borderColor: themeColors.primary,
-  },
-  radioText: {
-    fontSize: mhs(14),
-    color: themeColors.text.dark,
-    textAlign: "center",
-  },
-  selectedText: {
-    color: themeColors.text.light,
-    fontWeight: "bold",
-  },
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
@@ -923,34 +859,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
   },
-  inputError: {
-    borderWidth: 1,
-    borderColor: themeColors.text.error,
-  },
-  skillLevelGroup: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: vs(16),
-  },
-  skillLevelOption: {
-    padding: hs(12),
-    borderWidth: 1,
-    borderColor: themeColors.border.light,
-    borderRadius: mhs(8),
-    backgroundColor: themeColors.background.lightGrey,
-  },
-  skillLevelSelected: {
-    backgroundColor: themeColors.primary,
-    borderColor: themeColors.primary,
-  },
-  skillLevelText: {
-    fontSize: mhs(14),
-    color: themeColors.text.dark,
-  },
-  skillLevelTextSelected: {
-    color: themeColors.text.light,
-    fontWeight: "bold",
-  },
   safeArea: {
     flex: 1,
     backgroundColor: themeColors.background.light,
@@ -993,12 +901,6 @@ const styles = StyleSheet.create({
     color: themeColors.primary,
     marginHorizontal: 5,
   },
-  createEventContainer: {
-    paddingHorizontal: 16,
-    paddingBottom: 80,
-    backgroundColor: themeColors.background.light,
-  },
-  summaryText: { fontSize: 16, marginBottom: 5 },
   card: {
     backgroundColor: "#fff",
     padding: 15,
@@ -1020,14 +922,14 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: themeColors.text.dark,
     marginLeft: 8,
-    flexWrap: "nowrap", // Ensure the text stays on one line
+    flexWrap: "nowrap",
   },
   summaryValue: {
     fontSize: 16,
     color: themeColors.text.dark,
     marginLeft: 4,
-    flex: 1, // Allow text to take full available space
-    flexShrink: 1, // Prevent unnecessary wrapping
+    flex: 1,
+    flexShrink: 1,
     textAlign: "left",
   },
   descriptionCard: {
@@ -1095,30 +997,26 @@ const styles = StyleSheet.create({
     padding: 15,
     flex: 1,
   },
-
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: themeColors.background.lightGrey,
     borderRadius: 8,
-    paddingVertical: 6, // Reduced padding
+    paddingVertical: 6,
     paddingHorizontal: 10,
     marginBottom: 8,
     borderWidth: 1,
     borderColor: "#ddd",
   },
-
   inputField: {
     flex: 1,
     marginLeft: 10,
     fontSize: 16,
     color: themeColors.text.dark,
   },
-
   descriptionContainer: {
     alignItems: "flex-start",
   },
-
   descriptionField: {
     flex: 1,
     marginLeft: 10,
@@ -1127,7 +1025,6 @@ const styles = StyleSheet.create({
     textAlignVertical: "top",
     height: 100,
   },
-
   segmentedControl: {
     flexDirection: "row",
     backgroundColor: "#f5f5f5",
@@ -1135,28 +1032,23 @@ const styles = StyleSheet.create({
     padding: 5,
     marginBottom: 15,
   },
-
   segmentButton: {
     flex: 1,
     alignItems: "center",
     paddingVertical: 10,
     borderRadius: 10,
   },
-
   segmentButtonSelected: {
     backgroundColor: themeColors.primary,
   },
-
   segmentButtonText: {
     fontSize: 16,
     color: themeColors.text.dark,
   },
-
   segmentButtonTextSelected: {
     color: "#fff",
     fontWeight: "bold",
   },
-
   errorText: {
     color: themeColors.text.error,
     fontSize: 12,
@@ -1179,15 +1071,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: themeColors.primary,
     marginBottom: 10,
-  },
-  inputRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: themeColors.background.lightGrey,
-    borderRadius: 8,
-    paddingVertical: 2,
-    paddingHorizontal: 12,
-    marginBottom: 1,
   },
   sideBySideContainer: {
     flexDirection: "row",
@@ -1215,10 +1098,6 @@ const styles = StyleSheet.create({
     width: "48%",
     borderColor: "#ddd",
     marginLeft: 5,
-  },
-  datePicker: {
-    flex: 1,
-    marginLeft: 8,
   },
   inputLabel: {
     fontSize: 14,
