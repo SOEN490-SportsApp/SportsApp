@@ -102,7 +102,7 @@ public class UserSearchTest {
 
         // Mock User with Profile
         User user = User.builder()
-                .withKeycloakId("1234")
+                .withId("1234")
                 .withEmail("john.doe@example.com")
                 .withUsername("johndoe")
                 .withProfile(profile)
