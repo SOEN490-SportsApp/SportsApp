@@ -365,7 +365,6 @@ const Create = () => {
                   <Controller
                     control={control}
                     name="eventName"
-                    rules={{ required: "Event Name is required" }}
                     render={({ field: { onChange, onBlur, value } }) => (
                       <TextInput
                         placeholder="Enter Event Name"
@@ -448,8 +447,8 @@ const Create = () => {
                         control={control}
                         name="maxParticipants"
                         rules={{
-                          required: "Required",
-                          validate: (v) => parseInt(v, 10) > 0 || "Must be > 0",
+                          validate: (v) =>
+                            parseInt(v, 10) > 1 || "Must be at least 2",
                         }}
                         render={({ field: { onChange, value } }) => (
                           <TextInput
@@ -492,7 +491,6 @@ const Create = () => {
                   <Controller
                     control={control}
                     name="description"
-                    rules={{ required: "Description is required" }}
                     render={({ field: { onChange, onBlur, value } }) => (
                       <TextInput
                         placeholder="Enter Description"
