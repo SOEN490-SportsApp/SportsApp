@@ -1,13 +1,5 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Image,
-  StyleSheet,
-  Alert,
-} from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Alert } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -17,9 +9,9 @@ import themeColors from "@/utils/constants/colors";
 import { IconPlacement } from "@/utils/constants/enums";
 import { hs, vs, mvs, mhs } from "@/utils/helpers/uiScaler";
 import { loginUser } from "@/services/authService";
-import { useUpdateUserToStore } from "@/state/user/actions";
+import { useUpdateUserToStore } from '@/state/user/actions';
 import { getUserById } from "@/state/user/api";
-import { ALERT_MESSAGES } from "@/utils/api/errorHandlers";
+import { ALERT_MESSAGES } from "@/utils/api/errorHandlers"; 
 
 interface LoginPageFormData {
   identifier: string;
@@ -29,41 +21,31 @@ interface LoginPageFormData {
 const LoginPage: React.FC = () => {
   const router = useRouter();
   const updateUserToStore = useUpdateUserToStore();
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LoginPageFormData>();
+  const { control, handleSubmit, formState: { errors } } = useForm<LoginPageFormData>();
   const [showPassword, setShowPassword] = useState(false);
 
   const onSubmit = async (data: LoginPageFormData) => {
     try {
-      const res = await loginUser(data.identifier, data.password);
-      await updateUserToStore(res.userID);
-      const response = await getUserById(res.userID);
-      const { firstName, lastName } = response.profile;
-      if (firstName === "" && lastName === "") {
-        router.push({
-          pathname: "/auth/registerProfile",
-          params: { userID: res.userID },
-        });
-      } else {
-        router.push("/(tabs)/home");
-      }
+        const res = await loginUser(data.identifier, data.password);
+        await updateUserToStore(res.userID);
+        const response = await getUserById(res.userID);
+        const { firstName, lastName } = response.profile;
+        if (firstName === '' && lastName === '') {
+            router.push({ pathname: '/auth/registerProfile', params: { userID: res.userID } });
+        } else {
+            router.push('/(tabs)/home');
+        }
     } catch (error: any) {
-      console.log(error);
+        console.log(error);
 
-      // Check for specific error message from the backend
-      if (
-        error.message ===
-        "The email or password you entered is incorrect. Please try again."
-      ) {
-        Alert.alert("Login Failed", error.message);
-      } else {
-        Alert.alert("Error", "An unexpected error occurred. Please try again.");
-      }
+        // Check for specific error message from the backend
+        if (error.message === "The email or password you entered is incorrect. Please try again.") {
+            Alert.alert('Login Failed', error.message);
+        } else {
+            Alert.alert('Error', 'An unexpected error occurred. Please try again.');
+        }
     }
-  };
+};
   return (
     <View style={styles.container}>
       <View style={styles.mainContent}>
@@ -139,11 +121,9 @@ const LoginPage: React.FC = () => {
               )}
             />
           </View>
-          {errors.password && (
-            <Text style={styles.errorText}>{errors.password.message}</Text>
-          )}
+          {errors.password && (<Text style={styles.errorText}>{errors.password.message}</Text>)}
 
-          <TouchableOpacity onPress={() => router.push("/auth/resetPassword")}>
+          <TouchableOpacity onPress={() => router.push('/auth/resetPassword')}>
             <Text style={styles.forgotPasswordText} testID="forgot-password">
               Forgot your password?
             </Text>
@@ -151,13 +131,7 @@ const LoginPage: React.FC = () => {
           <View style={{ height: vs(64) }} />
 
           <ConfirmButton
-            icon={
-              <MaterialCommunityIcons
-                name="login"
-                size={mvs(24)}
-                color="#fff"
-              />
-            }
+            icon={<MaterialCommunityIcons name="login" size={mvs(24)} color="#fff" />}
             text="Login"
             onPress={handleSubmit(onSubmit)}
             iconPlacement={IconPlacement.left}
@@ -209,7 +183,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     backgroundColor: themeColors.background.light,
     height: "100%",
-    minHeight: vs(700),
+    minHeight: vs(700)
   },
   mainContent: {
     flex: 1,
