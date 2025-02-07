@@ -4,25 +4,11 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useForm, Controller } from "react-hook-form";
 import { Picker } from "@react-native-picker/picker";
 import { IconPlacement } from "@/utils/constants/enums";
-import {
-  View,
-  Text,
-  TextInput,
-  Modal,
-  ScrollView,
-  Alert,
-  TouchableOpacity,
-  StyleSheet,
-} from "react-native";
-import {
-  isOlderThanSixteen,
-  isValidDate,
-  formatBirthday,
-  formatPhoneNumber,
-} from "@/utils/helpers/registerProfileHelpers";
-import { mvs, vs, hs } from "@/utils/helpers/uiScaler";
+import { View, Text, TextInput, Modal, ScrollView, Alert, TouchableOpacity,StyleSheet} from "react-native";
+import { isOlderThanSixteen, isValidDate, formatBirthday, formatPhoneNumber} from "@/utils/helpers/registerProfileHelpers";
+import { mvs,vs, hs} from "@/utils/helpers/uiScaler";
 import { Profile, SportPreference } from "@/types";
-import { useUpdateUserToStore } from "@/state/user/actions";
+import { useUpdateUserToStore } from '@/state/user/actions';
 import { registerProfile } from "@/utils/api/profileApiClient";
 import themeColors from "@/utils/constants/colors";
 import ConfirmButton from "@/components/Helper Components/ConfirmButton";
@@ -44,12 +30,7 @@ const RegisterProfilePage: React.FC = () => {
   const router = useRouter();
   const updateUserToStore = useUpdateUserToStore();
   const { userID } = useLocalSearchParams();
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-    trigger,
-  } = useForm<RegisterProfilePageFormData>();
+  const {control, handleSubmit, formState: { errors }, trigger} = useForm<RegisterProfilePageFormData>();
   const [currentStep, setCurrentStep] = useState(1);
   const [showGenderPicker, setShowGenderPicker] = useState(false);
   const [selectedGender, setSelectedGender] = useState("");
@@ -71,7 +52,7 @@ const RegisterProfilePage: React.FC = () => {
             "Error Occured",
             "Please complete form before proceeding."
           );
-    }
+    } 
     if (currentStep === 2) {
       const isValid = await trigger(["selectedSports"]);
       isValid
@@ -84,7 +65,7 @@ const RegisterProfilePage: React.FC = () => {
   };
 
   const onSubmit = async (data: RegisterProfilePageFormData) => {
-    try {
+    try{
       const profile: Profile = {
         firstName: data.firstName,
         lastName: data.lastName,
@@ -98,8 +79,8 @@ const RegisterProfilePage: React.FC = () => {
       await registerProfile(profile, userID as string);
       await updateUserToStore(userID as string);
       router.replace("/(tabs)/home");
-    } catch (error: any) {
-      Alert.alert("Error", "Error occured creating profile");
+    } catch (error: any){
+      Alert.alert('Error', 'Error occured creating profile');
       throw new Error(`Error regestering profile: ${error}`);
     }
   };
@@ -237,9 +218,7 @@ const RegisterProfilePage: React.FC = () => {
                             <View>
                               <Text
                                 className={`${
-                                  value
-                                    ? themeColors.text.dark
-                                    : themeColors.text.lightGrey
+                                  value ? themeColors.text.dark : themeColors.text.lightGrey 
                                 }`}
                               >
                                 {value ? value : "Gender"}
@@ -263,15 +242,13 @@ const RegisterProfilePage: React.FC = () => {
                                           setSelectedGender(gender);
                                         }}
                                       >
-                                        {Object.values(genders).map(
-                                          (gender, index) => (
-                                            <Picker.Item
-                                              key={index}
-                                              label={gender}
-                                              value={gender}
-                                            />
-                                          )
-                                        )}
+                                        {Object.values(genders).map((gender, index) => (
+                                          <Picker.Item
+                                            key={index}
+                                            label={gender}
+                                            value={gender}
+                                          />
+                                        ))}
                                       </Picker>
                                       <View
                                         style={{
@@ -281,7 +258,7 @@ const RegisterProfilePage: React.FC = () => {
                                         }}
                                       >
                                         <TouchableOpacity
-                                          testID="genderPickerSubmit"
+                                        testID="genderPickerSubmit"
                                           style={{
                                             alignItems: "center",
                                             backgroundColor:
@@ -299,12 +276,7 @@ const RegisterProfilePage: React.FC = () => {
                                             setShowGenderPicker(false);
                                           }}
                                         >
-                                          <Text
-                                            style={{
-                                              color:
-                                                themeColors.background.light,
-                                            }}
-                                          >
+                                          <Text style={{ color: themeColors.background.light }}>
                                             Select
                                           </Text>
                                         </TouchableOpacity>
@@ -450,10 +422,7 @@ const RegisterProfilePage: React.FC = () => {
                 }}
                 render={({ field: { onChange, onBlur, value } }) => (
                   <View style={styles.multiSportContainer}>
-                    <RegisterProfileSports
-                      onChange={onChange}
-                      selectedSports={[]}
-                    />
+                    <RegisterProfileSports onChange={onChange} selectedSports={[]} />
                   </View>
                 )}
               />
@@ -475,7 +444,7 @@ const RegisterProfilePage: React.FC = () => {
                     <MaterialCommunityIcons
                       name="arrow-right"
                       size={25}
-                      color={themeColors.background.light}
+                      color= {themeColors.background.light}
                       style={{ marginLeft: 8 }}
                     />
                   }
@@ -495,7 +464,7 @@ export default RegisterProfilePage;
 const styles = StyleSheet.create({
   scrollViewContainer: {
     flex: 1,
-    flexGrow: 1,
+    flexGrow: 1
   },
   imageContainer: {
     flexDirection: "row",
