@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @ToString
 @Data
-public class Object {
+public class MinioObjectMetadata {
     @NotBlank(message = "File name must be provided")
     private String fileName;
 
