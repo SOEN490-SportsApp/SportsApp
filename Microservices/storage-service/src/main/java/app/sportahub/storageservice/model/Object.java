@@ -1,7 +1,7 @@
 package app.sportahub.storageservice.model;
 
-import lombok.*;
 import jakarta.validation.constraints.NotBlank;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.io.InputStream;

@@ -1,4 +1,4 @@
-package app.sportahub.storageservice.config;
+package app.sportahub.storageservice.config.minio;
 
 import io.minio.MinioClient;
 import org.springframework.beans.factory.annotation.Value;
