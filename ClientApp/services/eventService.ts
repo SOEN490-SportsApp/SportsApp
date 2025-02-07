@@ -45,7 +45,7 @@ export const deleteEvent = async (eventId: string) => {
 export const getEventsJoined = async (userId: string, page: number = 0, size: number = 5) => {
   try {
     const axiosInstance = getAxiosInstance();
-    const endpoint = API_ENDPOINTS.GET_ALL_EVENTS_JOINED.replace("{userId}", userId);
+    const endpoint = API_ENDPOINTS.GET_EVENTS_BY_USER_ID.replace("{userId}", userId);
     const url = `${endpoint}?page=${page}&size=${size}`;
     const response = await axiosInstance.get(url);
     return response;

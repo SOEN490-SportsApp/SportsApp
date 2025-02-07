@@ -85,14 +85,14 @@ const AboutTab: React.FC<{ user: any }> = ({ user }) => {
 };
 
 const ProfilePage: React.FC = () => {
-    const { userId } = useLocalSearchParams<{ userId: string }>();
+    const { id } = useLocalSearchParams<{ id: string }>();
     const [user, setUser] = useState<any | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const userData = await getOtherUserProfile(userId!);
+                const userData = await getOtherUserProfile(id!);
                 setUser(userData);
             } catch (error) {
                 console.error("Error fetching user data:", error);
@@ -101,7 +101,7 @@ const ProfilePage: React.FC = () => {
             }
         };
         fetchUser();
-    }, [userId]);
+    }, [id]);
 
     if (loading) {
         return (
@@ -125,7 +125,7 @@ const ProfilePage: React.FC = () => {
         { key: 'about', title: 'About', testID: 'About' },
     ];
     const scenes = {
-        activity: <ActivityTab userId={userId} />,
+        activity: <ActivityTab userId={id} />,
         friends: <FriendsTab />,
         about: <AboutTab user={user} />,
     };

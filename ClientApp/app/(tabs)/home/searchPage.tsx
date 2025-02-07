@@ -44,6 +44,7 @@ export default function searchPage() {
       const response = await searchUser(searchText);
       if (response) {
         setResults(response);
+        console.log(response);
       }
     } catch (err) {
       console.log(err);
