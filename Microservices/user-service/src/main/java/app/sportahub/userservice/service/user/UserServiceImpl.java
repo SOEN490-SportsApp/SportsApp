@@ -421,7 +421,7 @@ public class UserServiceImpl implements UserService {
         Page<User> users = userRepository.searchUsers(firstName, lastName, sport, rankings, gender, age, pageable);
 
         List<UserProfileResponse> userProfileResponses = users.stream()
-                .map(user -> new UserProfileResponse(user.getKeycloakId(), profileMapper.profileToProfileResponse(user.getProfile())))
+                .map(user -> new UserProfileResponse(user.getId(), profileMapper.profileToProfileResponse(user.getProfile())))
                 .collect(Collectors.toList());
         return new PageImpl<>(userProfileResponses, users.getPageable(), users.getTotalElements());
     }
