@@ -1,15 +1,17 @@
 package app.sportahub.storageservice.service;
 
-import app.sportahub.storageservice.model.Object;
+import app.sportahub.storageservice.exception.storage.FileCannotBeNullException;
+import app.sportahub.storageservice.model.MinioObjectMetadata;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
 @Service
 @RequiredArgsConstructor
-public class ObjectServiceImpl implements ObjectService {
+public class ObjectStorageServiceImpl implements ObjectStorageService {
     private final MinioClient minioClient;
     private static final String BUCKET_NAME = "sports-app-bucket";
 
@@ -22,14 +24,20 @@ public class ObjectServiceImpl implements ObjectService {
      */
     @SneakyThrows
     @Override
-    public Object storeFile(MultipartFile file) {
+    public MinioObjectMetadata storeFile(MultipartFile file) {
+        if (file == null) {
+            throw new FileCannotBeNullException();
+        }
+
         String fileName = System.currentTimeMillis() + "-" + file.getOriginalFilename();
-            minioClient.putObject(
-                PutObjectArgs.builder().bucket(BUCKET_NAME).object(fileName).stream(
-                                file.getInputStream(), file.getSize(), -1)
+        minioClient.putObject(
+                PutObjectArgs.builder()
+                        .bucket(BUCKET_NAME)
+                        .object(fileName).stream(file.getInputStream(), file.getSize(), -1)
                         .contentType(file.getContentType())
                         .build());
-        return Object.builder()
+
+        return MinioObjectMetadata.builder()
                 .withFileName(fileName)
                 .withContentType(file.getContentType())
                 .withSize(file.getSize())
