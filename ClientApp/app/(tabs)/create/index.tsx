@@ -997,7 +997,7 @@ const styles = StyleSheet.create({
   },
   mapContainer: {
     marginTop: 10,
-    marginBottom: 100,
+    marginBottom: 200,
     borderRadius: 10,
     overflow: "hidden",
   },
@@ -1083,6 +1083,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: vs(10),
+    marginLeft: -5,
+    width: "102.5%",
   },
   inputHalfContainer: {
     flex: 1,
@@ -1101,6 +1103,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 8,
+    width: "102.5%",
+    marginLeft: -5,
   },
   inputHalf: {
     flexDirection: "row",
@@ -1122,7 +1126,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     width: "48%",
     borderColor: "#ddd",
-    marginLeft: 5,
   },
   inputLabel: {
     fontSize: 14,
