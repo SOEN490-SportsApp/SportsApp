@@ -596,7 +596,7 @@ const Create = () => {
                 </View>
               </View>
 
-              <Text style={styles.inputLabel}>Cutoff Date</Text>
+              <Text style={styles.inputLabel}>Register by (Date)</Text>
               <View style={styles.inputContainer}>
                 <Ionicons
                   name="calendar-outline"
@@ -611,7 +611,7 @@ const Create = () => {
                 />
               </View>
 
-              <Text style={styles.inputLabel}>Cutoff Time</Text>
+              <Text style={styles.inputLabel}>Register by (Time)</Text>
               <View style={styles.inputHalfCutoffTime}>
                 <Ionicons
                   name="time-outline"
