@@ -10,6 +10,7 @@ import { useSelector } from 'react-redux';
 import EventList from '@/components/Event/EventList';
 import { getEventsCreated, getEventsJoined } from '@/services/eventService';
 import FavoriteSportsBadges from '@/components/FavoriteSportsBadges';
+import FriendsList from '@/components/Profile/FriendsList';
 
 
 const screenHeight = Dimensions.get('window').height;
@@ -28,17 +29,14 @@ const ActivityTab = () => {
   };
 
 // Friends tab content
-const FriendsTab = () => (
+const FriendsTab = () => {
+  const user = useSelector((state: { user: any }) => state.user);
+  return (
     <View className="p-4 bg-white flex-1">
-        <ScrollView className="pt-3 space-y-4" style={{ maxHeight }}>
-            {Array.from({ length: 6 }).map((_, index) => (
-                <View key={index} className="mt-4 p-4 rounded-lg" style={{ backgroundColor: '#0C9E04' }}>
-                    <Text className="text-xl font-bold text-black">Friend {index + 1}</Text>
-                </View>
-            ))}
-        </ScrollView>
+      <FriendsList userId={user.id} />
     </View>
-);
+    );
+  }
 
 // About tab content with user data
 const MyEvents = () => {

@@ -16,6 +16,9 @@ export const API_ENDPOINTS = {
   GET_ALL_EVENTS: "event-service/event",
   JOIN_EVENT_BY_ID: "event-service/event/{id}/join",
   DELETE_EVENT_BY_ID: "event-service/event/{id}",
+  GET_ALL_EVENTS_JOINED: 'event-service/event/participant/{userId}',
   GET_ALL_EVENTS_CREATED_BY: 'event-service/event/created-by/{userId}',
-  GET_EVENTS_BY_USER_ID: "event-service/event/participant/{userId}",
+GET_EVENTS_BY_USER_ID: "event-service/event/participant/{userId}",
+  GET_ALL_FRIENDS: 'user-service/user/{userId}/friends',
+  GET_PROFILE_BY_ID: 'user-service/user/{userId}/profile',
 };
