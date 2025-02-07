@@ -303,6 +303,7 @@ const Create = () => {
           !formValues.eventType ||
           !formValues.sportType ||
           !formValues.maxParticipants ||
+          !formValues.requiredSkillLevel?.length ||
           !formValues.description
         ) {
           Alert.alert("Oops!", "Please complete all fields before proceeding.");
@@ -478,6 +479,32 @@ const Create = () => {
                 </View>
 
                 {isSportTypeModalVisible && renderSportTypeModal()}
+
+                <Text style={styles.inputLabel}>Required Skill Level</Text>
+                <View style={styles.skillLevelGroup}>
+                  {["Beginner", "Intermediate", "Advanced"].map((level) => (
+                    <TouchableOpacity
+                      key={level}
+                      testID={`skill-level-${level}`}
+                      style={[
+                        styles.skillLevelOption,
+                        requiredSkillLevel.includes(level) &&
+                          styles.skillLevelSelected,
+                      ]}
+                      onPress={() => toggleSkillLevel(level)}
+                    >
+                      <Text
+                        style={[
+                          styles.skillLevelText,
+                          requiredSkillLevel.includes(level) &&
+                            styles.skillLevelTextSelected,
+                        ]}
+                      >
+                        {level}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
 
                 <Text style={styles.inputLabel}>Description</Text>
                 <View
@@ -1103,6 +1130,30 @@ const styles = StyleSheet.create({
     color: themeColors.primary,
     marginBottom: 5,
     marginLeft: 5,
+  },
+  skillLevelOption: {
+    padding: hs(12),
+    borderWidth: 1,
+    borderColor: themeColors.border.light,
+    borderRadius: mhs(8),
+    backgroundColor: themeColors.background.lightGrey,
+  },
+  skillLevelText: {
+    fontSize: mhs(14),
+    color: themeColors.text.dark,
+  },
+  skillLevelTextSelected: {
+    color: themeColors.text.light,
+    fontWeight: "bold",
+  },
+  skillLevelGroup: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: vs(16),
+  },
+  skillLevelSelected: {
+    backgroundColor: themeColors.primary,
+    borderColor: themeColors.primary,
   },
 });
 
