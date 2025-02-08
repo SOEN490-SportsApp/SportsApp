@@ -111,7 +111,6 @@ const ProfilePage: React.FC = () => {
                     {user?.profile.firstName} {user?.profile.lastName}
                 </Text>
             </View>
-
             <FavoriteSportsBadges sports={user?.profile.sportsOfPreference} />
 
             {/* CustomTabMenu */}

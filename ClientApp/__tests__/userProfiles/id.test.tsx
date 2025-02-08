@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen, waitFor, fireEvent } from "@testing-library/react-native";
-import ProfilePage from "../../app/userProfiles/[id]";
+import ProfilePage from "../../app/(tabs)/home/userProfiles/[id]";
 import { getOtherUserProfile, getEventsByUserId } from "@/utils/api/profileApiClient";
 import { useLocalSearchParams } from "expo-router";
 
