@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { Menu, Provider } from "react-native-paper";
 import { Alert, TouchableOpacity } from "react-native";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import themeColors from "@/utils/constants/colors";
 import { useSelector } from "react-redux";
 import { getSentFriendRequests, sendFriendRequest } from "@/utils/api/profileApiClient";
@@ -84,6 +84,14 @@ export default function UserProfilesLayout() {
                             <Menu.Item onPress={() => handleOptionPress("message")} title="Send a Message" />
                         </Menu>
                     ),
+                    headerLeft: () => (
+                        <TouchableOpacity
+                          onPress={() => router.back()}
+                          style={{ marginLeft: 10 }}
+                        >
+                          <Ionicons name="arrow-back" size={24} color="black" />
+                        </TouchableOpacity>
+                      ),
                 }}
             />
         </Provider>

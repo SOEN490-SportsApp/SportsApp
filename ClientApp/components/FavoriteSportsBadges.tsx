@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
-const getSportIcon = (sportName: string) => {
+export const getSportIcon = (sportName: string) => {
     switch (sportName.toLowerCase()) {
         case "football":
             return { name: "american-football", type: "Ionicons" };
@@ -35,7 +35,7 @@ const getSportIcon = (sportName: string) => {
     }
 };
 
-const getSkillColor = (ranking: string) => {
+export const getSkillColor = (ranking: string) => {
     switch (ranking.toLowerCase()) {
         case "beginner":
             return "#228B22";

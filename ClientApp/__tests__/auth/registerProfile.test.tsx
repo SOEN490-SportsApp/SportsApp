@@ -187,7 +187,7 @@ describe("profile preference form test", () => {
     const mockOnChange = jest.fn();
     const { getByText, getByPlaceholderText, getByTestId, queryByText } = render(
       <Provider store={store}>
-        <RegisterProfileSports onChange={mockOnChange} />
+        <RegisterProfileSports onChange={mockOnChange} selectedSports={[]} />
       </Provider>
     );
     const soccerButton = getByTestId('Soccer-selection-button')
@@ -202,7 +202,7 @@ describe("profile preference form test", () => {
     const mockOnChange = jest.fn();
     const {queryByText } = render(
       <Provider store={store}>
-        <RegisterProfileSports onChange={mockOnChange} />
+        <RegisterProfileSports onChange={mockOnChange} selectedSports={[]} />
       </Provider>
     );
 
@@ -214,7 +214,7 @@ describe("profile preference form test", () => {
     const mockOnChange = jest.fn();
     const {getByTestId,} = render(
       <Provider store={store}>
-        <RegisterProfileSports onChange={mockOnChange} />
+        <RegisterProfileSports onChange={mockOnChange} selectedSports={[]} />
       </Provider>
     );
     const soccerButton = getByTestId('Soccer-selection-button')
@@ -231,7 +231,7 @@ describe("profile preference form test", () => {
     const mockOnChange = jest.fn();
     const {getByTestId,} = render(
       <Provider store={store}>
-        <RegisterProfileSports onChange={mockOnChange} />
+        <RegisterProfileSports onChange={mockOnChange} selectedSports={[]} />
       </Provider>
     );
     const soccerButton = getByTestId('Soccer-selection-button')
@@ -248,7 +248,7 @@ describe("profile preference form test", () => {
     const mockOnChange = jest.fn();
     const {getByTestId,} = render(
       <Provider store={store}>
-        <RegisterProfileSports onChange={mockOnChange} />
+        <RegisterProfileSports onChange={mockOnChange} selectedSports={[]} />
       </Provider>
     );
     const soccerButton = getByTestId('Soccer-selection-button')
@@ -265,7 +265,7 @@ describe("profile preference form test", () => {
     const mockOnChange = jest.fn();
     const {getByTestId,} = render(
       <Provider store={store}>
-        <RegisterProfileSports onChange={mockOnChange} />
+        <RegisterProfileSports onChange={mockOnChange} selectedSports={[]} />
       </Provider>
     );
     const soccerButton = getByTestId('Soccer-selection-button')
@@ -280,7 +280,7 @@ describe("profile preference form test", () => {
     const mockOnChange = jest.fn();
     const {getByTestId,} = render(
       <Provider store={store}>
-        <RegisterProfileSports onChange={mockOnChange} />
+        <RegisterProfileSports onChange={mockOnChange} selectedSports={[]} />
       </Provider>
     );
     const soccerButton = getByTestId('Soccer-selection-button')
@@ -298,8 +298,5 @@ describe("profile preference form test", () => {
     fireEvent.press(removeSport)
     expect(mockOnChange).toHaveBeenCalledWith([])
   })
-
-
-
-
+  
 });
