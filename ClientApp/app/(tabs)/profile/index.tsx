@@ -9,58 +9,11 @@ import { useRouter } from 'expo-router';
 import { useSelector } from 'react-redux';
 import EventList from '@/components/Event/EventList';
 import { getEventsCreated, getEventsJoined } from '@/services/eventService';
-import Ionicons from "react-native-vector-icons/Ionicons"; 
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import FavoriteSportsBadges from '@/components/FavoriteSportsBadges';
 
 
 const screenHeight = Dimensions.get('window').height;
 const maxHeight = screenHeight * 0.5;
-
-const getSportIcon = (sportName: string) => {
-    switch (sportName.toLowerCase()) {
-      case "football":
-        return { name: "american-football", type: "Ionicons" }; 
-      case "soccer":
-        return { name: "soccer", type: "MaterialCommunityIcons" }; 
-      case "basketball":
-        return { name: "basketball", type: "Ionicons" }; 
-      case "baseball":
-        return { name: "baseball", type: "MaterialCommunityIcons" }; 
-      case "cycling":
-        return { name: "bike", type: "MaterialCommunityIcons" }; 
-      case "ping-pong":
-      case "table-tennis":
-        return { name: "table-tennis", type: "MaterialCommunityIcons" }; 
-      case "tennis":
-        return { name: "tennis", type: "MaterialCommunityIcons" }; 
-      case "rugby":
-        return { name: "rugby", type: "MaterialCommunityIcons" }; 
-      case "golf":
-        return { name: "golf-tee", type: "MaterialCommunityIcons" }; 
-      case "hockey":
-        return { name: "hockey-sticks", type: "MaterialCommunityIcons" }; 
-      case "boxing":
-        return { name: "boxing-glove", type: "MaterialCommunityIcons" }; 
-        case "hiking":
-            return { name: "hiking", type: "MaterialCommunityIcons" };
-      default:
-        return { name: "help-circle", type: "Ionicons" }; 
-    }
-  };
-  
-  // Helper function to assign color based on skill level
-const getSkillColor = (ranking: string) => {
-    switch (ranking.toLowerCase()) {
-        case "beginner":
-            return "#228B22"; 
-        case "intermediate":
-            return "#FFD700"; 
-        case "advanced":
-            return "#FF0000"; 
-        default:
-            return "#808080"; 
-    }
-};
 
 const ActivityTab = () => {
     const user = useSelector((state: { user: any }) => state.user);
@@ -159,29 +112,7 @@ const ProfilePage: React.FC = () => {
                 </Text>
             </View>
 
-            {/* Favorite Sports Badges */}
-            <View className="mt-0 items-center">
-                <View className="flex-row flex-wrap gap-2 mt-2 justify-center">
-                    {user?.profile?.sportsOfPreference?.length ? (
-                        user.profile.sportsOfPreference.map((sport: { name: string; ranking: string }, index: number) => (
-                            <View 
-                                key={index} 
-                                className="px-3 py-1 rounded-full border border-gray-300 flex-row items-center"
-                                style={{ backgroundColor: "white", minWidth: 100, margin: 4 }}
-                            >
-                                {["soccer", "baseball", "bike", "table-tennis", "tennis", "rugby", "golf-tee", "hockey-sticks", "boxing-glove","hiking"].includes(getSportIcon(sport.name).name) ? (
-                                <MaterialCommunityIcons name={getSportIcon(sport.name).name} size={16} color={getSkillColor(sport.ranking)} style={{ marginRight: 4 }} />
-                                ) : (
-                                 <Ionicons name={getSportIcon(sport.name).name} size={16} color={getSkillColor(sport.ranking)} style={{ marginRight: 4 }} />
-                                )}
-                                <Text className="text-black text-sm">{sport.name}</Text>
-                            </View>
-                        ))
-                    ) : (
-                        <Text className="text-md text-gray-600">None</Text>
-                    )}
-                </View>
-            </View>
+            <FavoriteSportsBadges sports={user?.profile.sportsOfPreference} />
 
             {/* CustomTabMenu */}
             <CustomTabMenu routes={routes} scenes={scenes} backgroundColor={"#fff"} />
