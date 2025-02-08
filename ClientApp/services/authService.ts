@@ -42,6 +42,12 @@ export async function registerUser(email: string, username: string, password: st
     const response = await axiosInstance.post(API_ENDPOINTS.REGISTER, { email, username, password });
     return response;
   } catch (error: any) {
+    if (error.response?.status === 409) {
+      throw new Error("This email or username is already registered. Please use a different one.");
+    }
+    if (error.response?.status === 400) {
+      throw new Error("Invalid registration details. Please check your input and try again.");
+    }
     if (__DEV__) {
       console.error('Registration failed:', error instanceof Error ? error : new Error(String(error)));
     }
@@ -61,5 +67,24 @@ export async function resetPassword(email: string) {
     throw err.response?.data || err;
   }
 }
+export async function deleteUser(userId: string) {
+  try {
+    const axiosInstance = getAxiosInstance();
+    const response = await axiosInstance.delete(API_ENDPOINTS.DELETE_PROFILE.replace('{userId}', userId));
+    return response;
+  } catch (error: any) {
+    if (error.response?.status === 404) {
+      throw new Error("The user account does not exist or has already been deleted.");
+    }
+    if (error.response?.status === 400) {
+      throw new Error("Invalid request. Please check your input.");
+    }
+    if (__DEV__) {
+      console.error('Delete user failed:', error instanceof Error ? error : new Error(String(error)));
+    }
+    throw error.response?.data || error;
+  }
+}
+
 
 

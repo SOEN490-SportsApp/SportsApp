@@ -19,6 +19,10 @@ export default function SettingsLayout() {
         name="helpPage" 
         options={{ title: "Help & Support", headerShown: true, }} 
       />
+        <Stack.Screen 
+        name="deleteAccountPage" 
+        options={{ title: "Delete Account", headerShown: true, }} 
+      />
     </Stack>
   );
 }
