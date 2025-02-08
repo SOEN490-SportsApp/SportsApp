@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text } from 'react-native';
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
@@ -59,29 +59,67 @@ interface FavoriteSportsBadgesProps {
 
 const FavoriteSportsBadges: React.FC<FavoriteSportsBadgesProps> = ({ sports }) => {
     return (
-        <View className="mt-0 items-center">
-            <View className="flex-row flex-wrap gap-2 mt-2 justify-center">
+        <View style={styles.container}>
+            <View style={styles.badgeContainer}>
                 {sports?.length ? (
-                    sports.map((sport, index) => (
-                        <View
-                            key={index}
-                            className="px-3 py-1 rounded-full border border-gray-300 flex-row items-center"
-                            style={{ backgroundColor: "white", minWidth: 100, margin: 4 }}
-                        >
-                            {["soccer", "baseball", "bike", "table-tennis", "tennis", "rugby", "golf-tee", "hockey-sticks", "boxing-glove", "hiking"].includes(getSportIcon(sport.name).name) ? (
-                                <MaterialCommunityIcons name={getSportIcon(sport.name).name} size={16} color={getSkillColor(sport.ranking)} style={{ marginRight: 4 }} />
-                            ) : (
-                                <Ionicons name={getSportIcon(sport.name).name} size={16} color={getSkillColor(sport.ranking)} style={{ marginRight: 4 }} />
-                            )}
-                            <Text className="text-black text-sm">{sport.name}</Text>
-                        </View>
-                    ))
+                    sports.map((sport, index) => {
+                        const { name, type } = getSportIcon(sport.name);
+                        const IconComponent = type === "Ionicons" ? Ionicons : MaterialCommunityIcons;
+                        return (
+                            <View key={index} style={styles.badge}>
+                                <IconComponent
+                                    name={name}
+                                    size={16}
+                                    color={getSkillColor(sport.ranking)}
+                                    style={styles.icon}
+                                />
+                                <Text style={styles.text}>{sport.name}</Text>
+                            </View>
+                        );
+                    })
                 ) : (
-                    <Text className="text-md text-gray-600">None</Text>
+                    <Text style={styles.noSportsText}>None</Text>
                 )}
             </View>
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    container: {
+        marginTop: 0,
+        alignItems: "center",
+    },
+    badgeContainer: {
+        flexDirection: "row",
+        flexWrap: "wrap",
+        gap: 8,
+        marginTop: 4,
+        justifyContent: "center",
+    },
+    badge: {
+        flexDirection: "row",
+        alignItems: "center",
+        paddingVertical: 4,
+        paddingHorizontal: 12,
+        borderRadius: 50,
+        borderWidth: 1,
+        borderColor: "#ccc",
+        backgroundColor: "white",
+        minWidth: 100,
+        margin: 2,
+    },
+    icon: {
+        marginRight: 4,
+    },
+    text: {
+        color: "black",
+        fontSize: 14,
+    },
+    noSportsText: {
+        fontSize: 16,
+        color: "#808080",
+    },
+});
 
 export default FavoriteSportsBadges;
