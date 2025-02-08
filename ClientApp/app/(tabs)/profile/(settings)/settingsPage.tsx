@@ -8,6 +8,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { logoutUser } from '@/services/authService';
 import QRCode from 'react-native-qrcode-svg'
 import * as Linking from "expo-linking";
+import QR from '@/components/QR/QR';
+
+
 
 const settingsPage: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false)
@@ -41,33 +44,10 @@ const settingsPage: React.FC = () => {
             color="black"
             style={styles.icon}
           />
-          <Text style={styles.text}>Show QR Code</Text>
-        <TouchableOpacity onPress={() => Linking.openURL("myapp://events/67a2c78b6cb4b06b5018d1dd")}>
-          <Text>Redirect me</Text>
+          <Text style={styles.text}>Share Profile</Text>
         </TouchableOpacity>
-        </TouchableOpacity>
-        <Modal
-          visible={modalVisible}
-          animationType="slide"
-          transparent={true}
-          onRequestClose={() => setModalVisible(false)}
-        >
-          <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
-            <View style={styles.modalOverlay}>
-              <View style={styles.modalContent}>
-                <QRCode
-                  value={`myapp://events/${user.id}`}
-                  size={250}
-                  logo={logo}
-                />
-                <View style={styles.closeButton}>
-                  <Text style={styles.closeButtonText}>Share your profile with friends</Text>
-                </View>
-              </View>
-            </View>
-          </TouchableWithoutFeedback>
-        </Modal>
 
+        <QR id={user.id} isVisible={modalVisible} setIsVisible={setModalVisible} isProfile={true}/>
 
         {/* Notification Settings */}
         <TouchableOpacity style={styles.option} onPress={() => router.push('/(tabs)/profile/(settings)/notificationsPage')}>

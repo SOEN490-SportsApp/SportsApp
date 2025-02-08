@@ -1,15 +1,18 @@
 import React, { useState } from "react";
-import { Alert, TouchableOpacity } from "react-native";
+import { Alert, TouchableOpacity, View } from "react-native";
 import { router, Stack } from "expo-router";
 import { Menu, Provider } from "react-native-paper";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import themeColors from "@/utils/constants/colors";
 import { deleteEvent } from "@/services/eventService";
 import { useLocalSearchParams } from "expo-router";
+import QR from "@/components/QR/QR";
+import { mvs } from "@/utils/helpers/uiScaler";
 
 export default function EventDetailsLayout() {
   const { eventId } = useLocalSearchParams<{ eventId: string }>();
   const [menuVisible, setMenuVisible] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const openMenu = () => setMenuVisible(true);
   const closeMenu = () => setMenuVisible(false);
@@ -71,37 +74,78 @@ export default function EventDetailsLayout() {
         screenOptions={{
           headerShown: true,
           title: "",
+
           headerRight: () => (
-            <Menu
-              style={{
-                backgroundColor: themeColors.background.lightGrey,
-                position: "absolute",
-                top: 50,
-                right: 10,
-                left: "auto",
-              }}
-              visible={menuVisible}
-              onDismiss={closeMenu}
-              anchor={
-                <TouchableOpacity onPress={openMenu}>
-                  <MaterialCommunityIcons name="dots-vertical" size={24} />
+            <>
+              <View style={{marginRight:8}}>
+                <TouchableOpacity onPress={() => setModalVisible(true)}>
+                  <Ionicons
+                    name="qr-code-outline"
+                    size={mvs(24)}
+                    color="black"
+                  />
                 </TouchableOpacity>
-              }
+                <QR
+                  id={eventId}
+                  isVisible={modalVisible}
+                  setIsVisible={setModalVisible}
+                  isProfile={false}
+                />
+              </View>
+              <Menu
+                style={{
+                  backgroundColor: themeColors.background.lightGrey,
+                  position: "absolute",
+                  top: 50,
+                  right: 10,
+                  left: "auto",
+                }}
+                visible={menuVisible}
+                onDismiss={closeMenu}
+                anchor={
+                  <TouchableOpacity onPress={openMenu}>
+                    <MaterialCommunityIcons name="dots-vertical" size={24} />
+                  </TouchableOpacity>
+                }
+              >
+                <Menu.Item
+                  onPress={() => handleOptionPress("invite")}
+                  title="Invite Friend"
+                />
+                <Menu.Item
+                  onPress={() => handleOptionPress("leave")}
+                  title="Leave Event"
+                />
+                <Menu.Item
+                  onPress={() => handleOptionPress("delete")}
+                  title="Delete Event"
+                  titleStyle={{ color: "red" }}
+                />
+              </Menu>
+            </>
+          ),
+          // headerLeft: () => (
+          //   <View>
+          //   <TouchableOpacity
+          //   onPress={() => setModalVisible(true)}
+          // >
+          //   <Ionicons
+          //     name="qr-code-outline"
+          //     size={mvs(22)}
+          //     color="black"
+          //   />
+          // </TouchableOpacity>
+          //   <QR id={eventId} isVisible={modalVisible} setIsVisible={setModalVisible} isProfile={false}/>
+          //   </View>
+          // )
+
+          headerLeft: () => (
+            <TouchableOpacity
+              onPress={() => router.back()}
+              style={{ marginLeft: 10 }}
             >
-              <Menu.Item
-                onPress={() => handleOptionPress("invite")}
-                title="Invite Friend"
-              />
-              <Menu.Item
-                onPress={() => handleOptionPress("leave")}
-                title="Leave Event"
-              />
-              <Menu.Item
-                onPress={() => handleOptionPress("delete")}
-                title="Delete Event"
-                titleStyle={{ color: "red" }}
-              />
-            </Menu>
+              <Ionicons name="arrow-back" size={24} color="black" />
+            </TouchableOpacity>
           ),
         }}
       />
