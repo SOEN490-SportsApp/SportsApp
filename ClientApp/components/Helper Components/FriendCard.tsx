@@ -17,6 +17,7 @@ function generateRandomFriendsInCommon() {
 const FriendCard: React.FC<FriendCardProp> = ({ user }) => {
   const router = useRouter();
   const [requestSent, setRequestSent] = useState(false);
+  const userId = user.userId;
   return (
     <TouchableOpacity
       style={styles.cardHolder}

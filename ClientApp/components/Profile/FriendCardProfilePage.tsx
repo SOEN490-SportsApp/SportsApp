@@ -1,14 +1,17 @@
 import themeColors from "@/utils/constants/colors";
 import { hs, mhs, mvs, vs } from "@/utils/helpers/uiScaler";
+import { useRouter } from "expo-router";
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image} from "react-native";
 
 const FriendCardProfilePage = ({ friend }: { friend: any }) => {
-  console.log(friend.profile.sportsOfPreference);
+  const router = useRouter();
+  const userId = friend.friendUserId;
+  console.log(friend);
   return (
     <TouchableOpacity
       style={styles.cardHolder}
-      onPress={() => alert("Redirect to profile..")}
+      onPress={() => router.push({pathname: `/(tabs)/home/userProfiles/[id]`, params: {id: userId}})}
     >
       <View style={styles.pictureSection}>
         <Image
