@@ -8,6 +8,7 @@ import { getEventsByUserId } from '@/utils/api/profileApiClient';
 import EventCard from '@/components/Event/EventCard';
 import UserInfoCard from '@/components/Helper Components/UserInfoCard';
 import { Event } from '@/types/event';
+import FavoriteSportsBadges from '@/components/FavoriteSportsBadges';
 
 const screenHeight = Dimensions.get('window').height;
 const maxHeight = screenHeight * 0.5;
@@ -142,6 +143,7 @@ const ProfilePage: React.FC = () => {
                     {user?.profile.firstName} {user?.profile.lastName}
                 </Text>
             </View>
+            <FavoriteSportsBadges sports={user?.profile.sportsOfPreference} />
             <CustomTabMenu routes={routes} scenes={scenes} backgroundColor={"#fff"} />
         </SafeAreaView>
     );
