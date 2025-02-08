@@ -73,3 +73,16 @@ export async function sendFriendRequest(senderUserId: string, receiverUserId: st
         throw error.response?.data || error;
     }
 }
+
+export async function getSentFriendRequests(userId: string) {
+    const axiosInstance = getAxiosInstance();
+    try {
+        const response = await axiosInstance.get(
+            `user-service/user/${userId}/friend-requests?type=SENT`
+        );
+        return response.data;
+    } catch (error: any) {
+        console.error("Error fetching sent friend requests:", error);
+        throw error.response?.data || error;
+    }
+}

@@ -9,6 +9,7 @@ export const API_ENDPOINTS = {
   GET_USER_PROFILE: 'user-service/user/{id}/profile',
   DELETE_PROFILE: 'user-service/user/{userId}',
   SEND_FRIEND_REQUEST: 'user-service/user/{userId}/friends/requests',
+  RETRIEVE_USER_FRIEND_REQUESTS: 'user-service/user/{userId}/friend-requests',
 
   CREATE_EVENT: "event-service/event",
   GET_EVENT_BY_ID: "event-service/event/{id}",
