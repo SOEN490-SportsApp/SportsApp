@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import QRCode from "react-native-qrcode-svg";
 import * as Linking from "expo-linking";
+import { deepLinks } from "@/utils/Deeplinks/Deeplinks";
 
 interface QRProps {
   id: string;
@@ -27,11 +28,8 @@ const QR: React.FC<QRProps> = ({ id, isVisible, setIsVisible, isProfile }) => {
     Linking.canOpenURL("myapp://").then((result) => setCanOpenLink(true));
   }, []);
   const logo = require("@/assets/images/sporta_logo.png");
-  const userURL = isProfile && id 
-    ? `myapp://(tabs)/home/userProfiles/${id}`
-    : `myapp://events/${id}`;
-
-    console.log(userURL)
+  const userURL = isProfile && id ? deepLinks.Profile.replace("{id}", id): deepLinks.Event.replace("{id}", id);
+ 
   return (
     <Modal
       visible={isVisible}
