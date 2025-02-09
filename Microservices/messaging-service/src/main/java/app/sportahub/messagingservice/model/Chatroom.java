@@ -33,13 +33,14 @@ public class Chatroom {
     @NotNull
     private String createdBy;
 
-    @Builder.Default
-    private List<String> participants = new ArrayList<>();
-
     @NotEmpty
     @Size(min = 1, max = 255)
     private Set<String> members;
 
     @Builder.Default
     private List<Message> messages = new ArrayList<>();
+
+    @NotNull
+    @Builder.Default
+    private Boolean isEvent = false;
 }

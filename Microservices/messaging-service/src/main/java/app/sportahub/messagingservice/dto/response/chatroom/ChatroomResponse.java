@@ -7,6 +7,6 @@ import java.sql.Timestamp;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record ChatRoomResponse(String chatroomId, Timestamp createdAt, String createdBy, List<String> participants,
-                               List<String> members, List<Message> messages ) {
+public record ChatroomResponse(String chatroomId, Timestamp createdAt, String createdBy,
+                               List<String> members, List<Message> messages, Boolean isEvent) {
 }

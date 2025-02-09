@@ -24,8 +24,8 @@ public class OpenApiConfig {
                                         .bearerFormat("JWT")
                         ))
                 .servers(List.of(
-                        new Server().url("https://api-dev.sportahub.app/api/message-service").description("Development"),
-                        new Server().url("http://localhost:8080/api/message-service").description("Local")
+                        new Server().url("https://api-dev.sportahub.app/api/messaging-service").description("Development"),
+                        new Server().url("http://localhost:8080/api/messaging-service").description("Local")
                 ));
     }
 }
