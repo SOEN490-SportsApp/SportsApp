@@ -9,5 +9,5 @@ import java.util.Set;
 
 @Repository
 public interface MessageRepository extends MongoRepository<Message, String> {
-    List<Message> findAllBySenderIdAndReceiverIds(String senderId, Set<String> receiverId);
+    List<Message> findAllBySenderId(String senderId);
 }
