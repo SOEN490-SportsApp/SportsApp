@@ -95,7 +95,13 @@ jobs:
       - name: Build with Gradle
         working-directory: Microservices/${{ matrix.service }}
         run: ./gradlew clean build
-
+      - name: Determine JAR File Name
+        id: jar
+        working-directory: Microservices/${{ matrix.service }}
+        run: |
+          JAR_FILE=$(find build/libs -type f -name "*.jar" ! -name "*plain*.jar" | head -n 1)
+          echo "JAR file: $JAR_FILE"
+          echo "jar_file=$JAR_FILE" >> $GITHUB_ENV
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v2
         with:
@@ -118,3 +124,4 @@ jobs:
           file: ./Microservices/${{ matrix.service }}/Dockerfile
           push: true
           tags: ghcr.io/${{ env.repo_name }}-${{ env.service_name }}:latest
+          build-args: JAR_FILE=${{ env.jar_file }}
