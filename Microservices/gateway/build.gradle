@@ -24,16 +24,22 @@ configurations {
 
 repositories {
     mavenCentral()
+    maven {
+        url = uri("https://maven.pkg.github.com/SOEN490-SportsApp/SportsApp")
+        credentials {
+            username = System.getenv("GITHUB_USERNAME")
+            password = System.getenv("GITHUB_TOKEN")
+        }
+    }
 }
 
 ext {
     set('springCloudVersion', "2023.0.3")
 }
 
-
 dependencies {
-    implementation 'app.sportahub.kafkevents:kafka-events:1.0.0'
-	implementation 'org.springframework.cloud:spring-cloud-starter-gateway-mvc'
+    implementation 'app.sportahub:kafka-events:1.0.0'
+    implementation 'org.springframework.cloud:spring-cloud-starter-gateway-mvc'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
