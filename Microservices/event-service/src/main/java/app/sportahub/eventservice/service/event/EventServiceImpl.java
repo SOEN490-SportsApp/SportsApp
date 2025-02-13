@@ -275,13 +275,14 @@ public class EventServiceImpl implements EventService {
             leavingParticipant.setAttendStatus(ParticipantAttendStatus.CANCELLED);
         } else {
             event.getParticipants().remove(leavingParticipant);
+            leavingParticipant.setAttendStatus(ParticipantAttendStatus.LEFT);
         }
 
         eventRepository.save(event);
         log.info("EventServiceImpl::leaveEvent: User with id:{} left event with id:{}", userId, eventId);
         return new ParticipantResponse(
                 leavingParticipant.getUserId(),
-                ParticipantAttendStatus.LEFT,
+                leavingParticipant.getAttendStatus(),
                 leavingParticipant.getJoinedOn()
         );
     }
