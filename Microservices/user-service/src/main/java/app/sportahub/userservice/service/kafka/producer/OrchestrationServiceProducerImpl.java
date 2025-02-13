@@ -16,8 +16,7 @@ import java.util.UUID;
 @Slf4j
 @RequiredArgsConstructor
 public class OrchestrationServiceProducerImpl implements OrchestrationServiceProducer {
-    private final UserRepository userRepository;
-    private final KeycloakApiClient keycloakApiClient;
+
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @Override

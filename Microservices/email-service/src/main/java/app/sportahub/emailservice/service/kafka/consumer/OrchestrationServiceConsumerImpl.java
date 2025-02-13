@@ -17,8 +17,8 @@ public class OrchestrationServiceConsumerImpl implements OrchestrationServiceCon
 
     @Override
     @KafkaListener(topics = "forgot-password.email-send", groupId ="OrchServiceKafkaConsumer")
-    public void listenForForgotPasswordValidateEvent(ForgotPasswordSendEmailEvent forgotPasswordSendEmailEvent) throws MessagingException {
-        log.info("OrchestrationServiceConsumerImpl::listenForForgotPasswordValidateEvent: received event: {}", forgotPasswordSendEmailEvent);
+    public void listenForForgotPasswordSendEmailEvent(ForgotPasswordSendEmailEvent forgotPasswordSendEmailEvent) throws MessagingException {
+        log.info("OrchestrationServiceConsumerImpl::ForgotPasswordSendEmailEvent: received forgot password request with email: {}", forgotPasswordSendEmailEvent.getEmail());
         emailService.sendForgotPasswordEmail(forgotPasswordSendEmailEvent.getEmail());
     }
 }
