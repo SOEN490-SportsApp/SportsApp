@@ -1,7 +1,7 @@
 package app.sportahub.orchestrationservice.service.consumer;
 
-import app.sportahub.kafkevents.ForgotPasswordRequestedEvent;
-import app.sportahub.kafkevents.ForgotPasswordSendEmailEvent;
+import app.sportahub.ForgotPasswordRequestedEvent;
+import app.sportahub.ForgotPasswordSendEmailEvent;
 import app.sportahub.orchestrationservice.service.producer.EmailServiceProducer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,11 +17,11 @@ public class UserServiceConsumerImpl implements UserServiceConsumer {
 
     @KafkaListener(topics = "forgot-password.request", groupId ="UserServiceKafkaConsumer")
     public void listenForForgotPasswordRequestedEvent(ForgotPasswordRequestedEvent forgotPasswordRequestedEvent) {
-        log.info("EmailServiceProducerImpl::sendForgotPasswordValidateEvent: received forgot password request with email : {} ", forgotPasswordRequestedEvent.getEmail());
+        log.info("EmailServiceProducerImpl::listenForForgotPasswordRequestedEvent: received forgot password request with email : {} ", forgotPasswordRequestedEvent.getEmail());
         ForgotPasswordSendEmailEvent forgotPasswordSendEmailEvent = new ForgotPasswordSendEmailEvent(
                 forgotPasswordRequestedEvent.getBaseEvent(),
                 forgotPasswordRequestedEvent.getEmail()
         );
-        emailServiceProducer.sendForgotPasswordValidateEvent(forgotPasswordSendEmailEvent);
+        emailServiceProducer.sendForgotPasswordSendEmailEvent(forgotPasswordSendEmailEvent);
     }
 }
