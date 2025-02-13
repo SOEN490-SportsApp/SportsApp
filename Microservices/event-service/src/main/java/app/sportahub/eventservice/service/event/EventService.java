@@ -28,6 +28,8 @@ public interface EventService {
 
     ParticipantResponse joinEvent(String id, String userId);
 
+    ParticipantResponse leaveEvent(String eventId, String userId);
+
     Page<EventResponse> getEventsByParticipantId(String userId, int page, int size, SortDirection sort, EventSortingField field);
 
     Page<EventResponse> getEventsCreatedByUserId(String userId, int page, int size, SortDirection sort, EventSortingField field);

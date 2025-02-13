@@ -23,8 +23,10 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service("eventService")
@@ -234,6 +236,54 @@ public class EventServiceImpl implements EventService {
         log.info("EventServiceImpl::joinEvent: User with id:{} joined event with id:{}", userId, id);
         return new ParticipantResponse(participant.getUserId(), participant.getAttendStatus(),
                 participant.getJoinedOn());
+    }
+
+    /**
+     * Allows a user to leave an event.
+     *
+     * <p>
+     * This method checks if the specified event exists and if the user is a registered participant.
+     * If the event has already started, the user cannot leave. If the event's cut-off time has passed,
+     * the user's attendance status is updated to {@code CANCELLED} instead of removing them.
+     * Otherwise, the user is removed from the participant list.
+     * </p>
+     *
+     * @param eventId The unique identifier of the event the user wants to leave.
+     * @param userId  The unique identifier of the user leaving the event.
+     * @return A {@link ParticipantResponse} containing the user's ID, updated attendance status,
+     *         and the date they joined the event.
+     * @throws EventDoesNotExistException      if the event does not exist.
+     * @throws UserNotAParticipantException    if the user is not registered as a participant in the event.
+     * @throws EventAlreadyStartedException    if the event has already started.
+     */
+    @Override
+    public ParticipantResponse leaveEvent(String eventId, String userId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EventDoesNotExistException(eventId));
+
+        Participant leavingParticipant = event.getParticipants()
+                .stream()
+                .filter(participant -> participant.getUserId().equals(userId))
+                .findFirst()
+                .orElseThrow(() -> new UserNotAParticipantException(eventId, userId));
+
+        if (event.getDate().isBefore(LocalDate.now())) {
+            throw new EventAlreadyStartedException(eventId);
+        }
+
+        if (LocalDateTime.parse(event.getCutOffTime()).isBefore(LocalDateTime.now())) {
+            leavingParticipant.setAttendStatus(ParticipantAttendStatus.CANCELLED);
+        } else {
+            event.getParticipants().remove(leavingParticipant);
+        }
+
+        eventRepository.save(event);
+        log.info("EventServiceImpl::leaveEvent: User with id:{} left event with id:{}", userId, eventId);
+        return new ParticipantResponse(
+                leavingParticipant.getUserId(),
+                ParticipantAttendStatus.LEFT,
+                leavingParticipant.getJoinedOn()
+        );
     }
 
     /**
