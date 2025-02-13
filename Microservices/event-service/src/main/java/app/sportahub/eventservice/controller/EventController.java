@@ -91,6 +91,14 @@ public class EventController {
         return eventService.joinEvent(id, userId);
     }
 
+    @PostMapping("/{id}/leave")
+    @PreAuthorize("authentication.name == #userId || hasRole('ROLE_ADMIN')")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Leave an event", description = "Enables a user to leave an event, provided they already joined.")
+    public ParticipantResponse leaveEvent(@PathVariable String eventId, @RequestParam String userId) {
+        return eventService.joinEvent(eventId, userId);
+    }
+
     @GetMapping("/participant/{userId}")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Retrieve events by user ID",description = "Retrieve events that a user has participated in")
