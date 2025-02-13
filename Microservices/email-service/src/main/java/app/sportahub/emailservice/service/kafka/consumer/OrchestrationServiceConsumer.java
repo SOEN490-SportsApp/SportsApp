@@ -1,9 +1,9 @@
 package app.sportahub.emailservice.service.kafka.consumer;
 
-import app.sportahub.kafkevents.ForgotPasswordValidateEvent;
+import app.sportahub.ForgotPasswordSendEmailEvent;
 import jakarta.mail.MessagingException;
 
 public interface OrchestrationServiceConsumer {
 
-    void listenForForgotPasswordValidateEvent(ForgotPasswordValidateEvent forgotPasswordValidateEvent) throws MessagingException;
+    void listenForForgotPasswordValidateEvent(ForgotPasswordSendEmailEvent forgotPasswordSendEmailEvent) throws MessagingException;
 }
