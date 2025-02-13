@@ -1,6 +1,6 @@
 package app.sportahub.orchestrationservice.service.producer;
 
-import app.sportahub.kafkevents.ForgotPasswordSendEmailEvent;
+import app.sportahub.ForgotPasswordSendEmailEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -14,8 +14,8 @@ public class EmailServiceProducerImpl implements EmailServiceProducer {
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @Override
-    public void sendForgotPasswordValidateEvent(ForgotPasswordSendEmailEvent forgotPasswordSendEmailEvent){
-        kafkaTemplate.send("forgot-password.email-send", forgotPasswordSendEmailEvent);
-        log.info("EmailServiceProducerImpl::sendForgotPasswordValidateEvent: forgot password reset email sent to 'forgot-password.email-send' topic");
+    public void sendForgotPasswordSendEmailEvent(ForgotPasswordSendEmailEvent forgotPasswordSendEmailEvent){
+        kafkaTemplate.send("forgot-password.send-email", forgotPasswordSendEmailEvent);
+        log.info("EmailServiceProducerImpl::sendForgotPasswordSendEmailEvent: forgot password reset email sent to 'forgot-password.send-email' topic");
     }
 }
