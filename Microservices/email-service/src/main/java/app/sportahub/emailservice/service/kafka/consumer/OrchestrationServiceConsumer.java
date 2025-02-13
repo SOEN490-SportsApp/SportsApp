@@ -5,5 +5,5 @@ import jakarta.mail.MessagingException;
 
 public interface OrchestrationServiceConsumer {
 
-    void listenForForgotPasswordValidateEvent(ForgotPasswordSendEmailEvent forgotPasswordSendEmailEvent) throws MessagingException;
+    void listenForForgotPasswordSendEmailEvent(ForgotPasswordSendEmailEvent forgotPasswordSendEmailEvent) throws MessagingException;
 }
