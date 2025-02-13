@@ -22,6 +22,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -385,5 +386,103 @@ class EventServiceTest {
         assertNotNull(events);
         assertEquals(1, events.getTotalElements());
         verify(eventRepository, times(1)).findByCreatedBy(eq("creatorId"), any(Pageable.class));
+    }
+
+    @Test
+    void leaveEvent_SuccessfullyLeavesEvent() {
+        // Arrange
+        String eventId = "event123";
+        String userId = "user456";
+        LocalDate eventDate = LocalDate.now().plusDays(1);
+        LocalDateTime cutOffTime = LocalDateTime.now().plusHours(1);
+
+        Participant participant = new Participant(userId, ParticipantAttendStatus.JOINED, LocalDate.now());
+        Event event = new Event();
+        event.setId(eventId);
+        event.setDate(eventDate);
+        event.setCutOffTime(cutOffTime.toString());
+        event.setParticipants(new ArrayList<>(List.of(participant)));
+
+        when(eventRepository.findById(eventId)).thenReturn(Optional.of(event));
+
+        // Act
+        ParticipantResponse response = eventServiceImpl.leaveEvent(eventId, userId);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(userId, response.userId());
+        assertEquals(ParticipantAttendStatus.LEFT, response.attendStatus());
+        verify(eventRepository).save(event);
+    }
+
+    @Test
+    void leaveEvent_EventDoesNotExist_ThrowsException() {
+        // Arrange
+        String eventId = "event123";
+        String userId = "user456";
+
+        when(eventRepository.findById(eventId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(EventDoesNotExistException.class, () -> eventServiceImpl.leaveEvent(eventId, userId));
+    }
+
+    @Test
+    void leaveEvent_UserNotAParticipant_ThrowsException() {
+        // Arrange
+        String eventId = "event123";
+        String userId = "user456";
+        Event event = new Event();
+        event.setId(eventId);
+        event.setDate(LocalDate.now().plusDays(1));
+        event.setCutOffTime(LocalDateTime.now().plusHours(1).toString());
+        event.setParticipants(new ArrayList<>());
+
+        when(eventRepository.findById(eventId)).thenReturn(Optional.of(event));
+
+        // Act & Assert
+        assertThrows(UserNotAParticipantException.class, () -> eventServiceImpl.leaveEvent(eventId, userId));
+    }
+
+    @Test
+    void leaveEvent_EventAlreadyStarted_ThrowsException() {
+        // Arrange
+        String eventId = "event123";
+        String userId = "user456";
+        Event event = new Event();
+        event.setId(eventId);
+        event.setDate(LocalDate.now().minusDays(1)); // Event already started
+        event.setParticipants(new ArrayList<>(List.of(new Participant(userId, ParticipantAttendStatus.JOINED, LocalDate.now()))));
+
+        when(eventRepository.findById(eventId)).thenReturn(Optional.of(event));
+
+        // Act & Assert
+        assertThrows(EventAlreadyStartedException.class, () -> eventServiceImpl.leaveEvent(eventId, userId));
+    }
+
+    @Test
+    void leaveEvent_AfterCutOffTime_SetsCancelledStatus() {
+        // Arrange
+        String eventId = "event123";
+        String userId = "user456";
+        LocalDateTime pastCutOffTime = LocalDateTime.now().minusHours(1);
+
+        Participant participant = new Participant(userId, ParticipantAttendStatus.JOINED, LocalDate.now());
+        Event event = new Event();
+        event.setId(eventId);
+        event.setDate(LocalDate.now().plusDays(1));
+        event.setCutOffTime(pastCutOffTime.toString());
+        event.setParticipants(new ArrayList<>(List.of(participant)));
+
+        when(eventRepository.findById(eventId)).thenReturn(Optional.of(event));
+
+        // Act
+        ParticipantResponse response = eventServiceImpl.leaveEvent(eventId, userId);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(userId, response.userId());
+        assertEquals(ParticipantAttendStatus.CANCELLED, response.attendStatus());
+        verify(eventRepository).save(event);
     }
 }
