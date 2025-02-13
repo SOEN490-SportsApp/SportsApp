@@ -5,6 +5,7 @@ import app.sportahub.userservice.dto.response.auth.LoginResponse;
 import app.sportahub.userservice.dto.response.auth.TokenResponse;
 import app.sportahub.userservice.dto.response.user.UserResponse;
 import app.sportahub.userservice.service.auth.AuthService;
+import app.sportahub.userservice.service.kafka.producer.OrchestrationServiceProducer;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final OrchestrationServiceProducer orchestrationServiceProducer;
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
@@ -59,7 +61,7 @@ public class AuthController {
                description = "Sends an email to the specified user containing a temporary token to be used to update the password.")
     public void sendPasswordResetEmail(@Valid @RequestBody SendPasswordResetEmailRequest sendPasswordResetEmail){
         authService.sendPasswordResetEmail(sendPasswordResetEmail.email());
-        authService.sendPasswordResetEmailUsingKafka(sendPasswordResetEmail.email());
+        orchestrationServiceProducer.sendPasswordResetEmailUsingKafka(sendPasswordResetEmail.email());
     }
 }
 
