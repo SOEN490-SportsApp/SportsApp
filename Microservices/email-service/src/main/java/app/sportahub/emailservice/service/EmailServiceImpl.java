@@ -1,5 +1,4 @@
 package app.sportahub.emailservice.service;
-import jakarta.mail.*;
 import jakarta.mail.internet.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,9 +10,6 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import java.nio.charset.StandardCharsets;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
 
 @Slf4j
 @Service
