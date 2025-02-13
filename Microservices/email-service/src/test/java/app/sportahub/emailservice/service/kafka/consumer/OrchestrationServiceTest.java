@@ -29,7 +29,7 @@ public class OrchestrationServiceTest {
     }
 
     @Test
-    public void testListenForForgotPasswordValidateEvent() throws MessagingException {
+    public void testListenForForgotPasswordSendEmailEvent() throws MessagingException {
         String email = "test@example.com";
         BaseEvent baseEvent = new BaseEvent(
                 UUID.randomUUID().toString(),
@@ -39,7 +39,7 @@ public class OrchestrationServiceTest {
                 UUID.randomUUID().toString());
         ForgotPasswordSendEmailEvent event = new ForgotPasswordSendEmailEvent(baseEvent, email);
 
-        orchestrationService.listenForForgotPasswordValidateEvent(event);
+        orchestrationService.listenForForgotPasswordSendEmailEvent(event);
 
         verify(emailService, times(1)).sendForgotPasswordEmail(event.getEmail());
     }
