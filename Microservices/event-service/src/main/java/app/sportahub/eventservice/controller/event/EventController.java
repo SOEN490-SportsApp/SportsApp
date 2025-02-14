@@ -134,6 +134,7 @@ public class EventController {
     }
 
     @PostMapping("/{id}/reaction")
+    @PostMapping("/{id}/react")
     @PreAuthorize("authentication.name == #userId")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "React to an event", description = "Enables a user to react to an event.")
