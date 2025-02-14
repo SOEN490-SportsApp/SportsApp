@@ -474,7 +474,7 @@ class EventServiceTest {
         when(eventRepository.findById(eventId)).thenReturn(Optional.of(event));
 
         // Act & Assert
-        assertThrows(EventCreatorCannotLeaveEvent.class, () -> eventServiceImpl.leaveEvent(eventId, userId));
+        assertThrows(EventCreatorCannotLeaveEventException.class, () -> eventServiceImpl.leaveEvent(eventId, userId));
     }
 
     @Test

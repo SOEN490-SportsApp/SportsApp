@@ -23,10 +23,8 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service("eventService")
@@ -272,7 +270,7 @@ public class EventServiceImpl implements EventService {
         LocalDateTime cutOffDateTime = LocalDateTime.parse(event.getCutOffTime());
 
         if (userId.equals(event.getCreatedBy()))
-            throw new EventCreatorCannotLeaveEvent(eventId, userId);
+            throw new EventCreatorCannotLeaveEventException(eventId, userId);
 
         if (event.getDate().isBefore(currentDate))
             throw new EventAlreadyStartedException(eventId);

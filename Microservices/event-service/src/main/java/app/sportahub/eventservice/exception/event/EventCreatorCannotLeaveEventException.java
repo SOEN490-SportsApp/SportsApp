@@ -5,8 +5,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 @ResponseStatus(code = HttpStatus.CONFLICT, reason = "Event creator cannot leave event.")
-public class EventCreatorCannotLeaveEvent extends ResponseStatusException {
-    public EventCreatorCannotLeaveEvent(String eventId, String userId) {
+public class EventCreatorCannotLeaveEventException extends ResponseStatusException {
+    public EventCreatorCannotLeaveEventException(String eventId, String userId) {
         super(HttpStatus.CONFLICT, "User with id: " + userId + " is the creator of event id: "
                 + eventId );    }
 }
