@@ -14,7 +14,7 @@ import app.sportahub.eventservice.model.event.Event;
 import app.sportahub.eventservice.model.event.EventCancellation;
 import app.sportahub.eventservice.model.event.participant.Participant;
 import app.sportahub.eventservice.model.event.participant.ParticipantAttendStatus;
-import app.sportahub.eventservice.repository.EventRepository;
+import app.sportahub.eventservice.repository.event.EventRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -88,7 +88,7 @@ public class EventServiceImpl implements EventService {
         List<Participant> participants = participantRequests.stream()
                 .map(participantRequest -> new Participant(participantRequest.userId(),
                         participantRequest.attendStatus(),
-                         participantRequest.joinedOn())).toList();
+                        participantRequest.joinedOn())).toList();
 
         Event event = eventMapper.eventRequestToEvent(eventRequest)
                 .toBuilder()
@@ -257,10 +257,10 @@ public class EventServiceImpl implements EventService {
      * @param eventId The unique identifier of the event the user wants to leave.
      * @param userId  The unique identifier of the user leaving the event.
      * @return A {@link ParticipantResponse} containing the user's ID, updated attendance status,
-     *         and the date they joined the event.
-     * @throws EventDoesNotExistException      if the event does not exist.
-     * @throws UserNotAParticipantException    if the user is not registered as a participant in the event.
-     * @throws EventAlreadyStartedException    if the event has already started.
+     * and the date they joined the event.
+     * @throws EventDoesNotExistException   if the event does not exist.
+     * @throws UserNotAParticipantException if the user is not registered as a participant in the event.
+     * @throws EventAlreadyStartedException if the event has already started.
      */
     @Override
     public ParticipantResponse leaveEvent(String eventId, String userId) {
@@ -346,11 +346,11 @@ public class EventServiceImpl implements EventService {
      * This method ensures that only the event creator or an admin can cancel an event.
      * If the event is already cancelled, an exception is thrown.
      *
-     * @param eventId            the unique identifier of the event to be cancelled
+     * @param eventId       the unique identifier of the event to be cancelled
      * @param cancelRequest contains the reason for cancellation
      * @return an {@link EventResponse} representing the updated event
-     * @throws EventDoesNotExistException      if no event with the given ID exists
-     * @throws EventAlreadyCancelledException  if the event is already cancelled
+     * @throws EventDoesNotExistException     if no event with the given ID exists
+     * @throws EventAlreadyCancelledException if the event is already cancelled
      */
     @Override
     public EventResponse cancelEvent(String eventId, EventCancellationRequest cancelRequest) {
