@@ -15,8 +15,5 @@ public record PostRequest(
         String createdBy,
 
         @Nullable
-        List<String> attachments,
-
-        @Nullable
-        List<CommentRequest> comments) {
+        List<String> attachments) {
 }
