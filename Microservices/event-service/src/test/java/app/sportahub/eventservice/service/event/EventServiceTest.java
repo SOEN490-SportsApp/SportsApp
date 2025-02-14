@@ -94,6 +94,7 @@ class EventServiceTest {
                 "2 hours",
                 10,
                 Collections.emptyList(),
+                Collections.emptyList(),
                 "creatorId",
                 Collections.emptyList(),
                 "14:00",
@@ -121,6 +122,7 @@ class EventServiceTest {
                 "14:00",
                 "Practice game",
                 true,
+                null,
                 null,
                 null
         );
@@ -562,7 +564,7 @@ class EventServiceTest {
     void testReactToEvent_LikeEvent_Success() {
         Event event = new Event();
         event.setId("event123");
-        event.setReactions(new ArrayList<>());
+        event.setReactors(new ArrayList<>());
 
         when(eventRepository.findEventById("event123")).thenReturn(Optional.of(event));
 
@@ -572,7 +574,7 @@ class EventServiceTest {
         assertEquals("user456", response.userId());
         assertEquals(ReactionType.LIKE, response.reactionType());
         assertEquals(LocalDate.now(), response.reactionDate());
-        assertEquals(1, event.getReactions().size());
+        assertEquals(1, event.getReactors().size());
 
         verify(eventRepository).findEventById("event123");
     }
@@ -582,16 +584,16 @@ class EventServiceTest {
         Event event = new Event();
         event.setId("event123");
         Reactor reactor = new Reactor("user456", ReactionType.LIKE, LocalDate.now());
-        event.setReactions(new ArrayList<>(List.of(reactor)));
+        event.setReactors(new ArrayList<>(List.of(reactor)));
 
         when(eventRepository.findEventById("event123")).thenReturn(Optional.of(event));
 
         ReactorResponse response = eventServiceImpl.reactToEvent("event123", "user456", "null");
 
         assertNotNull(response);
-        assertNull(response.userId());
-        assertNull(response.reactionType());
-        assertEquals(0, event.getReactions().size());
+        assertEquals("user456", response.userId());
+        assertEquals(ReactionType.NULL, response.reactionType());
+        assertEquals(0, event.getReactors().size());
 
         verify(eventRepository).findEventById("event123");
     }
@@ -601,7 +603,7 @@ class EventServiceTest {
         Event event = new Event();
         event.setId("event123");
         Reactor reactor = new Reactor("user456", ReactionType.LIKE, LocalDate.now());
-        event.setReactions(new ArrayList<>(List.of(reactor)));
+        event.setReactors(new ArrayList<>(List.of(reactor)));
 
         when(eventRepository.findEventById("event123")).thenReturn(Optional.of(event));
 

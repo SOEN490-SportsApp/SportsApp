@@ -64,6 +64,10 @@ public record EventRequest(
         List<String> whitelistedUsers,
 
         @Nullable
-        EnumSet<SkillLevelEnum> requiredSkillLevel){
+        EnumSet<SkillLevelEnum> requiredSkillLevel,
+
+        @Nullable
+        List<ReactorRequest> reactors)
+{
 
 }

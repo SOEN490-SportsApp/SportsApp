@@ -63,6 +63,7 @@ public class EventControllerTest {
                 "2 hours",
                 10,
                 Collections.emptyList(),
+                Collections.emptyList(),
                 "User123",
                 Collections.emptyList(),
                 "14:00",
@@ -92,7 +93,8 @@ public class EventControllerTest {
                 "Let's practice together!",
                 true,
                 List.of("User111"),
-                EnumSet.of(SkillLevelEnum.INTERMEDIATE)
+                EnumSet.of(SkillLevelEnum.INTERMEDIATE),
+                null
         );
 
 
