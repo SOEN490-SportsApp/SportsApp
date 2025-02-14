@@ -49,7 +49,7 @@ public class PostServiceImpl implements PostService {
         Post post = postMapper.postRequestToPost(postRequest)
                 .toBuilder()
                 .withEventId(eventId)
-                .withUpdatedAt(Timestamp.valueOf(LocalDateTime.now()))
+                .withCreationDate(Timestamp.valueOf(LocalDateTime.now()))
                 .withUpdatedAt(Timestamp.valueOf(LocalDateTime.now()))
                 .build();
 

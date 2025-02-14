@@ -4,7 +4,6 @@ import app.sportahub.eventservice.dto.request.social.PostRequest;
 import app.sportahub.eventservice.model.social.Post;
 import app.sportahub.eventservice.service.social.PostService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

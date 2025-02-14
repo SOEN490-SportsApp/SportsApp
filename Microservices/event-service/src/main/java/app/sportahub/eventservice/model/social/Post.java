@@ -7,7 +7,7 @@ import lombok.experimental.SuperBuilder;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = false)
@@ -29,9 +29,9 @@ public class Post extends BaseEntity {
     private String createdBy;
 
     @Builder.Default
-    private List<String> attachments = new ArrayList<>();
+    private List<String> attachments = Collections.emptyList();
 
     @DBRef(lazy = true)
     @Builder.Default
-    private List<Comment> comments = new ArrayList<>();
+    private List<Comment> comments = Collections.emptyList();
 }
