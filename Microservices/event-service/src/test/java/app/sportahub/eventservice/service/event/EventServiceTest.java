@@ -461,6 +461,23 @@ class EventServiceTest {
     }
 
     @Test
+    void leaveEvent_CreatorCannotLeave_ThrowsException() {
+        // Arrange
+        String eventId = "event123";
+        String userId = "user456";
+        Event event = new Event();
+        event.setId(eventId);
+        event.setCreatedBy(userId);
+        event.setCutOffTime(LocalDateTime.now().toString());
+        event.setParticipants(new ArrayList<>(List.of(new Participant(userId, ParticipantAttendStatus.JOINED, LocalDate.now()))));
+
+        when(eventRepository.findById(eventId)).thenReturn(Optional.of(event));
+
+        // Act & Assert
+        assertThrows(EventCreatorCannotLeaveEvent.class, () -> eventServiceImpl.leaveEvent(eventId, userId));
+    }
+
+    @Test
     void leaveEvent_AfterCutOffTime_SetsCancelledStatus() {
         // Arrange
         String eventId = "event123";
