@@ -407,6 +407,11 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public ReactorResponse reactToEvent(String eventId, String userId, String newReaction) {
+
+        if(!(newReaction.equalsIgnoreCase("null") || newReaction.equalsIgnoreCase("like"))){
+            throw new InvalidReactionException();
+        }
+
         Event event = eventRepository.findEventById(eventId)
                 .orElseThrow(() -> new EventDoesNotExistException(eventId));
 
@@ -419,51 +424,21 @@ public class EventServiceImpl implements EventService {
 
         if(reactorToEventOpt.isPresent()) {
             Reactor reactorToEvent = reactorToEventOpt.get();
-            ReactionType currentReaction = reactorToEvent.getReactionType();
 
             if (newReaction.equalsIgnoreCase("null")) {
                 event.getReactions().remove(reactorToEvent);
-            } else if (newReaction.equalsIgnoreCase("dislike") &&
-                    currentReaction.equals(ReactionType.LIKE)) {
-                event.getReactions()
-                        .stream()
-                        .filter(thisReactor -> thisReactor.getUserId().equals(userId))
-                        .findFirst()
-                        .ifPresent(thisReactor -> {
-                            thisReactor.setReactionType(ReactionType.DISLIKE);
-                        });
-            } else if (newReaction.equalsIgnoreCase("like") &&
-                    currentReaction.equals(ReactionType.DISLIKE)) {
-                event.getReactions()
-                        .stream()
-                        .filter(thisReactor -> thisReactor.getUserId().equals(userId))
-                        .findFirst()
-                        .ifPresent(thisReactor -> {
-                            thisReactor.setReactionType(ReactionType.LIKE);
-                        });
+            } else {
+               throw new ReactionAlreadySubmittedException(eventId, userId);
             }
-            else{
-                throw new ReactionAlreadySubmittedException(eventId, userId);
-            }
-        }
-        else{
-            if (newReaction.equalsIgnoreCase("like")) {
-                 reactor = Reactor.builder()
+        } else {
+            if(newReaction.equalsIgnoreCase("like")) {
+                reactor = Reactor.builder()
                         .withUserId(userId)
                         .withReactionType(ReactionType.LIKE)
                         .withReactionDate(LocalDateTime.now().toLocalDate())
                         .build();
                 event.getReactions().add(reactor);
-            }
-            else if (newReaction.equalsIgnoreCase("dislike")) {
-                reactor = Reactor.builder()
-                        .withUserId(userId)
-                        .withReactionType(ReactionType.DISLIKE)
-                        .withReactionDate(LocalDateTime.now().toLocalDate())
-                        .build();
-                event.getReactions().add(reactor);
-            }
-            else {
+            } else{
                 throw new ReactionAlreadySubmittedException(eventId, userId);
             }
         }
