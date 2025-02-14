@@ -144,6 +144,7 @@ public class EventMapperTest {
                 null,
                 null,
                 null,
+                null,
                 null);
 
         //Act & Assert
@@ -193,6 +194,7 @@ public class EventMapperTest {
                 null,
                 null,
                 locationRequest,
+                null,
                 null,
                 null,
                 null,
