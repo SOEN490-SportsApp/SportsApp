@@ -1,7 +1,7 @@
 package app.sportahub.eventservice.service.event;
 
 import app.sportahub.eventservice.dto.request.EventCancellationRequest;
-import app.sportahub.eventservice.dto.request.EventRequest;
+import app.sportahub.eventservice.dto.request.event.EventRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.dto.response.ParticipantResponse;
 import app.sportahub.eventservice.enums.EventSortingField;
@@ -12,7 +12,7 @@ import app.sportahub.eventservice.mapper.event.EventMapper;
 import app.sportahub.eventservice.model.event.Event;
 import app.sportahub.eventservice.model.event.participant.Participant;
 import app.sportahub.eventservice.model.event.participant.ParticipantAttendStatus;
-import app.sportahub.eventservice.repository.EventRepository;
+import app.sportahub.eventservice.repository.event.EventRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
