@@ -1,0 +1,134 @@
+replicaCount: 2
+
+image:
+  repository: ghcr.io/walidoow/gateway
+  pullPolicy: Always
+  tag: "latest"
+
+imagePullSecrets:
+  - name: ghcr-access-secret
+nameOverride: "gateway"
+
+serviceAccount:
+  create: true
+  automount: true
+  name: "gateway"
+
+service:
+  type: LoadBalancer
+  port: 80
+
+ingress:
+  enabled: true
+  className: ""
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  hosts:
+    - host: localhost
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+    - host: sporta-dev.sportahub.app
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls:
+    - secretName: sporta-dev-sportahub-app-tls
+      hosts:
+        - sporta-dev.sportahub.app
+
+resources:
+   limits:
+     cpu: 1000m
+     memory: 1Gi
+   requests:
+     cpu: 500m
+     memory: 500Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+
+volumes: []
+volumeMounts: []
+
+env:
+  - name: LOGGING_LEVEL_APP_SPORTAHUB
+    valueFrom:
+      secretKeyRef:
+        name: shared-secrets
+        key: logging-level-app-sportahub
+  - name: LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB
+    valueFrom:
+      secretKeyRef:
+        name: shared-secrets
+        key: logging-level-org-springframework-web
+  - name: KEYCLOAK_CLIENT_ID
+    valueFrom:
+      secretKeyRef:
+        name: shared-secrets
+        key: keycloak-client-id
+  - name: KEYCLOAK_CLIENT_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: shared-secrets
+        key: keycloak-client-secret
+  - name: KEYCLOAK_REDIRECT_URI
+    valueFrom:
+      secretKeyRef:
+        name: shared-secrets
+        key: keycloak-redirect-uri
+  - name: KEYCLOAK_ISSUER_URI
+    valueFrom:
+      secretKeyRef:
+        name: shared-secrets
+        key: keycloak-issuer-uri
+  - name: KEYCLOAK_TOKEN_URI
+    valueFrom:
+      secretKeyRef:
+        name: shared-secrets
+        key: keycloak-token-uri
+  - name: KEYCLOAK_AUTHORIZATION_URI
+    valueFrom:
+      secretKeyRef:
+        name: shared-secrets
+        key: keycloak-authorization-uri
+  - name: KEYCLOAK_USER_INFO_URI
+    valueFrom:
+      secretKeyRef:
+        name: shared-secrets
+        key: keycloak-user-info-uri
+  - name: KEYCLOAK_JWK_SET_URI
+    valueFrom:
+      secretKeyRef:
+        name: shared-secrets
+        key: keycloak-jwk-set-uri
+  - name: JWT_ISSUER_URI
+    valueFrom:
+      secretKeyRef:
+        name: shared-secrets
+        key: jwt-issuer-uri
+  - name: KEYCLOAK_AUTH_SERVER_URL
+    valueFrom:
+      secretKeyRef:
+        name: shared-secrets
+        key: keycloak-auth-server-url
+  - name: KEYCLOAK_REALM
+    valueFrom:
+      secretKeyRef:
+        name: shared-secrets
+        key: keycloak-realm
+
+livenessProbe:
+  enabled: true
+  path: /actuator/health
+  initialDelaySeconds: 30
+  periodSeconds: 10
+
+readinessProbe:
+  enabled: true
+  path: /actuator/health
+  initialDelaySeconds: 15
+  periodSeconds: 5
