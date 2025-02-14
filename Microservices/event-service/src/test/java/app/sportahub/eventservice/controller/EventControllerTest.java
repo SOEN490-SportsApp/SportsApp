@@ -192,7 +192,8 @@ public class EventControllerTest {
         Mockito.verify(eventService).getEventsCreatedByUserId("userId", 0, 10, SortDirection.DESC, EventSortingField.DATE);
     }
 
-    @Test void testLeaveEvent() {
+    @Test
+    void testLeaveEvent() {
         Mockito.when(eventService.leaveEvent(anyString(), anyString())).thenReturn(participantResponse);
 
         ParticipantResponse response = eventController.leaveEvent("testId", "userId");
