@@ -267,14 +267,20 @@ public class EventServiceImpl implements EventService {
                 .findFirst()
                 .orElseThrow(() -> new UserNotAParticipantException(eventId, userId));
 
-        if (event.getDate().isBefore(LocalDate.now())) {
-            throw new EventAlreadyStartedException(eventId);
-        }
+        LocalDate currentDate = LocalDate.now();
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        LocalDateTime cutOffDateTime = LocalDateTime.parse(event.getCutOffTime());
 
-        if (LocalDateTime.parse(event.getCutOffTime()).isBefore(LocalDateTime.now())) {
+        if (userId.equals(event.getCreatedBy()))
+            throw new EventCreatorCannotLeaveEvent(eventId, userId);
+
+        if (event.getDate().isBefore(currentDate))
+            throw new EventAlreadyStartedException(eventId);
+
+        if (cutOffDateTime.isBefore(currentDateTime)) {
             leavingParticipant.setAttendStatus(ParticipantAttendStatus.CANCELLED);
         } else {
-            event.getParticipants().remove(leavingParticipant);
+            event.getParticipants().removeIf(p -> p.getUserId().equals(userId));
             leavingParticipant.setAttendStatus(ParticipantAttendStatus.LEFT);
         }
 
