@@ -151,6 +151,20 @@ public class EventServiceImpl implements EventService {
     }
 
     /**
+     * Deletes an event from the database using the event id
+     *
+     * @param id The id of the event to be deleted
+     * @throws EventDoesNotExistException if there is no event associated with the provided id
+     */
+    @Override
+    public void deleteEvent(String id) {
+
+        Event evt = eventRepository.findEventById(id).orElseThrow(() -> new EventDoesNotExistException(id));
+        eventRepository.delete(evt);
+        log.info("deleteEvent: Event with id: {} was successfully deleted", id);
+    }
+
+    /**
      * Checks if the user with the specified userId is the creator of the event with
      * the specified id.
      *
@@ -167,17 +181,25 @@ public class EventServiceImpl implements EventService {
     }
 
     /**
-     * Deletes an event from the database using the event id
+     * Checks if a user is a participant of a specific event.
+     * <p>
+     * This method retrieves the event by its ID and throws an exception if the event does not exist.
+     * If the event is found, it checks whether the user with the given user ID is part of the event's participant list.
+     * </p>
      *
-     * @param id The id of the event to be deleted
-     * @throws EventDoesNotExistException if there is no event associated with the provided id
+     * @param eventId The ID of the event to check for participant membership
+     * @param userId  The ID of the user to verify as a participant of the event
+     * @return {@code true} if the user is a participant of the event; {@code false} otherwise
+     * @throws EventDoesNotExistException if no event is found with the given {@code eventId}
      */
     @Override
-    public void deleteEvent(String id) {
-
-        Event evt = eventRepository.findEventById(id).orElseThrow(() -> new EventDoesNotExistException(id));
-        eventRepository.delete(evt);
-        log.info("deleteEvent: Event with id: {} was successfully deleted", id);
+    public boolean isParticipant(String eventId, String userId) {
+        return eventRepository.findById(eventId)
+                .map(event -> event.getParticipants().stream()
+                        .anyMatch(participant ->
+                                participant.getUserId().equals(userId)
+                                        && participant.getAttendStatus() != ParticipantAttendStatus.CANCELLED))
+                .orElseThrow(() -> new EventDoesNotExistException(eventId));
     }
 
     /**

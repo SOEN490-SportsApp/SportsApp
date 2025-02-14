@@ -23,9 +23,11 @@ public interface EventService {
 
     EventResponse patchEvent(String id, EventRequest eventRequest);
 
+    void deleteEvent(String id);
+
     boolean isCreator(String id, String userId);
 
-    void deleteEvent(String id);
+    boolean isParticipant(String eventId, String userId);
 
     ParticipantResponse joinEvent(String id, String userId);
 
