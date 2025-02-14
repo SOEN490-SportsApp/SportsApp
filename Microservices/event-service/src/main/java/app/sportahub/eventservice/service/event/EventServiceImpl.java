@@ -5,6 +5,7 @@ import app.sportahub.eventservice.dto.request.event.EventRequest;
 import app.sportahub.eventservice.dto.request.event.ParticipantRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.dto.response.ParticipantResponse;
+import app.sportahub.eventservice.dto.response.ReactorResponse;
 import app.sportahub.eventservice.enums.EventSortingField;
 import app.sportahub.eventservice.enums.EventState;
 import app.sportahub.eventservice.enums.SortDirection;
@@ -15,6 +16,9 @@ import app.sportahub.eventservice.model.event.EventCancellation;
 import app.sportahub.eventservice.model.event.participant.Participant;
 import app.sportahub.eventservice.model.event.participant.ParticipantAttendStatus;
 import app.sportahub.eventservice.repository.event.EventRepository;
+import app.sportahub.eventservice.model.event.reactor.ReactionType;
+import app.sportahub.eventservice.model.event.reactor.Reactor;
+import app.sportahub.eventservice.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -31,6 +35,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service("eventService")
@@ -398,5 +403,72 @@ public class EventServiceImpl implements EventService {
         log.info("EventServiceImpl::cancelEvent: Event with id:{} was cancelled by user:{}", eventId,
                 authentication.getName());
         return eventMapper.eventToEventResponse(savedEvent);
+    }
+
+    @Override
+    public ReactorResponse reactToEvent(String eventId, String userId, String newReaction) {
+        Event event = eventRepository.findEventById(eventId)
+                .orElseThrow(() -> new EventDoesNotExistException(eventId));
+
+        Optional<Reactor> reactorToEventOpt = event.getReactions()
+                .stream()
+                .filter(reactor -> reactor.getUserId().equals(userId))
+                .findFirst();
+
+        Reactor reactor = new Reactor();
+
+        if(reactorToEventOpt.isPresent()) {
+            Reactor reactorToEvent = reactorToEventOpt.get();
+            ReactionType currentReaction = reactorToEvent.getReactionType();
+
+            if (newReaction.equalsIgnoreCase("null")) {
+                event.getReactions().remove(reactorToEvent);
+            } else if (newReaction.equalsIgnoreCase("dislike") &&
+                    currentReaction.equals(ReactionType.LIKE)) {
+                event.getReactions()
+                        .stream()
+                        .filter(thisReactor -> thisReactor.getUserId().equals(userId))
+                        .findFirst()
+                        .ifPresent(thisReactor -> {
+                            thisReactor.setReactionType(ReactionType.DISLIKE);
+                        });
+            } else if (newReaction.equalsIgnoreCase("like") &&
+                    currentReaction.equals(ReactionType.DISLIKE)) {
+                event.getReactions()
+                        .stream()
+                        .filter(thisReactor -> thisReactor.getUserId().equals(userId))
+                        .findFirst()
+                        .ifPresent(thisReactor -> {
+                            thisReactor.setReactionType(ReactionType.LIKE);
+                        });
+            }
+            else{
+                throw new ReactionAlreadySubmittedException(eventId, userId);
+            }
+        }
+        else{
+            if (newReaction.equalsIgnoreCase("like")) {
+                 reactor = Reactor.builder()
+                        .withUserId(userId)
+                        .withReactionType(ReactionType.LIKE)
+                        .withReactionDate(LocalDateTime.now().toLocalDate())
+                        .build();
+                event.getReactions().add(reactor);
+            }
+            else if (newReaction.equalsIgnoreCase("dislike")) {
+                reactor = Reactor.builder()
+                        .withUserId(userId)
+                        .withReactionType(ReactionType.DISLIKE)
+                        .withReactionDate(LocalDateTime.now().toLocalDate())
+                        .build();
+                event.getReactions().add(reactor);
+            }
+            else {
+                throw new ReactionAlreadySubmittedException(eventId, userId);
+            }
+        }
+
+        log.info("EventServiceImpl::reactToEvent: Event with id: {} reaction: {}", eventId, newReaction);
+        return new ReactorResponse( reactor.getUserId(), reactor.getReactionType(), reactor.getReactionDate());
     }
 }

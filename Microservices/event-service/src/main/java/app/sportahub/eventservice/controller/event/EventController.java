@@ -6,6 +6,7 @@ import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.dto.response.ParticipantResponse;
 import app.sportahub.eventservice.enums.EventSortingField;
 import app.sportahub.eventservice.enums.SortDirection;
+import app.sportahub.eventservice.dto.response.ReactorResponse;
 import app.sportahub.eventservice.service.event.EventService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -130,5 +131,15 @@ public class EventController {
     public EventResponse cancelEvent(@PathVariable String id,
                                      @RequestBody @Valid EventCancellationRequest cancelRequest) {
         return eventService.cancelEvent(id, cancelRequest);
+    }
+
+    @PostMapping("/{id}/reaction")
+    @PreAuthorize("authentication.name == #userId")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "React to an event", description = "Enables a user to react to an event.")
+    public ReactorResponse reactToEvent(@PathVariable String id,
+                                        @RequestParam String userId,
+                                        @RequestParam(required = true) String reaction) {
+        return eventService.reactToEvent(id, userId, reaction);
     }
 }
