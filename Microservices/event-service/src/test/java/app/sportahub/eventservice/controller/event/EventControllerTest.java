@@ -4,6 +4,7 @@ import app.sportahub.eventservice.dto.request.event.EventCancellationRequest;
 import app.sportahub.eventservice.dto.request.event.EventRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.dto.response.ParticipantResponse;
+import app.sportahub.eventservice.dto.response.ReactorResponse;
 import app.sportahub.eventservice.enums.EventSortingField;
 import app.sportahub.eventservice.enums.SkillLevelEnum;
 import app.sportahub.eventservice.enums.SortDirection;
@@ -44,6 +45,7 @@ public class EventControllerTest {
     private EventRequest eventRequest;
     private EventCancellationRequest cancelRequest;
     private ParticipantResponse participantResponse;
+    private ReactorResponse reactorResponse;
 
     @BeforeEach
     public void setUp() {
@@ -211,5 +213,15 @@ public class EventControllerTest {
 
         assertEquals(eventResponse, response);
         Mockito.verify(eventService).cancelEvent("testId", cancelRequest);
+    }
+
+    @Test
+    public void testReactToEvent() {
+        Mockito.when(eventService.reactToEvent(anyString(), anyString(), anyString())).thenReturn(reactorResponse);
+
+        ReactorResponse response = eventController.reactToEvent("testId", "userId", "like");
+
+        assertEquals(reactorResponse, response);
+        Mockito.verify(eventService).reactToEvent("testId", "userId", "like");
     }
 }

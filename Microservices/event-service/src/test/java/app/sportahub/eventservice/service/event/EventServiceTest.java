@@ -4,6 +4,7 @@ import app.sportahub.eventservice.dto.request.event.EventCancellationRequest;
 import app.sportahub.eventservice.dto.request.event.EventRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.dto.response.ParticipantResponse;
+import app.sportahub.eventservice.dto.response.ReactorResponse;
 import app.sportahub.eventservice.enums.EventSortingField;
 import app.sportahub.eventservice.enums.EventState;
 import app.sportahub.eventservice.enums.SortDirection;
@@ -13,6 +14,9 @@ import app.sportahub.eventservice.model.event.Event;
 import app.sportahub.eventservice.model.event.participant.Participant;
 import app.sportahub.eventservice.model.event.participant.ParticipantAttendStatus;
 import app.sportahub.eventservice.repository.event.EventRepository;
+import app.sportahub.eventservice.model.event.reactor.ReactionType;
+import app.sportahub.eventservice.model.event.reactor.Reactor;
+import app.sportahub.eventservice.repository.EventRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -552,5 +556,77 @@ class EventServiceTest {
         when(eventRepository.findById(anyString())).thenReturn(Optional.of(event));
 
         assertThrows(EventAlreadyCancelledException.class, () -> eventServiceImpl.cancelEvent("1", cancelRequest));
+    }
+
+    @Test
+    void testReactToEvent_LikeEvent_Success() {
+        Event event = new Event();
+        event.setId("event123");
+        event.setReactions(new ArrayList<>());
+
+        when(eventRepository.findEventById("event123")).thenReturn(Optional.of(event));
+
+        ReactorResponse response = eventServiceImpl.reactToEvent("event123", "user456", "like");
+
+        assertNotNull(response);
+        assertEquals("user456", response.userId());
+        assertEquals(ReactionType.LIKE, response.reactionType());
+        assertEquals(LocalDate.now(), response.reactionDate());
+        assertEquals(1, event.getReactions().size());
+
+        verify(eventRepository).findEventById("event123");
+    }
+
+    @Test
+    void testReactToEvent_RemoveReaction_Success() {
+        Event event = new Event();
+        event.setId("event123");
+        Reactor reactor = new Reactor("user456", ReactionType.LIKE, LocalDate.now());
+        event.setReactions(new ArrayList<>(List.of(reactor)));
+
+        when(eventRepository.findEventById("event123")).thenReturn(Optional.of(event));
+
+        ReactorResponse response = eventServiceImpl.reactToEvent("event123", "user456", "null");
+
+        assertNotNull(response);
+        assertNull(response.userId());
+        assertNull(response.reactionType());
+        assertEquals(0, event.getReactions().size());
+
+        verify(eventRepository).findEventById("event123");
+    }
+
+    @Test
+    void testReactToEvent_AlreadyReacted_ThrowsException() {
+        Event event = new Event();
+        event.setId("event123");
+        Reactor reactor = new Reactor("user456", ReactionType.LIKE, LocalDate.now());
+        event.setReactions(new ArrayList<>(List.of(reactor)));
+
+        when(eventRepository.findEventById("event123")).thenReturn(Optional.of(event));
+
+        assertThrows(ReactionAlreadySubmittedException.class,
+                () -> eventServiceImpl.reactToEvent("event123", "user456", "like")
+        );
+
+        verify(eventRepository).findEventById("event123");
+    }
+
+    @Test
+    void testReactToEvent_InvalidReaction_ThrowsException() {
+        assertThrows(InvalidReactionException.class,
+                () -> eventServiceImpl.reactToEvent("event123", "user456", "dislike")
+        );
+    }
+
+    @Test
+    void testReactToEvent_EventDoesNotExist_ThrowsException() {
+        when(eventRepository.findEventById("event123")).thenReturn(Optional.empty());
+
+        assertThrows(EventDoesNotExistException.class,
+                () -> eventServiceImpl.reactToEvent("event123", "user456", "like")
+        );
+
+        verify(eventRepository).findEventById("event123");
     }
 }
