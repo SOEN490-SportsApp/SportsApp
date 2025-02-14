@@ -2,6 +2,7 @@ package app.sportahub.eventservice.service.event;
 
 import java.util.List;
 
+import app.sportahub.eventservice.dto.response.ReactorResponse;
 import org.springframework.data.domain.Page;
 
 import app.sportahub.eventservice.dto.request.event.EventRequest;
@@ -38,4 +39,6 @@ public interface EventService {
     Page<EventResponse> getEventsCreatedByUserId(String userId, int page, int size, SortDirection sort, EventSortingField field);
 
     EventResponse cancelEvent(String id, EventCancellationRequest cancelRequest);
+
+    ReactorResponse reactToEvent(String id, String userId, String reaction);
 }
