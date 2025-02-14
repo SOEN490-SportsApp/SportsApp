@@ -1,4 +1,4 @@
-package app.sportahub.eventservice.dto.request;
+package app.sportahub.eventservice.dto.request.event;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mongodb.lang.Nullable;

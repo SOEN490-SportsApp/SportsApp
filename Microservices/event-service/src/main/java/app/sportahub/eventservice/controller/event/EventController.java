@@ -1,23 +1,23 @@
-package app.sportahub.eventservice.controller;
+package app.sportahub.eventservice.controller.event;
 
+import app.sportahub.eventservice.dto.request.event.EventRequest;
 import app.sportahub.eventservice.dto.request.EventCancellationRequest;
 import app.sportahub.eventservice.dto.request.EventRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.dto.response.ParticipantResponse;
+import app.sportahub.eventservice.enums.EventSortingField;
+import app.sportahub.eventservice.enums.SortDirection;
 import app.sportahub.eventservice.service.event.EventService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
-import java.util.List;
-
-import app.sportahub.eventservice.enums.EventSortingField;
-import app.sportahub.eventservice.enums.SortDirection;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -31,7 +31,7 @@ public class EventController {
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Retrieve event by ID",
-    description = "Fetches an event by their unique identifier.")
+            description = "Fetches an event by their unique identifier.")
     public EventResponse getEventById(@PathVariable String id) {
         return eventService.getEventById(id);
     }
@@ -39,7 +39,7 @@ public class EventController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Retrieve all events",
-    description = "Fetches all events in the database.")
+            description = "Fetches all events in the database.")
     public List<EventResponse> getAllEvents() {
         return eventService.getAllEvents();
     }
@@ -47,7 +47,7 @@ public class EventController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Creates a new event",
-    description = "Creates a new event resource to the database based on the provided event details.")
+            description = "Creates a new event resource to the database based on the provided event details.")
     public EventResponse createEvent(@Valid @RequestBody EventRequest eventRequest) {
         return eventService.createEvent(eventRequest);
     }
@@ -102,25 +102,25 @@ public class EventController {
 
     @GetMapping("/participant/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Retrieve events by user ID",description = "Retrieve events that a user has participated in")
-    public Page<EventResponse> getEventByUserId(@PathVariable String userId, 
-                                                @RequestParam(defaultValue = "0") int page, 
-                                                @RequestParam(defaultValue = "10") int size, 
-                                                @RequestParam(defaultValue = "DESC")  SortDirection sort, 
+    @Operation(summary = "Retrieve events by user ID", description = "Retrieve events that a user has participated in")
+    public Page<EventResponse> getEventByUserId(@PathVariable String userId,
+                                                @RequestParam(defaultValue = "0") int page,
+                                                @RequestParam(defaultValue = "10") int size,
+                                                @RequestParam(defaultValue = "DESC") SortDirection sort,
                                                 @RequestParam(defaultValue = "DATE") EventSortingField field
-                                                ) {
+    ) {
         return eventService.getEventsByParticipantId(userId, page, size, sort, field);
     }
 
     @GetMapping("created-by/{userId}")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Retrieve events created by user ID", description = "Retrieve events that a user has created")
-    public Page<EventResponse> getEventsCreatedByUserId(@PathVariable String userId, 
-                                                        @RequestParam(defaultValue = "0") int page, 
-                                                        @RequestParam(defaultValue = "10") int size, 
-                                                        @RequestParam(defaultValue = "DESC")  SortDirection sort,
+    public Page<EventResponse> getEventsCreatedByUserId(@PathVariable String userId,
+                                                        @RequestParam(defaultValue = "0") int page,
+                                                        @RequestParam(defaultValue = "10") int size,
+                                                        @RequestParam(defaultValue = "DESC") SortDirection sort,
                                                         @RequestParam(defaultValue = "DATE") EventSortingField field
-                                            ) {
+    ) {
         return eventService.getEventsCreatedByUserId(userId, page, size, sort, field);
     }
 

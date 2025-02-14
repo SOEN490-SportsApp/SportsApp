@@ -1,6 +1,6 @@
 package app.sportahub.eventservice.mapper.event;
 
-import app.sportahub.eventservice.dto.request.EventRequest;
+import app.sportahub.eventservice.dto.request.event.EventRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.model.event.Event;
 import org.mapstruct.*;
