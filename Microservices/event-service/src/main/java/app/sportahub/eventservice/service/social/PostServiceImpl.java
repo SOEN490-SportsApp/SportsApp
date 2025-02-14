@@ -9,6 +9,7 @@ import app.sportahub.eventservice.repository.event.EventRepository;
 import app.sportahub.eventservice.repository.social.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,5 +60,32 @@ public class PostServiceImpl implements PostService {
         eventRepository.save(event);
         log.info("Creating a new post for eventId: {} with the provided details: {}", eventId, postRequest);
         return post;
+    }
+
+    /**
+     * Retrieves a paginated list of posts associated with a specific event, ordered by creation date in descending order.
+     * <p>
+     * This method checks if the event exists by its ID and throws an exception if the event is not found.
+     * It then retrieves the posts related to the event, pages and sorts them by the creation date in descending order.
+     * The posts are returned encapsulated in a {@code Page} object representing one segment of the posts list.
+     * </p>
+     *
+     * @param eventId  The unique identifier of the event whose posts are to be retrieved.
+     * @param pageable The pagination information including page number and size requirements.
+     * @return A {@code Page} object containing a list of {@code Post} entities ordered by creation date in descending order.
+     * @throws EventDoesNotExistException if no event is found with the given {@code eventId}.
+     */
+    @Override
+    public Page<Post> getAllPostsOrderedByCreationDateInDesc(String eventId, Pageable pageable) {
+        eventRepository.findEventById(eventId).orElseThrow(() -> new EventDoesNotExistException(eventId));
+
+        Pageable sortedPageable = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by(Sort.Direction.DESC, "creationDate")
+        );
+
+        Page<Post> posts = postRepository.findByEventId(eventId, sortedPageable);
+        return new PageImpl<>(posts.getContent(), posts.getPageable(), posts.getTotalElements());
     }
 }
