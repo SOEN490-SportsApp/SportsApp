@@ -4,6 +4,7 @@ import app.sportahub.eventservice.enums.EventState;
 import app.sportahub.eventservice.enums.SkillLevelEnum;
 import app.sportahub.eventservice.model.BaseEntity;
 import app.sportahub.eventservice.model.event.participant.Participant;
+import app.sportahub.eventservice.model.social.Post;
 import com.mongodb.lang.Nullable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -11,6 +12,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -18,7 +20,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 @SuperBuilder(toBuilder = true, setterPrefix = "with")
 @AllArgsConstructor
 @NoArgsConstructor
@@ -82,4 +84,8 @@ public class Event extends BaseEntity {
 
     @Nullable
     private EventCancellation cancellation;
+
+    @DBRef(lazy = true)
+    @Builder.Default
+    private List<Post> posts = new ArrayList<>();
 }
