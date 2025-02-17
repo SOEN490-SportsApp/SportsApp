@@ -18,38 +18,52 @@ import CustomTabMenu from "@/components/Helper Components/CustomTabMenu";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import FriendCard from "@/components/Helper Components/FriendCard";
 import { Profile } from "@/types";
+import { searchEvent } from "@/services/eventService";
 
 export default function searchPage() {
   const router = useRouter();
   const [searchText, setSearchText] = useState("");
-  const [results, setResults] = useState<Profile[]>([]);
+  const [events, setEvents] = useState([]);
+  const [users, setUsers] = useState<Profile[]>([]);
   const [cancel, setCancel] = useState(false);
   const [loading, setLoading] = useState(false);
-
 
   useEffect(() => {
     const timer = setTimeout(async () => {
       if (searchText) {
-        await fetchResults(searchText);
+        await fetchUsers(searchText);
+        // await fetchEvents(searchText);
       } else {
-        setResults([]);
+        setUsers([]);
       }
     }, 300);
     return () => clearTimeout(timer);
   }, [searchText]);
 
-  const fetchResults = async (searchText: string) => {
+  const fetchUsers = async (searchText: string) => {
     setLoading(true);
     try {
       const response = await searchUser(searchText);
       if (response) {
-        setResults(response);
+        setUsers(response);
         console.log(response);
       }
     } catch (err) {
       console.log(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchEvents = async (searchText: string) => {
+    try {
+      const response = await searchEvent(searchText);
+      if (response) {
+        console.log("Events response: ", response);
+        setEvents(response);
+      }
+    } catch (err) {
+      console.log(err);
     }
   };
 
@@ -61,34 +75,38 @@ export default function searchPage() {
   const LoadingScreen = () => {
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="large" color={themeColors.sportIcons.lightGrey} />
+        <ActivityIndicator
+          size="large"
+          color={themeColors.sportIcons.lightGrey}
+        />
       </View>
     );
-  }
+  };
   const UsersTab = () => (
-    <View >
+    <View>
       {loading ? (
         <View>
           <LoadingScreen />
         </View>
-      ) : (searchText.length >= 1) ? (
+      ) : searchText.length >= 1 ? (
         <FlatList
-          data={results}
+          data={users}
           renderItem={({ item }) => <FriendCard user={item} />}
-          ListEmptyComponent={<CenterMessage  message={"No users found"}/>}
+          ListEmptyComponent={<CenterMessage message={"No users found"} />}
         />
       ) : (
-        <CenterMessage  message={"Connect with others and plan events!"}/>
+        <CenterMessage message={"Connect with others and plan events!"} />
       )}
     </View>
   );
 
-  const CenterMessage = ({message}: {message:string}) => (
-    <View style={{paddingTop:'50%'}}>
-      <Text style={[{textAlign:"center"}, styles.initialSearchText]}>{message} </Text>
+  const CenterMessage = ({ message }: { message: string }) => (
+    <View style={{ paddingTop: "50%" }}>
+      <Text style={[{ textAlign: "center" }, styles.initialSearchText]}>
+        {message}{" "}
+      </Text>
     </View>
-  )
-
+  );
 
   const EventsTab = () => (
     <View>
@@ -131,30 +149,34 @@ export default function searchPage() {
             onPress={() => setSearchText("")}
           >
             <View style={styles.iconCircle}>
-            <MaterialCommunityIcons
-              name="window-close"
-              testID="window-close"
-              size={30}
-              color="#aaa"
-            />
+              <MaterialCommunityIcons
+                name="window-close"
+                testID="window-close"
+                size={30}
+                color="#aaa"
+              />
             </View>
           </TouchableOpacity>
         )}
       </Animated.View>
       <View style={{ flex: 1 }}>
-        <CustomTabMenu routes={routes} scenes={scenes} backgroundColor="#f5f5f5"/>
+        <CustomTabMenu
+          routes={routes}
+          scenes={scenes}
+          backgroundColor="#f5f5f5"
+        />
       </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      justifyContent: "center",
-      alignItems: "center",
-      marginTop: vs(128)
-    },
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: vs(128),
+  },
   header1: {
     padding: 15,
     marginTop: vs(50),
@@ -211,9 +233,9 @@ const styles = StyleSheet.create({
     paddingLeft: hs(8),
     minHeight: vs(56),
   },
-  initialSearchText:{
+  initialSearchText: {
     color: themeColors.sportIcons.lightGrey,
     fontSize: 24,
     fontWeight: "bold",
-  }
+  },
 });

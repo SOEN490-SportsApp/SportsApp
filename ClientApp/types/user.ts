@@ -27,4 +27,10 @@ export interface SportPreference {
     profile: Profile;
     preferences: Preferences;
   }
+
+  export interface Friend {
+    FriendId: string;
+    friendUserId: string;
+    friendUsername: string;
+  }
   
