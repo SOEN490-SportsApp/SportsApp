@@ -140,7 +140,7 @@ public class EventController {
     @Operation(summary = "React to an event", description = "Enables a user to react to an event.")
     public ReactorResponse reactToEvent(@PathVariable String id,
                                         @RequestParam String userId,
-                                        @RequestParam(required = true) String reaction) {
+                                        @RequestParam String reaction) {
         return eventService.reactToEvent(id, userId, reaction);
     }
 }
