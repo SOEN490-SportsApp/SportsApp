@@ -437,7 +437,6 @@ public class EventServiceImpl implements EventService {
                 reaction = Reaction.builder()
                         .withUserId(userId)
                         .withReactionType(ReactionType.NO_REACTION)
-                        .withReactionDate(LocalDateTime.now())
                         .build();
                 event.getReactions().remove(reactorToEvent);
             } else {
@@ -448,7 +447,6 @@ public class EventServiceImpl implements EventService {
                 reaction = Reaction.builder()
                         .withUserId(userId)
                         .withReactionType(ReactionType.LIKE)
-                        .withReactionDate(LocalDateTime.now())
                         .build();
                 event.getReactions().add(reaction);
             } else{
@@ -458,6 +456,6 @@ public class EventServiceImpl implements EventService {
 
         eventRepository.save(event);
         log.info("EventServiceImpl::reactToEvent: Event with id: {} reaction: {}", eventId, newReaction);
-        return new ReactionResponse( reaction.getUserId(), reaction.getReactionType(), reaction.getReactionDate());
+        return new ReactionResponse( reaction.getUserId(), reaction.getReactionType());
     }
 }
