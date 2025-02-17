@@ -4,10 +4,10 @@ import app.sportahub.eventservice.model.event.reactor.ReactionType;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotBlank;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record ReactorRequest (
+public record ReactorRequest(
         @NotBlank(message = "Valid user id must be provided")
         String userId,
 
@@ -15,6 +15,6 @@ public record ReactorRequest (
         ReactionType reactionType,
 
         @NotBlank(message = "Date user reacted must be provided")
-        LocalDate reactedOn
+        LocalDateTime reactedOn
 ) {
 }

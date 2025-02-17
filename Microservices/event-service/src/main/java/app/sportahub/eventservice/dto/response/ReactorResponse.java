@@ -4,7 +4,7 @@ import app.sportahub.eventservice.model.event.reactor.ReactionType;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotBlank;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record ReactorResponse (
@@ -15,6 +15,6 @@ public record ReactorResponse (
         ReactionType reactionType,
 
         @NotBlank(message = "Date user reacted must be provided")
-        LocalDate reactionDate
+        LocalDateTime reactionDate
 ) {
 }

@@ -15,7 +15,7 @@ import app.sportahub.eventservice.model.event.participant.Participant;
 import app.sportahub.eventservice.model.event.participant.ParticipantAttendStatus;
 import app.sportahub.eventservice.repository.event.EventRepository;
 import app.sportahub.eventservice.model.event.reactor.ReactionType;
-import app.sportahub.eventservice.model.event.reactor.Reactor;
+import app.sportahub.eventservice.model.event.reactor.Reaction;
 import app.sportahub.eventservice.repository.EventRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -573,7 +573,6 @@ class EventServiceTest {
         assertNotNull(response);
         assertEquals("user456", response.userId());
         assertEquals(ReactionType.LIKE, response.reactionType());
-        assertEquals(LocalDate.now(), response.reactionDate());
         assertEquals(1, event.getReactors().size());
 
         verify(eventRepository).findEventById("event123");
@@ -583,7 +582,7 @@ class EventServiceTest {
     void testReactToEvent_RemoveReaction_Success() {
         Event event = new Event();
         event.setId("event123");
-        Reactor reactor = new Reactor("user456", ReactionType.LIKE, LocalDate.now());
+        Reaction reactor = new Reaction("user456", ReactionType.LIKE, LocalDateTime.now());
         event.setReactors(new ArrayList<>(List.of(reactor)));
 
         when(eventRepository.findEventById("event123")).thenReturn(Optional.of(event));
@@ -602,7 +601,7 @@ class EventServiceTest {
     void testReactToEvent_AlreadyReacted_ThrowsException() {
         Event event = new Event();
         event.setId("event123");
-        Reactor reactor = new Reactor("user456", ReactionType.LIKE, LocalDate.now());
+        Reaction reactor = new Reaction("user456", ReactionType.LIKE, LocalDateTime.now());
         event.setReactors(new ArrayList<>(List.of(reactor)));
 
         when(eventRepository.findEventById("event123")).thenReturn(Optional.of(event));
