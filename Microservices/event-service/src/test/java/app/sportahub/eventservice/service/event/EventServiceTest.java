@@ -4,7 +4,7 @@ import app.sportahub.eventservice.dto.request.event.EventCancellationRequest;
 import app.sportahub.eventservice.dto.request.event.EventRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.dto.response.ParticipantResponse;
-import app.sportahub.eventservice.dto.response.ReactorResponse;
+import app.sportahub.eventservice.dto.response.ReactionResponse;
 import app.sportahub.eventservice.enums.EventSortingField;
 import app.sportahub.eventservice.enums.EventState;
 import app.sportahub.eventservice.enums.SortDirection;
@@ -31,7 +31,6 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -564,16 +563,16 @@ class EventServiceTest {
     void testReactToEvent_LikeEvent_Success() {
         Event event = new Event();
         event.setId("event123");
-        event.setReactors(new ArrayList<>());
+        event.setReactions(new ArrayList<>());
 
         when(eventRepository.findEventById("event123")).thenReturn(Optional.of(event));
 
-        ReactorResponse response = eventServiceImpl.reactToEvent("event123", "user456", "like");
+        ReactionResponse response = eventServiceImpl.reactToEvent("event123", "user456", ReactionType.LIKE);
 
         assertNotNull(response);
         assertEquals("user456", response.userId());
         assertEquals(ReactionType.LIKE, response.reactionType());
-        assertEquals(1, event.getReactors().size());
+        assertEquals(1, event.getReactions().size());
 
         verify(eventRepository).findEventById("event123");
     }
@@ -583,16 +582,16 @@ class EventServiceTest {
         Event event = new Event();
         event.setId("event123");
         Reaction reactor = new Reaction("user456", ReactionType.LIKE, LocalDateTime.now());
-        event.setReactors(new ArrayList<>(List.of(reactor)));
+        event.setReactions(new ArrayList<>(List.of(reactor)));
 
         when(eventRepository.findEventById("event123")).thenReturn(Optional.of(event));
 
-        ReactorResponse response = eventServiceImpl.reactToEvent("event123", "user456", "null");
+        ReactionResponse response = eventServiceImpl.reactToEvent("event123", "user456", ReactionType.NO_REACTION);
 
         assertNotNull(response);
         assertEquals("user456", response.userId());
-        assertEquals(ReactionType.NULL, response.reactionType());
-        assertEquals(0, event.getReactors().size());
+        assertEquals(ReactionType.NO_REACTION, response.reactionType());
+        assertEquals(0, event.getReactions().size());
 
         verify(eventRepository).findEventById("event123");
     }
@@ -602,12 +601,12 @@ class EventServiceTest {
         Event event = new Event();
         event.setId("event123");
         Reaction reactor = new Reaction("user456", ReactionType.LIKE, LocalDateTime.now());
-        event.setReactors(new ArrayList<>(List.of(reactor)));
+        event.setReactions(new ArrayList<>(List.of(reactor)));
 
         when(eventRepository.findEventById("event123")).thenReturn(Optional.of(event));
 
         assertThrows(ReactionAlreadySubmittedException.class,
-                () -> eventServiceImpl.reactToEvent("event123", "user456", "like")
+                () -> eventServiceImpl.reactToEvent("event123", "user456", ReactionType.LIKE)
         );
 
         verify(eventRepository).findEventById("event123");
@@ -616,7 +615,7 @@ class EventServiceTest {
     @Test
     void testReactToEvent_InvalidReaction_ThrowsException() {
         assertThrows(InvalidReactionException.class,
-                () -> eventServiceImpl.reactToEvent("event123", "user456", "dislike")
+                () -> eventServiceImpl.reactToEvent("event123", "user456", null)
         );
     }
 
@@ -625,7 +624,7 @@ class EventServiceTest {
         when(eventRepository.findEventById("event123")).thenReturn(Optional.empty());
 
         assertThrows(EventDoesNotExistException.class,
-                () -> eventServiceImpl.reactToEvent("event123", "user456", "like")
+                () -> eventServiceImpl.reactToEvent("event123", "user456", ReactionType.LIKE)
         );
 
         verify(eventRepository).findEventById("event123");

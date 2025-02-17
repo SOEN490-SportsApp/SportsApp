@@ -67,7 +67,7 @@ public record EventRequest(
         EnumSet<SkillLevelEnum> requiredSkillLevel,
 
         @Nullable
-        List<ReactorRequest> reactors)
+        List<ReactionRequest> reactors)
 {
 
 }

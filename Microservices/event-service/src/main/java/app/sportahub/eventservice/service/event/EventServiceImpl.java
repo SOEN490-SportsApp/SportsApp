@@ -5,10 +5,10 @@ import app.sportahub.eventservice.dto.request.event.EventRequest;
 import app.sportahub.eventservice.dto.request.event.ParticipantRequest;
 import app.sportahub.eventservice.dto.request.EventRequest;
 import app.sportahub.eventservice.dto.request.ParticipantRequest;
-import app.sportahub.eventservice.dto.request.ReactorRequest;
+import app.sportahub.eventservice.dto.request.ReactionRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.dto.response.ParticipantResponse;
-import app.sportahub.eventservice.dto.response.ReactorResponse;
+import app.sportahub.eventservice.dto.response.ReactionResponse;
 import app.sportahub.eventservice.enums.EventSortingField;
 import app.sportahub.eventservice.enums.EventState;
 import app.sportahub.eventservice.enums.SortDirection;
@@ -35,9 +35,7 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -97,9 +95,9 @@ public class EventServiceImpl implements EventService {
                         participantRequest.attendStatus(),
                         participantRequest.joinedOn())).toList();
 
-        List<ReactorRequest> reactorRequests = eventRequest.reactors();
-        if (reactorRequests == null) {
-            reactorRequests = new ArrayList<>();
+        List<ReactionRequest> reactionRequests = eventRequest.reactors();
+        if (reactionRequests == null) {
+            reactionRequests = new ArrayList<>();
         }
 
         Event event = eventMapper.eventRequestToEvent(eventRequest)
@@ -107,7 +105,7 @@ public class EventServiceImpl implements EventService {
                 .withCreationDate(Timestamp.valueOf(LocalDateTime.now()))
                 .withUpdatedAt(Timestamp.valueOf(LocalDateTime.now()))
                 .withParticipants(participants)
-                .withReactors(new ArrayList<>())
+                .withReactions(new ArrayList<>())
                 .build();
 
         Event savedEvent = eventRepository.save(event);
@@ -416,16 +414,16 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public ReactorResponse reactToEvent(String eventId, String userId, String newReaction) {
+    public ReactionResponse reactToEvent(String eventId, String userId, ReactionType newReaction) {
 
-        if(!(newReaction.equalsIgnoreCase("no_reaction") || newReaction.equalsIgnoreCase("like"))){
+        if(!(newReaction == ReactionType.NO_REACTION || newReaction == ReactionType.LIKE)){
             throw new InvalidReactionException();
         }
 
         Event event = eventRepository.findEventById(eventId)
                 .orElseThrow(() -> new EventDoesNotExistException(eventId));
 
-        Optional<Reaction> reactorToEventOpt = event.getReactors()
+        Optional<Reaction> reactorToEventOpt = event.getReactions()
                 .stream()
                 .filter(reaction -> reaction.getUserId().equals(userId))
                 .findFirst();
@@ -435,24 +433,24 @@ public class EventServiceImpl implements EventService {
         if(reactorToEventOpt.isPresent()) {
             Reaction reactorToEvent = reactorToEventOpt.get();
 
-            if (newReaction.equalsIgnoreCase("no_reaction")) {
+            if (newReaction == ReactionType.NO_REACTION) {
                 reaction = Reaction.builder()
                         .withUserId(userId)
                         .withReactionType(ReactionType.NO_REACTION)
                         .withReactionDate(LocalDateTime.now())
                         .build();
-                event.getReactors().remove(reactorToEvent);
+                event.getReactions().remove(reactorToEvent);
             } else {
                throw new ReactionAlreadySubmittedException(eventId, userId);
             }
         } else {
-            if(newReaction.equalsIgnoreCase("like")) {
+            if(newReaction == ReactionType.LIKE) {
                 reaction = Reaction.builder()
                         .withUserId(userId)
                         .withReactionType(ReactionType.LIKE)
                         .withReactionDate(LocalDateTime.now())
                         .build();
-                event.getReactors().add(reaction);
+                event.getReactions().add(reaction);
             } else{
                 throw new ReactionAlreadySubmittedException(eventId, userId);
             }
@@ -460,6 +458,6 @@ public class EventServiceImpl implements EventService {
 
         eventRepository.save(event);
         log.info("EventServiceImpl::reactToEvent: Event with id: {} reaction: {}", eventId, newReaction);
-        return new ReactorResponse( reaction.getUserId(), reaction.getReactionType(), reaction.getReactionDate());
+        return new ReactionResponse( reaction.getUserId(), reaction.getReactionType(), reaction.getReactionDate());
     }
 }
