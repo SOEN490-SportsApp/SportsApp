@@ -15,7 +15,7 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record EventResponse(String id, Timestamp creationDate, String eventName, String eventType, String sportType,
                             LocationResponse locationResponse, LocalDate date, LocalTime startTime, LocalTime endTime,
-                            String duration, Integer maxParticipants, List<ParticipantResponse> participants, List<ReactorResponse> reactors,
+                            String duration, Integer maxParticipants, List<ParticipantResponse> participants, List<ReactionResponse> reactors,
                             String createdBy, List<Team> teams, String cutOffTime, String description,
                             Boolean isPrivate, List<String> whitelistedUsers,
                             EnumSet<SkillLevelEnum> requiredSkillLevel, List<Post> posts,

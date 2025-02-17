@@ -2,7 +2,8 @@ package app.sportahub.eventservice.service.event;
 
 import java.util.List;
 
-import app.sportahub.eventservice.dto.response.ReactorResponse;
+import app.sportahub.eventservice.dto.response.ReactionResponse;
+import app.sportahub.eventservice.model.event.reactor.ReactionType;
 import org.springframework.data.domain.Page;
 
 import app.sportahub.eventservice.dto.request.event.EventRequest;
@@ -40,5 +41,5 @@ public interface EventService {
 
     EventResponse cancelEvent(String id, EventCancellationRequest cancelRequest);
 
-    ReactorResponse reactToEvent(String id, String userId, String reaction);
+    ReactionResponse reactToEvent(String id, String userId, ReactionType reaction);
 }

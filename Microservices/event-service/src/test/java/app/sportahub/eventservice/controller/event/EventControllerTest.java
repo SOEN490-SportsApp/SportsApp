@@ -4,11 +4,12 @@ import app.sportahub.eventservice.dto.request.event.EventCancellationRequest;
 import app.sportahub.eventservice.dto.request.event.EventRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.dto.response.ParticipantResponse;
-import app.sportahub.eventservice.dto.response.ReactorResponse;
+import app.sportahub.eventservice.dto.response.ReactionResponse;
 import app.sportahub.eventservice.enums.EventSortingField;
 import app.sportahub.eventservice.enums.SkillLevelEnum;
 import app.sportahub.eventservice.enums.SortDirection;
 import app.sportahub.eventservice.model.event.participant.ParticipantAttendStatus;
+import app.sportahub.eventservice.model.event.reactor.ReactionType;
 import app.sportahub.eventservice.service.event.EventService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,7 +46,7 @@ public class EventControllerTest {
     private EventRequest eventRequest;
     private EventCancellationRequest cancelRequest;
     private ParticipantResponse participantResponse;
-    private ReactorResponse reactorResponse;
+    private ReactionResponse reactionResponse;
 
     @BeforeEach
     public void setUp() {
@@ -219,11 +220,13 @@ public class EventControllerTest {
 
     @Test
     public void testReactToEvent() {
-        Mockito.when(eventService.reactToEvent(anyString(), anyString(), anyString())).thenReturn(reactorResponse);
+        Mockito.when(eventService.reactToEvent(Mockito.eq("testId"), Mockito.eq("userId"), Mockito.eq(ReactionType.LIKE)))
+                .thenReturn(reactionResponse);
 
-        ReactorResponse response = eventController.reactToEvent("testId", "userId", "like");
+        ReactionResponse response = eventController.reactToEvent("testId", "userId", ReactionType.LIKE);
 
-        assertEquals(reactorResponse, response);
-        Mockito.verify(eventService).reactToEvent("testId", "userId", "like");
+        assertEquals(reactionResponse, response);
+        Mockito.verify(eventService).reactToEvent(Mockito.eq("testId"), Mockito.eq("userId"), Mockito.eq(ReactionType.LIKE));
     }
+
 }
