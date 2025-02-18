@@ -40,6 +40,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final KeycloakApiClient keycloakApiClient;
     private final UserMapper userMapper;
+    private final KeycloakService keycloakService;
 
     @SneakyThrows
     @Override
@@ -58,7 +59,7 @@ public class AuthServiceImpl implements AuthService {
                 userRequest.username(),
                 userRequest.password());
 
-        String keycloakId = keycloakApiClient.createUserAndReturnCreatedId(keycloakRequest)
+        String keycloakId = keycloakService.createUserAndReturnCreatedId(keycloakRequest)
                 .flatMap(response -> {
                     if (response.has("keycloakId")) {
                         return Mono.just(response.get("keycloakId").asText());
@@ -92,17 +93,17 @@ public class AuthServiceImpl implements AuthService {
                     keycloakRequest.credentials(),
                     attributes);
             log.info("AuthServiceImpl::updating userId in keycloak for user with id:{}", user.getId());
-            keycloakApiClient.updateUser(keycloakId, updateUserIdKeycloakRequest).block();
+            keycloakService.updateUser(keycloakId, updateUserIdKeycloakRequest).block();
         } catch (Exception e) {
             log.error("AuthServiceImpl::registerUser: Failed to update user with keycloak id:{} in keycloak. User registration cancelled", keycloakId);
             userRepository.delete(user);
-            keycloakApiClient.deleteUser(keycloakId).block();
+            keycloakService.deleteUser(keycloakId).block();
             throw e;
         }
 
         log.info("AuthServiceImpl::registerUser: User with id:{} successfully registered", user.getId());
 
-        keycloakApiClient.sendVerificationEmail(user.getKeycloakId()).block();
+        keycloakService.sendVerificationEmail(user.getKeycloakId()).block();
         log.info("AuthServiceImpl::registerUser: Verification email sent to {} for user with keycloak id:{}",
                 user.getEmail(), user.getKeycloakId());
 
@@ -115,20 +116,19 @@ public class AuthServiceImpl implements AuthService {
                 .or(() -> userRepository.findUserByUsername(loginRequest.identifier()))
                 .orElseThrow(InvalidCredentialsException::new);
 
-        TokenResponse tokenResponse = Mono
-                .from(keycloakApiClient.login(loginRequest.identifier(), loginRequest.password())).map(jsonNode -> {
-                    String accessToken = jsonNode.get("access_token").asText();
-                    String refreshToken = jsonNode.get("refresh_token").asText();
-                    boolean emailVerified = JwtUtils.getClaim(accessToken, "email_verified").asBoolean();
-                    return new TokenResponse(accessToken, refreshToken, emailVerified);
-                }).block();
+        TokenResponse tokenResponse = keycloakService.login(loginRequest.identifier(), loginRequest.password()).map(jsonNode ->  {
+            String accessToken = jsonNode.get("access_token").asText();
+            String refreshToken = jsonNode.get("refresh_token").asText();
+            boolean emailVerified = JwtUtils.getClaim(accessToken, "email_verified").asBoolean();
+            return new TokenResponse(accessToken, refreshToken, emailVerified);
+        }).block();
 
         return new LoginResponse(user.getId(), tokenResponse);
     }
 
     @Override
     public TokenResponse refreshToken(RefreshTokenRequest tokenRequest) {
-        return Mono.from(keycloakApiClient.refreshToken(tokenRequest.refreshToken())).map(jsonNode -> {
+        return Mono.from(keycloakService.refreshToken(tokenRequest.refreshToken())).map(jsonNode -> {
             String refreshToken = jsonNode.get("refresh_token").asText();
             String accessToken = jsonNode.get("access_token").asText();
             boolean emailVerified = JwtUtils.getClaim(accessToken, "email_verified").asBoolean();
@@ -147,7 +147,7 @@ public class AuthServiceImpl implements AuthService {
     public void sendPasswordResetEmail(String email) {
         User user = userRepository.findUserByEmail(email.toLowerCase())
                 .orElseThrow(() -> new UserWithEmailDoesNotExistException(email.toLowerCase()));
-        keycloakApiClient.sendPasswordResetEmail(user.getKeycloakId()).block();
+        keycloakService.sendPasswordResetEmail(user.getKeycloakId()).block();
         log.info("AuthServiceImpl::sendPasswordResetEmail: password reset email sent to {}", email);
     }
 }
