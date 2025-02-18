@@ -1,8 +1,10 @@
 package app.sportahub.eventservice.model.event;
 
+import app.sportahub.eventservice.enums.EventState;
 import app.sportahub.eventservice.enums.SkillLevelEnum;
 import app.sportahub.eventservice.model.BaseEntity;
 import app.sportahub.eventservice.model.event.participant.Participant;
+import com.mongodb.lang.Nullable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -74,4 +76,10 @@ public class Event extends BaseEntity {
 
     @Builder.Default
     private EnumSet<SkillLevelEnum> requiredSkillLevel = EnumSet.allOf(SkillLevelEnum.class);
+
+    @Builder.Default
+    private EventState state = EventState.ACTIVE;
+
+    @Nullable
+    private EventCancellation cancellation;
 }
