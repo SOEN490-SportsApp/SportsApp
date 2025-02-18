@@ -44,6 +44,7 @@ import app.sportahub.userservice.repository.BadgeRepository;
 import app.sportahub.userservice.repository.FriendRepository;
 import app.sportahub.userservice.repository.FriendRequestRepository;
 import app.sportahub.userservice.repository.user.UserRepository;
+import app.sportahub.userservice.service.auth.KeycloakService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -67,7 +68,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final BadgeRepository badgeRepository;
-    private final KeycloakApiClient keycloakApiClient;
+    private final KeycloakService keycloakService;
     private final UserMapper userMapper;
     private final ProfileMapper profileMapper;
     private final FriendMapper friendMapper;
@@ -119,7 +120,7 @@ public class UserServiceImpl implements UserService {
 
         User savedUser = userRepository.save(user);
         Profile updatedProfile = savedUser.getProfile();
-        keycloakApiClient.updateUser(savedUser.getKeycloakId(),
+        keycloakService.updateUser(savedUser.getKeycloakId(),
                 new KeycloakRequest(updatedProfile.getFirstName(), updatedProfile.getLastName())).block();
 
         log.info("UserServiceImpl::updateUserProfile: User with id:{} was updated", savedUser.getId());
@@ -137,7 +138,7 @@ public class UserServiceImpl implements UserService {
         User savedUser = userRepository.save(user);
 
         if (profileRequest.firstName() != null || profileRequest.lastName() != null) {
-            keycloakApiClient.updateUser(
+            keycloakService.updateUser(
                     savedUser.getKeycloakId(),
                     new KeycloakRequest(profile.getFirstName(), profile.getLastName())
             ).block();
@@ -198,7 +199,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserDoesNotExistException(userId));
 
-        keycloakApiClient.deleteUser(user.getKeycloakId())
+        keycloakService.deleteUser(user.getKeycloakId())
                 .block();
         userRepository.deleteById(userId);
         log.info("deleteUser: User with id: {} was successfully deleted", userId);
