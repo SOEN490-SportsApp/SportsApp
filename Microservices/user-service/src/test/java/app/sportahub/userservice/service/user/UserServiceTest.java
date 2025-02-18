@@ -1,6 +1,5 @@
 package app.sportahub.userservice.service.user;
 
-import app.sportahub.userservice.client.KeycloakApiClient;
 import app.sportahub.userservice.dto.request.user.*;
 import app.sportahub.userservice.dto.request.user.friend.FriendRequestRequest;
 import app.sportahub.userservice.dto.request.user.friend.UpdateFriendRequestRequest;
@@ -31,6 +30,8 @@ import app.sportahub.userservice.repository.BadgeRepository;
 import app.sportahub.userservice.repository.FriendRepository;
 import app.sportahub.userservice.repository.FriendRequestRepository;
 import app.sportahub.userservice.repository.user.UserRepository;
+import app.sportahub.userservice.service.auth.KeycloakService;
+
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -69,7 +70,7 @@ public class UserServiceTest {
     private FriendRequestRepository friendRequestRepository;
 
     @Mock
-    private KeycloakApiClient keycloakApiClient;
+    private KeycloakService keycloakService;
 
     private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
     private final ProfileMapper profileMapper = Mappers.getMapper(ProfileMapper.class);
@@ -81,7 +82,7 @@ public class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        userService = new UserServiceImpl(userRepository, badgeRepository, keycloakApiClient, userMapper, profileMapper,
+        userService = new UserServiceImpl(userRepository, badgeRepository, keycloakService, userMapper, profileMapper,
                 friendMapper, friendRepository, friendRequestRepository, publicProfileMapper);
     }
 
@@ -342,7 +343,7 @@ public class UserServiceTest {
 
         when(userRepository.findUserById(existingUser.get().getId())).thenReturn(existingUser);
         when(userRepository.save(any(User.class))).thenReturn(existingUser.get());
-        when(keycloakApiClient.updateUser(anyString(), any(KeycloakRequest.class)))
+        when(keycloakService.updateUser(anyString(), any(KeycloakRequest.class)))
                 .thenReturn(Mono.empty());
 
         ProfileResponse updatedProfile = userService.updateUserProfile(existingUser.get().getId(), profileRequest);
@@ -534,12 +535,12 @@ public class UserServiceTest {
         user.setKeycloakId("keycloak-123");
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(keycloakApiClient.deleteUser("keycloak-123")).thenReturn(Mono.empty());
+        when(keycloakService.deleteUser("keycloak-123")).thenReturn(Mono.empty());
 
         userService.deleteUserById(userId);
 
         verify(userRepository, times(1)).deleteById(userId);
-        verify(keycloakApiClient, times(1)).deleteUser("keycloak-123");
+        verify(keycloakService, times(1)).deleteUser("keycloak-123");
     }
 
     @Test
@@ -550,7 +551,7 @@ public class UserServiceTest {
         assertThrows(UserDoesNotExistException.class, () -> userService.deleteUserById(userId));
 
         verify(userRepository, never()).deleteById(anyString());
-        verify(keycloakApiClient, never()).deleteUser(anyString());
+        verify(keycloakService, never()).deleteUser(anyString());
     }
 
     @Test
