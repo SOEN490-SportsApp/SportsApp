@@ -40,7 +40,7 @@ public class AuthServiceTest {
     private UserRepository userRepository;
 
     @Mock
-    private KeycloakApiClient keycloakApiClient;
+    private KeycloakService keycloakService;
 
     @Mock
     private UserMapper userMapper;
@@ -71,12 +71,12 @@ public class AuthServiceTest {
         when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.empty());
         when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.empty());
 
-        when(keycloakApiClient.createUserAndReturnCreatedId(any())).thenReturn(Mono.just(responseNode));
-        when(keycloakApiClient.updateUser(anyString(), any())).thenReturn(Mono.empty());
+        when(keycloakService.createUserAndReturnCreatedId(any())).thenReturn(Mono.just(responseNode));
+        when(keycloakService.updateUser(anyString(), any())).thenReturn(Mono.empty());
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
         when(userMapper.userToUserResponse(any(User.class))).thenReturn(new UserResponse("1", "keycloakId",
                 "email@example.com", "username", null, null, null, null));
-        when(keycloakApiClient.sendVerificationEmail(anyString())).thenReturn(Mono.empty());
+        when(keycloakService.sendVerificationEmail(anyString())).thenReturn(Mono.empty());
 
         UserResponse result = authService.registerUser(request);
         assertEquals("email@example.com", result.email());
@@ -112,7 +112,7 @@ public class AuthServiceTest {
 
         when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.empty());
         when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.empty());
-        when(keycloakApiClient.createUserAndReturnCreatedId(any())).thenReturn(Mono.just(responseNode));
+        when(keycloakService.createUserAndReturnCreatedId(any())).thenReturn(Mono.just(responseNode));
 
         assertThrows(ResponseStatusException.class, () -> {
             authService.registerUser(request);
@@ -124,7 +124,7 @@ public class AuthServiceTest {
         RegistrationRequest request = new RegistrationRequest("email@example.com", "username", "password");
         when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.empty());
         when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.empty());
-        when(keycloakApiClient.createUserAndReturnCreatedId(any()))
+        when(keycloakService.createUserAndReturnCreatedId(any()))
                 .thenReturn(Mono.error(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Keycloak error")));
 
         assertThrows(ResponseStatusException.class, () -> {
@@ -148,7 +148,7 @@ public class AuthServiceTest {
         ObjectNode tokenNode = objectMapper.createObjectNode();
         tokenNode.put("access_token", mockAccessToken);
         tokenNode.put("refresh_token", "refreshToken");
-        when(keycloakApiClient.login(anyString(), anyString())).thenReturn(Mono.just(tokenNode));
+        when(keycloakService.login(anyString(), anyString())).thenReturn(Mono.just(tokenNode));
 
         LoginResponse response = authService.loginUser(request);
         assertNotNull(response);
@@ -172,7 +172,7 @@ public class AuthServiceTest {
         ObjectNode tokenNode = objectMapper.createObjectNode();
         tokenNode.put("access_token", newAccessToken);
         tokenNode.put("refresh_token", "newRefreshToken");
-        when(keycloakApiClient.refreshToken(anyString())).thenReturn(Mono.just(tokenNode));
+        when(keycloakService.refreshToken(anyString())).thenReturn(Mono.just(tokenNode));
 
         TokenResponse response = authService.refreshToken(request);
         assertNotNull(response);
@@ -184,7 +184,7 @@ public class AuthServiceTest {
     @Test
     void refreshTokenFailure() {
         RefreshTokenRequest request = new RefreshTokenRequest("oldRefreshToken");
-        when(keycloakApiClient.refreshToken(anyString())).thenReturn(Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST)));
+        when(keycloakService.refreshToken(anyString())).thenReturn(Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST)));
 
         assertThrows(ResponseStatusException.class, () -> authService.refreshToken(request));
     }
@@ -193,7 +193,7 @@ public class AuthServiceTest {
     void sendVerificationEmailSuccessful() {
         User user = User.builder().withEmail("email@example.com").withKeycloakId("keycloakId").build();
         when(userRepository.findUserByEmail("email@example.com")).thenReturn(Optional.of(user));
-        when(keycloakApiClient.sendVerificationEmail("keycloakId")).thenReturn(Mono.empty());
+        when(keycloakService.sendVerificationEmail("keycloakId")).thenReturn(Mono.empty());
 
         assertDoesNotThrow(() -> authService.sendVerificationEmail("email@example.com"));
     }
@@ -209,7 +209,7 @@ public class AuthServiceTest {
     void sendPasswordResetEmailSuccessful() {
         User user = User.builder().withEmail("email@example.com").withKeycloakId("keycloakId").build();
         when(userRepository.findUserByEmail("email@example.com")).thenReturn(Optional.of(user));
-        when(keycloakApiClient.sendPasswordResetEmail("keycloakId")).thenReturn(Mono.empty());
+        when(keycloakService.sendPasswordResetEmail("keycloakId")).thenReturn(Mono.empty());
 
         assertDoesNotThrow(() -> authService.sendPasswordResetEmail("email@example.com"));
     }
