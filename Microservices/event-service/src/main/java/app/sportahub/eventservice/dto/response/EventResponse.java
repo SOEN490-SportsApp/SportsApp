@@ -1,6 +1,7 @@
 package app.sportahub.eventservice.dto.response;
 
 import app.sportahub.eventservice.enums.SkillLevelEnum;
+import app.sportahub.eventservice.model.event.EventCancellation;
 import app.sportahub.eventservice.model.event.Team;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -16,5 +17,5 @@ public record EventResponse(String id, Timestamp creationDate, String eventName,
                             String duration, Integer maxParticipants, List<ParticipantResponse> participants,
                             String createdBy, List<Team> teams, String cutOffTime, String description,
                             Boolean isPrivate, List<String> whitelistedUsers,
-                            EnumSet<SkillLevelEnum> requiredSkillLevel) {
+                            EnumSet<SkillLevelEnum> requiredSkillLevel, EventCancellation cancellation) {
 }
