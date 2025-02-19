@@ -1,9 +1,11 @@
 package app.sportahub.eventservice.service.event;
 
+import app.sportahub.eventservice.dto.request.EventCancellationRequest;
 import app.sportahub.eventservice.dto.request.EventRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.dto.response.ParticipantResponse;
 import app.sportahub.eventservice.enums.EventSortingField;
+import app.sportahub.eventservice.enums.EventState;
 import app.sportahub.eventservice.enums.SortDirection;
 import app.sportahub.eventservice.exception.event.*;
 import app.sportahub.eventservice.mapper.event.EventMapper;
@@ -20,6 +22,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -48,10 +53,12 @@ class EventServiceTest {
     private Event event;
     private EventResponse eventResponse;
     private EventRequest eventRequest;
+    private EventCancellationRequest cancelRequest;
     private Participant participant;
 
     @BeforeEach
     void setUp() {
+        cancelRequest = new EventCancellationRequest("Weather conditions");
         participant = Participant.builder()
                 .withUserId("user123")
                 .withAttendStatus(ParticipantAttendStatus.JOINED)
@@ -66,6 +73,7 @@ class EventServiceTest {
                 .withCreatedBy("creatorId")
                 .withIsPrivate(false)
                 .withCutOffTime(LocalDateTime.now().plusDays(1).toString())
+                .withState(EventState.ACTIVE)
                 .build();
 
         eventResponse = new EventResponse(
@@ -86,6 +94,7 @@ class EventServiceTest {
                 "14:00",
                 "Friendly game",
                 false,
+                null,
                 null,
                 null
         );
@@ -501,5 +510,42 @@ class EventServiceTest {
         assertEquals(userId, response.userId());
         assertEquals(ParticipantAttendStatus.CANCELLED, response.attendStatus());
         verify(eventRepository).save(event);
+    }
+
+    @Test
+    void cancelEventShouldSuccessfullyCancelEvent() {
+        when(eventRepository.findById(anyString())).thenReturn(Optional.of(event));
+        when(eventRepository.save(any(Event.class))).thenReturn(event);
+        when(eventMapper.eventToEventResponse(any(Event.class))).thenReturn(eventResponse);
+
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn("adminUser");
+        SecurityContextHolder.setContext(securityContext);
+
+        EventResponse response = eventServiceImpl.cancelEvent("1", cancelRequest);
+
+        assertNotNull(response);
+        assertEquals(EventState.CANCELLED, event.getState());
+        assertNotNull(event.getCancellation());
+        assertEquals("adminUser", event.getCancellation().getCancelledBy());
+        assertEquals("Weather conditions", event.getCancellation().getReason());
+        verify(eventRepository, times(1)).save(event);
+    }
+
+    @Test
+    void cancelEventShouldThrowEventDoesNotExistException() {
+        when(eventRepository.findById(anyString())).thenReturn(Optional.empty());
+
+        assertThrows(EventDoesNotExistException.class, () -> eventServiceImpl.cancelEvent("1", cancelRequest));
+    }
+
+    @Test
+    void cancelEventShouldThrowEventAlreadyCancelledException() {
+        event.setState(EventState.CANCELLED);
+        when(eventRepository.findById(anyString())).thenReturn(Optional.of(event));
+
+        assertThrows(EventAlreadyCancelledException.class, () -> eventServiceImpl.cancelEvent("1", cancelRequest));
     }
 }
