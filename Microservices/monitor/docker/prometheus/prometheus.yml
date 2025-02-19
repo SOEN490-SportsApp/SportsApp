@@ -1,0 +1,28 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'user-service'
+    metrics_path: '/api/user-service/actuator/prometheus'
+    static_configs:
+      - targets: [ 'host.docker.internal:8080' ]
+  - job_name: 'event-service'
+    metrics_path: '/api/event-service/actuator/prometheus'
+    scrape_interval: 5s
+    static_configs:
+      - targets: [ 'host.docker.internal:8080' ]
+  - job_name: 'storage-service'
+    metrics_path: '/api/storage-service/actuator/prometheus'
+    scrape_interval: 5s
+    static_configs:
+      - targets: [ 'host.docker.internal:8080' ]
+  - job_name: 'orchestration-service'
+    metrics_path: '/api/orchestration-service/actuator/prometheus'
+    scrape_interval: 5s
+    static_configs:
+      - targets: [ 'host.docker.internal:8080' ]
+  - job_name: 'messaging-service'
+    metrics_path: '/api/messaging-service/actuator/prometheus'
+    scrape_interval: 5s
+    static_configs:
+      - targets: [ 'host.docker.internal:8080' ]
