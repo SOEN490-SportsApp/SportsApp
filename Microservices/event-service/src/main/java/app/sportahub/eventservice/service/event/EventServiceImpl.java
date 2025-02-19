@@ -1,14 +1,17 @@
 package app.sportahub.eventservice.service.event;
 
 import app.sportahub.eventservice.dto.request.EventRequest;
+import app.sportahub.eventservice.dto.request.EventCancellationRequest;
 import app.sportahub.eventservice.dto.request.ParticipantRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
+import app.sportahub.eventservice.enums.EventState;
 import app.sportahub.eventservice.dto.response.ParticipantResponse;
 import app.sportahub.eventservice.enums.EventSortingField;
 import app.sportahub.eventservice.enums.SortDirection;
 import app.sportahub.eventservice.exception.event.*;
 import app.sportahub.eventservice.mapper.event.EventMapper;
 import app.sportahub.eventservice.model.event.Event;
+import app.sportahub.eventservice.model.event.EventCancellation;
 import app.sportahub.eventservice.model.event.participant.Participant;
 import app.sportahub.eventservice.model.event.participant.ParticipantAttendStatus;
 import app.sportahub.eventservice.repository.EventRepository;
@@ -18,6 +21,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -329,5 +336,44 @@ public class EventServiceImpl implements EventService {
         Page<Event> events = eventRepository.findByCreatedBy(userId, pageable);
         log.info("EventServiceImpl::getEventsCreatedByUserId: Retrieved {} events created by user {}", events.getNumberOfElements(), userId);
         return events.map(eventMapper::eventToEventResponse);
+    }
+
+    /**
+     * Cancels an event by updating its state to {@code CANCELLED}.
+     * This method ensures that only the event creator or an admin can cancel an event.
+     * If the event is already cancelled, an exception is thrown.
+     *
+     * @param eventId            the unique identifier of the event to be cancelled
+     * @param cancelRequest contains the reason for cancellation
+     * @return an {@link EventResponse} representing the updated event
+     * @throws EventDoesNotExistException      if no event with the given ID exists
+     * @throws EventAlreadyCancelledException  if the event is already cancelled
+     */
+    @Override
+    public EventResponse cancelEvent(String eventId, EventCancellationRequest cancelRequest) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EventDoesNotExistException(eventId));
+
+        if (event.getState() == EventState.CANCELLED) {
+            throw new EventAlreadyCancelledException(eventId);
+        }
+
+        event.setState(EventState.CANCELLED);
+        event.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        EventCancellation cancellation = EventCancellation.builder()
+                .cancelledBy(authentication.getName())
+                .reason(cancelRequest.reason())
+                .cancelledAt(Timestamp.valueOf(LocalDateTime.now()))
+                .build();
+
+        event.setCancellation(cancellation);
+
+        Event savedEvent = eventRepository.save(event);
+        log.info("EventServiceImpl::cancelEvent: Event with id:{} was cancelled by user:{}", eventId,
+                authentication.getName());
+        return eventMapper.eventToEventResponse(savedEvent);
     }
 }
