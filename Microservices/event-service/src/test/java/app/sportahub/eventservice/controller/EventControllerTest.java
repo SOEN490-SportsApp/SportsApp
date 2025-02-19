@@ -1,5 +1,6 @@
 package app.sportahub.eventservice.controller;
 
+import app.sportahub.eventservice.dto.request.EventCancellationRequest;
 import app.sportahub.eventservice.dto.request.EventRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.dto.response.ParticipantResponse;
@@ -41,10 +42,12 @@ public class EventControllerTest {
 
     private EventResponse eventResponse;
     private EventRequest eventRequest;
+    private EventCancellationRequest cancelRequest;
     private ParticipantResponse participantResponse;
 
     @BeforeEach
     public void setUp() {
+        cancelRequest = new EventCancellationRequest("Weather conditions");
         eventResponse = new EventResponse(
                 "1",
                 Timestamp.valueOf("2023-01-01 10:00:00"),
@@ -64,7 +67,8 @@ public class EventControllerTest {
                 "Join us for a friendly match!",
                 false,
                 List.of("User111", "User222"),
-                EnumSet.of(SkillLevelEnum.BEGINNER, SkillLevelEnum.INTERMEDIATE)
+                EnumSet.of(SkillLevelEnum.BEGINNER, SkillLevelEnum.INTERMEDIATE),
+                null
         );
 
 
@@ -195,5 +199,15 @@ public class EventControllerTest {
 
         assertEquals(participantResponse, response);
         Mockito.verify(eventService).leaveEvent("testId", "userId");
+    }
+
+    @Test
+    public void testCancelEvent() {
+        Mockito.when(eventService.cancelEvent(anyString(), any(EventCancellationRequest.class))).thenReturn(eventResponse);
+
+        EventResponse response = eventController.cancelEvent("testId", cancelRequest);
+
+        assertEquals(eventResponse, response);
+        Mockito.verify(eventService).cancelEvent("testId", cancelRequest);
     }
 }
