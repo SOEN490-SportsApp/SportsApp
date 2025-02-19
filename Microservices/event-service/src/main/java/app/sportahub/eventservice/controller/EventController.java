@@ -1,5 +1,6 @@
 package app.sportahub.eventservice.controller;
 
+import app.sportahub.eventservice.dto.request.EventCancellationRequest;
 import app.sportahub.eventservice.dto.request.EventRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.dto.response.ParticipantResponse;
@@ -121,5 +122,14 @@ public class EventController {
                                                         @RequestParam(defaultValue = "DATE") EventSortingField field
                                             ) {
         return eventService.getEventsCreatedByUserId(userId, page, size, sort, field);
+    }
+
+    @PatchMapping("/{id}/cancel")
+    @PreAuthorize("@eventService.isCreator(#id, authentication.name) || hasRole('ROLE_ADMIN')")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Cancel an event", description = "Marks an event as 'Cancelled' instead of deleting it.")
+    public EventResponse cancelEvent(@PathVariable String id,
+                                     @RequestBody @Valid EventCancellationRequest cancelRequest) {
+        return eventService.cancelEvent(id, cancelRequest);
     }
 }
