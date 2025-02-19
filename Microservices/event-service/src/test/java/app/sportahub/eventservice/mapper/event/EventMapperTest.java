@@ -57,6 +57,8 @@ public class EventMapperTest {
                 null,
                 null,
                 null,
+                null,
+                null,
                 null);
 
         //Act
