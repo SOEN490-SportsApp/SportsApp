@@ -274,7 +274,8 @@ public class EventServiceImpl implements EventService {
         if (userId.equals(event.getCreatedBy()))
             throw new EventCreatorCannotLeaveEventException(eventId, userId);
 
-        if (event.getStartTime().isBefore(currentTime))
+        if (event.getDate().isBefore(currentDate) ||
+                (event.getDate().isEqual(currentDate) && event.getStartTime().isBefore(currentTime)))
             throw new EventAlreadyStartedException(eventId);
 
         if (cutOffDateTime.isBefore(currentDateTime)) {
