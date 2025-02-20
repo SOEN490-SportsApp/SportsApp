@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface EventRepository extends MongoRepository<Event, String> {
+public interface EventRepository extends MongoRepository<Event, String>, SearchingEventRepository {
 
     Optional<Event> findEventById(String id);
 
