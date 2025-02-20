@@ -86,3 +86,30 @@ export async function getSentFriendRequests(userId: string) {
         throw error.response?.data || error;
     }
 }
+
+export async function getReceivedFriendRequests() {
+    const axiosInstance = getAxiosInstance();
+    try {
+        const response = await axiosInstance.get(
+            API_ENDPOINTS.RETRIEVE_USER_FRIEND_REQUESTS.replace("{userId}", "679fca7d6dfc9749eedcf832") + "?type=RECEIVED"
+        );
+        return response.data;
+    } catch (error: any) {
+        console.error("Error fetching received friend requests:", error);
+        throw error.response?.data || error;
+    }
+}
+
+export async function respondToFriendRequest(userId: string, senderId: string, requestId: string, action: "ACCEPT" | "DECLINE") {
+    const axiosInstance = getAxiosInstance();
+    try {
+        const response = await axiosInstance.put(API_ENDPOINTS.RESPOND_TO_FRIEND_REQUEST.replace("{userId}", userId).replace("{requestId}", requestId), {
+            friendRequestUserId: senderId,
+            action,
+        });
+        return response.data;
+    } catch (error: any) {
+        console.error(`Error ${action.toLowerCase()}ing friend request:`, error);
+        throw error.response?.data || error;
+    }
+}
