@@ -462,6 +462,7 @@ class EventServiceTest {
         String userId = "user456";
         Event event = new Event();
         event.setId(eventId);
+        event.setDate(LocalDate.now().minusDays(1));
         event.setStartTime(LocalTime.now().minusHours(1)); // Event already started
         event.setCutOffTime(LocalDateTime.now().minusDays(2).toString());
         event.setParticipants(new ArrayList<>(List.of(new Participant(userId, ParticipantAttendStatus.JOINED, LocalDate.now()))));
