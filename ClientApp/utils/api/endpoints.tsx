@@ -8,8 +8,7 @@ export const API_ENDPOINTS = {
   SEARCH_USERS: 'user-service/user/search',
   GET_USER_PROFILE: 'user-service/user/{id}/profile',
   DELETE_PROFILE: 'user-service/user/{userId}',
-  SEND_FRIEND_REQUEST: 'user-service/user/{userId}/friends/requests',
-  RETRIEVE_USER_FRIEND_REQUESTS: 'user-service/user/{userId}/friend-requests',
+
 
   CREATE_EVENT: "event-service/event",
   GET_EVENT_BY_ID: "event-service/event/{id}",
@@ -18,7 +17,12 @@ export const API_ENDPOINTS = {
   DELETE_EVENT_BY_ID: "event-service/event/{id}",
   GET_ALL_EVENTS_JOINED: 'event-service/event/participant/{userId}',
   GET_ALL_EVENTS_CREATED_BY: 'event-service/event/created-by/{userId}',
-GET_EVENTS_BY_USER_ID: "event-service/event/participant/{userId}",
+  GET_EVENTS_BY_USER_ID: "event-service/event/participant/{userId}",
+
+
+  SEND_FRIEND_REQUEST: 'user-service/user/{userId}/friends/requests',
+  RETRIEVE_USER_FRIEND_REQUESTS: 'user-service/user/{userId}/friend-requests',
   GET_ALL_FRIENDS: 'user-service/user/{userId}/friends',
+  RESPOND_TO_FRIEND_REQUEST: 'user-service/user/{userId}/friend-requests/{requestId}',
   GET_PROFILE_BY_ID: 'user-service/user/{userId}/profile',
 };
