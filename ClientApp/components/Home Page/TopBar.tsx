@@ -14,6 +14,11 @@ const TopBar = () => {
             <Icon name="search" type="font-awesome" color="#000" size={20} />
           </View>
         </TouchableOpacity>
+        <TouchableOpacity style={styles.iconButton} testID="search-icon" onPress={() => router.push('/(tabs)/home/(notifications)/notificationsPage')}>
+          <View style={styles.iconCircle}>
+            <Icon name="bell" type="font-awesome" color="#000" size={20} />
+          </View>
+        </TouchableOpacity>
       </View>
     </View>
   );
