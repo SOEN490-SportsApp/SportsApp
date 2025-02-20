@@ -1,18 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Image } from "react-native";
-import { useLocalSearchParams, router } from "expo-router";
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Image, Pressable } from "react-native";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useSelector } from "react-redux";
-import SkillTag from "@/components/Event/SkillTag";
 import { Event } from "@/types/event";
-import { API_ENDPOINTS } from "@/utils/api/endpoints";
-import { getAxiosInstance } from "@/services/axiosInstance";
 import ConfirmButton from "@/components/Helper Components/ConfirmButton";
 import themeColors from "@/utils/constants/colors";
 import { mhs, mvs } from "@/utils/helpers/uiScaler";
+import { getEventById, joinEvent } from "@/utils/api/eventApiClient";
+import SkillTag from "@/components/Event/SkillTag";
 
 const EventDetails = () => {
-  const axiosInstance = getAxiosInstance();
+  const router = useRouter();
   const user = useSelector((state: { user: any }) => state.user);
   const { eventId } = useLocalSearchParams<{ eventId: string }>();
   const [event, setEvent] = useState<Event | null>(null);
@@ -21,46 +20,34 @@ const EventDetails = () => {
 
   const handleJoinEvent = async () => {
     try {
-      await axiosInstance.post(
-        API_ENDPOINTS.JOIN_EVENT_BY_ID.replace("{id}", eventId!),
-        null,
-        { params: { userId: user.id } }
-      );
+      await joinEvent(eventId!, user.id);
       setEvent((prevEvent) => {
         if (!prevEvent) return prevEvent;
         return {
           ...prevEvent,
           participants: [
             ...prevEvent.participants,
-            {
-              userId: user.id,
-              attendStatus: "JOINED",
-            },
+            { userId: user.id, attendStatus: "JOINED" },
           ],
         };
       });
       alert("Successfully joined the event!");
     } catch (err) {
-      console.error(err);
       setError("Failed to join the event.");
     }
   };
-
+  
   useEffect(() => {
     const fetchEventDetails = async () => {
       try {
-        const response = await axiosInstance.get<Event>(
-          API_ENDPOINTS.GET_EVENT_BY_ID.replace("{id}", eventId!)
-        );
-        setEvent(response.data);
+        const eventData = await getEventById(eventId!);
+        setEvent(eventData);
       } catch (err) {
-        console.error(err);
         setError("Failed to fetch event details.");
       } finally {
         setLoading(false);
       }
     };
-
     if (eventId) fetchEventDetails();
   }, [eventId]);
 
@@ -91,6 +78,7 @@ const EventDetails = () => {
   const isUserParticipant = event.participants.some(
     (participant) => participant.userId === user.id
   );
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* Event Header */}
@@ -145,19 +133,28 @@ const EventDetails = () => {
             event.participants
               .filter((p) => p.attendStatus === "JOINED" || p.attendStatus === "CONFIRMED")
               .map((participant) => (
-                <View
+                <Pressable
                   key={participant.userId}
-                  style={styles.participant}
+                  onPress={() => {
+                    if (participant.userId !== user.id) {
+                      router.push({
+                        pathname: `/(tabs)/home/userProfiles/[id]`,
+                        params: { id: participant.userId },
+                      });
+                    }
+                  }}
                 >
-                  <Image
-                    source={require("@/assets/images/avatar-placeholder.png")}
-                    style={[styles.participantAvatar, participant.userId === user.id && styles.currentUserBorder]}
-                    testID="participant-avatar"
-                  />
-                  {participant.userId === user.id && (
-                    <Text style={styles.currentUserText}>You</Text>
-                  )}
-                </View>
+                  <View style={styles.participant}>
+                    <Image
+                      source={require("@/assets/images/avatar-placeholder.png")}
+                      style={[styles.participantAvatar, participant.userId === user.id && styles.currentUserBorder]}
+                      testID="participant-avatar"
+                    />
+                    {participant.userId === user.id && (
+                      <Text style={styles.currentUserText}>You</Text>
+                    )}
+                  </View>
+                </Pressable>
               ))
           ) : (
             <Text style={styles.noParticipantsText}>
