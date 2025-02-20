@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -266,13 +267,14 @@ public class EventServiceImpl implements EventService {
                 .orElseThrow(() -> new UserNotAParticipantException(eventId, userId));
 
         LocalDate currentDate = LocalDate.now();
+        LocalTime currentTime = LocalTime.now();
         LocalDateTime currentDateTime = LocalDateTime.now();
         LocalDateTime cutOffDateTime = LocalDateTime.parse(event.getCutOffTime());
 
         if (userId.equals(event.getCreatedBy()))
             throw new EventCreatorCannotLeaveEventException(eventId, userId);
 
-        if (event.getDate().isBefore(currentDate))
+        if (event.getStartTime().isBefore(currentTime))
             throw new EventAlreadyStartedException(eventId);
 
         if (cutOffDateTime.isBefore(currentDateTime)) {

@@ -24,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -401,6 +402,7 @@ class EventServiceTest {
         event.setId(eventId);
         event.setDate(eventDate);
         event.setCutOffTime(cutOffTime.toString());
+        event.setStartTime(LocalTime.now().plusHours(1));
         event.setParticipants(new ArrayList<>(List.of(participant)));
 
         when(eventRepository.findById(eventId)).thenReturn(Optional.of(event));
@@ -451,7 +453,8 @@ class EventServiceTest {
         String userId = "user456";
         Event event = new Event();
         event.setId(eventId);
-        event.setDate(LocalDate.now().minusDays(1)); // Event already started
+        event.setStartTime(LocalTime.now().minusHours(1)); // Event already started
+        event.setCutOffTime(LocalDateTime.now().minusDays(2).toString());
         event.setParticipants(new ArrayList<>(List.of(new Participant(userId, ParticipantAttendStatus.JOINED, LocalDate.now()))));
 
         when(eventRepository.findById(eventId)).thenReturn(Optional.of(event));
@@ -488,6 +491,7 @@ class EventServiceTest {
         Event event = new Event();
         event.setId(eventId);
         event.setDate(LocalDate.now().plusDays(1));
+        event.setStartTime(LocalTime.now().plusHours(1));
         event.setCutOffTime(pastCutOffTime.toString());
         event.setParticipants(new ArrayList<>(List.of(participant)));
 
