@@ -7,7 +7,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Image} from "react-native";
 const FriendCardProfilePage = ({ friend }: { friend: any }) => {
   const router = useRouter();
   const userId = friend.friendUserId;
-  console.log(friend);
+
   return (
     <TouchableOpacity
       style={styles.cardHolder}
