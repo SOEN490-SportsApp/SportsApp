@@ -46,6 +46,7 @@ import app.sportahub.eventservice.exception.event.UserIsNotEventWhitelistedExcep
 import app.sportahub.eventservice.exception.event.UserNotAParticipantException;
 import app.sportahub.eventservice.mapper.event.EventMapper;
 import app.sportahub.eventservice.model.event.Event;
+import app.sportahub.eventservice.model.event.Location;
 import app.sportahub.eventservice.model.event.EventCancellation;
 import app.sportahub.eventservice.model.event.participant.Participant;
 import app.sportahub.eventservice.model.event.participant.ParticipantAttendStatus;
@@ -54,6 +55,14 @@ import app.sportahub.eventservice.model.event.reactor.ReactionType;
 import app.sportahub.eventservice.repository.event.EventRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
 
 
 @Slf4j
@@ -87,9 +96,9 @@ public class EventServiceImpl implements EventService {
         return eventRepository.findAll().stream().map(eventMapper::eventToEventResponse).toList();
     }
 
-    /** 
-     * Returns either a paginated list or a regular list of EventResponse objects that are within a certain radius of a given location. 
-     * 
+    /**
+     * Returns either a paginated list or a regular list of EventResponse objects that are within a certain radius of a given location.
+     *
      * @param longitude the longitude of the location to search around
      * @param latitude the latitude of the location to search around
      * @param radius the radius around the location to search within
@@ -97,13 +106,13 @@ public class EventServiceImpl implements EventService {
      * @param paginate whether to return a paginated list or not
      * @param page the page number to return if paginated
      * @param size the number of events per page if paginated
-     * 
-     * @return a {@Link Pageable}  or {@Link List} of {@Link EventResponse} objects 
+     *
+     * @return a {@Link Pageable}  or {@Link List} of {@Link EventResponse} objects
      * @throws EventsNotFoundException if no events are found within the specified radius
     */
     @Override
     public ResponseEntity<?> getRelevantEvents(double longitude, double latitude ,double radius, boolean radiusExpansion, boolean paginate, int page, int size){
-        
+
         GeoJsonPoint point = new GeoJsonPoint(longitude, latitude);
         Distance distance = new Distance(radius, Metrics.KILOMETERS);
         Pageable pageable =  paginate ? PageRequest.of(page, size) : Pageable.unpaged();
@@ -120,7 +129,7 @@ public class EventServiceImpl implements EventService {
             throw new EventsNotFoundException();
         }
 
-        return ResponseEntity.ok(paginate ? events.map(eventMapper::eventToEventResponse): 
+        return ResponseEntity.ok(paginate ? events.map(eventMapper::eventToEventResponse):
                 events.getContent().stream().map(eventMapper::eventToEventResponse).toList());
     }
 
@@ -466,6 +475,33 @@ public class EventServiceImpl implements EventService {
                 authentication.getName());
         return eventMapper.eventToEventResponse(savedEvent);
     }
+
+    @Override
+    public Page<EventResponse> searchEvents(String eventName, String eventType, String sportType, Location location, LocalDate date, LocalTime startTime, LocalTime endTime, String duration, Integer maxParticipants, String createdBy, Boolean isPrivate, List<String> requiredSkillLevel, Pageable pageable) {
+        if (eventName == null &&
+                eventType == null &&
+                sportType == null &&
+                location == null &&
+                date == null &&
+                startTime == null &&
+                endTime == null &&
+                duration == null &&
+                maxParticipants == null &&
+                createdBy == null &&
+                isPrivate == null &&
+                requiredSkillLevel == null) {
+            throw new NoSearchCriteriaProvidedException();
+        }
+        log.info("UserServiceImpl::searchUsers: User created a search query");
+        Page<Event> events = eventRepository.searchEvent(eventName, eventType, sportType, location, date, startTime, endTime, duration, maxParticipants, createdBy, isPrivate, requiredSkillLevel, pageable);
+
+        List<EventResponse> eventResponses = events.stream()
+                .map(eventMapper::eventToEventResponse).toList();
+
+        return new PageImpl<>(eventResponses, events.getPageable(), events.getTotalElements());
+    }
+
+
 
     @Override
     public ReactionResponse reactToEvent(String eventId, ReactionType newReaction) {
