@@ -1,4 +1,9 @@
 package app.sportahub.userservice.dto.response.user.friendRequest;
 
-public record FriendRequestResponse(String message, String RequestId) {
+import java.time.LocalDateTime;
+
+public record FriendRequestResponse(String message, String RequestId,
+                                    LocalDateTime createdAt,
+                                    LocalDateTime withUpdatedAt,
+                                    String profilePictureURL) {
 }
