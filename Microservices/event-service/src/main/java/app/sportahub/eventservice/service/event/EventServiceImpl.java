@@ -1,12 +1,12 @@
 package app.sportahub.eventservice.service.event;
 
-import app.sportahub.eventservice.dto.request.EventRequest;
-import app.sportahub.eventservice.dto.request.EventCancellationRequest;
-import app.sportahub.eventservice.dto.request.ParticipantRequest;
+import app.sportahub.eventservice.dto.request.event.EventCancellationRequest;
+import app.sportahub.eventservice.dto.request.event.EventRequest;
+import app.sportahub.eventservice.dto.request.event.ParticipantRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
-import app.sportahub.eventservice.enums.EventState;
 import app.sportahub.eventservice.dto.response.ParticipantResponse;
 import app.sportahub.eventservice.enums.EventSortingField;
+import app.sportahub.eventservice.enums.EventState;
 import app.sportahub.eventservice.enums.SortDirection;
 import app.sportahub.eventservice.exception.event.*;
 import app.sportahub.eventservice.mapper.event.EventMapper;
@@ -23,8 +23,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
