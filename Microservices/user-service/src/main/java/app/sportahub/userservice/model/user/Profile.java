@@ -23,6 +23,7 @@ public class Profile {
     private String postalCode;
     private String phoneNumber;
     private String ranking;
+    private String profilePicture;
 
     @Builder.Default
     private List<SportLevel> sportsOfPreference = new ArrayList<>();
