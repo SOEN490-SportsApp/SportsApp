@@ -1,6 +1,6 @@
 package app.sportahub.eventservice.service.event;
 
-import app.sportahub.eventservice.dto.request.EventCancellationRequest;
+import app.sportahub.eventservice.dto.request.event.EventCancellationRequest;
 import app.sportahub.eventservice.dto.request.event.EventRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.dto.response.ParticipantResponse;
@@ -97,6 +97,7 @@ class EventServiceTest {
                 false,
                 null,
                 null,
+                new ArrayList<>(),
                 null
         );
 
@@ -411,7 +412,6 @@ class EventServiceTest {
         event.setId(eventId);
         event.setDate(eventDate);
         event.setCutOffTime(cutOffTime.toString());
-        event.setStartTime(LocalTime.now().plusHours(1));
         event.setParticipants(new ArrayList<>(List.of(participant)));
 
         when(eventRepository.findById(eventId)).thenReturn(Optional.of(event));
