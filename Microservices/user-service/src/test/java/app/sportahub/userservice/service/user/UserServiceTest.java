@@ -129,6 +129,7 @@ public class UserServiceTest {
                                 List.of(new SportLevel("Basketball", "Intermediate"),
                                         new SportLevel("Soccer", "Beginner")))
                         .withRanking("100")
+                        .withProfilePicture("https://example.com/profile.jpg")
                         .build())
                 .build());
     }
@@ -399,6 +400,7 @@ public class UserServiceTest {
                 "12345",
                 "123-456-7890",
                 "A",
+                "https://image.com",
                 List.of(new SportLevel("Basketball", "Intermediate"),
                         new SportLevel("Soccer", "Beginner")),
                 List.of()
@@ -571,6 +573,8 @@ public class UserServiceTest {
         FriendRequestRequest friendRequestRequest = new FriendRequestRequest(receiverUser.get().getId());
         FriendRequest friend = FriendRequest.builder().withFriendRequestStatus(FriendRequestStatusEnum.SENT)
                 .withUserId(receiverId)
+                .withCreatedAt(Timestamp.valueOf(LocalDateTime.now()))
+                .withUpdatedAt(Timestamp.valueOf(LocalDateTime.now()))
                 .build();
 
         when(userRepository.save(send)).thenReturn(send);
@@ -586,6 +590,8 @@ public class UserServiceTest {
         assertEquals("Friend request sent successfully.", response.message());
         assertFalse(send.getFriendRequestList().isEmpty());
         assertFalse(receiver.getFriendRequestList().isEmpty());
+        assertNotNull(response.createdAt());
+        assertEquals("https://example.com/profile.jpg", response.profilePictureURL());
         assertEquals(FriendRequestStatusEnum.SENT, send.getFriendRequestList().getFirst().getFriendRequestStatus());
         assertEquals(FriendRequestStatusEnum.RECEIVED, receiver.getFriendRequestList().getFirst()
                 .getFriendRequestStatus());
@@ -960,15 +966,35 @@ public class UserServiceTest {
     @Test
     void getFriendRequestsShouldReturnSuccess() {
         // Arrange
-        User user = new User();
-        user.setUsername("testUsername");
+        User user = User.builder()
+                .withUsername("testUsername")
+                .withProfile(Profile.builder()
+                        .withProfilePicture("https://example.com/profile.jpg").build())
+                .build();
+
         List<FriendRequest> friendRequestList = new ArrayList<>();
-        FriendRequest friendRequest1 = new FriendRequest("senderId", FriendRequestStatusEnum.SENT);
-        friendRequest1.setId("friend1RequestId");
+
+        FriendRequest friendRequest1 = FriendRequest
+                .builder()
+                .withId("friend1RequestId")
+                .withUserId("senderId")
+                .withFriendRequestStatus(FriendRequestStatusEnum.SENT)
+                .withCreatedAt(Timestamp.valueOf(LocalDateTime.now()))
+                .withUpdatedAt(Timestamp.valueOf(LocalDateTime.now()))
+                .build();
         friendRequestList.add(friendRequest1);
-        FriendRequest friendRequest2 = new FriendRequest("receiverId", FriendRequestStatusEnum.RECEIVED);
-        friendRequest2.setId("friend2RequestId");
+
+        FriendRequest friendRequest2 = FriendRequest
+                .builder()
+                .withId("friend2RequestId")
+                .withUserId("receiverId")
+                .withFriendRequestStatus(FriendRequestStatusEnum.RECEIVED)
+                .withCreatedAt(Timestamp.valueOf(LocalDateTime.now()))
+                .withUpdatedAt(Timestamp.valueOf(LocalDateTime.now()))
+                .build();
+                new FriendRequest("receiverId", FriendRequestStatusEnum.RECEIVED);
         friendRequestList.add(friendRequest2);
+
         user.setFriendRequestList(friendRequestList);
 
         User receiverUser = new User();
@@ -988,6 +1014,8 @@ public class UserServiceTest {
         assertFalse(listResponse.isEmpty());
         assertEquals(1, listResponse.size());
         assertEquals("receiverId", listResponse.getFirst().friendRequestUserId());
+        assertNotNull(listResponse.getFirst().createdAt());
+        assertEquals("https://example.com/profile.jpg", listResponse.getFirst().profilePictureURL());
         assertEquals("receiverUsername", listResponse.getFirst().friendRequestUsername());
         assertEquals("friend2RequestId", listResponse.getFirst().RequestId());
     }
