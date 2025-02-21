@@ -255,7 +255,11 @@ public class UserServiceImpl implements UserService {
         log.info("UserServiceImpl::sendFriendRequest: User with id: {} received a new friend request",
                 savedReceiverUser.getId());
 
-        return new FriendRequestResponse("Friend request sent successfully.", savedSenderFriendRequest.getId());
+        return new FriendRequestResponse("Friend request sent successfully.",
+                savedSenderFriendRequest.getId(),
+                savedSenderFriendRequest.getCreatedAt().toLocalDateTime(),
+                savedSenderFriendRequest.getUpdatedAt().toLocalDateTime(),
+                userReceiver.getProfile().getProfilePicture());
     }
 
     @Override
@@ -306,45 +310,44 @@ public class UserServiceImpl implements UserService {
         // Iterate through the user's friendRequest list to find the relevant friendRequest based on given parameters
         userFriendRequestList.stream().filter(e -> e.getUserId().equals(friendRequest.getUserId()))
                 .findAny().ifPresent(e -> {
+                    // Make sure the user isn't trying to accept a friend request that's not marked as RECEIVED
+                    if (!e.getFriendRequestStatus().equals(FriendRequestStatusEnum.RECEIVED) &&
+                            action.equals(UpdateFriendRequestActionEnum.ACCEPT)) {
+                        throw new TryingToAcceptInvalidFriendRequestException(user.getId(),
+                                friendUser.getId(), e.getFriendRequestStatus());
+                    }
+                    isFriendFound1.set(true);
 
-            // Make sure the user isn't trying to accept a friend request that's not marked as RECEIVED
-            if (!e.getFriendRequestStatus().equals(FriendRequestStatusEnum.RECEIVED) &&
-                    action.equals(UpdateFriendRequestActionEnum.ACCEPT)) {
-                throw new TryingToAcceptInvalidFriendRequestException(user.getId(),
-                        friendUser.getId(), e.getFriendRequestStatus());
-            }
-            isFriendFound1.set(true);
+                    // If the action is ACCEPT, then we change the status of the friend request and move it to the friend list
+                    // If the action is DECLINE, we simply remove the friend request from the friend list
+                    if (action.equals(UpdateFriendRequestActionEnum.ACCEPT)) {
+                        userFriendRequestList.remove(e);
+                        e.setFriendRequestStatus(FriendRequestStatusEnum.ACCEPTED);
+                        Friend friend1 = friendMapper.friendRequestToFriend(e);
+                        userFriendList.add(friend1);
+                        friendRepository.save(friend1);
+                        friendRequestRepository.deleteById(e.getId());
+                    } else if (action.equals(UpdateFriendRequestActionEnum.DECLINE)) {
+                        userFriendRequestList.remove(e);
+                        friendRequestRepository.deleteById(e.getId());
+                    }
 
-            // If the action is ACCEPT, then we change the status of the friend request and move it to the friend list
-            // If the action is DECLINE, we simply remove the friend request from the friend list
-            if (action.equals(UpdateFriendRequestActionEnum.ACCEPT)) {
-                userFriendRequestList.remove(e);
-                e.setFriendRequestStatus(FriendRequestStatusEnum.ACCEPTED);
-                Friend friend1 = friendMapper.friendRequestToFriend(e);
-                userFriendList.add(friend1);
-                friendRepository.save(friend1);
-                friendRequestRepository.deleteById(e.getId());
-            } else if (action.equals(UpdateFriendRequestActionEnum.DECLINE)) {
-                userFriendRequestList.remove(e);
-                friendRequestRepository.deleteById(e.getId());
-            }
-
-            // If the operation was successful for the user, we repeat the process for the user who original sent the friend request
-            friendUserFriendRequestList.stream().filter(el -> el.getUserId().equals(user.getId())).findAny().ifPresent(el -> {
-                isFriendFound2.set(true);
-                if (action.equals(UpdateFriendRequestActionEnum.ACCEPT)) {
-                    friendUserFriendRequestList.remove(el);
-                    el.setFriendRequestStatus(FriendRequestStatusEnum.ACCEPTED);
-                    Friend friend2 = friendMapper.friendRequestToFriend(el);
-                    friendUserFriendList.add(friend2);
-                    friendRepository.save(friend2);
-                    friendRequestRepository.deleteById(el.getId());
-                } else if (action.equals(UpdateFriendRequestActionEnum.DECLINE)) {
-                    friendUserFriendRequestList.remove(el);
-                    friendRequestRepository.deleteById(el.getId());
-                }
-            });
-        });
+                    // If the operation was successful for the user, we repeat the process for the user who original sent the friend request
+                    friendUserFriendRequestList.stream().filter(el -> el.getUserId().equals(user.getId())).findAny().ifPresent(el -> {
+                        isFriendFound2.set(true);
+                        if (action.equals(UpdateFriendRequestActionEnum.ACCEPT)) {
+                            friendUserFriendRequestList.remove(el);
+                            el.setFriendRequestStatus(FriendRequestStatusEnum.ACCEPTED);
+                            Friend friend2 = friendMapper.friendRequestToFriend(el);
+                            friendUserFriendList.add(friend2);
+                            friendRepository.save(friend2);
+                            friendRequestRepository.deleteById(el.getId());
+                        } else if (action.equals(UpdateFriendRequestActionEnum.DECLINE)) {
+                            friendUserFriendRequestList.remove(el);
+                            friendRequestRepository.deleteById(el.getId());
+                        }
+                    });
+                });
 
         // These errors make sure we don't save any changes if the transaction was invalid
         if (!isFriendFound1.get())
@@ -385,7 +388,7 @@ public class UserServiceImpl implements UserService {
     /**
      * This method returns the details of the user's friendRequests based on the given type(s).
      *
-     * @param userId The user id of the user whose friend requests you want to retrieve
+     * @param userId   The user id of the user whose friend requests you want to retrieve
      * @param typeList The types of friend request you want to retrieve: RECEIVED and/or SENT.
      * @return a list of {@link ViewFriendRequestsResponse} containing the details of the friend requests
      * @throws UserDoesNotExistException if the given user id doesn't correspond to a user in the database
@@ -401,13 +404,15 @@ public class UserServiceImpl implements UserService {
         List<FriendRequest> friendRequestList = user.getFriendRequestList();
 
         return friendRequestList.stream()
-                .filter(s -> typeList.contains(s.getFriendRequestStatus()) )
+                .filter(s -> typeList.contains(s.getFriendRequestStatus()))
                 .map(friendRequest -> {
                     Optional<User> friendRequestUser = userRepository.findUserById(friendRequest.getUserId());
                     return friendRequestUser.map(value -> new ViewFriendRequestsResponse(
                             value.getUsername(), friendRequest.getUserId(),
-                            friendRequest.getFriendRequestStatus(), friendRequest.getId())).orElse(null);
-                } ).filter(Objects::nonNull).toList();
+                            friendRequest.getFriendRequestStatus(), friendRequest.getId(),
+                            friendRequest.getCreatedAt().toLocalDateTime(),
+                            user.getProfile().getProfilePicture())).orElse(null);
+                }).filter(Objects::nonNull).toList();
     }
 
     /**
@@ -442,7 +447,7 @@ public class UserServiceImpl implements UserService {
         List<Friend> requesterFriendList = requester.getFriendList();
 
         Friend requesterFriend = requesterFriendList.stream().filter(f -> f.getId().equals(friendId))
-                .findFirst().orElseThrow(() -> new FriendNotFoundInFriendListException(userId,friendId));
+                .findFirst().orElseThrow(() -> new FriendNotFoundInFriendListException(userId, friendId));
 
         Friend friendFriend = null;
         List<Friend> friendFriendList = null;
