@@ -1,7 +1,8 @@
 package app.sportahub.eventservice.controller;
 
-import app.sportahub.eventservice.dto.request.EventCancellationRequest;
-import app.sportahub.eventservice.dto.request.EventRequest;
+import app.sportahub.eventservice.controller.event.EventController;
+import app.sportahub.eventservice.dto.request.event.EventCancellationRequest;
+import app.sportahub.eventservice.dto.request.event.EventRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.dto.response.ParticipantResponse;
 import app.sportahub.eventservice.enums.EventSortingField;
@@ -68,7 +69,8 @@ public class EventControllerTest {
                 false,
                 List.of("User111", "User222"),
                 EnumSet.of(SkillLevelEnum.BEGINNER, SkillLevelEnum.INTERMEDIATE),
-                null
+                null,
+                 null
         );
 
 

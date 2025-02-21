@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 
-import app.sportahub.eventservice.dto.request.EventRequest;
-import app.sportahub.eventservice.dto.request.EventCancellationRequest;
+import app.sportahub.eventservice.dto.request.event.EventRequest;
+import app.sportahub.eventservice.dto.request.event.EventCancellationRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.dto.response.ParticipantResponse;
 import app.sportahub.eventservice.enums.EventSortingField;

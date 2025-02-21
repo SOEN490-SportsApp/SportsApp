@@ -1,4 +1,4 @@
-package app.sportahub.eventservice.dto.request;
+package app.sportahub.eventservice.dto.request.event;
 
 import jakarta.validation.constraints.NotBlank;
 public record EventCancellationRequest(
