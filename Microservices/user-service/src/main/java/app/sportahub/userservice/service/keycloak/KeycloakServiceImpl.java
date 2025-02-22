@@ -1,28 +1,15 @@
-package app.sportahub.userservice.service.auth;
-
-import app.sportahub.userservice.config.auth.KeycloakConfig;
-import app.sportahub.userservice.dto.request.user.keycloak.KeycloakRequest;
-import app.sportahub.userservice.exception.user.keycloak.KeycloakCommunicationException;
-import app.sportahub.userservice.mapper.keycloak.KeycloakMapper;
-import app.sportahub.userservice.model.user.User;
-import app.sportahub.userservice.model.user.keycloak.KeycloakUser;
-import jakarta.ws.rs.core.Response;
-
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
+package app.sportahub.userservice.service.keycloak;
 
 import java.util.List;
 
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
-import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
-import org.keycloak.representations.AccessToken;
-import org.keycloak.representations.RefreshToken;
 import org.keycloak.representations.idm.UserRepresentation;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -34,8 +21,11 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import lombok.AllArgsConstructor;
-import lombok.Generated;
+import app.sportahub.userservice.dto.request.user.keycloak.KeycloakRequest;
+import app.sportahub.userservice.exception.user.keycloak.KeycloakCommunicationException;
+import app.sportahub.userservice.mapper.keycloak.KeycloakMapper;
+import app.sportahub.userservice.model.user.keycloak.KeycloakUser;
+import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
@@ -44,20 +34,25 @@ import reactor.core.publisher.Mono;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class KeycloakService {
+public class KeycloakServiceImpl implements KeycloakService {
 
     @Value("${keycloak.realm}")
     private String realm;
+    @Value("${keycloak.auth-server-url}")
+    private String authServerUrl;
+    @Value("${keycloak.admin-client-id}")
+    private String clientId;
+    @Value("${keycloak.admin-client-secret}")
+    private String clientSecret;
+
     private final Keycloak keycloak;
-    private final KeycloakConfig keycloakConfig;
     private final KeycloakMapper keycloakMapper; 
     private final ObjectMapper objectMapper;   
 
-    
+    @Override
     public Mono<JsonNode> createUserAndReturnCreatedId(KeycloakRequest keycloakRequest) {        
         UserRepresentation user = keycloakMapper.keycloakRequestToUserRepresentation(keycloakRequest);
 
-        // Create User Representation 
         UsersResource usersResource = getUsersResource();
         Response response = usersResource.create(user);
 
@@ -71,75 +66,48 @@ public class KeycloakService {
         }
     }
 
+    @Override
     public Mono<KeycloakUser> getUserById(String userId) {
-        // Get User Representation
         UsersResource usersResource = getUsersResource();
         UserRepresentation user = usersResource.get(userId).toRepresentation();
 
-        // If user is null, return error
         if(user == null) {
             return Mono.error(new KeycloakCommunicationException(HttpStatus.NOT_FOUND, "User not found"));
         }
         
-        KeycloakUser keycloakUser = keycloakMapper.userRepresentationTKeycloakUser(user);
+        KeycloakUser keycloakUser = keycloakMapper.userRepresentationToKeycloakUser(user);
         return Mono.just(keycloakUser);
     }
 
+    @Override
     public Mono<KeycloakUser> getUserByUsername(String username) {
         UsersResource usersResource = getUsersResource();
         UserRepresentation user = usersResource.search(username, true).get(0);       
-       // If user is null, return error
+
        if(user == null) {
            return Mono.error(new KeycloakCommunicationException(HttpStatus.NOT_FOUND, "User not found"));
        }
        
-       KeycloakUser keycloakUser = keycloakMapper.userRepresentationTKeycloakUser(user);
+       KeycloakUser keycloakUser = keycloakMapper.userRepresentationToKeycloakUser(user);
        return Mono.just(keycloakUser);
     }
 
-    // TODO: refractor updateUser method
+    @Override
     public Mono<Void> updateUser(String userId, KeycloakRequest keycloakRequest) {
-        UserRepresentation user = this.keycloak.realm(keycloakConfig.getRealm())
-                .users()
-                .get(userId)
-                .toRepresentation();
-        
+        UsersResource usersResource = getUsersResource();
+        UserRepresentation user = usersResource.get(userId).toRepresentation();
+ 
         if(user == null) {
             return Mono.error(new KeycloakCommunicationException(HttpStatus.NOT_FOUND, "User not found"));
         }
 
-
-        if (keycloakRequest.email() != null) {
-            user.setEmail(keycloakRequest.email());
-            
-        }
-        if(keycloakRequest.username() != null) {
-            user.setUsername(keycloakRequest.username());
-        }
-        if(keycloakRequest.firstName() != null) {
-            user.setFirstName(keycloakRequest.firstName());
-        }
-        if(keycloakRequest.lastName() != null) {
-            user.setLastName(keycloakRequest.lastName());
-        }
-        if(keycloakRequest.enabled() != null) {
-            user.setEnabled(keycloakRequest.enabled());
-        }
-        if(keycloakRequest.attributes() != null) {
-            user.setAttributes(keycloakRequest.attributes());
-        }
-        if(keycloakRequest.credentials() != null) {
-            user.setCredentials(keycloakMapper.keycloakRequestToUserRepresentation(keycloakRequest).getCredentials());
-        }
-        if(keycloakRequest.attributes() != null) {
-            user.setAttributes(keycloakRequest.attributes());
-        }
-
-        this.keycloak.realm(keycloakConfig.getRealm()).users().get(userId).update(user);
+        keycloakMapper.updateUserRepresentation(user, keycloakRequest);
+        usersResource.get(userId).update(user);
         
         return Mono.empty();
     }
 
+    @Override
     public Mono<Void> deleteUser(String userId) {
         UsersResource usersResource = getUsersResource();
         UserResource user = usersResource.get(userId);
@@ -151,17 +119,18 @@ public class KeycloakService {
         return Mono.empty();
     }
     
+    @Override
     public Mono<JsonNode> login(String identifier, String password) {
-        String tokenUrl = UriComponentsBuilder.fromHttpUrl(keycloakConfig.getAuthServerUrl())
-                .path("/realms/" + keycloakConfig.getRealm() + "/protocol/openid-connect/token")
+        String tokenUrl = UriComponentsBuilder.fromHttpUrl(authServerUrl)
+                .path("/realms/" + realm + "/protocol/openid-connect/token")
                 .toUriString();
         
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         MultiValueMap<String, String>  formData = new LinkedMultiValueMap<>();
         formData.add("grant_type", OAuth2Constants.PASSWORD);
-        formData.add("client_id", keycloakConfig.getAdminClientId());
-        formData.add("client_secret", keycloakConfig.getAdminClientSecret());
+        formData.add("client_id", clientId);
+        formData.add("client_secret", clientSecret);
         formData.add("username", identifier);
         formData.add("password", password);
 
@@ -177,16 +146,17 @@ public class KeycloakService {
         }
     }
 
+    @Override
     public Mono<Void> logout(String refreshToken) {
-        String logoutUrl = UriComponentsBuilder.fromHttpUrl(keycloakConfig.getAuthServerUrl())
-        .path("/realms/" + keycloakConfig.getRealm() + "/protocol/openid-connect/revoke")
+        String logoutUrl = UriComponentsBuilder.fromHttpUrl(authServerUrl)
+        .path("/realms/" + realm + "/protocol/openid-connect/revoke")
         .toUriString();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         MultiValueMap<String, String>  formData = new LinkedMultiValueMap<>();
-        formData.add("client_id", keycloakConfig.getAdminClientId());
-        formData.add("client_secret", keycloakConfig.getAdminClientSecret());
+        formData.add("client_id", clientId);
+        formData.add("client_secret", clientSecret);
         formData.add("token", refreshToken);
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(formData, headers);
@@ -199,20 +169,20 @@ public class KeycloakService {
         } catch (Exception e) {
             return Mono.error(new KeycloakCommunicationException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage()));
         }
-
     }
 
+    @Override
     public Mono<JsonNode> refreshToken(String refreshToken) {
-        String tokenUrl = UriComponentsBuilder.fromHttpUrl(keycloakConfig.getAuthServerUrl())
-                .path("/realms/" + keycloakConfig.getRealm() + "/protocol/openid-connect/token")
+        String tokenUrl = UriComponentsBuilder.fromHttpUrl(authServerUrl)
+                .path("/realms/" + realm + "/protocol/openid-connect/token")
                 .toUriString();
 
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
                 MultiValueMap<String, String>  formData = new LinkedMultiValueMap<>();
                 formData.add("grant_type", OAuth2Constants.REFRESH_TOKEN);
-                formData.add("client_id", keycloakConfig.getAdminClientId());
-                formData.add("client_secret", keycloakConfig.getAdminClientSecret());
+                formData.add("client_id", clientId);
+                formData.add("client_secret", clientSecret);
                 formData.add("refresh_token", refreshToken);
 
         
@@ -226,9 +196,9 @@ public class KeycloakService {
                 } catch (Exception e) {
                     return Mono.error(new KeycloakCommunicationException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage()));
                 }
-    
     }
 
+    @Override
     public Mono<JsonNode> sendVerificationEmail(String userId ) {
         UsersResource usersResource = getUsersResource();
         usersResource.get(userId).sendVerifyEmail();
@@ -236,6 +206,7 @@ public class KeycloakService {
         return Mono.empty();
     }
 
+    @Override
     public Mono<Void> sendPasswordResetEmail(String userId) {
         UsersResource usersResource = getUsersResource();
         usersResource.get(userId).executeActionsEmail(List.of("UPDATE_PASSWORD"));
@@ -272,7 +243,4 @@ public class KeycloakService {
     private String extractKeycloakIdFromLocationHeader(Response response) {
         return response.getLocation().getPath().substring(response.getLocation().getPath().lastIndexOf('/') + 1);
     }
-
-
-
 }
