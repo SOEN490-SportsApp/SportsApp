@@ -44,7 +44,7 @@ import app.sportahub.userservice.repository.BadgeRepository;
 import app.sportahub.userservice.repository.FriendRepository;
 import app.sportahub.userservice.repository.FriendRequestRepository;
 import app.sportahub.userservice.repository.user.UserRepository;
-import app.sportahub.userservice.service.auth.KeycloakService;
+import app.sportahub.userservice.service.keycloak.KeycloakServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -68,7 +68,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final BadgeRepository badgeRepository;
-    private final KeycloakService keycloakService;
+    private final KeycloakServiceImpl keycloakService;
     private final UserMapper userMapper;
     private final ProfileMapper profileMapper;
     private final FriendMapper friendMapper;

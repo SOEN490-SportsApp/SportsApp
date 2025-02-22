@@ -26,6 +26,7 @@ import app.sportahub.userservice.exception.user.UsernameAlreadyExistsException;
 import app.sportahub.userservice.mapper.user.UserMapper;
 import app.sportahub.userservice.model.user.User;
 import app.sportahub.userservice.repository.user.UserRepository;
+import app.sportahub.userservice.service.keycloak.KeycloakServiceImpl;
 import app.sportahub.userservice.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -40,7 +41,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final KeycloakApiClient keycloakApiClient;
     private final UserMapper userMapper;
-    private final KeycloakService keycloakService;
+    private final KeycloakServiceImpl keycloakService;
 
     @SneakyThrows
     @Override
