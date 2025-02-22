@@ -1,6 +1,5 @@
-package app.sportahub.eventservice.controller;
+package app.sportahub.eventservice.controller.event;
 
-import app.sportahub.eventservice.controller.event.EventController;
 import app.sportahub.eventservice.dto.request.event.EventCancellationRequest;
 import app.sportahub.eventservice.dto.request.event.EventRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
