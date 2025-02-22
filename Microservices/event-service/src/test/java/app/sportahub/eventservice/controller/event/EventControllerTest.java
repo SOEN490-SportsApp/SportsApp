@@ -295,7 +295,9 @@ public class EventControllerTest {
                 "A friendly soccer match in Central Park",
                 false,
                 Collections.emptyList(), // whitelistedUsers
-                EnumSet.of(SkillLevelEnum.INTERMEDIATE)
+                EnumSet.of(SkillLevelEnum.INTERMEDIATE),
+                Collections.emptyList(),
+                null
         );
         Page<EventResponse> mockPage = new PageImpl<>(List.of(eventResponse), pageable, 1);
 
