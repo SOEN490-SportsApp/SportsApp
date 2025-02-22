@@ -7,6 +7,7 @@ import { Event } from "@/types/event";
 import ConfirmButton from "@/components/Helper Components/ConfirmButton";
 import themeColors from "@/utils/constants/colors";
 import { mhs, mvs } from "@/utils/helpers/uiScaler";
+import { sportIconMap } from "@/utils/mappers/eventIconsMappers";
 import { getEventById, joinEvent } from "@/utils/api/eventApiClient";
 import SkillTag from "@/components/Event/SkillTag";
 
@@ -79,12 +80,14 @@ const EventDetails = () => {
     (participant) => participant.userId === user.id
   );
 
+  let sportIcon = sportIconMap[event.sportType];
+  
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* Event Header */}
       <View style={styles.header}>
         <MaterialCommunityIcons
-          name={event.sportType ? (event.sportType.toLowerCase() as any) : "help-circle-outline"}
+          name={event.sportType ? sportIcon as any : "help-circle-outline"}
           size={50}
           color="#94504b"
         />
