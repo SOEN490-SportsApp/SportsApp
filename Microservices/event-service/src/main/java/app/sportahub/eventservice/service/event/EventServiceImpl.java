@@ -24,11 +24,15 @@ import org.springframework.stereotype.Service;
 import app.sportahub.eventservice.dto.request.event.EventCancellationRequest;
 import app.sportahub.eventservice.dto.request.event.EventRequest;
 import app.sportahub.eventservice.dto.request.event.ParticipantRequest;
+import app.sportahub.eventservice.dto.request.EventRequest;
+import app.sportahub.eventservice.dto.request.LocationRequest;
+import app.sportahub.eventservice.dto.request.ParticipantRequest;
 import app.sportahub.eventservice.dto.request.event.ReactionRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.dto.response.ParticipantResponse;
 import app.sportahub.eventservice.dto.response.ReactionResponse;
 import app.sportahub.eventservice.enums.EventSortingField;
+import app.sportahub.eventservice.enums.SkillLevelEnum;
 import app.sportahub.eventservice.enums.EventState;
 import app.sportahub.eventservice.enums.SortDirection;
 import app.sportahub.eventservice.exception.event.EventAlreadyCancelledException;
@@ -477,23 +481,44 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public Page<EventResponse> searchEvents(String eventName, String eventType, String sportType, Location location, LocalDate date, LocalTime startTime, LocalTime endTime, String duration, Integer maxParticipants, String createdBy, Boolean isPrivate, List<String> requiredSkillLevel, Pageable pageable) {
+    public Page<EventResponse> searchEvents(String eventName,
+                                            String eventType,
+                                            String sportType,
+                                            String locationName,
+                                            String city,
+                                            String province,
+                                            String country,
+                                            String postalCode,
+                                            String date,
+                                            String startTime,
+                                            String endTime,
+                                            String duration,
+                                            String maxParticipants,
+                                            String createdBy,
+                                            Boolean isPrivate,
+                                            List<SkillLevelEnum> requiredSkillLevel,
+                                            Pageable pageable) {
         if (eventName == null &&
-                eventType == null &&
-                sportType == null &&
-                location == null &&
-                date == null &&
-                startTime == null &&
-                endTime == null &&
-                duration == null &&
-                maxParticipants == null &&
-                createdBy == null &&
-                isPrivate == null &&
-                requiredSkillLevel == null) {
+            eventType == null &&
+            sportType == null &&
+            locationName == null &&
+            city == null &&
+            province == null &&
+            country == null &&
+            postalCode == null &&
+            date == null &&
+            startTime == null &&
+            endTime == null &&
+            duration == null &&
+            maxParticipants == null &&
+            createdBy == null &&
+            isPrivate == null &&
+            requiredSkillLevel == null) {
             throw new NoSearchCriteriaProvidedException();
         }
         log.info("UserServiceImpl::searchUsers: User created a search query");
-        Page<Event> events = eventRepository.searchEvent(eventName, eventType, sportType, location, date, startTime, endTime, duration, maxParticipants, createdBy, isPrivate, requiredSkillLevel, pageable);
+
+        Page<Event> events = eventRepository.searchEvent(eventName, eventType, sportType, locationName, city, province, country, postalCode, date, startTime, endTime, duration, maxParticipants, createdBy, isPrivate, requiredSkillLevel, pageable);
 
         List<EventResponse> eventResponses = events.stream()
                 .map(eventMapper::eventToEventResponse).toList();
