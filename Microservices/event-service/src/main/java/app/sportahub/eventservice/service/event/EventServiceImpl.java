@@ -3,9 +3,6 @@ package app.sportahub.eventservice.service.event;
 import app.sportahub.eventservice.dto.request.event.EventCancellationRequest;
 import app.sportahub.eventservice.dto.request.event.EventRequest;
 import app.sportahub.eventservice.dto.request.event.ParticipantRequest;
-import app.sportahub.eventservice.dto.request.EventRequest;
-import app.sportahub.eventservice.dto.request.LocationRequest;
-import app.sportahub.eventservice.dto.request.ParticipantRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.dto.response.ParticipantResponse;
 import app.sportahub.eventservice.enums.EventSortingField;
@@ -15,7 +12,6 @@ import app.sportahub.eventservice.enums.SortDirection;
 import app.sportahub.eventservice.exception.event.*;
 import app.sportahub.eventservice.mapper.event.EventMapper;
 import app.sportahub.eventservice.model.event.Event;
-import app.sportahub.eventservice.model.event.Location;
 import app.sportahub.eventservice.model.event.EventCancellation;
 import app.sportahub.eventservice.model.event.participant.Participant;
 import app.sportahub.eventservice.model.event.participant.ParticipantAttendStatus;
@@ -444,7 +440,7 @@ public class EventServiceImpl implements EventService {
         }
         log.info("UserServiceImpl::searchUsers: User created a search query");
 
-        Page<Event> events = eventRepository.searchEvent(eventName, eventType, sportType, locationName, city, province, country, postalCode, date, startTime, endTime, duration, maxParticipants, createdBy, isPrivate, requiredSkillLevel, pageable);
+        Page<Event> events = eventRepository.searchEvents(eventName, eventType, sportType, locationName, city, province, country, postalCode, date, startTime, endTime, duration, maxParticipants, createdBy, isPrivate, requiredSkillLevel, pageable);
 
         List<EventResponse> eventResponses = events.stream()
                 .map(eventMapper::eventToEventResponse).toList();

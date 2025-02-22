@@ -1,6 +1,5 @@
 package app.sportahub.eventservice.repository;
 
-import app.sportahub.eventservice.dto.request.LocationRequest;
 import app.sportahub.eventservice.enums.SkillLevelEnum;
 import app.sportahub.eventservice.model.event.Event;
 import org.springframework.data.domain.Page;
@@ -9,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface SearchingEventRepository {
-    Page<Event> searchEvent(String eventName,
+    Page<Event> searchEvents(String eventName,
                             String eventType,
                             String sportType,
                             String locationName,
