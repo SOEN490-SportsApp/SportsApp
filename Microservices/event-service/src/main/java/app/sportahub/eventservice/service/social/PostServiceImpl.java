@@ -10,6 +10,8 @@ import app.sportahub.eventservice.repository.social.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,11 +47,12 @@ public class PostServiceImpl implements PostService {
     public Post createPost(String eventId, PostRequest postRequest) {
         Event event = eventRepository.findEventById(eventId).orElseThrow(() -> new EventDoesNotExistException(eventId));
 
-        //TODO: check if userid exists
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         Post post = postMapper.postRequestToPost(postRequest)
                 .toBuilder()
                 .withEventId(eventId)
+                .withCreatedBy(authentication.getName())
                 .withCreationDate(Timestamp.valueOf(LocalDateTime.now()))
                 .withUpdatedAt(Timestamp.valueOf(LocalDateTime.now()))
                 .build();
