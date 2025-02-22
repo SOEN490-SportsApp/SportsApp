@@ -1,8 +1,9 @@
 package app.sportahub.eventservice.service.event;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
-import app.sportahub.eventservice.dto.request.LocationRequest;
 import app.sportahub.eventservice.enums.SkillLevelEnum;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -47,7 +48,6 @@ public interface EventService {
 
     EventResponse cancelEvent(String id, EventCancellationRequest cancelRequest);
 
-    Page<EventResponse> searchEvents(String eventName, String  eventType, String  sportType, Location location, LocalDate date, LocalTime startTime, LocalTime endTime, String duration, Integer maxParticipants, String createdBy, Boolean isPrivate, List<String> requiredSkillLevel, Pageable pageable);
     Page<EventResponse> searchEvents(String eventName,
                                      String eventType,
                                      String sportType,
