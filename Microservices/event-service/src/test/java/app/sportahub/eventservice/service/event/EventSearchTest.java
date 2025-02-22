@@ -7,8 +7,8 @@ import app.sportahub.eventservice.exception.event.NoSearchCriteriaProvidedExcept
 import app.sportahub.eventservice.mapper.event.EventMapper;
 import app.sportahub.eventservice.model.event.Event;
 import app.sportahub.eventservice.model.event.Location;
-import app.sportahub.eventservice.repository.EventRepository;
 import app.sportahub.eventservice.repository.SearchingEventRepositoryImpl;
+import app.sportahub.eventservice.repository.event.EventRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Query;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -93,7 +92,7 @@ public class EventSearchTest {
         List<Event> events = Collections.singletonList(event);
         Page<Event> mockEventPage = new PageImpl<>(events, pageable, events.size());
 
-        when(eventRepository.searchEvent("Soccer Match", "Friendly", "Soccer", "Central Park", "New York", "NY", "USA", "10001", "2023-10-15", "14:00", "16:00", "120", "20", "user123", false, List.of(SkillLevelEnum.INTERMEDIATE), pageable))
+        when(eventRepository.searchEvents("Soccer Match", "Friendly", "Soccer", "Central Park", "New York", "NY", "USA", "10001", "2023-10-15", "14:00", "16:00", "120", "20", "user123", false, List.of(SkillLevelEnum.INTERMEDIATE), pageable))
                 .thenReturn(mockEventPage);
 
         LocationResponse locationResponse = new LocationResponse("Central Park", "", "", "New York", "NY", "USA", "10001", "", "", "", "");
@@ -110,14 +109,16 @@ public class EventSearchTest {
                 LocalTime.of(16, 0),
                 "120",
                 20,
-                Collections.emptyList(), // participants
+                Collections.emptyList(),
                 "user123",
-                Collections.emptyList(), // teams
-                "18:00", // cutOffTime
+                Collections.emptyList(),
+                "18:00",
                 "A friendly soccer match in Central Park",
                 false,
-                Collections.emptyList(), // whitelistedUsers
-                EnumSet.of(SkillLevelEnum.INTERMEDIATE)
+                Collections.emptyList(),
+                EnumSet.of(SkillLevelEnum.INTERMEDIATE),
+                Collections.emptyList(),
+                null
         );
 
         when(eventMapper.eventToEventResponse(event)).thenReturn(eventResponse);
@@ -150,7 +151,7 @@ public class EventSearchTest {
         Assertions.assertEquals(EnumSet.of(SkillLevelEnum.INTERMEDIATE), result.getContent().getFirst().requiredSkillLevel());
 
         // Verify interactions
-        verify(eventRepository, times(1)).searchEvent("Soccer Match", "Friendly", "Soccer", "Central Park", "New York", "NY", "USA", "10001", "2023-10-15", "14:00", "16:00", "120", "20", "user123", false, List.of(SkillLevelEnum.INTERMEDIATE), pageable);
+        verify(eventRepository, times(1)).searchEvents("Soccer Match", "Friendly", "Soccer", "Central Park", "New York", "NY", "USA", "10001", "2023-10-15", "14:00", "16:00", "120", "20", "user123", false, List.of(SkillLevelEnum.INTERMEDIATE), pageable);
         verify(eventMapper, times(1)).eventToEventResponse(event);
     }
 
@@ -165,7 +166,7 @@ public class EventSearchTest {
         });
 
         // Verify interactions
-        verify(eventRepository, never()).searchEvent(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any());
+        verify(eventRepository, never()).searchEvents(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any());
         verify(eventMapper, never()).eventToEventResponse(any());
     }
 
@@ -192,7 +193,7 @@ public class EventSearchTest {
         List<Event> events = Collections.singletonList(event);
         Page<Event> mockEventPage = new PageImpl<>(events, pageable, events.size());
 
-        when(eventRepository.searchEvent("Soccer Match", null, "Soccer", null, "New York", null, null, null, "2023-10-15", null, null, null, null, null, null, null, pageable))
+        when(eventRepository.searchEvents("Soccer Match", null, "Soccer", null, "New York", null, null, null, "2023-10-15", null, null, null, null, null, null, null, pageable))
                 .thenReturn(mockEventPage);
 
         LocationResponse locationResponse = new LocationResponse("Central Park", "", "", "New York", "NY", "USA", "10001", "", "", "", "");
@@ -216,7 +217,9 @@ public class EventSearchTest {
                 "A friendly soccer match in Central Park",
                 false,
                 Collections.emptyList(), // whitelistedUsers
-                EnumSet.of(SkillLevelEnum.INTERMEDIATE)
+                EnumSet.of(SkillLevelEnum.INTERMEDIATE),
+                Collections.emptyList(),
+                null
         );
 
 
@@ -234,7 +237,7 @@ public class EventSearchTest {
         assertEquals(LocalDate.of(2023, 10, 15), result.getContent().getFirst().date());
 
         // Verify interactions
-        verify(eventRepository, times(1)).searchEvent("Soccer Match", null, "Soccer", null, "New York", null, null, null, "2023-10-15", null, null, null, null, null, null, null, pageable);
+        verify(eventRepository, times(1)).searchEvents("Soccer Match", null, "Soccer", null, "New York", null, null, null, "2023-10-15", null, null, null, null, null, null, null, pageable);
         verify(eventMapper, times(1)).eventToEventResponse(event);
     }
 
@@ -252,7 +255,7 @@ public class EventSearchTest {
         List<Event> events = Collections.singletonList(event);
         Page<Event> mockEventPage = new PageImpl<>(events, pageable, events.size());
 
-        when(eventRepository.searchEvent(
+        when(eventRepository.searchEvents(
                 null, null, null, null, null, null, null, null,
                 "2023-10-15-2023-10-20", null, null, null, null, null, null, null, pageable
         )).thenReturn(mockEventPage);
@@ -265,6 +268,8 @@ public class EventSearchTest {
                 null,
                 null,
                 LocalDate.of(2023, 10, 15),
+                null,
+                null,
                 null,
                 null,
                 null,
@@ -295,7 +300,7 @@ public class EventSearchTest {
         assertEquals(LocalDate.of(2023, 10, 15), result.getContent().getFirst().date());
 
         // Verify interactions
-        verify(eventRepository, times(1)).searchEvent(
+        verify(eventRepository, times(1)).searchEvents(
                 null, null, null, null, null, null, null, null,
                 "2023-10-15-2023-10-20", null, null, null, null, null, null, null, pageable
         );
@@ -316,7 +321,7 @@ public class EventSearchTest {
         List<Event> events = Collections.singletonList(event);
         Page<Event> mockEventPage = new PageImpl<>(events, pageable, events.size());
 
-        when(eventRepository.searchEvent(
+        when(eventRepository.searchEvents(
                 null, null, null, null, null, null, null, null, null,
                 "14:00-16:00", null, null, null, null, null, null, pageable
         )).thenReturn(mockEventPage);
@@ -330,6 +335,8 @@ public class EventSearchTest {
                 null,
                 null,
                 LocalTime.of(14, 0),
+                null,
+                null,
                 null,
                 null,
                 null,
@@ -359,7 +366,7 @@ public class EventSearchTest {
         assertEquals(LocalTime.of(14, 0), result.getContent().getFirst().startTime());
 
         // Verify interactions
-        verify(eventRepository, times(1)).searchEvent(
+        verify(eventRepository, times(1)).searchEvents(
                 null, null, null, null, null, null, null, null, null,
                 "14:00-16:00", null, null, null, null, null, null, pageable
         );
@@ -380,7 +387,7 @@ public class EventSearchTest {
         List<Event> events = Collections.singletonList(event);
         Page<Event> mockEventPage = new PageImpl<>(events, pageable, events.size());
 
-        when(eventRepository.searchEvent(
+        when(eventRepository.searchEvents(
                 null, null, null, null, null, null, null, null, null, null, null,
                 "10-20", null, null, null, null, pageable
         )).thenReturn(mockEventPage);
@@ -397,6 +404,8 @@ public class EventSearchTest {
                 null,
                 null,
                 15,
+                null,
+                null,
                 null,
                 null,
                 null,
@@ -423,7 +432,7 @@ public class EventSearchTest {
         assertEquals(15, result.getContent().getFirst().maxParticipants());
 
         // Verify interactions
-        verify(eventRepository, times(1)).searchEvent(
+        verify(eventRepository, times(1)).searchEvents(
                 null, null, null, null, null, null, null, null, null, null, null,
                 "10-20", null, null, null, null, pageable
         );
