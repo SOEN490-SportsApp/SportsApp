@@ -50,7 +50,6 @@ import app.sportahub.eventservice.exception.event.UserIsNotEventWhitelistedExcep
 import app.sportahub.eventservice.exception.event.UserNotAParticipantException;
 import app.sportahub.eventservice.mapper.event.EventMapper;
 import app.sportahub.eventservice.model.event.Event;
-import app.sportahub.eventservice.model.event.Location;
 import app.sportahub.eventservice.model.event.EventCancellation;
 import app.sportahub.eventservice.model.event.participant.Participant;
 import app.sportahub.eventservice.model.event.participant.ParticipantAttendStatus;
@@ -518,7 +517,7 @@ public class EventServiceImpl implements EventService {
         }
         log.info("UserServiceImpl::searchUsers: User created a search query");
 
-        Page<Event> events = eventRepository.searchEvent(eventName, eventType, sportType, locationName, city, province, country, postalCode, date, startTime, endTime, duration, maxParticipants, createdBy, isPrivate, requiredSkillLevel, pageable);
+        Page<Event> events = eventRepository.searchEvents(eventName, eventType, sportType, locationName, city, province, country, postalCode, date, startTime, endTime, duration, maxParticipants, createdBy, isPrivate, requiredSkillLevel, pageable);
 
         List<EventResponse> eventResponses = events.stream()
                 .map(eventMapper::eventToEventResponse).toList();

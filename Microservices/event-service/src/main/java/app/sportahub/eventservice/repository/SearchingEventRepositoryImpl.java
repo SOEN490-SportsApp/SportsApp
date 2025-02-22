@@ -1,9 +1,8 @@
 package app.sportahub.eventservice.repository;
 
-import app.sportahub.eventservice.dto.request.LocationRequest;
+import app.sportahub.eventservice.dto.request.event.LocationRequest;
 import app.sportahub.eventservice.enums.SkillLevelEnum;
 import app.sportahub.eventservice.model.event.Event;
-import app.sportahub.eventservice.model.event.Location;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -24,7 +23,7 @@ public class SearchingEventRepositoryImpl implements SearchingEventRepository {
     private final MongoTemplate mongoTemplate;
 
     @Override
-    public Page<Event> searchEvent(String eventName,
+    public Page<Event> searchEvents(String eventName,
                                    String eventType,
                                    String sportType,
                                    String locationName,
