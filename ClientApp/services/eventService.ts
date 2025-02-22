@@ -27,6 +27,21 @@ export const getAllEvents = async () => {
     throw error;
   }
 };
+export const getEventDetails = async (eventId: string) => {
+  try {
+    const axiosInstance = getAxiosInstance();
+    const response = await axiosInstance.get(
+      API_ENDPOINTS.GET_EVENT_BY_ID.replace("{id}", eventId)
+    );
+
+   // console.log("API Response Event Data:", response.data);
+
+    return response.data;
+  } catch (error) {
+    //console.error("Error fetching event details:", error);
+    throw error;
+  }
+};
 export const deleteEvent = async (eventId: string) => {
   try {
     const axiosInstance = getAxiosInstance();
