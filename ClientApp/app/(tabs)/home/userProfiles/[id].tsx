@@ -9,6 +9,7 @@ import EventCard from '@/components/Event/EventCard';
 import UserInfoCard from '@/components/Helper Components/UserInfoCard';
 import { Event } from '@/types/event';
 import FavoriteSportsBadges from '@/components/FavoriteSportsBadges';
+import FriendsList from '@/components/Profile/FriendsList';
 
 const screenHeight = Dimensions.get('window').height;
 const maxHeight = screenHeight * 0.5;
@@ -57,17 +58,14 @@ const ActivityTab = ({ userId }: { userId: string }) => {
     );
 };
 
-const FriendsTab = () => (
-    <View className="p-4 bg-white flex-1">
-        <ScrollView className="pt-3 space-y-4" style={{ maxHeight }}>
-            {Array.from({ length: 6 }).map((_, index) => (
-                <View key={index} className="mt-4 p-4 rounded-lg" style={{ backgroundColor: '#0C9E04' }}>
-                    <Text className="text-xl font-bold text-black">Friend {index + 1}</Text>
-                </View>
-            ))}
-        </ScrollView>
-    </View>
-);
+// Friends tab content
+const FriendsTab = ({ userId }: { userId: string }) => {
+    return (
+      <View className="p-4 bg-white flex-1">
+        <FriendsList userId={userId} />
+      </View>
+      );
+    }
 
 const AboutTab: React.FC<{ user: any }> = ({ user }) => {
     let age = "N/A";
@@ -127,7 +125,7 @@ const ProfilePage: React.FC = () => {
     ];
     const scenes = {
         activity: <ActivityTab userId={id} />,
-        friends: <FriendsTab />,
+        friends: <FriendsTab userId={id}/>,
         about: <AboutTab user={user} />,
     };
 
