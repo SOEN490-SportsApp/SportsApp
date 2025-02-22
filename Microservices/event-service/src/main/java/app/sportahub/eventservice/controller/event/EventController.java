@@ -7,6 +7,7 @@ import app.sportahub.eventservice.dto.response.ParticipantResponse;
 import app.sportahub.eventservice.enums.EventSortingField;
 import app.sportahub.eventservice.enums.SortDirection;
 import app.sportahub.eventservice.model.event.Location;
+import app.sportahub.eventservice.enums.SkillLevelEnum;
 import app.sportahub.eventservice.dto.response.ReactionResponse;
 import app.sportahub.eventservice.model.event.reactor.ReactionType;
 import app.sportahub.eventservice.service.event.EventService;
@@ -15,8 +16,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -162,19 +161,23 @@ public class EventController {
             @RequestParam(required = false) String eventName,
             @RequestParam(required = false) String eventType,
             @RequestParam(required = false) String sportType,
-            @RequestParam(required = false) Location location,
-            @RequestParam(required = false) LocalDate date,
-            @RequestParam(required = false) LocalTime startTime,
-            @RequestParam(required = false) LocalTime endTime,
+            @RequestParam(required = false) String locationName,
+            @RequestParam(required = false) String city,
+            @RequestParam(required = false) String province,
+            @RequestParam(required = false) String country,
+            @RequestParam(required = false) String postalCode,
+            @RequestParam(required = false) String date,
+            @RequestParam(required = false) String startTime,
+            @RequestParam(required = false) String endTime,
             @RequestParam(required = false) String duration,
-            @RequestParam(required = false) Integer maxParticipants,
+            @RequestParam(required = false) String maxParticipants,
             @RequestParam(required = false) String createdBy,
             @RequestParam(required = false) Boolean isPrivate,
-            @RequestParam(required = false) List<String> requiredSkillLevel,
+            @RequestParam(required = false) List<SkillLevelEnum> requiredSkillLevel,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return eventService.searchEvents(eventName, eventType, sportType, location, date, startTime, endTime, duration, maxParticipants, createdBy, isPrivate, requiredSkillLevel, pageable);
+        return eventService.searchEvents(eventName, eventType, sportType, locationName, city, province, country, postalCode, date, startTime, endTime, duration, maxParticipants, createdBy, isPrivate, requiredSkillLevel, pageable);
     }
 
     @PostMapping("/{id}/reaction")
