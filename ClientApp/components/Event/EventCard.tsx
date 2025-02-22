@@ -51,6 +51,7 @@ const EventCard: React.FC<EventCardProps> = ({
     Boxing: "boxing-glove",
     Cycling: "bike",
     Rugby: "rugby",
+    Running: "run",
     "Ping-Pong": "table-tennis",
   };
 
