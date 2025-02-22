@@ -11,6 +11,8 @@ import app.sportahub.userservice.exception.user.*;
 import app.sportahub.userservice.mapper.user.UserMapper;
 import app.sportahub.userservice.model.user.User;
 import app.sportahub.userservice.repository.user.UserRepository;
+import app.sportahub.userservice.service.keycloak.KeycloakServiceImpl;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -40,7 +42,7 @@ public class AuthServiceTest {
     private UserRepository userRepository;
 
     @Mock
-    private KeycloakService keycloakService;
+    private KeycloakServiceImpl keycloakService;
 
     @Mock
     private UserMapper userMapper;

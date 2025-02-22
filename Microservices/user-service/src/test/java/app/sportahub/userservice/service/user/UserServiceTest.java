@@ -30,7 +30,7 @@ import app.sportahub.userservice.repository.BadgeRepository;
 import app.sportahub.userservice.repository.FriendRepository;
 import app.sportahub.userservice.repository.FriendRequestRepository;
 import app.sportahub.userservice.repository.user.UserRepository;
-import app.sportahub.userservice.service.auth.KeycloakService;
+import app.sportahub.userservice.service.keycloak.KeycloakServiceImpl;
 
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -70,7 +70,7 @@ public class UserServiceTest {
     private FriendRequestRepository friendRequestRepository;
 
     @Mock
-    private KeycloakService keycloakService;
+    private KeycloakServiceImpl keycloakService;
 
     private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
     private final ProfileMapper profileMapper = Mappers.getMapper(ProfileMapper.class);
