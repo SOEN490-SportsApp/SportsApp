@@ -87,11 +87,11 @@ export async function getSentFriendRequests(userId: string) {
     }
 }
 
-export async function getReceivedFriendRequests() {
+export async function getReceivedFriendRequests(userId: string) {
     const axiosInstance = getAxiosInstance();
     try {
         const response = await axiosInstance.get(
-            API_ENDPOINTS.RETRIEVE_USER_FRIEND_REQUESTS.replace("{userId}", "679fca7d6dfc9749eedcf832") + "?type=RECEIVED"
+            API_ENDPOINTS.RETRIEVE_USER_FRIEND_REQUESTS.replace("{userId}", userId) + "?type=RECEIVED"
         );
         return response.data;
     } catch (error: any) {
