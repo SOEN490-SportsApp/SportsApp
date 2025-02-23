@@ -4,7 +4,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Icon } from 'react-native-elements';
 
 const TopBar = () => {
-  const router = useRouter()
+  const router = useRouter();
   return (
     <View style={styles.header}>
       <Text style={styles.logoText}>Sporta</Text>

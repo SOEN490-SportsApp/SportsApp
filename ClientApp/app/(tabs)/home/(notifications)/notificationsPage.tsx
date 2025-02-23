@@ -6,7 +6,7 @@ import { removeNotification, addNotification, setLoading, setNotifications } fro
 import FriendRequestNotification from "@/components/Helper Components/FriendRequestNotification";
 import { router } from "expo-router";
 import themeColors from "@/utils/constants/colors";
-import { getReceivedFriendRequests } from "@/utils/api/profileApiClient"; 
+import { getReceivedFriendRequests } from "@/utils/api/profileApiClient";
 
 const NotificationsScreen: React.FC = () => {
     const user = useSelector((state: RootState) => state.user);
@@ -18,14 +18,14 @@ const NotificationsScreen: React.FC = () => {
         async function fetchFriendRequests() {
             dispatch(setLoading(true));
             try {
-                const data = await getReceivedFriendRequests();
+                const data = await getReceivedFriendRequests(user.id);
 
                 const formattedRequests = data.map((request: any) => ({
                     id: request.RequestId,
                     senderId: request.friendRequestUserId,
                     senderName: request.friendRequestUsername,
-                    senderProfilePic: "https://randomuser.me/api/portraits/women/1.jpg",
-                    timeAgo: "Just now",
+                    senderProfilePic: "",
+                    timeAgo: "",
                     type: "friend_request",
                     status: request.status,
                 }));
@@ -39,7 +39,7 @@ const NotificationsScreen: React.FC = () => {
         }
 
         fetchFriendRequests();
-    }, [dispatch]); 
+    }, [dispatch]);
 
     return (
         <View style={{ flex: 1, padding: 20, backgroundColor: "#f9f9f9" }}>
@@ -70,9 +70,16 @@ const NotificationsScreen: React.FC = () => {
                                 />
                             )}
                             style={{ flex: 1 }}
+                            ListEmptyComponent={
+                                <View style={{ alignItems: "center", padding: 20 }}>
+                                    <Text style={{ fontSize: 16, color: "gray" }}>No new friend requests 🤝</Text>
+                                    <Text style={{ fontSize: 14, color: "gray", marginTop: 5 }}>Check back later!</Text>
+                                </View>
+                            }
                         />
                     )}
                 </View>
+
 
                 {/* What's New Section */}
                 <View style={{ flex: 1, backgroundColor: "#fff", borderRadius: 10, padding: 15, marginTop: 20 }}>
@@ -83,7 +90,7 @@ const NotificationsScreen: React.FC = () => {
                         </TouchableOpacity>
                     </View>
                     <FlatList
-                        data={notifications}
+                        data={notifications.filter(n=> n.type !== "friend_request")}
                         keyExtractor={(item) => item.id}
                         renderItem={({ item }) => (
                             <View style={{ padding: 15, backgroundColor: "#fff", borderRadius: 10, marginVertical: 8 }}>
@@ -92,8 +99,15 @@ const NotificationsScreen: React.FC = () => {
                             </View>
                         )}
                         style={{ flex: 1 }}
+                        ListEmptyComponent={
+                            <View style={{ alignItems: "center", padding: 20 }}>
+                                <Text style={{ fontSize: 16, color: "gray" }}>No new notifications 🎉</Text>
+                                <Text style={{ fontSize: 14, color: "gray", marginTop: 5 }}>You're all caught up!</Text>
+                            </View>
+                        }
                     />
                 </View>
+
             </View>
         </View>
     );

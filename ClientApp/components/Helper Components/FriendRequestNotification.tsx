@@ -4,6 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useDispatch } from "react-redux";
 import { respondToFriendRequest } from "@/utils/api/profileApiClient";
+import { removeNotification } from "@/state/notifications/notificationSlice";
 
 type FriendRequestNotificationProps = {
   userId: string,
@@ -22,7 +23,7 @@ const FriendRequestNotification: React.FC<FriendRequestNotificationProps> = ({ u
   const handleAccept = async () => {
     try {
       await respondToFriendRequest(userId, senderId, requestId, "ACCEPT");
-      // dispatch(removeNotification(requestId)); // Remove the notification from the Redux store
+      dispatch(removeNotification(requestId)); // Remove the notification from the Redux store
       console.log("Friend request accepted:", requestId);
     } catch (error) {
       console.error("Failed to accept friend request:", error);
@@ -32,7 +33,7 @@ const FriendRequestNotification: React.FC<FriendRequestNotificationProps> = ({ u
   const handleDecline = async () => {
     try {
       await respondToFriendRequest(userId, senderId, requestId, "DECLINE");
-      // dispatch(removeNotification(requestId)); // Remove the notification from the Redux store
+      dispatch(removeNotification(requestId));
       console.log("Friend request declined:", requestId);
     } catch (error) {
       console.error("Failed to decline friend request:", error);
@@ -43,7 +44,7 @@ const FriendRequestNotification: React.FC<FriendRequestNotificationProps> = ({ u
   return (
     <TouchableOpacity onPress={() => router.push(`/(tabs)/home/userProfiles/${senderId}`)} activeOpacity={0.8}>
       <View style={{ flexDirection: "row", alignItems: "center", padding: 15, backgroundColor: "#f9f9f9", borderRadius: 10, marginVertical: 8, elevation: 2 }}>
-        <Image source={{ uri: senderProfilePic }} style={{ width: 50, height: 50, borderRadius: 25, marginRight: 10 }} />
+        <Image source={require("@/assets/images/avatar-placeholder.png")} style={{ width: 50, height: 50, borderRadius: 25, marginRight: 10 }} />
         <View style={{ flex: 1 }}>
           <Text style={{ fontSize: 18, fontWeight: "bold" }}>{senderName}</Text>
           <Text style={{ fontSize: 14, color: "gray" }}>{timeAgo}</Text>

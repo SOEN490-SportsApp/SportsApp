@@ -28,8 +28,6 @@ export default function FriendRequestsPage() {
                 </View>
                 {loading ? ( // Keep loading check if you are passing loading from NotificationsScreen, otherwise, remove this whole conditional and just use FlatList
                     <ActivityIndicator size="large" color="blue" />
-                ) : notifications.filter(n => n.type === 'friend_request').length === 0 ? ( // Filter friend requests here
-                    <Text style={{ textAlign: "center", color: "gray" }}>No friend requests</Text>
                 ) : (
                     <FlatList
                         data={notifications.filter(n => n.type === 'friend_request')}
@@ -45,6 +43,13 @@ export default function FriendRequestsPage() {
                                 status={item.status}
                             />
                         )}
+                        style={{ flex: 1 }}
+                        ListEmptyComponent={
+                            <View style={{ alignItems: "center", padding: 20 }}>
+                                <Text style={{ fontSize: 16, color: "gray" }}>No new friend requests 🤝</Text>
+                                <Text style={{ fontSize: 14, color: "gray", marginTop: 5 }}>Check back later!</Text>
+                            </View>
+                        }
                     />
                 )}
             </View>
