@@ -1,3 +1,5 @@
+import { G } from "react-native-svg";
+
 export const API_ENDPOINTS = {
   REGISTER: "user-service/auth/register",
   REFRESH_TOKEN: "user-service/auth/refresh",
@@ -25,4 +27,5 @@ export const API_ENDPOINTS = {
   GET_ALL_FRIENDS: 'user-service/user/{userId}/friends',
   RESPOND_TO_FRIEND_REQUEST: 'user-service/user/{userId}/friend-requests/{requestId}',
   GET_PROFILE_BY_ID: 'user-service/user/{userId}/profile',
+  EDIT_EVENT_BY_ID: 'event-service/event/{id}',
 };

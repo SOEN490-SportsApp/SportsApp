@@ -8,11 +8,14 @@ import { deleteEvent } from "@/services/eventService";
 import { useLocalSearchParams } from "expo-router";
 import QR from "@/components/QR/QR";
 import { mvs } from "@/utils/helpers/uiScaler";
+import EditEventModal from "@/components/Event/EditEventModal";
 
 export default function EventDetailsLayout() {
   const { eventId } = useLocalSearchParams<{ eventId: string }>();
   const [menuVisible, setMenuVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [eventData, setEventData] = useState(null);
 
   const openMenu = () => setMenuVisible(true);
   const closeMenu = () => setMenuVisible(false);
@@ -27,6 +30,10 @@ export default function EventDetailsLayout() {
       case "leave":
         console.log("Leave event selected");
         // Add leave event logic
+        break;
+      case "edit":
+        console.log("Edit event selected");
+        setEditModalVisible(true);
         break;
       case "delete":
         handleDeleteEvent(eventId);
@@ -117,6 +124,10 @@ export default function EventDetailsLayout() {
                   title="Leave Event"
                 />
                 <Menu.Item
+                  onPress={() => handleOptionPress("edit")}
+                  title="Edit Event"
+                />
+                <Menu.Item
                   onPress={() => handleOptionPress("delete")}
                   title="Delete Event"
                   titleStyle={{ color: "red" }}
@@ -149,6 +160,8 @@ export default function EventDetailsLayout() {
           ),
         }}
       />
+      
+      <EditEventModal visible={editModalVisible} onClose={() => setEditModalVisible(false)} eventId={eventId} />
     </Provider>
   );
 }
