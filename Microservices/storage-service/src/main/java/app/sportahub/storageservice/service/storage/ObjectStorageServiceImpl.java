@@ -1,13 +1,15 @@
 package app.sportahub.storageservice.service.storage;
 
-import app.sportahub.storageservice.utils.MimeTypeUtil;
 import app.sportahub.storageservice.dto.response.ObjectStorageResponse;
 import app.sportahub.storageservice.exception.storage.FileCannotBeNullException;
+import app.sportahub.storageservice.utils.MimeTypeUtil;
 import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
+import io.minio.errors.ErrorResponseException;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ObjectStorageServiceImpl implements ObjectStorageService {
@@ -65,29 +68,34 @@ public class ObjectStorageServiceImpl implements ObjectStorageService {
      * @param filePath The file path in MinIO storage.
      * @return ResponseEntity with the file content and headers.
      */
-    @SneakyThrows
     @Override
     public ResponseEntity<byte[]> getFile(String filePath) {
-        InputStream stream = minioClient.getObject(
+        try (InputStream stream = minioClient.getObject(
                 GetObjectArgs.builder()
                         .bucket(BUCKET_NAME)
                         .object(filePath)
-                        .build());
+                        .build())) {
 
-        byte[] fileBytes = stream.readAllBytes();
-        stream.close();
+            byte[] fileBytes = stream.readAllBytes();
+            stream.close();
 
-        String mimeType = MimeTypeUtil.getMimeTypeFromExtension(filePath);
+            String mimeType = MimeTypeUtil.getMimeTypeFromExtension(filePath);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_TYPE, mimeType);
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_TYPE, mimeType);
 
-        if (mimeType.startsWith("image/")) {
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline");
-        } else {
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filePath.substring(filePath.lastIndexOf("/") + 1) + "\"");
+            if (mimeType.startsWith("image/")) {
+                headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline");
+            } else {
+                headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filePath.substring(filePath.lastIndexOf("/") + 1) + "\"");
+            }
+
+            return ResponseEntity.ok().headers(headers).body(fileBytes);
+        } catch (ErrorResponseException e) {
+            return ResponseEntity.status(e.response().code()).build();
+        } catch (Exception e) {
+            log.error(e.getLocalizedMessage());
+            return ResponseEntity.internalServerError().build();
         }
-
-        return ResponseEntity.ok().headers(headers).body(fileBytes);
     }
 }
