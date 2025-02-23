@@ -15,9 +15,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,8 +49,8 @@ public class PostServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        postRequest = new PostRequest("Content of the post", "8btr8h689hhr909h", new ArrayList<>());
-        post = Post.builder().withEventId("1").build();
+        postRequest = new PostRequest("Content of the post", new ArrayList<>());
+        post = Post.builder().withEventId("1").withCreatedBy("adminUser").build();
         event = new Event();
         event.setPosts(new ArrayList<>());
     }
@@ -56,6 +58,12 @@ public class PostServiceImplTest {
     @Test
     void testCreatePostShouldCreateAndReturnPost() {
         String eventId = "1";
+
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn("adminUser");
+        SecurityContextHolder.setContext(securityContext);
 
         when(eventRepository.findEventById(eventId)).thenReturn(Optional.of(event));
         when(postMapper.postRequestToPost(postRequest)).thenReturn(post);
