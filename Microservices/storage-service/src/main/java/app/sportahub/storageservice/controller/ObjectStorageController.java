@@ -26,7 +26,7 @@ public class ObjectStorageController {
         return objectStorageService.storeFile(file);
     }
 
-    @GetMapping("/**")
+    @GetMapping("file/**")
     public ResponseEntity<byte[]> getFile(HttpServletRequest request) {
         // Extract the remaining part of the URL path after "/objects"
         String pathWithinHandlerMapping = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
