@@ -1,8 +1,8 @@
 package app.sportahub.storageservice.service.storage;
 
+import app.sportahub.storageservice.utils.MimeTypeUtil;
 import app.sportahub.storageservice.dto.response.ObjectStorageResponse;
 import app.sportahub.storageservice.exception.storage.FileCannotBeNullException;
-import app.sportahub.storageservice.service.file.MimeTypeService;
 import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,18 +22,18 @@ import java.io.InputStream;
 @RequiredArgsConstructor
 public class ObjectStorageServiceImpl implements ObjectStorageService {
 
-    private final MimeTypeService mimeTypeService;
-
     private final MinioClient minioClient;
 
     @Value("${minio.bucket.name}")
     private String BUCKET_NAME;
 
     /**
-     * Stores a file in MinIO storage and returns the ObjectResponse.
+     * Stores a file in MinIO and returns its metadata.
+     * The file is stored under the authenticated user's directory with a unique name.
      *
-     * @param file The MultipartFile to be stored.
-     * @return The ObjectResponse containing file details and download URL.
+     * @param file The file to be stored.
+     * @return Metadata including file name, content type, size, and storage path.
+     * @throws FileCannotBeNullException if the file is null or empty.
      */
     @SneakyThrows
     @Override
@@ -59,6 +58,13 @@ public class ObjectStorageServiceImpl implements ObjectStorageService {
         return new ObjectStorageResponse(fileName, authentication.getName(), file.getContentType(), file.getSize(), filePath);
     }
 
+    /**
+     * Retrieves a file from MinIO and returns it as a byte array.
+     * Sets headers to display images inline and prompt download for other file types.
+     *
+     * @param filePath The file path in MinIO storage.
+     * @return ResponseEntity with the file content and headers.
+     */
     @SneakyThrows
     @Override
     public ResponseEntity<byte[]> getFile(String filePath) {
@@ -68,7 +74,10 @@ public class ObjectStorageServiceImpl implements ObjectStorageService {
                         .object(filePath)
                         .build());
 
-        String mimeType = mimeTypeService.getMimeTypeFromInputStream(stream);
+        byte[] fileBytes = stream.readAllBytes();
+        stream.close();
+
+        String mimeType = MimeTypeUtil.getMimeTypeFromExtension(filePath);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, mimeType);
@@ -76,10 +85,9 @@ public class ObjectStorageServiceImpl implements ObjectStorageService {
         if (mimeType.startsWith("image/")) {
             headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline");
         } else {
-            headers.add(HttpHeaders.CONTENT_DISPOSITION,
-                    "attachment; filename=\"" + filePath.substring(filePath.lastIndexOf("/") + 1) + "\"");
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filePath.substring(filePath.lastIndexOf("/") + 1) + "\"");
         }
 
-        return new ResponseEntity<>(stream.readAllBytes(), headers, HttpStatus.OK);
+        return ResponseEntity.ok().headers(headers).body(fileBytes);
     }
 }
