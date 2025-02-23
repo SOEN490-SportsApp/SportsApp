@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { View, Text, FlatList, TouchableOpacity, ActivityIndicator } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/state/store";
-import { removeNotification, addNotification, setLoading, setNotifications } from "@/state/notifications/notificationSlice";
+import { setLoading, setNotifications } from "@/state/notifications/notificationSlice";
 import FriendRequestNotification from "@/components/Helper Components/FriendRequestNotification";
 import { router } from "expo-router";
 import themeColors from "@/utils/constants/colors";

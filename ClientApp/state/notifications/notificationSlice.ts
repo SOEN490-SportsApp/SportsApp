@@ -7,7 +7,7 @@ type FriendRequestNotification = {
   senderName: string;
   senderProfilePic?: string;
   timeAgo: string;
-  type: "friend_request"; // Only one type of notification for now
+  type: string;
 };
 
 type NotificationsState = {
