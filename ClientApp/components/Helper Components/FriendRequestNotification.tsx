@@ -23,8 +23,7 @@ const FriendRequestNotification: React.FC<FriendRequestNotificationProps> = ({ u
   const handleAccept = async () => {
     try {
       await respondToFriendRequest(userId, senderId, requestId, "ACCEPT");
-      dispatch(removeNotification(requestId)); // Remove the notification from the Redux store
-      console.log("Friend request accepted:", requestId);
+      dispatch(removeNotification(requestId));
     } catch (error) {
       console.error("Failed to accept friend request:", error);
     }
@@ -34,7 +33,6 @@ const FriendRequestNotification: React.FC<FriendRequestNotificationProps> = ({ u
     try {
       await respondToFriendRequest(userId, senderId, requestId, "DECLINE");
       dispatch(removeNotification(requestId));
-      console.log("Friend request declined:", requestId);
     } catch (error) {
       console.error("Failed to decline friend request:", error);
     }
@@ -49,15 +47,14 @@ const FriendRequestNotification: React.FC<FriendRequestNotificationProps> = ({ u
           <Text style={{ fontSize: 18, fontWeight: "bold" }}>{senderName}</Text>
           <Text style={{ fontSize: 14, color: "gray" }}>{timeAgo}</Text>
         </View>
-        {/* Conditional Rendering Based on Status */}
         {status === "ACCEPTED" ? (
           <Text style={{ color: "green", fontWeight: "bold" }}>Accepted</Text>
         ) : status === "RECEIVED" ? (
           <>
-            <TouchableOpacity onPress={handleAccept} style={{ marginRight: 10 }}>
+            <TouchableOpacity onPress={handleAccept} testID="accept-button" style={{ marginRight: 10 }}>
               <Ionicons name="checkmark-circle-outline" size={28} color="gray" />
             </TouchableOpacity>
-            <TouchableOpacity onPress={handleDecline}>
+            <TouchableOpacity onPress={handleDecline} testID="decline-button">
               <Ionicons name="close-circle-outline" size={28} color="gray" />
             </TouchableOpacity>
           </>

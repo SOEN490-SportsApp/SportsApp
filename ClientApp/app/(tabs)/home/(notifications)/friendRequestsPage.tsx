@@ -7,7 +7,7 @@ import { RootState } from "@/state/store";
 export default function FriendRequestsPage() {
     const user = useSelector((state: RootState) => state.user);
     const notifications = useSelector((state: RootState) => state.notifications.notifications);
-    const loading = useSelector((state: RootState) => state.notifications.loading); // You can keep loading state if you want to pass it down from NotificationsScreen, otherwise, remove this line and useSelector for loading
+    const loading = useSelector((state: RootState) => state.notifications.loading);
 
     return (
         <View style={{ flex: 1, padding: 20, backgroundColor: "#f9f9f9" }}>
