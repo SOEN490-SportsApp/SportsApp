@@ -141,7 +141,7 @@ const EventDetails = () => {
                   onPress={() => {
                     if (participant.userId !== user.id) {
                       router.push({
-                        pathname: `/(tabs)/home/userProfiles/[id]`,
+                        pathname: `/userProfiles/[id]`,
                         params: { id: participant.userId },
                       });
                     }

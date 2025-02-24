@@ -20,6 +20,8 @@ export default function RootLayout() {
                 <Stack.Screen name="editProfile/index" options={{ headerShown: false }} />
                 <Stack.Screen name="editProfile/sportsSkills" options={{ headerShown: false}} />
                 <Stack.Screen name="events" options={{ headerShown: false }} />
+                <Stack.Screen name="userProfiles" options={{ headerShown: false }} />
+
             </Stack>
         </Provider>
     );

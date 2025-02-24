@@ -11,7 +11,7 @@ const FriendCardProfilePage = ({ friend }: { friend: any }) => {
   return (
     <TouchableOpacity
       style={styles.cardHolder}
-      onPress={() => router.push({pathname: `/(tabs)/home/userProfiles/[id]`, params: {id: userId}})}
+      onPress={() => router.push({pathname: `/userProfiles/[id]`, params: {id: userId}})}
     >
       <View style={styles.pictureSection}>
         <Image

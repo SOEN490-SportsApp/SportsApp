@@ -1,4 +1,4 @@
 export  const deepLinks = {
-    Profile: 'myapp://(tabs)/home/userProfiles/{id}',
+    Profile: 'myapp://userProfiles/{id}',
     Event: 'myapp://events/{id}'
 }
