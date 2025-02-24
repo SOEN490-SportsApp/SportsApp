@@ -5,24 +5,34 @@ scrape_configs:
   - job_name: 'user-service'
     metrics_path: '/api/user-service/actuator/prometheus'
     static_configs:
-      - targets: [ 'host.docker.internal:8080' ]
+      - targets: [ 'host.docker.internal:8080' ] #host.docker.internal may not work on all machines. Add internal port number manually.
+  - job_name: 'email-service'
+    metrics_path: '/api/event-service/actuator/prometheus'
+    scrape_interval: 5s
+    static_configs:
+      - targets: [ 'host.docker.internal:8081' ]
   - job_name: 'event-service'
     metrics_path: '/api/event-service/actuator/prometheus'
     scrape_interval: 5s
     static_configs:
-      - targets: [ 'host.docker.internal:8080' ]
+      - targets: [ 'host.docker.internal:8082' ]
+  - job_name: 'gateway'
+    metrics_path: '/api/storage-service/actuator/prometheus'
+    scrape_interval: 5s
+    static_configs:
+      - targets: [ 'host.docker.internal:8083' ]
   - job_name: 'storage-service'
     metrics_path: '/api/storage-service/actuator/prometheus'
     scrape_interval: 5s
     static_configs:
-      - targets: [ 'host.docker.internal:8080' ]
+      - targets: [ 'host.docker.internal:8085' ]
   - job_name: 'orchestration-service'
     metrics_path: '/api/orchestration-service/actuator/prometheus'
     scrape_interval: 5s
     static_configs:
-      - targets: [ 'host.docker.internal:8080' ]
+      - targets: [ 'host.docker.internal:8086' ]
   - job_name: 'messaging-service'
     metrics_path: '/api/messaging-service/actuator/prometheus'
     scrape_interval: 5s
     static_configs:
-      - targets: [ 'host.docker.internal:8080' ]
+      - targets: [ 'host.docker.internal:8084' ]
