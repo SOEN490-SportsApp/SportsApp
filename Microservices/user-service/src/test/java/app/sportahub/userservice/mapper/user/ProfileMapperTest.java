@@ -48,7 +48,7 @@ public class ProfileMapperTest {
 
     @Test
     public void shouldMapProfileRequestToProfile() {
-        ProfileRequest request = new ProfileRequest("John", "Doe", LocalDate.of(1990, 1, 1), "Male", "12345", "555-1234", null, "Amateur");
+        ProfileRequest request = new ProfileRequest("John", "Doe", LocalDate.of(1990, 1, 1), "Male", "12345", "555-1234", null, "Amateur","https://i1.sndcdn.com/artworks-000360728946-bilq7t-t500x500.jpg");
 
         Profile profile = profileMapper.profileRequestToProfile(request);
         assertNotNull(profile);
@@ -56,6 +56,7 @@ public class ProfileMapperTest {
         assertEquals("Doe", profile.getLastName());
         assertEquals(LocalDate.of(1990, 1, 1), profile.getDateOfBirth());
         assertEquals("Male", profile.getGender());
+        assertEquals("https://i1.sndcdn.com/artworks-000360728946-bilq7t-t500x500.jpg", profile.getProfilePicture());
     }
 
     @Test
@@ -63,13 +64,15 @@ public class ProfileMapperTest {
         Profile profile = Profile.builder()
                 .withFirstName("Jane")
                 .withLastName("Doe")
+                .withProfilePicture("profileurlhere")
                 .build();
-        ProfileRequest request = new ProfileRequest("John", null, null, "Male", "12345", "555-1234", null, "Amateur");
+        ProfileRequest request = new ProfileRequest("John", null, null, "Male", "12345", "555-1234", null, "Amateur","");
 
         profileMapper.patchProfileFromRequest(request, profile);
         assertEquals("John", profile.getFirstName());
         assertEquals("Doe", profile.getLastName());
         assertEquals("Male", profile.getGender());
+        assertEquals("",profile.getProfilePicture());
     }
 
     @Test
@@ -85,7 +88,7 @@ public class ProfileMapperTest {
 
     @Test
     public void shouldHandleNullValuesInProfileRequest() {
-        ProfileRequest request = new ProfileRequest(null, null, null, null, null, null, null, null);
+        ProfileRequest request = new ProfileRequest(null, null, null, null, null, null, null, null,null);
         Profile profile = profileMapper.profileRequestToProfile(request);
 
         assertNull(profile.getFirstName(), "First name should be null.");
@@ -106,7 +109,7 @@ public class ProfileMapperTest {
         sportLevelRequests.add(new SportLevelRequest("Tennis", "Intermediate"));
 
         profileMapper.patchProfileFromRequest(
-                new ProfileRequest("John", "Doe", null, null, null, null, sportLevelRequests, null),
+                new ProfileRequest("John", "Doe", null, null, null, null, sportLevelRequests, null,null),
                 profile
         );
 
@@ -131,7 +134,7 @@ public class ProfileMapperTest {
         sportLevelRequests.add(new SportLevelRequest("Tennis", "Intermediate"));
 
         profileMapper.patchProfileFromRequest(
-                new ProfileRequest("John", "Doe", null, null, null, null, sportLevelRequests, null),
+                new ProfileRequest("John", "Doe", null, null, null, null, sportLevelRequests, null,null),
                 profile
         );
 
@@ -156,7 +159,7 @@ public class ProfileMapperTest {
 
     @Test
     public void shouldHandleNullSportsPreferencesInRequestToProfile() {
-        ProfileRequest request = new ProfileRequest("John", "Doe", LocalDate.of(1990, 1, 1), "Male", "12345", "555-1234", null, "Amateur");
+        ProfileRequest request = new ProfileRequest("John", "Doe", LocalDate.of(1990, 1, 1), "Male", "12345", "555-1234", null, "Amateur",null);
 
         Profile profile = profileMapper.profileRequestToProfile(request);
         assertNotNull(profile);
@@ -165,7 +168,7 @@ public class ProfileMapperTest {
 
     @Test
     public void shouldConvertEmptySportsPreferences() {
-        ProfileRequest request = new ProfileRequest("John", "Doe", LocalDate.of(1990, 1, 1), "Male", "12345", "555-1234", Collections.emptyList(), "Amateur");
+        ProfileRequest request = new ProfileRequest("John", "Doe", LocalDate.of(1990, 1, 1), "Male", "12345", "555-1234", Collections.emptyList(), "Amateur",null);
 
         Profile profile = profileMapper.profileRequestToProfile(request);
         assertNotNull(profile);
