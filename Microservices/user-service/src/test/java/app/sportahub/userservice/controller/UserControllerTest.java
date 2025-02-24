@@ -103,8 +103,8 @@ public class UserControllerTest {
     @SneakyThrows
     @Test
     public void updateUserProfileSuccessfully() {
-        ProfileRequest profileRequest = new ProfileRequest("John", "Doe", null, "Male", "12345", "555-1234", null, "Amateur");
-        ProfileResponse expectedResponse = new ProfileResponse("John", "Doe", null, "Male", "12345", "555-1234", null, "Amateur");
+        ProfileRequest profileRequest = new ProfileRequest("John", "Doe", null, "Male", "12345", "555-1234", null, "Amateur","https://i1.sndcdn.com/artworks-000360728946-bilq7t-t500x500.jpg");
+        ProfileResponse expectedResponse = new ProfileResponse("John", "Doe", null, "Male", "12345", "555-1234", null, "Amateur","https://i1.sndcdn.com/artworks-000360728946-bilq7t-t500x500.jpg");
         when(userService.updateUserProfile("1", profileRequest)).thenReturn(expectedResponse);
 
         mockMvc.perform(put("/user/1/profile")
@@ -117,8 +117,8 @@ public class UserControllerTest {
     @SneakyThrows
     @Test
     public void shouldPatchProfileSuccessfully() {
-        ProfileRequest profileRequest = new ProfileRequest("John", "Doe", null, "Male", "12345", "555-1234", null, "Amateur");
-        ProfileResponse expectedResponse = new ProfileResponse("John", "Doe", null, "Male", "12345", "555-1234", null, "Amateur");
+        ProfileRequest profileRequest = new ProfileRequest("John", "Doe", null, "Male", "12345", "555-1234", null, "Amateur",null);
+        ProfileResponse expectedResponse = new ProfileResponse("John", "Doe", null, "Male", "12345", "555-1234", null, "Amateur",null);
         when(userService.patchUserProfile("1", profileRequest)).thenReturn(expectedResponse);
 
         mockMvc.perform(patch("/user/1/profile")
@@ -132,7 +132,7 @@ public class UserControllerTest {
     @SneakyThrows
     @Test
     public void patchProfileUserNotFound() {
-        ProfileRequest profileRequest = new ProfileRequest("John", "Doe", null, "Male", "12345", "555-1234", null, "Amateur");
+        ProfileRequest profileRequest = new ProfileRequest("John", "Doe", null, "Male", "12345", "555-1234", null, "Amateur",null);
         doThrow(new UserDoesNotExistException("User does not exist"))
                 .when(userService).patchUserProfile("999", profileRequest);
 
@@ -255,7 +255,7 @@ public class UserControllerTest {
     @SneakyThrows
     @Test
     public void searchUsersSuccessfully() {
-        ProfileResponse profileResponse = new ProfileResponse("John", "Doe", null, "Male", "12345", "555-1234", null, "Amateur");
+        ProfileResponse profileResponse = new ProfileResponse("John", "Doe", null, "Male", "12345", "555-1234", null, "Amateur","https://i1.sndcdn.com/artworks-000360728946-bilq7t-t500x500.jpg");
 
         List<UserProfileResponse> userProfiles = List.of(new UserProfileResponse("123abc", profileResponse));
         Page<UserProfileResponse> page = new PageImpl<>(userProfiles);
