@@ -1,49 +1,86 @@
-import React, { useEffect, useState } from 'react';
-import { 
-    View, Text, Image, ActivityIndicator, SafeAreaView, ScrollView, 
-    TouchableOpacity, Dimensions 
-} from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons'; 
-import CustomTabMenu from '@/components/Helper Components/CustomTabMenu';
-import { useRouter } from 'expo-router';
-import { useSelector } from 'react-redux';
-import EventList from '@/components/Event/EventList';
-import { getEventsCreated, getEventsJoined } from '@/services/eventService';
-import Ionicons from "react-native-vector-icons/Ionicons"; 
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  Image,
+  ActivityIndicator,
+  SafeAreaView,
+  TouchableOpacity,
+  Dimensions,
+} from "react-native";
+import Toggle from "react-native-toggle-element";
+import Icon from "react-native-vector-icons/Ionicons";
+import CustomTabMenu from "@/components/Helper Components/CustomTabMenu";
+import { useRouter } from "expo-router";
+import { useSelector } from "react-redux";
+import EventList from "@/components/Event/EventList";
+import { getEventsCreated, getEventsJoined } from "@/services/eventService";
+import Ionicons from "react-native-vector-icons/Ionicons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import FavoriteSportsBadges from '@/components/FavoriteSportsBadges';
-import FriendsList from '@/components/Profile/FriendsList';
+import FavoriteSportsBadges from "@/components/FavoriteSportsBadges";
+import FriendsList from "@/components/Profile/FriendsList";
+import MyCalendar from "@/components/Calendar/MyCalendar";
 
-
-const screenHeight = Dimensions.get('window').height;
+const screenHeight = Dimensions.get("window").height;
 const maxHeight = screenHeight * 0.5;
-  
-  // Helper function to assign color based on skill level
+
+// Helper function to assign color based on skill level
 const getSkillColor = (ranking: string) => {
-    switch (ranking.toLowerCase()) {
-        case "beginner":
-            return "#228B22"; 
-        case "intermediate":
-            return "#FFD700"; 
-        case "advanced":
-            return "#FF0000"; 
-        default:
-            return "#808080"; 
-    }
+  switch (ranking.toLowerCase()) {
+    case "beginner":
+      return "#228B22";
+    case "intermediate":
+      return "#FFD700";
+    case "advanced":
+      return "#FF0000";
+    default:
+      return "#808080";
+  }
 };
 
 const ActivityTab = () => {
   const user = useSelector((state: { user: any }) => state.user);
-
+  const [isListView, setIsListView] = useState(false);
+  const toggleSwitch = () => {
+    setIsListView(!isListView);
+  };
   return (
     <View className="p-4 bg-white">
-      <View>
-        <EventList
-          fetchEventsFunction={(page, size) =>
-            getEventsJoined(user.id, page, size)
+      <View className="flex flex-row justify-around h-16">
+        <Text>Schedule view</Text>
+        {/* <Toggle
+          value={isListView}
+          onPress={() => setIsListView(!isListView)}
+          
+          leftComponent={
+            <MaterialCommunityIcons
+              name="calendar-account"
+              // width="30"
+            
+              // fill={Colors.tabIconSelected}
+            />
           }
-        />
+          rightComponent={
+            <MaterialCommunityIcons
+              name="calendar-account"
+              size={1}
+              
+              // fill={theme.tabIconSelected}
+            />
+          }
+        /> */}
       </View>
+      {isListView ? (
+        <View>
+          <EventList
+            fetchEventsFunction={(page, size) =>
+              getEventsJoined(user.id, page, size)
+            }
+          />
+        </View>
+      ) : (
+        <MyCalendar userId={user.id} />
+      )}
     </View>
   );
 };
@@ -55,8 +92,8 @@ const FriendsTab = () => {
     <View className="p-4 bg-white flex-1">
       <FriendsList userId={user.id} />
     </View>
-    );
-  }
+  );
+};
 
 // About tab content with user data
 const MyEvents = () => {
@@ -124,18 +161,18 @@ const ProfilePage: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-            {/* Profile Header */}
-            <View className="items-center p-4 bg-white">
-                <Image
-                    className="w-20 h-20 rounded-full"
-                    source={require("@/assets/images/avatar-placeholder.png")}
-                    defaultSource={require('@/assets/images/Unknown.jpg')}
-                />
-                <Text testID="firstName" className="text-2xl font-bold text-black mt-2">
-                    {user?.profile.firstName} {user?.profile.lastName}
-                </Text>
-            </View>
-            <FavoriteSportsBadges sports={user?.profile.sportsOfPreference} />
+      {/* Profile Header */}
+      <View className="items-center p-4 bg-white">
+        <Image
+          className="w-20 h-20 rounded-full"
+          source={require("@/assets/images/avatar-placeholder.png")}
+          defaultSource={require("@/assets/images/Unknown.jpg")}
+        />
+        <Text testID="firstName" className="text-2xl font-bold text-black mt-2">
+          {user?.profile.firstName} {user?.profile.lastName}
+        </Text>
+      </View>
+      <FavoriteSportsBadges sports={user?.profile.sportsOfPreference} />
 
       {/* CustomTabMenu */}
       <CustomTabMenu routes={routes} scenes={scenes} backgroundColor={"#fff"} />
