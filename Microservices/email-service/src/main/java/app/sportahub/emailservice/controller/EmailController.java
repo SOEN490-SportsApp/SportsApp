@@ -17,7 +17,6 @@ public class EmailController {
     @PostMapping("/send")
     @ResponseStatus(HttpStatus.OK)
     public void sendEmail(@RequestBody EmailRequest emailRequest) {
-        emailService.sendEmail(emailRequest);
     }
 }
 
