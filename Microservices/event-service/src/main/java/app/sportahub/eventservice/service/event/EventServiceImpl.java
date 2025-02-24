@@ -6,6 +6,7 @@ import app.sportahub.eventservice.dto.request.event.ParticipantRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.dto.response.ParticipantResponse;
 import app.sportahub.eventservice.enums.EventSortingField;
+import app.sportahub.eventservice.enums.SkillLevelEnum;
 import app.sportahub.eventservice.enums.EventState;
 import app.sportahub.eventservice.enums.SortDirection;
 import app.sportahub.eventservice.exception.event.*;
@@ -17,6 +18,7 @@ import app.sportahub.eventservice.model.event.participant.ParticipantAttendStatu
 import app.sportahub.eventservice.repository.event.EventRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -398,5 +400,51 @@ public class EventServiceImpl implements EventService {
         log.info("EventServiceImpl::cancelEvent: Event with id:{} was cancelled by user:{}", eventId,
                 authentication.getName());
         return eventMapper.eventToEventResponse(savedEvent);
+    }
+
+    @Override
+    public Page<EventResponse> searchEvents(String eventName,
+                                            String eventType,
+                                            String sportType,
+                                            String locationName,
+                                            String city,
+                                            String province,
+                                            String country,
+                                            String postalCode,
+                                            String date,
+                                            String startTime,
+                                            String endTime,
+                                            String duration,
+                                            String maxParticipants,
+                                            String createdBy,
+                                            Boolean isPrivate,
+                                            List<SkillLevelEnum> requiredSkillLevel,
+                                            Pageable pageable) {
+        if (eventName == null &&
+            eventType == null &&
+            sportType == null &&
+            locationName == null &&
+            city == null &&
+            province == null &&
+            country == null &&
+            postalCode == null &&
+            date == null &&
+            startTime == null &&
+            endTime == null &&
+            duration == null &&
+            maxParticipants == null &&
+            createdBy == null &&
+            isPrivate == null &&
+            requiredSkillLevel == null) {
+            throw new NoSearchCriteriaProvidedException();
+        }
+        log.info("UserServiceImpl::searchUsers: User created a search query");
+
+        Page<Event> events = eventRepository.searchEvents(eventName, eventType, sportType, locationName, city, province, country, postalCode, date, startTime, endTime, duration, maxParticipants, createdBy, isPrivate, requiredSkillLevel, pageable);
+
+        List<EventResponse> eventResponses = events.stream()
+                .map(eventMapper::eventToEventResponse).toList();
+
+        return new PageImpl<>(eventResponses, events.getPageable(), events.getTotalElements());
     }
 }

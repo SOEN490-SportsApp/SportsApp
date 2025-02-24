@@ -6,17 +6,22 @@ import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.dto.response.ParticipantResponse;
 import app.sportahub.eventservice.enums.EventSortingField;
 import app.sportahub.eventservice.enums.SortDirection;
+import app.sportahub.eventservice.model.event.Location;
+import app.sportahub.eventservice.enums.SkillLevelEnum;
 import app.sportahub.eventservice.service.event.EventService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 
 @RestController
@@ -130,5 +135,32 @@ public class EventController {
     public EventResponse cancelEvent(@PathVariable String id,
                                      @RequestBody @Valid EventCancellationRequest cancelRequest) {
         return eventService.cancelEvent(id, cancelRequest);
+    }
+
+    @GetMapping("/search")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Search for events",
+            description = "Allows the search of events based on various filters like name, sport type, event type, location, date, and more.")
+    public Page<EventResponse> searchEvents(
+            @RequestParam(required = false) String eventName,
+            @RequestParam(required = false) String eventType,
+            @RequestParam(required = false) String sportType,
+            @RequestParam(required = false) String locationName,
+            @RequestParam(required = false) String city,
+            @RequestParam(required = false) String province,
+            @RequestParam(required = false) String country,
+            @RequestParam(required = false) String postalCode,
+            @RequestParam(required = false) String date,
+            @RequestParam(required = false) String startTime,
+            @RequestParam(required = false) String endTime,
+            @RequestParam(required = false) String duration,
+            @RequestParam(required = false) String maxParticipants,
+            @RequestParam(required = false) String createdBy,
+            @RequestParam(required = false) Boolean isPrivate,
+            @RequestParam(required = false) List<SkillLevelEnum> requiredSkillLevel,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return eventService.searchEvents(eventName, eventType, sportType, locationName, city, province, country, postalCode, date, startTime, endTime, duration, maxParticipants, createdBy, isPrivate, requiredSkillLevel, pageable);
     }
 }
