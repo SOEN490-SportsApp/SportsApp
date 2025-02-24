@@ -6,7 +6,6 @@ import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.dto.response.ParticipantResponse;
 import app.sportahub.eventservice.enums.EventSortingField;
 import app.sportahub.eventservice.enums.SortDirection;
-import app.sportahub.eventservice.dto.response.ReactorResponse;
 import app.sportahub.eventservice.dto.response.ReactionResponse;
 import app.sportahub.eventservice.model.event.reactor.ReactionType;
 import app.sportahub.eventservice.service.event.EventService;
@@ -136,7 +135,6 @@ public class EventController {
     }
 
     @PostMapping("/{id}/reaction")
-    @PostMapping("/{id}/react")
     @PreAuthorize("authentication.name == #userId")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "React to an event", description = "Enables a user to react to an event.")
