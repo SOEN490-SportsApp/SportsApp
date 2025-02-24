@@ -3,7 +3,7 @@ package app.sportahub.eventservice.service.event;
 import app.sportahub.eventservice.dto.request.event.EventCancellationRequest;
 import app.sportahub.eventservice.dto.request.event.EventRequest;
 import app.sportahub.eventservice.dto.request.event.ParticipantRequest;
-import app.sportahub.eventservice.dto.request.ReactionRequest;
+import app.sportahub.eventservice.dto.request.event.ReactionRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.dto.response.ParticipantResponse;
 import app.sportahub.eventservice.dto.response.ReactionResponse;
@@ -412,7 +412,10 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public ReactionResponse reactToEvent(String eventId, String userId, ReactionType newReaction) {
+    public ReactionResponse reactToEvent(String eventId, ReactionType newReaction) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userId = authentication.getName();
 
         if(!(newReaction == ReactionType.NO_REACTION || newReaction == ReactionType.LIKE)){
             throw new InvalidReactionException();

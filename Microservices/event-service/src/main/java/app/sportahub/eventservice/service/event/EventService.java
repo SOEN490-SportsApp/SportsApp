@@ -41,5 +41,5 @@ public interface EventService {
 
     EventResponse cancelEvent(String id, EventCancellationRequest cancelRequest);
 
-    ReactionResponse reactToEvent(String id, String userId, ReactionType reaction);
+    ReactionResponse reactToEvent(String id, ReactionType reaction);
 }

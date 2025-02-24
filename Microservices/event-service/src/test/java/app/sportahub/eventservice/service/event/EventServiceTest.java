@@ -561,13 +561,19 @@ class EventServiceTest {
 
     @Test
     void testReactToEvent_LikeEvent_Success() {
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn("user456");
+        SecurityContextHolder.setContext(securityContext);
+
         Event event = new Event();
         event.setId("event123");
         event.setReactions(new ArrayList<>());
 
         when(eventRepository.findEventById("event123")).thenReturn(Optional.of(event));
 
-        ReactionResponse response = eventServiceImpl.reactToEvent("event123", "user456", ReactionType.LIKE);
+        ReactionResponse response = eventServiceImpl.reactToEvent("event123",  ReactionType.LIKE);
 
         assertNotNull(response);
         assertEquals("user456", response.userId());
@@ -579,6 +585,12 @@ class EventServiceTest {
 
     @Test
     void testReactToEvent_RemoveReaction_Success() {
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn("user456");
+        SecurityContextHolder.setContext(securityContext);
+
         Event event = new Event();
         event.setId("event123");
         Reaction reactor = new Reaction("user456", ReactionType.LIKE, LocalDateTime.now());
@@ -586,7 +598,7 @@ class EventServiceTest {
 
         when(eventRepository.findEventById("event123")).thenReturn(Optional.of(event));
 
-        ReactionResponse response = eventServiceImpl.reactToEvent("event123", "user456", ReactionType.NO_REACTION);
+        ReactionResponse response = eventServiceImpl.reactToEvent("event123",  ReactionType.NO_REACTION);
 
         assertNotNull(response);
         assertEquals("user456", response.userId());
@@ -606,7 +618,7 @@ class EventServiceTest {
         when(eventRepository.findEventById("event123")).thenReturn(Optional.of(event));
 
         assertThrows(ReactionAlreadySubmittedException.class,
-                () -> eventServiceImpl.reactToEvent("event123", "user456", ReactionType.LIKE)
+                () -> eventServiceImpl.reactToEvent("event123",  ReactionType.LIKE)
         );
 
         verify(eventRepository).findEventById("event123");
@@ -614,17 +626,29 @@ class EventServiceTest {
 
     @Test
     void testReactToEvent_InvalidReaction_ThrowsException() {
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn("user456");
+        SecurityContextHolder.setContext(securityContext);
+
         assertThrows(InvalidReactionException.class,
-                () -> eventServiceImpl.reactToEvent("event123", "user456", null)
+                () -> eventServiceImpl.reactToEvent("event123", null)
         );
     }
 
     @Test
     void testReactToEvent_EventDoesNotExist_ThrowsException() {
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn("user456");
+        SecurityContextHolder.setContext(securityContext);
+
         when(eventRepository.findEventById("event123")).thenReturn(Optional.empty());
 
         assertThrows(EventDoesNotExistException.class,
-                () -> eventServiceImpl.reactToEvent("event123", "user456", ReactionType.LIKE)
+                () -> eventServiceImpl.reactToEvent("event123", ReactionType.LIKE)
         );
 
         verify(eventRepository).findEventById("event123");

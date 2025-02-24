@@ -220,13 +220,13 @@ public class EventControllerTest {
 
     @Test
     public void testReactToEvent() {
-        Mockito.when(eventService.reactToEvent(Mockito.eq("testId"), Mockito.eq("userId"), Mockito.eq(ReactionType.LIKE)))
+        Mockito.when(eventService.reactToEvent(Mockito.eq("testId"), Mockito.eq(ReactionType.LIKE)))
                 .thenReturn(reactionResponse);
 
-        ReactionResponse response = eventController.reactToEvent("testId", "userId", ReactionType.LIKE);
+        ReactionResponse response = eventController.reactToEvent("testId", ReactionType.LIKE);
 
         assertEquals(reactionResponse, response);
-        Mockito.verify(eventService).reactToEvent(Mockito.eq("testId"), Mockito.eq("userId"), Mockito.eq(ReactionType.LIKE));
+        Mockito.verify(eventService).reactToEvent(Mockito.eq("testId"), Mockito.eq(ReactionType.LIKE));
     }
 
 }

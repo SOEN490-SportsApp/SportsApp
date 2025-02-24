@@ -1,4 +1,4 @@
-package app.sportahub.eventservice.dto.request;
+package app.sportahub.eventservice.dto.request.event;
 
 import app.sportahub.eventservice.model.event.reactor.ReactionType;
 import com.fasterxml.jackson.annotation.JsonInclude;

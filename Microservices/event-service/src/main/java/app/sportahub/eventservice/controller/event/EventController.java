@@ -135,12 +135,10 @@ public class EventController {
     }
 
     @PostMapping("/{id}/reaction")
-    @PreAuthorize("authentication.name == #userId")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "React to an event", description = "Enables a user to react to an event.")
     public ReactionResponse reactToEvent(@PathVariable String id,
-                                         @RequestParam String userId,
                                          @RequestParam ReactionType reaction) {
-        return eventService.reactToEvent(id, userId, reaction);
+        return eventService.reactToEvent(id, reaction);
     }
 }
