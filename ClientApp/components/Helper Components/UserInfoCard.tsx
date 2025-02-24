@@ -1,22 +1,43 @@
-import React from "react";
+import { Sport } from "@/types/sport";
+import React, { ReactNode } from "react";
 import { View, Text, StyleSheet } from "react-native";
+import FavoriteSportsBadges from "../FavoriteSportsBadges";
 
 interface UserInfoCardProps {
-  username: string,
+  username: string;
   gender: string;
   age: string;
   phoneNumber: string;
+  sports: Sport[] | undefined;
 }
 
-const UserInfoCard: React.FC<UserInfoCardProps> = ({ username, gender, age, phoneNumber }) => {
+const UserInfoCard: React.FC<UserInfoCardProps> = ({
+  username,
+  gender,
+  age,
+  phoneNumber,
+  sports,
+}) => {
   return (
     <View style={styles.card}>
       <View style={styles.infoContainer}>
-        <Text style={styles.infoText}>✍️ Username: {username || "Not Provided"}</Text>
-        <Text style={styles.infoText}>👤 Gender: {gender || "Not Provided"}</Text>
+        <Text style={styles.infoText}>
+          ✍️ Username: {username || "Not Provided"}
+        </Text>
+        <Text style={styles.infoText}>
+          👤 Gender: {gender || "Not Provided"}
+        </Text>
         <Text style={styles.infoText}>📅 Age: {age}</Text>
-        <Text style={styles.infoText}>📞 Phone: {phoneNumber || "Not Provided"}</Text>
+        <Text style={styles.infoText}>
+          📞 Phone: {phoneNumber || "Not Provided"}
+        </Text>
       </View>
+      {sports && (
+        <View style={styles.childrenContainer}>
+          <Text style={styles.infoText}>Favourite sports: </Text>
+          <FavoriteSportsBadges sports={sports} />
+        </View>
+      )}
     </View>
   );
 };
@@ -48,6 +69,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#666",
     marginBottom: 5,
+  },
+  childrenContainer: {
+    marginTop: 10,
   },
 });
 
