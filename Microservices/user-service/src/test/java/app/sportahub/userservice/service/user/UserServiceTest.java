@@ -95,7 +95,8 @@ public class UserServiceTest {
                 "123-456-7890",
                 List.of(new SportLevelRequest("Basketball", "Intermediate"),
                         new SportLevelRequest("Soccer", "Beginner")),
-                "A"
+                "A",
+                null
         );
 
         PreferencesRequest preferences = new PreferencesRequest(true, "english");
@@ -323,7 +324,8 @@ public class UserServiceTest {
                 "123-456-7890",
                 List.of(new SportLevelRequest("Basketball", "Intermediate"),
                         new SportLevelRequest("Soccer", "Beginner")),
-                "A"
+                "A",
+                null
         );
 
         existingUser.get().setProfile(Profile.builder()
@@ -377,7 +379,8 @@ public class UserServiceTest {
                 "123-456-7890",
                 List.of(new SportLevelRequest("Basketball", "Intermediate"),
                         new SportLevelRequest("Soccer", "Beginner")),
-                "A"
+                "A",
+                null
         );
 
         when(userRepository.findUserById("1")).thenReturn(Optional.empty());
@@ -413,6 +416,7 @@ public class UserServiceTest {
                 null,
                 null,
                 null,
+                null,
                 null
         );
 
@@ -436,7 +440,7 @@ public class UserServiceTest {
     @Test
     public void patchUserProfileShouldThrowUserNotFound() {
         ProfileRequest profileRequest = new ProfileRequest("John", null, null, null,
-                null, null, null, null);
+                null, null, null, null,null);
 
         when(userRepository.findUserById("1")).thenReturn(Optional.empty());
 
