@@ -33,6 +33,7 @@ import { Friend } from "@/types";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import themeColors from "@/utils/constants/colors";
+import { hs, vs } from "@/utils/helpers/uiScaler";
 
 const screenHeight = Dimensions.get("window").height;
 const maxHeight = screenHeight * 0.5;
@@ -131,7 +132,9 @@ const AboutTab: React.FC<{ user: any }> = ({ user }) => {
         gender={user.profile.gender}
         age={age}
         phoneNumber={user.profile.phoneNumber}
+        sports={user?.profile.sportsOfPreference}
       />
+        
     </View>
   );
 };
@@ -144,6 +147,7 @@ const ProfilePage: React.FC = () => {
   const [friendList, setFriendList] = useState<any[]>([]);
   const [friendStatus, setFriendStatus] = useState<string>("UNKNOWN");
   const visitingUser = useSelector((state: { user: any }) => state.user);
+
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -164,6 +168,7 @@ const ProfilePage: React.FC = () => {
     try {
       if(friendStatus !== "UNKNOWN") return;
       const response = await sendFriendRequest(visitingUser.id, id);
+      console.log(response)
       response
         ? setFriendStatus("PENDING")
         : Alert.alert("Error", "Failed to send friend request");
@@ -178,18 +183,20 @@ const ProfilePage: React.FC = () => {
       const friendList = await getFriendsOfUser(visitingUser.id);
       const friendRequest = await getSentFriendRequests(visitingUser.id);
       setFriendList(friendList);
+      console.log(friendList)
       const isFriends = friendList.some(
-        (friend: Friend) => friend.friendUserId === visitingUser.id
+        (friend: Friend) => friend.friendUserId === id
       );
       const isPending = friendRequest.some(
         (friend: FriendRequest) => friend.friendRequestUserId === id
       );
-      if (isFriends) {
-        setFriendStatus("ACCEPTED");
-      }
       if (isPending) {
         setFriendStatus("PENDING");
       }
+      if (isFriends) {
+        setFriendStatus("ACCEPTED");
+      }
+      
     } catch (error: any) {
       console.log(error, " occured fetching friends");
     }
@@ -226,7 +233,7 @@ const ProfilePage: React.FC = () => {
     <SafeAreaView className="flex-1 bg-white pt-6">
       <ImageBackground
         className="flex flex-1 items-start justify-end"
-        style={{ height: 475 }}
+        style={{ height: 350}}
         resizeMode="cover"
         source={require("@/assets/images/testBackground.jpg")}
         defaultSource={require("@/assets/images/Unknown.jpg")}
@@ -237,9 +244,9 @@ const ProfilePage: React.FC = () => {
         style={{
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
-          paddingTop: 30,
+          paddingVertical: vs(15),
           backgroundColor: "#fff",
-          marginTop: -80,
+          marginTop: hs(-225),
           borderColor: "#FFF",
         }}
       >
@@ -248,8 +255,8 @@ const ProfilePage: React.FC = () => {
             <Text testID="firstName" className="text-3xl font-bold ">
               {user?.profile.firstName} {user?.profile.lastName}
             </Text>
-            <FavoriteSportsBadges sports={user?.profile.sportsOfPreference} />
-            <View className="flex flex-row gap-4 w-full">
+            {/* <FavoriteSportsBadges sports={user?.profile.sportsOfPreference} /> */}
+            <View className="flex flex-row justify-center gap-4 w-full">
               <TouchableOpacity
                 style={[
                   styles.addFriendButton,
@@ -325,7 +332,7 @@ const styles = StyleSheet.create({
   addFriendButton: {
     padding: 5,
     borderRadius: 5,
-    width: "40%",
+    width: "48%",
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
