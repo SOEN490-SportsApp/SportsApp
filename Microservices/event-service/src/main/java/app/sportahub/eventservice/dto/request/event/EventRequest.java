@@ -1,6 +1,5 @@
 package app.sportahub.eventservice.dto.request.event;
 
-import app.sportahub.eventservice.dto.request.ReactionRequest;
 import app.sportahub.eventservice.enums.SkillLevelEnum;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.annotation.Nullable;
