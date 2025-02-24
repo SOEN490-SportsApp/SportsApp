@@ -78,6 +78,7 @@
     "react-dom": "18.3.1",
     "react-hook-form": "^7.53.1",
     "react-native": "0.76.5",
+    "react-native-calendars": "^1.1309.1",
     "react-native-date-picker": "^5.0.7",
     "react-native-dropdown-picker": "^5.4.6",
     "react-native-elements": "^3.4.3",
