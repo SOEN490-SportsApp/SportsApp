@@ -33,7 +33,8 @@ public class SecurityConfig {
                                 "/api-docs",
                                 "/api-docs/**",
                                 "/swagger-ui/**",
-                                "/webjars/**")
+                                "/webjars/**",
+                                "/actuator/**")
                         .permitAll()
                         .anyRequest().authenticated())
                 .csrf(AbstractHttpConfigurer::disable)

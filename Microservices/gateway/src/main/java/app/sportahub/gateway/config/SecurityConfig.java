@@ -23,7 +23,8 @@ public class SecurityConfig {
                                 "/api/user-service/auth/register",
                                 "/api/user-service/auth/login",
                                 "/api/user-service/auth/refresh",
-                                "/api/user-service/auth/reset-password")
+                                "/api/user-service/auth/reset-password",
+                                "/actuator/**")
                         .permitAll()
                         .anyRequest().authenticated())
                 .csrf(AbstractHttpConfigurer::disable)
