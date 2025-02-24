@@ -7,7 +7,6 @@ import app.sportahub.eventservice.model.event.participant.Participant;
 import app.sportahub.eventservice.model.event.reactor.Reaction;
 import app.sportahub.eventservice.model.social.Post;
 import com.mongodb.lang.Nullable;
-import app.sportahub.eventservice.model.event.reactor.Reactor;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -82,7 +81,7 @@ public class Event extends BaseEntity {
     private EnumSet<SkillLevelEnum> requiredSkillLevel = EnumSet.allOf(SkillLevelEnum.class);
 
     @Builder.Default
-    private List<Reactor> reactions = new ArrayList<>();
+    private List<Reaction> reactions = new ArrayList<>();
 
     @Builder.Default
     private EventState state = EventState.ACTIVE;

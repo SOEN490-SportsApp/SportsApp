@@ -16,7 +16,6 @@ import app.sportahub.eventservice.model.event.participant.ParticipantAttendStatu
 import app.sportahub.eventservice.repository.event.EventRepository;
 import app.sportahub.eventservice.model.event.reactor.ReactionType;
 import app.sportahub.eventservice.model.event.reactor.Reaction;
-import app.sportahub.eventservice.repository.EventRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,6 +30,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
