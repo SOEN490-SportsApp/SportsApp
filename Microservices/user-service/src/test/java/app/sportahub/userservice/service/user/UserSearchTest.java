@@ -125,7 +125,8 @@ public class UserSearchTest {
                 "H7H 7H7",
                 "5145145145",
                 Arrays.asList(new SportLevelResponse("Soccer", "Intermediate")),
-                "Pro"
+                "Pro",
+                null
         );
         when(profileMapper.profileToProfileResponse(profile)).thenReturn(profileResponse);
 

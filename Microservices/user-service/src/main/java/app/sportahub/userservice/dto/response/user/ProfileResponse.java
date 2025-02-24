@@ -8,5 +8,5 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record ProfileResponse(String firstName, String lastName, LocalDate dateOfBirth, String gender,
                               String postalCode, String phoneNumber, List<SportLevelResponse> sportsOfPreference,
-                              String ranking) {
+                              String ranking, String profilePicture) {
 }
