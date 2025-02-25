@@ -81,7 +81,7 @@ export default function UserProfilesLayout() {
                                 </TouchableOpacity>
                             }>
                             { (!isFriends || !isRequestSent) && <Menu.Item onPress={() => handleOptionPress("add")} title="Add Friend" />}
-                            <Menu.Item onPress={() => handleOptionPress("message")} title="Send a Message" />
+                            <Menu.Item onPress={() => handleOptionPress("message")} title="Send a ChatComponent" />
                         </Menu>
                     ),
                     headerLeft: () => (
