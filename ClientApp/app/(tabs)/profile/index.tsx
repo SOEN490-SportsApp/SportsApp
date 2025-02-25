@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   Dimensions,
 } from "react-native";
-import Toggle from "react-native-toggle-element";
 import Icon from "react-native-vector-icons/Ionicons";
 import CustomTabMenu from "@/components/Helper Components/CustomTabMenu";
 import { useRouter } from "expo-router";
@@ -39,48 +38,16 @@ const getSkillColor = (ranking: string) => {
 };
 
 const ActivityTab = () => {
-  const user = useSelector((state: { user: any }) => state.user);
-  const [isListView, setIsListView] = useState(false);
-  const toggleSwitch = () => {
-    setIsListView(!isListView);
-  };
+  const user = useSelector((state: { user: any }) => state.user);  
   return (
-    <View className="p-4 bg-white">
-      <View className="flex flex-row justify-around h-16">
-        <Text>Schedule view</Text>
-        {/* <Toggle
-          value={isListView}
-          onPress={() => setIsListView(!isListView)}
-          
-          leftComponent={
-            <MaterialCommunityIcons
-              name="calendar-account"
-              // width="30"
-            
-              // fill={Colors.tabIconSelected}
-            />
-          }
-          rightComponent={
-            <MaterialCommunityIcons
-              name="calendar-account"
-              size={1}
-              
-              // fill={theme.tabIconSelected}
-            />
-          }
-        /> */}
-      </View>
-      {isListView ? (
-        <View>
+    <View className="p-4">
+      <View >
           <EventList
             fetchEventsFunction={(page, size) =>
               getEventsJoined(user.id, page, size)
             }
           />
         </View>
-      ) : (
-        <MyCalendar userId={user.id} />
-      )}
     </View>
   );
 };
