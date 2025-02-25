@@ -1,28 +1,27 @@
-import { getEventsJoined } from "@/services/eventService";
+import { getAllEvents, getEventsJoined } from "@/services/eventService";
 import themeColors from "@/utils/constants/colors";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  TouchableOpacity,
   View,
   Text,
   StyleSheet,
   Modal,
   TouchableWithoutFeedback,
+  Animated,
 } from "react-native";
-import { Calendar, LocaleConfig } from "react-native-calendars";
+import { Calendar} from "react-native-calendars";
 import { Event } from "@/types/event";
 import { useRouter } from "expo-router";
 import CalendarEventCard from "../Event/CalendarEventCard";
-import { vs } from "@/utils/helpers/uiScaler";
-import { ActivityIndicator } from "react-native-paper";
+import { mhs, mvs, vs } from "@/utils/helpers/uiScaler";
 
 interface EventList {
   userId: string;
+  isVisible: boolean;
 }
-const MyCalendar: React.FC<EventList> = ({ userId }) => {
+const MyCalendar: React.FC<EventList> = ({ userId, isVisible }) => {
   const router = useRouter();
   const [modalVisible, setModalVisible] = useState(false);
-  // const [events, setEvents] = useState<any[]>([]);
   const events = useRef<Event[]>([]);
   const [selectedDate, setSelectedDate] = useState("");
   const today = new Date().toISOString().split("T")[0];
@@ -36,13 +35,23 @@ const MyCalendar: React.FC<EventList> = ({ userId }) => {
       selectedColor: themeColors.primary,
     },
   });
+
+  const heightAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(heightAnim, {
+      toValue: isVisible ? mvs(310) : 0,
+      duration: 400,
+      useNativeDriver: false,
+    }).start();
+  }, [isVisible]);
+
   useEffect(() => {
     setSelectedDate("");
     const fetchEvents = async () => {
-      const response = await getEventsJoined(userId);
-      events.current = response.data.content;
+      const response = await getAllEvents();
+      events.current = response;
       const eventDates = events.current.map((event) => event.date);
-
       const updatedMarkedDates = eventDates.reduce((acc: any, date: string) => {
         acc[date] = {
           marked: true,
@@ -59,7 +68,6 @@ const MyCalendar: React.FC<EventList> = ({ userId }) => {
     fetchEvents();
   }, []);
 
-  console.log(markedDates);
   const onDayPress = (day: any) => {
     setModalVisible(true);
     const selectedDate = day.dateString;
@@ -70,35 +78,6 @@ const MyCalendar: React.FC<EventList> = ({ userId }) => {
     setDisplayEvents(eventsForSelectedDate);
     console.log("Events: ", displayEvents);
 
-    // setEvents(markedDates[selectedDate] || []);
-  };
-
-  const CustomLeftArrow = ({ onPress }: any) => (
-    <TouchableOpacity onPress={onPress}>
-      <Text style={styles.arrow}>{"<"}</Text>
-    </TouchableOpacity>
-  );
-
-  // Custom right arrow component
-  const CustomRightArrow = ({ onPress }: any) => (
-    <TouchableOpacity onPress={onPress}>
-      <Text style={styles.arrow}>{">"}</Text>
-    </TouchableOpacity>
-  );
-
-  const handleMonthChange = (direction: "left" | "right") => {
-    const [year, month] = currentMonth.split("-");
-    const currentDate = new Date(parseInt(year), parseInt(month) - 1);
-
-    if (direction === "left") {
-      currentDate.setMonth(currentDate.getMonth() - 1); // Go to previous month
-    } else {
-      currentDate.setMonth(currentDate.getMonth() + 1); // Go to next month
-    }
-
-    const newMonth = currentDate.toISOString().split("T")[0].slice(0, 7); // YYYY-MM
-
-    setCurrentMonth(newMonth);
   };
 
   const handleEventPress = (eventId: string) => {
@@ -107,39 +86,47 @@ const MyCalendar: React.FC<EventList> = ({ userId }) => {
   };
 
   return (
-    <View style={{ height: "90%" }}>
-      {!!events.current ? (
+    <Animated.View style={[styles.animatedContainer, { height: heightAnim }]}>
+      {!!events.current && isVisible && (
         <Calendar
           style={{
-            // height: vs(800),
-            height: 500,
+            flexGrow: 1,
+            height: mvs(300),
+            borderRadius: 20,
+            margin: 4,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.2,
+            shadowRadius: 5,
+            elevation: 5,
           }}
           current={currentMonth}
           theme={{
-            textDayFontSize: 18, // Day text font size
-            textMonthFontSize: 22, // Month text font size
-            selectedDayBackgroundColor: themeColors.primary, // Selected day background color
-            selectedDayTextColor: "#fff", // Text color for selected day
-            todayTextColor: themeColors.primary, // Today text color
-            // Dot size for marked dates
-            arrowColor: "green",
+            textDayFontSize: mvs(18), 
+            textMonthFontSize: mvs(22), 
+            textMonthFontWeight: "bold",
+            selectedDayBackgroundColor: themeColors.primary,
+            selectedDayTextColor: "#fff", 
+            todayTextColor: themeColors.primary, 
+            arrowColor: themeColors.primary,
+            arrowWidth: 28,
+            textDayStyle: {
+              textAlign: "center",
+            },
+            weekVerticalMargin: 2,
           }}
+          enableSwipeMonth={true}
+          // showSixWeeks={true}
           minDate={Date()}
-          // renderArrow={(direction: any) =>
-          //   direction === 'left' ? (
-          //     <CustomLeftArrow onPress={() => handleMonthChange('left')} />
-          //   ) : (
-          //     <CustomRightArrow onPress={() => handleMonthChange('right')} />
-          //   )
-          // }
           onMonthChange={(month: any) =>
             setCurrentMonth(month.dateString.split("T")[0].slice(0, 7))
           }
           markedDates={markedDates}
           onDayPress={onDayPress}
         />
-      ) : (
-        <ActivityIndicator />
+        // ) : (
+        //   <ActivityIndicator />
+        // )
       )}
 
       {selectedDate && (
@@ -170,7 +157,7 @@ const MyCalendar: React.FC<EventList> = ({ userId }) => {
           </TouchableWithoutFeedback>
         </Modal>
       )}
-    </View>
+    </Animated.View>
   );
 };
 
@@ -183,8 +170,8 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    width: 350,
-    padding: 20,
+    width: mhs(350),
+    padding: mvs(20),
     backgroundColor: "white",
     borderRadius: 10,
     alignItems: "center",
@@ -195,7 +182,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#007AFF",
   },
-  eventText: { fontSize: 16, marginVertical: 5 },
+  eventText: { fontSize: 16, marginVertical: mvs(5) },
+  animatedContainer: { overflow: "hidden" },
 });
 
 export default MyCalendar;
