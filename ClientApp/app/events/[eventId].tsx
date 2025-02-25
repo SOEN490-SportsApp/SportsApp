@@ -11,6 +11,7 @@ import { sportIconMap } from "@/utils/mappers/eventIconsMappers";
 import { getEventById, joinEvent } from "@/utils/api/eventApiClient";
 import SkillTag from "@/components/Event/SkillTag";
 import CustomTabMenu from "@/components/Helper Components/CustomTabMenu";
+import EventLocationMap from "@/components/Helper Components/EventLocationMap";
 
 const EventPosts = () => {
   return (
@@ -46,6 +47,16 @@ const EventDetails = ({ event, handleJoinEvent }: { event: Event; handleJoinEven
           ))}
         </View> */}
       {/* </View> */}
+
+      {/* Event Location Map */}
+      {event.locationResponse?.latitude && event.locationResponse?.longitude && (
+        <View style={styles.section}>
+          <EventLocationMap 
+            latitude={parseFloat(event.locationResponse.latitude)} 
+            longitude={parseFloat(event.locationResponse.longitude)} 
+          />
+        </View>
+      )}
 
       {/* Description */}
       <View style={styles.section}>
