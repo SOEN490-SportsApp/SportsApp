@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Image, Pressable } from "react-native";
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Image, Pressable, SafeAreaView, TouchableOpacity } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useSelector } from "react-redux";
@@ -10,92 +10,26 @@ import { mhs, mvs } from "@/utils/helpers/uiScaler";
 import { sportIconMap } from "@/utils/mappers/eventIconsMappers";
 import { getEventById, joinEvent } from "@/utils/api/eventApiClient";
 import SkillTag from "@/components/Event/SkillTag";
+import CustomTabMenu from "@/components/Helper Components/CustomTabMenu";
 
-const EventDetails = () => {
+const EventPosts = () => {
+  return (
+    <View>
+      <Text>Event Posts</Text>
+    </View>
+  );
+}
+
+const EventDetails = ({ event, handleJoinEvent }: { event: Event; handleJoinEvent: () => void }) => {
   const router = useRouter();
   const user = useSelector((state: { user: any }) => state.user);
   const { eventId } = useLocalSearchParams<{ eventId: string }>();
-  const [event, setEvent] = useState<Event | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  const handleJoinEvent = async () => {
-    try {
-      await joinEvent(eventId!, user.id);
-      setEvent((prevEvent) => {
-        if (!prevEvent) return prevEvent;
-        return {
-          ...prevEvent,
-          participants: [
-            ...prevEvent.participants,
-            { userId: user.id, attendStatus: "JOINED" },
-          ],
-        };
-      });
-      alert("Successfully joined the event!");
-    } catch (err) {
-      setError("Failed to join the event.");
-    }
-  };
-  
-  useEffect(() => {
-    const fetchEventDetails = async () => {
-      try {
-        const eventData = await getEventById(eventId!);
-        setEvent(eventData);
-      } catch (err) {
-        setError("Failed to fetch event details.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    if (eventId) fetchEventDetails();
-  }, [eventId]);
-
-  if (loading) {
-    return (
-      <View style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color="#000" />
-      </View>
-    );
-  }
-
-  if (error) {
-    return (
-      <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>{error}</Text>
-      </View>
-    );
-  }
-
-  if (!event) {
-    return (
-      <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>Event not found.</Text>
-      </View>
-    );
-  }
-
-  const isUserParticipant = event.participants.some(
-    (participant) => participant.userId === user.id
-  );
-
-  let sportIcon = sportIconMap[event.sportType];
+  // const [event, setEvent] = useState<Event | null>(null);
   
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* Event Header */}
-      <View style={styles.header}>
-        <MaterialCommunityIcons
-          name={event.sportType ? sportIcon as any : "help-circle-outline"}
-          size={50}
-          color="#94504b"
-        />
-        <Text style={styles.eventName}>{event.eventName}</Text>
-      </View>
-
       {/* Event Details */}
-      <View style={styles.details}>
+      {/* <View style={styles.details}>
         <Text style={styles.detailText}>
           📍 {event.locationResponse?.streetNumber} {event.locationResponse?.streetName}, {event.locationResponse.city}, {event.locationResponse.province}
         </Text>
@@ -104,14 +38,14 @@ const EventDetails = () => {
         </Text>
         <Text style={styles.detailText}>
           {event.isPrivate ? "🔒 Private Event" : "🌐 Public Event"}
-        </Text>
+        </Text> */}
         {/* Skill Tags */}
-        <View style={styles.skillTags}>
+        {/* <View style={styles.skillTags}>
           {event.requiredSkillLevel.map((level, index) => (
             <SkillTag key={index} level={level} />
           ))}
-        </View>
-      </View>
+        </View> */}
+      {/* </View> */}
 
       {/* Description */}
       <View style={styles.section}>
@@ -166,18 +100,126 @@ const EventDetails = () => {
           )}
         </View>
       </View>
-
-      {/* Join Button */}
-      {!isUserParticipant && (
-        <ConfirmButton
-          text="Join Event"
-          onPress={handleJoinEvent} icon={undefined} iconPlacement={null} />
-      )}
     </ScrollView>
   );
 };
 
-export default EventDetails;
+const EventPage: React.FC = () => {
+  const user = useSelector((state: { user: any }) => state.user);
+  const [event, setEvent] = useState<Event | null>(null);
+  const { eventId } = useLocalSearchParams<{ eventId: string }>();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchEventDetails = async () => {
+      try {
+        const eventData = await getEventById(eventId!);
+        setEvent(eventData);
+      } catch (err) {
+        setError("Failed to fetch event details.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (eventId) fetchEventDetails();
+  }, [eventId]);
+
+  const handleJoinEvent = async () => {
+    try {
+      await joinEvent(eventId!, user.id);
+      setEvent((prevEvent) => {
+        if (!prevEvent) return prevEvent;
+        return {
+          ...prevEvent,
+          participants: [
+            ...prevEvent.participants,
+            { userId: user.id, attendStatus: "JOINED" },
+          ],
+        };
+      });
+    } catch (err) {
+      setError("Failed to join the event.");
+    }
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#000" />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>{error}</Text>
+      </View>
+    );
+  }
+
+  if (!event) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>Event not found.</Text>
+      </View>
+    );
+  }
+
+  const isUserParticipant = event.participants.some(
+    (participant) => participant.userId === user.id
+  );
+
+  let sportIcon = sportIconMap[event.sportType];
+
+  const routes = [
+    { key: "eventDetails", title: "Details", testID: "eventDetails" },
+    { key: "eventPosts", title: "Posts", testID: "eventPosts" },
+  ];
+  
+  const scenes = {
+    eventDetails: <EventDetails event={event} handleJoinEvent={handleJoinEvent} />,
+    eventPosts: <EventPosts />,
+  };
+
+  return (
+    <SafeAreaView className="flex-1 bg-white pt-6">
+      <View style={styles.header}>
+        <MaterialCommunityIcons
+          name={event.sportType ? sportIcon as any : "help-circle-outline"}
+          size={50}
+          color="#94504b"
+        />
+        <View style={styles.headerTextContainer}>
+          <Text style={styles.eventName}>{event.eventName}</Text>
+          <View style={styles.details}>
+            <Text style={styles.detailText}>
+              📅 {new Date(event.date).toDateString()}
+            </Text>
+            <Text style={styles.detailText}>
+              {event.isPrivate ? "🔒 Private Event" : "🌐 Public Event"}
+            </Text>
+            <View style={styles.skillTags}>
+              {event.requiredSkillLevel.map((level, index) => (
+                <SkillTag key={index} level={level} />
+              ))}
+            </View>
+          </View>
+          <View style={styles.jointButton}>
+            {!isUserParticipant && (
+              <ConfirmButton text="Join Event" onPress={handleJoinEvent} icon={undefined} iconPlacement={null} />
+            )}
+          </View>
+        </View>
+      </View>
+
+      <CustomTabMenu routes={routes} scenes={scenes} backgroundColor={"#fff"} />
+    </SafeAreaView>
+  );
+};
+
+export default EventPage;
 
 const styles = StyleSheet.create({
   container: {
@@ -204,7 +246,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: mvs(20),
+    marginBottom: mvs(5),
     backgroundColor: "#ffffff",
     padding: mhs(15),
     borderRadius: mhs(10),
@@ -290,5 +332,12 @@ const styles = StyleSheet.create({
     color: "#777",
     textAlign: "center",
     marginVertical: mvs(16),
+  },
+  headerTextContainer: {
+    flex: 1,
+    marginLeft: mhs(10),
+  },
+  jointButton: {
+    marginRight: mhs(60),
   },
 });
