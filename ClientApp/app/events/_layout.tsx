@@ -23,26 +23,18 @@ export default function EventDetailsLayout() {
   useEffect(() => {
     const fetchEventDetails = async () => {
       try {
-        if (!userId) {
-         // console.error(" No user ID found in Redux.");
-          return;
-        }
-
+        if (!userId) return;
+    
         const eventDetails = await getEventDetails(eventId);
-        //console.log("API Response Event Data:", eventDetails);
-        //console.log("Event Created By:", eventDetails.createdBy);
-
+    
         if (userId === eventDetails.createdBy) {
-         // console.log("User is the event creator.");
           setIsCreator(true);
-        } else {
-          //console.log("User is NOT the event creator.");
         }
       } catch (error) {
-        //console.error("Error fetching event details:", error);
+        console.error("Error fetching event details:", error);
       }
     };
-
+    
     fetchEventDetails();
   }, [eventId, userId]);
 
@@ -114,11 +106,10 @@ export default function EventDetailsLayout() {
             position: "absolute",
             top: 50,
             right: 10,
-           left: "auto",
-              } }
-  visible={menuVisible}
-  onDismiss={closeMenu}
-  anchor={
+           } }
+          visible={menuVisible}
+          onDismiss={closeMenu}
+          anchor={
     <TouchableOpacity onPress={openMenu}>
       <MaterialCommunityIcons name="dots-vertical" size={24} color="black" />
     </TouchableOpacity>
