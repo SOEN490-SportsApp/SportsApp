@@ -26,13 +26,10 @@ import { getEventsByUserId } from "@/utils/api/profileApiClient";
 import EventCard from "@/components/Event/EventCard";
 import UserInfoCard from "@/components/Helper Components/UserInfoCard";
 import { Event } from "@/types/event";
-import FavoriteSportsBadges from "@/components/FavoriteSportsBadges";
 import { getFriendsOfUser } from "@/services/userService";
 import { useSelector } from "react-redux";
 import { Friend } from "@/types";
-import Ionicons from "react-native-vector-icons/Ionicons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import themeColors from "@/utils/constants/colors";
 import { hs, vs } from "@/utils/helpers/uiScaler";
 
 const screenHeight = Dimensions.get("window").height;
@@ -126,7 +123,7 @@ const AboutTab: React.FC<{ user: any }> = ({ user }) => {
   }
 
   return (
-    <View className="p-4 bg-gray-100 flex-1">
+    <View className="p-4  bg-white flex-1">
       <UserInfoCard
         username={user.username}
         gender={user.profile.gender}
@@ -245,9 +242,9 @@ const ProfilePage: React.FC = () => {
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
           paddingVertical: vs(15),
-          backgroundColor: "#fff",
           marginTop: hs(-225),
           borderColor: "#FFF",
+          backgroundColor: "#FFF"
         }}
       >
         <View className="items-center flex flex-row gap-4">

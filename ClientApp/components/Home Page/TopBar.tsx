@@ -4,9 +4,12 @@ import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { Icon } from "react-native-elements";
 import { mhs } from "@/utils/helpers/uiScaler";
 
-const TopBar = () => {
+interface TopBarInterface {
+  onPress: () => void;
+}
+const TopBar: React.FC<TopBarInterface> = ({ onPress }) => {
   const logo = require("@/assets/images/sporta_logo.png");
-  const router = useRouter();;
+  const router = useRouter();
   return (
     <View style={styles.header}>
       <View style={styles.logoContainer}>
@@ -21,12 +24,17 @@ const TopBar = () => {
           onPress={() => router.push("/(tabs)/home/searchPage")}
         >
           <View style={styles.iconCircle}>
-            <Icon name="search" type="font-awesome" color="#000" size={20} />
+            <Icon name="search" type="font-awesome" color="#000" size={18} />
           </View>
         </TouchableOpacity>
         <TouchableOpacity style={styles.iconButton} testID="search-icon" onPress={() => router.push('/(tabs)/home/(notifications)/notificationsPage')}>
           <View style={styles.iconCircle}>
-            <Icon name="bell" type="font-awesome" color="#000" size={20} />
+            <Icon name="bell" type="font-awesome" color="#000" size={18} />
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.iconButton} testID="calendar-icon" onPress={onPress}>
+          <View style={styles.iconCircle}>
+            <Icon name="calendar" type="font-awesome" color="#000" size={18} />
           </View>
         </TouchableOpacity>
       </View>
