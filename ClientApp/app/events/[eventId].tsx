@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 import { Event } from "@/types/event";
 import ConfirmButton from "@/components/Helper Components/ConfirmButton";
 import themeColors from "@/utils/constants/colors";
-import { mhs, mvs } from "@/utils/helpers/uiScaler";
+import { hs, mhs, mvs, vs } from "@/utils/helpers/uiScaler";
 import { sportIconMap } from "@/utils/mappers/eventIconsMappers";
 import { getEventById, joinEvent } from "@/utils/api/eventApiClient";
 import SkillTag from "@/components/Event/SkillTag";
@@ -217,9 +217,13 @@ const EventPage: React.FC = () => {
               ))}
             </View>
           </View>
-          <View style={styles.jointButton}>
-            {!isUserParticipant && (
+          <View style={styles.joinButtonContainer}>
+            {!isUserParticipant ? (
               <ConfirmButton text="Join Event" onPress={handleJoinEvent} icon={undefined} iconPlacement={null} />
+            ) : (
+              <View style={styles.joinedTextContainer}>
+                <Text style={styles.joinedText}>Joined</Text>
+              </View>
             )}
           </View>
         </View>
@@ -348,7 +352,28 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: mhs(10),
   },
-  jointButton: {
+  joinButtonContainer: {
+    marginTop: mvs(10),
     marginRight: mhs(60),
+  },
+  joinedTextContainer: {
+    borderWidth: 2,
+    borderColor: "green",
+    backgroundColor: "white",
+    height: vs(50),
+    borderRadius: mhs(25),
+    alignItems: 'center',
+    justifyContent: "center",
+    marginBottom: vs(16),
+    shadowColor: '#475569',
+    shadowOffset: { width: 0, height: vs(2) },
+    shadowOpacity: 0.25,
+    shadowRadius: hs(4),
+    minHeight: 40
+  },
+  joinedText: {
+    color: "green",
+    fontWeight: "bold",
+    fontSize: mvs(16),
   },
 });
