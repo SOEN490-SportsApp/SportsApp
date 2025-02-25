@@ -12,7 +12,7 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 
 @Component
-public class LoggingFilter implements Filter {
+public class EndpointFilter implements Filter {
 
     private static final String REQUEST_ID = "endpoint";
 
