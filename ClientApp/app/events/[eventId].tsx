@@ -48,16 +48,6 @@ const EventDetails = ({ event, handleJoinEvent }: { event: Event; handleJoinEven
         </View> */}
       {/* </View> */}
 
-      {/* Event Location Map */}
-      {event.locationResponse?.latitude && event.locationResponse?.longitude && (
-        <View style={styles.section}>
-          <EventLocationMap 
-            latitude={parseFloat(event.locationResponse.latitude)} 
-            longitude={parseFloat(event.locationResponse.longitude)} 
-          />
-        </View>
-      )}
-
       {/* Description */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Description</Text>
@@ -75,7 +65,7 @@ const EventDetails = ({ event, handleJoinEvent }: { event: Event; handleJoinEven
             {event.maxParticipants}
           </Text>
         </View>
-        <View style={styles.participantsContainer}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.participantsScrollContainer}>
           {event.participants.filter((p) => p.attendStatus === "JOINED" || p.attendStatus === "CONFIRMED").length >
             0 ? (
             event.participants
@@ -109,8 +99,18 @@ const EventDetails = ({ event, handleJoinEvent }: { event: Event; handleJoinEven
               No participants yet. Be the first to join!
             </Text>
           )}
-        </View>
+        </ScrollView>
       </View>
+      
+      {/* Event Location Map */}
+      {event.locationResponse?.latitude && event.locationResponse?.longitude && (
+        <View style={styles.section}>
+          <EventLocationMap 
+            latitude={parseFloat(event.locationResponse.latitude)} 
+            longitude={parseFloat(event.locationResponse.longitude)} 
+          />
+        </View>
+      )}
     </ScrollView>
   );
 };
@@ -375,5 +375,9 @@ const styles = StyleSheet.create({
     color: "green",
     fontWeight: "bold",
     fontSize: mvs(16),
+  },
+  participantsScrollContainer: {
+    flexDirection: "row",
+    paddingVertical: vs(10),
   },
 });
