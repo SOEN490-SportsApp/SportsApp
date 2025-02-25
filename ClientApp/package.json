@@ -21,9 +21,6 @@
       "<rootDir>/jest.setup.ts",
       "@testing-library/jest-native/extend-expect"
     ],
-    "moduleNameMapper": {
-      "^@react-native-async-storage/async-storage$": "<rootDir>/__mocks__/@react-native-async-storage/async-storage.ts"
-    },
     "transform": {
       "^.+\\.[tj]sx?$": "babel-jest"
     },
