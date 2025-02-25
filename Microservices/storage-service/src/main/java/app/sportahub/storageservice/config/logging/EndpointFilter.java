@@ -1,4 +1,4 @@
-package app.sportahub.eventservice.config.logging;
+package app.sportahub.storageservice.config.logging;
 
 import java.io.IOException;
 
@@ -13,7 +13,7 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 
 @Component
-public class LoggingFilter implements Filter {
+public class EndpointFilter implements Filter {
 
     private static final String REQUEST_ID = "endpoint";
 
