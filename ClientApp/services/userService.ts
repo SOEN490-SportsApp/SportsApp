@@ -21,7 +21,6 @@ export async function searchUser(searchText: string){
 export const getUserProfile = async (userId: string) => {
     try {
       const axiosInstance = getAxiosInstance();
-      console.log(API_ENDPOINTS.GET_PROFILE_BY_ID.replace("{userId}", userId))
       const response = await axiosInstance.get(API_ENDPOINTS.GET_PROFILE_BY_ID.replace("{userId}", userId));   
       return response.data.profile;
     } catch (error) {

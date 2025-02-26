@@ -50,9 +50,7 @@ const EditProfilePage: React.FC = () => {
         ...data,
         sportsOfPreference: user.profile.sportsOfPreference,
       };
-      //console.log("Updated Data:", updatedData);
       const response = await updateProfile(updatedData, user.id);
-     // console.log("Profile updated successfully:", response);
       await updateUserToStore(user.id);
       router.replace("/(tabs)/profile");
     } catch (error: any) {

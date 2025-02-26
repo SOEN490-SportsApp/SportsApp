@@ -9,10 +9,10 @@ import {
   TouchableWithoutFeedback,
   Animated,
 } from "react-native";
-import { Calendar} from "react-native-calendars";
+import { Calendar } from "react-native-calendars";
 import { Event } from "@/types/event";
 import { useRouter } from "expo-router";
-import CalendarEventCard from "../Event/CalendarEventCard";
+import CalendarEventCard from "./CalendarEventCard";
 import { mhs, mvs, vs } from "@/utils/helpers/uiScaler";
 
 interface EventList {
@@ -76,8 +76,6 @@ const MyCalendar: React.FC<EventList> = ({ userId, isVisible }) => {
       (event) => event.date === selectedDate
     );
     setDisplayEvents(eventsForSelectedDate);
-    console.log("Events: ", displayEvents);
-
   };
 
   const handleEventPress = (eventId: string) => {
@@ -102,12 +100,12 @@ const MyCalendar: React.FC<EventList> = ({ userId, isVisible }) => {
           }}
           current={currentMonth}
           theme={{
-            textDayFontSize: mvs(18), 
-            textMonthFontSize: mvs(22), 
+            textDayFontSize: mvs(18),
+            textMonthFontSize: mvs(22),
             textMonthFontWeight: "bold",
             selectedDayBackgroundColor: themeColors.primary,
-            selectedDayTextColor: "#fff", 
-            todayTextColor: themeColors.primary, 
+            selectedDayTextColor: "#fff",
+            todayTextColor: themeColors.primary,
             arrowColor: themeColors.primary,
             arrowWidth: 28,
             textDayStyle: {
