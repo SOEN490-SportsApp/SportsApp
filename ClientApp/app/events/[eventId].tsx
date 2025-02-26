@@ -29,25 +29,6 @@ const EventDetails = ({ event, handleJoinEvent }: { event: Event; handleJoinEven
   
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* Event Details */}
-      {/* <View style={styles.details}>
-        <Text style={styles.detailText}>
-          📍 {event.locationResponse?.streetNumber} {event.locationResponse?.streetName}, {event.locationResponse.city}, {event.locationResponse.province}
-        </Text>
-        <Text style={styles.detailText}>
-          📅 {new Date(event.date).toDateString()}
-        </Text>
-        <Text style={styles.detailText}>
-          {event.isPrivate ? "🔒 Private Event" : "🌐 Public Event"}
-        </Text> */}
-        {/* Skill Tags */}
-        {/* <View style={styles.skillTags}>
-          {event.requiredSkillLevel.map((level, index) => (
-            <SkillTag key={index} level={level} />
-          ))}
-        </View> */}
-      {/* </View> */}
-
       {/* Description */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Description</Text>
@@ -197,11 +178,6 @@ const EventPage: React.FC = () => {
   return (
     <SafeAreaView className="flex-1 bg-white pt-6">
       <View style={styles.header}>
-        <MaterialCommunityIcons
-          name={event.sportType ? sportIcon as any : "help-circle-outline"}
-          size={50}
-          color="#94504b"
-        />
         <View style={styles.headerTextContainer}>
           <Text style={styles.eventName}>{event.eventName}</Text>
           <View style={styles.details}>
@@ -209,7 +185,12 @@ const EventPage: React.FC = () => {
               📅 {new Date(event.date).toDateString()}
             </Text>
             <Text style={styles.detailText}>
-              {event.isPrivate ? "🔒 Private Event" : "🌐 Public Event"}
+              <MaterialCommunityIcons
+                name={event.sportType ? sportIcon as any : "help-circle-outline"}
+                size={20}
+                color="#94504b"
+              />
+              {event.sportType} • {event.eventType}
             </Text>
             <View style={styles.skillTags}>
               {event.requiredSkillLevel.map((level, index) => (
@@ -278,7 +259,6 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   details: {
-    marginBottom: mvs(15),
     backgroundColor: "#ffffff",
     padding: mhs(15),
     borderRadius: mhs(10),
@@ -353,8 +333,8 @@ const styles = StyleSheet.create({
     marginLeft: mhs(10),
   },
   joinButtonContainer: {
-    marginTop: mvs(10),
     marginRight: mhs(60),
+    marginLeft: mhs(46),
   },
   joinedTextContainer: {
     borderWidth: 2,
