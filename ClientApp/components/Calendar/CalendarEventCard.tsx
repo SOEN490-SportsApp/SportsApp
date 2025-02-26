@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Event } from "@/types/event";
-import SkillTag from "./SkillTag";
+import SkillTag from "../Event/SkillTag";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 // all the show props are optional and default to true to modularize the component
@@ -125,8 +125,8 @@ export default CalendarEventCard;
 
 const styles = StyleSheet.create({
   card: {
-    // marginVertical: 5,
-    // marginHorizontal: 5,
+    marginVertical: 5,
+    marginHorizontal: 5,
     paddingHorizontal: 15,
     borderRadius: 10,
     backgroundColor: "#ffffff",

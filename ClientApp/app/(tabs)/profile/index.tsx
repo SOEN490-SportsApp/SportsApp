@@ -19,6 +19,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import FavoriteSportsBadges from "@/components/FavoriteSportsBadges";
 import FriendsList from "@/components/Profile/FriendsList";
 import MyCalendar from "@/components/Calendar/MyCalendar";
+import ProfileSection from "@/components/Profile/ProfileSection";
 
 const screenHeight = Dimensions.get("window").height;
 const maxHeight = screenHeight * 0.5;
@@ -38,16 +39,16 @@ const getSkillColor = (ranking: string) => {
 };
 
 const ActivityTab = () => {
-  const user = useSelector((state: { user: any }) => state.user);  
+  const user = useSelector((state: { user: any }) => state.user);
   return (
     <View className="p-4">
-      <View >
-          <EventList
-            fetchEventsFunction={(page, size) =>
-              getEventsJoined(user.id, page, size)
-            }
-          />
-        </View>
+      <View>
+        <EventList
+          fetchEventsFunction={(page, size) =>
+            getEventsJoined(user.id, page, size)
+          }
+        />
+      </View>
     </View>
   );
 };
@@ -129,17 +130,26 @@ const ProfilePage: React.FC = () => {
       </View>
 
       {/* Profile Header */}
-      <View className="items-center p-4 bg-white">
-        <Image
+      {/* <View className="items-center p-4 bg-white"> */}
+        {/* <Image
           className="w-20 h-20 rounded-full"
           source={require("@/assets/images/avatar-placeholder.png")}
           defaultSource={require("@/assets/images/Unknown.jpg")}
         />
         <Text testID="firstName" className="text-2xl font-bold text-black mt-2">
           {user?.profile.firstName} {user?.profile.lastName}
-        </Text>
-      </View>
-      <FavoriteSportsBadges sports={user?.profile.sportsOfPreference} />
+        </Text> */}
+
+        <ProfileSection
+          user={user}
+          isUserProfile={true}
+          friendStatus={null}
+          handleFriendRequest={function (): void | Promise<void> | null {
+            throw new Error("Function not implemented.");
+          }}
+        />
+      {/* </View> */}
+      {/* <FavoriteSportsBadges sports={user?.profile.sportsOfPreference} /> */}
 
       {/* CustomTabMenu */}
       <CustomTabMenu routes={routes} scenes={scenes} backgroundColor={"#fff"} />
