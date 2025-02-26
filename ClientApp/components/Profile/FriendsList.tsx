@@ -11,7 +11,6 @@ const FriendsList = ({ userId }: { userId: string }) => {
     const fetchFriends = async () => {
       setLoading(true);
       const friendList = await getFriendsOfUser(userId);
-      console.log(friendList);
       // Fetch profiles for each friend
       const friendsWithProfiles = await Promise.all(
         friendList.map(async (friend:any) => {
@@ -19,7 +18,6 @@ const FriendsList = ({ userId }: { userId: string }) => {
           return { ...friend, profile };
         })
       );
-      console.log(friendsWithProfiles);
       setFriends(friendsWithProfiles);
       setLoading(false);
     };

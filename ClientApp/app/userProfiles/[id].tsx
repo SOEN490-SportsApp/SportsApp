@@ -31,6 +31,7 @@ import { useSelector } from "react-redux";
 import { Friend } from "@/types";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { hs, vs } from "@/utils/helpers/uiScaler";
+import ProfileSection from "@/components/Profile/ProfileSection";
 
 const screenHeight = Dimensions.get("window").height;
 const maxHeight = screenHeight * 0.5;
@@ -131,7 +132,6 @@ const AboutTab: React.FC<{ user: any }> = ({ user }) => {
         phoneNumber={user.profile.phoneNumber}
         sports={user?.profile.sportsOfPreference}
       />
-        
     </View>
   );
 };
@@ -144,7 +144,6 @@ const ProfilePage: React.FC = () => {
   const [friendList, setFriendList] = useState<any[]>([]);
   const [friendStatus, setFriendStatus] = useState<string>("UNKNOWN");
   const visitingUser = useSelector((state: { user: any }) => state.user);
-
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -163,9 +162,8 @@ const ProfilePage: React.FC = () => {
 
   const handleFriendRequest = async () => {
     try {
-      if(friendStatus !== "UNKNOWN") return;
+      if (friendStatus !== "UNKNOWN") return;
       const response = await sendFriendRequest(visitingUser.id, id);
-      console.log(response)
       response
         ? setFriendStatus("PENDING")
         : Alert.alert("Error", "Failed to send friend request");
@@ -180,7 +178,6 @@ const ProfilePage: React.FC = () => {
       const friendList = await getFriendsOfUser(visitingUser.id);
       const friendRequest = await getSentFriendRequests(visitingUser.id);
       setFriendList(friendList);
-      console.log(friendList)
       const isFriends = friendList.some(
         (friend: Friend) => friend.friendUserId === id
       );
@@ -193,7 +190,6 @@ const ProfilePage: React.FC = () => {
       if (isFriends) {
         setFriendStatus("ACCEPTED");
       }
-      
     } catch (error: any) {
       console.log(error, " occured fetching friends");
     }
@@ -228,96 +224,7 @@ const ProfilePage: React.FC = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-white pt-6">
-      <ImageBackground
-        className="flex flex-1 items-start justify-end"
-        style={{ height: 350}}
-        resizeMode="cover"
-        source={require("@/assets/images/testBackground.jpg")}
-        defaultSource={require("@/assets/images/Unknown.jpg")}
-      />
-
-      <View
-        className=""
-        style={{
-          borderTopLeftRadius: 20,
-          borderTopRightRadius: 20,
-          paddingVertical: vs(15),
-          marginTop: hs(-225),
-          borderColor: "#FFF",
-          backgroundColor: "#FFF"
-        }}
-      >
-        <View className="items-center flex flex-row gap-4">
-          <View className="flex items-start flex-col gap-4 ml-4 w-11/12">
-            <Text testID="firstName" className="text-3xl font-bold ">
-              {user?.profile.firstName} {user?.profile.lastName}
-            </Text>
-            {/* <FavoriteSportsBadges sports={user?.profile.sportsOfPreference} /> */}
-            <View className="flex flex-row justify-center gap-4 w-full">
-              <TouchableOpacity
-                style={[
-                  styles.addFriendButton,
-                  {
-                    backgroundColor:
-                      friendStatus === "UNKNOWN" ? "#0C9E04" : "#fff",
-                    borderColor:
-                      friendStatus !== "UNKNOWN" ? "#0C9E04" : "#fff",
-                  },
-                ]}
-                onPress={handleFriendRequest}
-              >
-                <Text
-                  className="font-bold"
-                  style={{
-                    color: friendStatus === "UNKNOWN" ? "#fff" : "#0C9E04",
-                  }}
-                >
-                  {friendStatus === "ACCEPTED"
-                    ? "Friends"
-                    : friendStatus === "PENDING"
-                    ? "Pending"
-                    : "Add"}
-                </Text>
-                <MaterialCommunityIcons
-                  name={
-                    friendStatus === "ACCEPTED"
-                      ? "check"
-                      : friendStatus === "PENDING"
-                      ? "account-clock"
-                      : "account-plus"
-                  }
-                  size={22}
-                  color={friendStatus === "UNKNOWN" ? "#fff" : "#0C9E04"}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.messageButton,
-                  {
-                    backgroundColor:
-                      friendStatus === "UNKNOWN" ? "#fff" : "#0C9E04",
-                  },
-                ]}
-              >
-                <Text
-                  className="font-bold"
-                  style={{
-                    color: friendStatus === "UNKNOWN" ? "#0C9E04" : "#fff",
-                  }}
-                >
-                  Message
-                </Text>
-                <MaterialCommunityIcons
-                  name={friendStatus === "UNKOWN" ? "chat-outline" : "chat"}
-                  size={22}
-                  color={friendStatus === "UNKNOWN" ? "#0C9E04" : "#fff"}
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </View>
-      {/* <FavoriteSportsBadges sports={user?.profile.sportsOfPreference} /> */}
+      <ProfileSection user={user} friendStatus={friendStatus} handleFriendRequest={handleFriendRequest} isUserProfile={false} />
       <CustomTabMenu routes={routes} scenes={scenes} backgroundColor={"#fff"} />
     </SafeAreaView>
   );
