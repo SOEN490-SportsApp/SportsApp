@@ -25,8 +25,6 @@ const RegisterProfileSports: React.FC<sportSelection> = ({ selectedSports = [], 
   const [modalVisible, setModalVisible] = useState(false);
   const [currentSport, setCurrentSport] = useState<{ id: number; name: string } | null>(null);
   const [ranking, setRanking] = useState<string>("");
-
-  // ✅ Place useEffect inside the component and ensure it runs after the component mounts
   useEffect(() => {
     if (user?.profile?.sportsOfPreference) {
       setSelectedIcons(user.profile.sportsOfPreference.map(sport => {
@@ -49,29 +47,22 @@ const RegisterProfileSports: React.FC<sportSelection> = ({ selectedSports = [], 
                 ? prevState
                 : [...prevState, currentSport.id];
 
-            // ✅ Fix: Retrieve previous selections from Redux state to keep them
             const selectedNames = user.profile.sportsOfPreference ? [...user.profile.sportsOfPreference] : [];
 
             const existingSportIndex = selectedNames.findIndex(sport => sport.name === currentSport.name);
 
             if (existingSportIndex !== -1) {
-                // ✅ Update the ranking of an already selected sport
                 selectedNames[existingSportIndex].ranking = ranking;
             } else {
-                // ✅ Add a new selected sport, keeping previous selections
                 selectedNames.push({ name: currentSport.name, ranking });
             }
-
-            // ✅ Save updated list in Redux
             dispatch(setUser({
                 ...user,
                 profile: {
                     ...user.profile,
-                    sportsOfPreference: selectedNames // ✅ Preserve all previous selections
+                    sportsOfPreference: selectedNames 
                 }
             }));
-
-            // ✅ Notify the parent component
             onChange(selectedNames);
 
             return newSelectedIcons;
