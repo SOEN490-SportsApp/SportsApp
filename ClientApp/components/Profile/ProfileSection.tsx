@@ -46,7 +46,7 @@ const ProfileSection: React.FC<ProfileRequest> = ({
     <>
       <ImageBackground
         className="flex flex-1 items-start justify-end"
-        style={{ height: vs(320) }}
+        style={{ height: vs(320), marginTop: isUserProfile ? 16 : 0 }}
         resizeMode="cover"
         source={require("@/assets/images/testBackground.jpg")}
         defaultSource={require("@/assets/images/Unknown.jpg")}
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
   container: {
     display: "flex",
     flexDirection: "column",
-    alignItems: "flex-start",
+    alignItems: "center",
     gap: 4,
     marginLeft: vs(8),
     width: "91.6667%",
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
   headerContainer: {
     display: "flex",
     flexDirection: "row",
-    justifyContent: "flex-start",
+    justifyContent: "center",
     gap: 8,
     width: "100%",
   },

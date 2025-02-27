@@ -136,7 +136,8 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
     position: "relative",
-    width: "100%",
+    width: "98%",
+    justifyContent:"center"
   },
   eventName: {
     fontSize: 18,
