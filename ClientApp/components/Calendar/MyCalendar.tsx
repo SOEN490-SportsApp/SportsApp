@@ -52,27 +52,27 @@ const MyCalendar: React.FC<EventList> = ({ userId, isVisible }) => {
   useFocusEffect(
     useCallback(() => {
       setSelectedDate("");
-      const fetchEvents = async () => {
-        const response = await getAllEvents();
-        events.current = response;
-        const eventDates = events.current.map((event) => event.date);
-        const updatedMarkedDates = eventDates.reduce(
-          (acc: any, date: string) => {
-            acc[date] = {
-              marked: true,
-              dotColor: themeColors.primary,
-              activeOpacity: 0,
-            };
-            return acc;
-          },
-          {}
-        );
-        setMarkedDates((prevMarkedDates: any) => ({
-          ...prevMarkedDates,
-          ...updatedMarkedDates,
-        }));
-      };
-      fetchEvents();
+      // const fetchEvents = async () => {
+      //   const response = await getAllEvents();
+      //   events.current = response;
+      //   const eventDates = events.current.map((event) => event.date);
+      //   const updatedMarkedDates = eventDates.reduce(
+      //     (acc: any, date: string) => {
+      //       acc[date] = {
+      //         marked: true,
+      //         dotColor: themeColors.primary,
+      //         activeOpacity: 0,
+      //       };
+      //       return acc;
+      //     },
+      //     {}
+      //   );
+      //   setMarkedDates((prevMarkedDates: any) => ({
+      //     ...prevMarkedDates,
+      //     ...updatedMarkedDates,
+      //   }));
+      // };
+      // fetchEvents();
     }, [])
   );
 
