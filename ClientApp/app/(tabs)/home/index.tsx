@@ -45,7 +45,7 @@ const HomePage = () => {
       <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
 
       {/* TopBar */}
-      <TopBar onPress={() => setIsCalenarVisible(!isCalendarVisible)}/>
+      <TopBar onPress={() => setIsCalenarVisible(!isCalendarVisible)} isCalendarVisible={isCalendarVisible}/>
 
       {/* Feed */}
       <View style={styles.content}>

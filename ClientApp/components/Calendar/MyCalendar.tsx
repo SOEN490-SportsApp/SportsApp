@@ -1,6 +1,6 @@
 import { getAllEvents, getEventsJoined } from "@/services/eventService";
 import themeColors from "@/utils/constants/colors";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -8,10 +8,13 @@ import {
   Modal,
   TouchableWithoutFeedback,
   Animated,
+  ScrollView,
+  FlatList,
 } from "react-native";
+
 import { Calendar } from "react-native-calendars";
 import { Event } from "@/types/event";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import CalendarEventCard from "./CalendarEventCard";
 import { mhs, mvs, vs } from "@/utils/helpers/uiScaler";
 
@@ -46,27 +49,32 @@ const MyCalendar: React.FC<EventList> = ({ userId, isVisible }) => {
     }).start();
   }, [isVisible]);
 
-  useEffect(() => {
-    setSelectedDate("");
-    const fetchEvents = async () => {
-      const response = await getAllEvents();
-      events.current = response;
-      const eventDates = events.current.map((event) => event.date);
-      const updatedMarkedDates = eventDates.reduce((acc: any, date: string) => {
-        acc[date] = {
-          marked: true,
-          dotColor: themeColors.primary,
-          activeOpacity: 0,
-        };
-        return acc;
-      }, {});
-      setMarkedDates((prevMarkedDates: any) => ({
-        ...prevMarkedDates,
-        ...updatedMarkedDates,
-      }));
-    };
-    fetchEvents();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      setSelectedDate("");
+      const fetchEvents = async () => {
+        const response = await getAllEvents();
+        events.current = response;
+        const eventDates = events.current.map((event) => event.date);
+        const updatedMarkedDates = eventDates.reduce(
+          (acc: any, date: string) => {
+            acc[date] = {
+              marked: true,
+              dotColor: themeColors.primary,
+              activeOpacity: 0,
+            };
+            return acc;
+          },
+          {}
+        );
+        setMarkedDates((prevMarkedDates: any) => ({
+          ...prevMarkedDates,
+          ...updatedMarkedDates,
+        }));
+      };
+      fetchEvents();
+    }, [])
+  );
 
   const onDayPress = (day: any) => {
     setModalVisible(true);
@@ -114,7 +122,6 @@ const MyCalendar: React.FC<EventList> = ({ userId, isVisible }) => {
             weekVerticalMargin: 2,
           }}
           enableSwipeMonth={true}
-          // showSixWeeks={true}
           minDate={Date()}
           onMonthChange={(month: any) =>
             setCurrentMonth(month.dateString.split("T")[0].slice(0, 7))
@@ -122,9 +129,6 @@ const MyCalendar: React.FC<EventList> = ({ userId, isVisible }) => {
           markedDates={markedDates}
           onDayPress={onDayPress}
         />
-        // ) : (
-        //   <ActivityIndicator />
-        // )
       )}
 
       {selectedDate && (
@@ -139,14 +143,16 @@ const MyCalendar: React.FC<EventList> = ({ userId, isVisible }) => {
               <View style={styles.modalContent}>
                 <Text style={styles.modalTitle}>Events for {selectedDate}</Text>
                 {displayEvents && displayEvents.length > 0 ? (
-                  displayEvents.map((event, index) => (
-                    <CalendarEventCard
-                      event={event}
-                      onPress={handleEventPress}
-                      isForProfile={false}
-                      key={index}
-                    />
-                  ))
+                  <ScrollView style={{ width: "100%" }}>
+                    {displayEvents.map((event, index) => (
+                      <CalendarEventCard
+                        event={event}
+                        onPress={handleEventPress}
+                        isForProfile={false}
+                        key={index}
+                      />
+                    ))}
+                  </ScrollView>
                 ) : (
                   <Text>No events for this day.</Text>
                 )}
@@ -169,6 +175,7 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     width: mhs(350),
+    maxHeight: mvs(400),
     padding: mvs(20),
     backgroundColor: "white",
     borderRadius: 10,

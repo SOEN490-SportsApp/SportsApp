@@ -3,11 +3,13 @@ import { useRouter } from "expo-router";
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { Icon } from "react-native-elements";
 import { mhs } from "@/utils/helpers/uiScaler";
+import themeColors from "@/utils/constants/colors";
 
 interface TopBarInterface {
   onPress: () => void;
+  isCalendarVisible: boolean
 }
-const TopBar: React.FC<TopBarInterface> = ({ onPress }) => {
+const TopBar: React.FC<TopBarInterface> = ({ onPress, isCalendarVisible }) => {
   const logo = require("@/assets/images/sporta_logo.png");
   const router = useRouter();
   return (
@@ -33,8 +35,8 @@ const TopBar: React.FC<TopBarInterface> = ({ onPress }) => {
           </View>
         </TouchableOpacity>
         <TouchableOpacity style={styles.iconButton} testID="calendar-icon" onPress={onPress}>
-          <View style={styles.iconCircle}>
-            <Icon name="calendar" type="font-awesome" color="#000" size={18} />
+          <View style={[styles.iconCircle, {backgroundColor: isCalendarVisible ? themeColors.primary:"#d3d3d3"}]}>
+            <Icon name="calendar" type="font-awesome" color={isCalendarVisible ? "#fff" : "#000"} size={18} />
           </View>
         </TouchableOpacity>
       </View>
