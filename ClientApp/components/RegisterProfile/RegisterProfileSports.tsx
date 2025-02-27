@@ -1,29 +1,38 @@
-import React, { useState} from "react";
+import React, { useState, useEffect } from "react";
 import supportedSports from "@/utils/constants/supportedSports";
-import { View, Text, TouchableOpacity, FlatList, Modal,Dimensions, StyleSheet, TouchableWithoutFeedback } from "react-native";
+import { View, Text, TouchableOpacity, FlatList, Modal, Dimensions, StyleSheet, TouchableWithoutFeedback } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { vs,hs,} from "@/utils/helpers/uiScaler";
+import { vs, hs } from "@/utils/helpers/uiScaler";
 import themeColors from "@/utils/constants/colors";
+import { useDispatch, useSelector } from "react-redux";
+import { setUser, selectUser } from "@/state/user/userSlice";
 
 interface SportPreference {
   name: string;
   ranking: string;
 }
+
 interface sportSelection {
   selectedSports: SportPreference[];
   onChange: (selectedSports: SportPreference[]) => void;
 }
 
- const RegisterProfileSports: React.FC<sportSelection> = ({ selectedSports = [], onChange }) => {
- const [selectedIcons, setSelectedIcons] = useState<number[]>(selectedSports ? selectedSports.map(sport => {
-    const matchingSport = supportedSports.find(s => s.name === sport.name);
-    return matchingSport ? matchingSport.id : -1;
-}) : []);
-
+const RegisterProfileSports: React.FC<sportSelection> = ({ selectedSports = [], onChange }) => {
+  const dispatch = useDispatch();
+  const user = useSelector(selectUser);
+  const [selectedIcons, setSelectedIcons] = useState<number[]>([]);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [currentSport, setCurrentSport] = useState<{ id: number; name: string } | null>(null);
   const [ranking, setRanking] = useState<string>("");
+  useEffect(() => {
+    if (user?.profile?.sportsOfPreference) {
+      setSelectedIcons(user.profile.sportsOfPreference.map(sport => {
+        const matchingSport = supportedSports.find(s => s.name === sport.name);
+        return matchingSport ? matchingSport.id : -1;
+      }));
+    }
+  }, [user.profile.sportsOfPreference]); 
 
   const toggleIconSelection = (item: any) => {
     setCurrentSport(item);
@@ -33,53 +42,40 @@ interface sportSelection {
 
   const handleConfirm = () => {
     if (currentSport) {
-      setSelectedIcons((prevState) => {
-        const newSelectedIcons = prevState.includes(currentSport.id)
-          ? prevState
-          : [...prevState, currentSport.id];
+        setSelectedIcons((prevState) => {
+            const newSelectedIcons = prevState.includes(currentSport.id)
+                ? prevState
+                : [...prevState, currentSport.id];
 
-        const selectedNames = supportedSports
-          .filter((icon) => newSelectedIcons.includes(icon.id))
-          .map((icon) => {
-            const existingSport = selectedSports.find(sport => sport.name === icon.name);
-            return {
-              name: icon.name,
-              ranking: icon.id === currentSport.id ? ranking : existingSport?.ranking || "Beginner",
-            };
-          });
+            const selectedNames = user.profile.sportsOfPreference ? [...user.profile.sportsOfPreference] : [];
 
-        onChange(selectedNames);
-        return newSelectedIcons;
-      });
+            const existingSportIndex = selectedNames.findIndex(sport => sport.name === currentSport.name);
+
+            if (existingSportIndex !== -1) {
+                selectedNames[existingSportIndex].ranking = ranking;
+            } else {
+                selectedNames.push({ name: currentSport.name, ranking });
+            }
+            dispatch(setUser({
+                ...user,
+                profile: {
+                    ...user.profile,
+                    sportsOfPreference: selectedNames 
+                }
+            }));
+            onChange(selectedNames);
+
+            return newSelectedIcons;
+        });
     }
     setModalVisible(false);
-  };
+};
 
+const selectedIconRankings = (name: string): string => {
+  const selectedSport = user.profile.sportsOfPreference?.find((sport) => sport.name === name);
+  return selectedSport ? selectedSport.ranking : "";
+};
 
-  const removePick = () => {
-    if (currentSport) {
-      const newSports = selectedIcons.filter((sportId) => sportId !== currentSport.id);
-      setSelectedIcons(newSports);
-
-      const selectedNames = supportedSports.filter((icon) => newSports.includes(icon.id)).map((icon) => {
-        const existingSport = selectedSports?.find(sport => sport.name === icon.name);
-        return {
-          name: icon.name,
-          ranking: icon.id === currentSport.id ? ranking : existingSport?.ranking || "",
-        };
-      });
-      onChange(selectedNames);
-    }
-    setModalVisible(false);
-  };
-
-  const selectedIconRankings = (name: string): string => {
-    const selectedSport = selectedSports?.find((sport) => sport.name === name);
-    if (selectedSport) {
-      return selectedSport.ranking || '';
-    }
-    return themeColors.sportIcons.lightGrey;
-  };
 
   const renderItem = ({item}: { item: { id: number; name: string; icon: string }; }) => (
     <IconButton
@@ -91,8 +87,6 @@ interface sportSelection {
       onPress={() => toggleIconSelection(item)}
     />
   );
- 
-
   return (
     <>
       <View style={styles.mainSelectionView}>
@@ -174,11 +168,11 @@ interface sportSelection {
                     Advanced
                   </Text>
                 </TouchableOpacity>
-              </View>
+                </View>
               <View style={styles.selectSkillButtonContainer}>
                 <TouchableOpacity
-                testID="remove-sport"
-                  onPress={removePick}
+                  testID="remove-sport"
+                  onPress={() => setModalVisible(false)}
                   style={[
                     styles.baseSelectNRemoveButton,
                     styles.selectSkillsButtons,
@@ -225,22 +219,24 @@ const IconButton = ({
 
   const rankingColour = (rank: string) => {
     switch (rank) {
-      case 'Advanced':
-        return themeColors.error;
-      case 'Intermediate':
-        return themeColors.sportIcons.intermediate;
-      case 'Beginner':
-        return themeColors.sportIcons.beginner;
-      default:
-        return themeColors.text.grey;
+        case 'Advanced':
+            return themeColors.error;  
+        case 'Intermediate':
+            return themeColors.sportIcons.intermediate;  
+        case 'Beginner':
+            return themeColors.sportIcons.beginner;  
+        default:
+            return themeColors.text.grey;  
     }
-  };
-
+};
   return (
     <View style={styles.iconContainer}>
       <TouchableOpacity onPress={onPress} testID={name+"-selection-button"}>
-        <View style={[styles.iconImageContainer, {backgroundColor: `${isSelected ? rankingColour(sportRank): themeColors.text.light}`,borderColor: `${isSelected ? rankingColour(sportRank): themeColors.text.light}`,}]}>
-          <MaterialCommunityIcons
+      <View style={[styles.iconImageContainer, {
+    backgroundColor: isSelected ? rankingColour(sportRank) : themeColors.text.light,
+    borderColor: isSelected ? rankingColour(sportRank) : themeColors.text.light,
+          }]}>
+      <MaterialCommunityIcons
             name={icon as unknown as any}
             size={50}
             color={`${isSelected ? "#fff" : themeColors.sportIcons.lightGrey}`}
