@@ -22,6 +22,11 @@ public class MimeTypeUtil {
             Map.entry("pdf", "application/pdf"),
             Map.entry("txt", "text/plain"),
             Map.entry("mp4", "video/mp4"),
+            Map.entry("webm", "video/webm"),
+            Map.entry("ogg", "video/ogg"),
+            Map.entry("mov", "video/quicktime"),
+            Map.entry("avi", "video/x-msvideo"),
+            Map.entry("mkv", "video/x-matroska"),
             Map.entry("mp3", "audio/mpeg"),
             Map.entry("json", "application/json")
     );
