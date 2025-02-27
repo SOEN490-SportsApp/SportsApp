@@ -47,7 +47,7 @@ public class ObjectStorageServiceImpl implements ObjectStorageService {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        String fileName = System.currentTimeMillis() + "-" + file.getOriginalFilename();
+        String fileName = System.currentTimeMillis() + "-" + file.getOriginalFilename().replaceAll("\\s+", "-");
         String filePath = "/" + authentication.getName() + "/" + fileName;
 
         minioClient.putObject(
@@ -84,7 +84,7 @@ public class ObjectStorageServiceImpl implements ObjectStorageService {
             HttpHeaders headers = new HttpHeaders();
             headers.add(HttpHeaders.CONTENT_TYPE, mimeType);
 
-            if (mimeType.startsWith("image/")) {
+            if (mimeType.startsWith("image/") || mimeType.startsWith("video/")) {
                 headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline");
             } else {
                 headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filePath.substring(filePath.lastIndexOf("/") + 1) + "\"");
