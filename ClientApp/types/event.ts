@@ -4,6 +4,8 @@ export interface Event {
     eventType: string; 
     sportType: string; 
     date: string;
+    startTime: string;
+    endTime: string;
     description: string;
     cutOffTime: string;
     requiredSkillLevel: string[];
