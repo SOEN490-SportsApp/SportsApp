@@ -220,7 +220,7 @@ export default EventPage;
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    padding: mhs(15),
+    padding: mhs(8),
     backgroundColor: "#f5f5f5",
   },
   loaderContainer: {
@@ -242,31 +242,32 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: mvs(5),
+    marginBottom: mvs(3),
     backgroundColor: "#ffffff",
-    padding: mhs(15),
-    borderRadius: mhs(10),
+    padding: mhs(10),
+    borderRadius: mhs(8),
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.15,
     shadowRadius: 4,
-    elevation: 3,
+    elevation: 2,
   },
   eventName: {
     fontSize: mvs(23),
     fontWeight: "bold",
-    marginLeft: mhs(15),
+    marginLeft: mhs(8),
     color: "#333",
   },
   details: {
     backgroundColor: "#ffffff",
-    padding: mhs(15),
+    padding: mhs(10),
     borderRadius: mhs(10),
+    marginLeft: mhs(15),
   },
   detailText: {
-    fontSize: mvs(14),
+    fontSize: mvs(13),
     color: "#555",
-    marginBottom: mvs(5),
+    marginBottom: mvs(3),
   },
   skillTags: {
     flexDirection: "row",
@@ -274,16 +275,16 @@ const styles = StyleSheet.create({
     marginVertical: mvs(5),
   },
   section: {
-    marginVertical: mvs(10),
+    marginVertical: mvs(5),
     backgroundColor: "#ffffff",
-    padding: mhs(15),
+    padding: mhs(10),
     borderRadius: mhs(10),
   },
   sectionTitle: {
-    fontSize: mvs(16),
+    fontSize: mvs(15),
     fontWeight: "bold",
     color: "#333",
-    marginBottom: mvs(5),
+    marginBottom: mvs(4),
   },
   sectionText: {
     fontSize: mvs(14),
@@ -326,7 +327,7 @@ const styles = StyleSheet.create({
   },
   headerTextContainer: {
     flex: 1,
-    marginLeft: mhs(10),
+    marginLeft: mhs(8),
   },
   joinButtonContainer: {
     marginRight: mhs(60),
