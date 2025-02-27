@@ -25,7 +25,6 @@ const EventDetails = ({ event, handleJoinEvent }: { event: Event; handleJoinEven
   const router = useRouter();
   const user = useSelector((state: { user: any }) => state.user);
   const { eventId } = useLocalSearchParams<{ eventId: string }>();
-  // const [event, setEvent] = useState<Event | null>(null);
   
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -182,7 +181,8 @@ const EventPage: React.FC = () => {
           <Text style={styles.eventName}>{event.eventName}</Text>
           <View style={styles.details}>
             <Text style={styles.detailText}>
-              📅 {new Date(event.date).toDateString()}
+              📅 {new Date(event.date).toDateString()} •
+              ⏰ {`${event.startTime.slice(0, -3)} - ${event.endTime.slice(0, -3)}`}
             </Text>
             <Text style={styles.detailText}>
               <MaterialCommunityIcons
@@ -253,7 +253,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   eventName: {
-    fontSize: mvs(20),
+    fontSize: mvs(23),
     fontWeight: "bold",
     marginLeft: mhs(15),
     color: "#333",
@@ -298,10 +298,6 @@ const styles = StyleSheet.create({
   participantsCount: {
     fontSize: mvs(16),
     color: "#777",
-  },
-  participantsContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
   },
   participant: {
     alignItems: "center",
