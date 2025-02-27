@@ -1,50 +1,40 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text } from 'react-native';
+import { View, StyleSheet, Text, FlatList } from 'react-native';
 import EventsList from '../Event/EventsListHomePage';
-import * as Location from 'expo-location';
-import { useSelector } from 'react-redux';
-import { getCoordinatesFromPostalCode } from '../../utils/location/location';
+import { useDispatch, useSelector } from 'react-redux';
+import { requestAndStoreLocation } from '@/services/locationService';
+import EventCardSkeleton from '../Event/EventCardSkeleton';
 
 const Feed = () => {
 
+  const dispatch = useDispatch();
   const user = useSelector((state: { user: any }) => state.user);
-  const [location, setLocation] = useState<Location.LocationObject | null>(null);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  
+  const Location = useSelector((state: { location: any }) => state.location);
+  const [isLocationFetching, setIsLocationFetching] = useState(true);
+
   useEffect(() => {
-    async function getCurrentLocation() {
-      
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      console.log(status);
-      if (status !== 'granted') {
-        const result = await getCoordinatesFromPostalCode("H3B1A7");
-          if ("error" in result) {
-            console.log(result.error);
-          } else {
-            console.log(`Latitude: ${result.latitude}, Longitude: ${result.longitude}`);
-          }
-        return;
-      }
-
-      let location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
-    }
-
-    getCurrentLocation();
-
+    const fetchLocation = async () => {
+      setIsLocationFetching(true);
+      await requestAndStoreLocation(dispatch, user.profile.postalCode);
+      setTimeout(() => setIsLocationFetching(false), 700);
+      console.log("isLocationFetching is now ", isLocationFetching);
+    };
+    fetchLocation();
   }, [user.id]);
 
-  let text = 'Waiting...';
-  if (errorMsg) {
-    text = errorMsg;
-  } else if (location) {
-    text = JSON.stringify(location);
-  }
-
+  console.log("location from the store", Location);
+  
   return (
     <View testID = 'feed-container' style={styles.container}>
-      <Text> {text} </Text>
-      <EventsList />
+      {isLocationFetching ? (
+        <FlatList
+          data={[1, 2, 3]} // Temporary data to render multiple skeletons
+          keyExtractor={(item) => item.toString()}
+          renderItem={() => <EventCardSkeleton />}
+        />
+      ) : (
+        <EventsList />
+      )}
     </View>
   );
 };
