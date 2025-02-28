@@ -15,6 +15,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,6 +44,21 @@ public class EventController {
             description = "Fetches all events in the database.")
     public List<EventResponse> getAllEvents() {
         return eventService.getAllEvents();
+    }
+
+    @GetMapping("/relevant-events")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Retrieve events by location", 
+            description = "Fetches events based on the provided location.")
+    public ResponseEntity<?> getEventsByLocation(
+            @RequestParam double longitude,
+            @RequestParam double latitude,
+            @RequestParam(defaultValue = "25.0") double radius,
+            @RequestParam(defaultValue= "false") boolean radiusExpansion,
+            @RequestParam(defaultValue = "true") boolean paginate,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return eventService.getRelevantEvents(longitude, latitude, radius, radiusExpansion, paginate, page, size);
     }
 
     @PostMapping
@@ -105,11 +121,10 @@ public class EventController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Retrieve events by user ID", description = "Retrieve events that a user has participated in")
     public Page<EventResponse> getEventByUserId(@PathVariable String userId,
-                                                @RequestParam(defaultValue = "0") int page,
-                                                @RequestParam(defaultValue = "10") int size,
-                                                @RequestParam(defaultValue = "DESC") SortDirection sort,
-                                                @RequestParam(defaultValue = "DATE") EventSortingField field
-    ) {
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "DESC") SortDirection sort,
+            @RequestParam(defaultValue = "DATE") EventSortingField field) {
         return eventService.getEventsByParticipantId(userId, page, size, sort, field);
     }
 
@@ -117,11 +132,10 @@ public class EventController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Retrieve events created by user ID", description = "Retrieve events that a user has created")
     public Page<EventResponse> getEventsCreatedByUserId(@PathVariable String userId,
-                                                        @RequestParam(defaultValue = "0") int page,
-                                                        @RequestParam(defaultValue = "10") int size,
-                                                        @RequestParam(defaultValue = "DESC") SortDirection sort,
-                                                        @RequestParam(defaultValue = "DATE") EventSortingField field
-    ) {
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "DESC") SortDirection sort,
+            @RequestParam(defaultValue = "DATE") EventSortingField field) {
         return eventService.getEventsCreatedByUserId(userId, page, size, sort, field);
     }
 
@@ -130,7 +144,7 @@ public class EventController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Cancel an event", description = "Marks an event as 'Cancelled' instead of deleting it.")
     public EventResponse cancelEvent(@PathVariable String id,
-                                     @RequestBody @Valid EventCancellationRequest cancelRequest) {
+            @RequestBody @Valid EventCancellationRequest cancelRequest) {
         return eventService.cancelEvent(id, cancelRequest);
     }
 
@@ -138,7 +152,7 @@ public class EventController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "React to an event", description = "Enables a user to react to an event.")
     public ReactionResponse reactToEvent(@PathVariable String id,
-                                         @RequestParam ReactionType reaction) {
+            @RequestParam ReactionType reaction) {
         return eventService.reactToEvent(id, reaction);
     }
 }

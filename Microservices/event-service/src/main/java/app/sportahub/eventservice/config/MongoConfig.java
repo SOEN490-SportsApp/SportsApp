@@ -55,6 +55,11 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
         return "event-service";
     }
 
+    @Override
+    public boolean autoIndexCreation() {
+      return true;
+    }
+
     @Bean
     @Override
     public MongoCustomConversions customConversions() {

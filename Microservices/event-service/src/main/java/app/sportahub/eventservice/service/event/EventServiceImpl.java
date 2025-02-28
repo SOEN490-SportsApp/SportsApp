@@ -1,5 +1,26 @@
 package app.sportahub.eventservice.service.event;
 
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.geo.Distance;
+import org.springframework.data.geo.Metrics;
+import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
 import app.sportahub.eventservice.dto.request.event.EventCancellationRequest;
 import app.sportahub.eventservice.dto.request.event.EventRequest;
 import app.sportahub.eventservice.dto.request.event.ParticipantRequest;
@@ -10,32 +31,30 @@ import app.sportahub.eventservice.dto.response.ReactionResponse;
 import app.sportahub.eventservice.enums.EventSortingField;
 import app.sportahub.eventservice.enums.EventState;
 import app.sportahub.eventservice.enums.SortDirection;
-import app.sportahub.eventservice.exception.event.*;
+import app.sportahub.eventservice.exception.event.EventAlreadyCancelledException;
+import app.sportahub.eventservice.exception.event.EventAlreadyExistsException;
+import app.sportahub.eventservice.exception.event.EventAlreadyStartedException;
+import app.sportahub.eventservice.exception.event.EventCreatorCannotLeaveEventException;
+import app.sportahub.eventservice.exception.event.EventDoesNotExistException;
+import app.sportahub.eventservice.exception.event.EventFullException;
+import app.sportahub.eventservice.exception.event.EventRegistrationClosedException;
+import app.sportahub.eventservice.exception.event.EventsNotFoundException;
+import app.sportahub.eventservice.exception.event.InvalidReactionException;
+import app.sportahub.eventservice.exception.event.ReactionAlreadySubmittedException;
+import app.sportahub.eventservice.exception.event.UserAlreadyParticipantException;
+import app.sportahub.eventservice.exception.event.UserIsNotEventWhitelistedException;
+import app.sportahub.eventservice.exception.event.UserNotAParticipantException;
 import app.sportahub.eventservice.mapper.event.EventMapper;
 import app.sportahub.eventservice.model.event.Event;
 import app.sportahub.eventservice.model.event.EventCancellation;
 import app.sportahub.eventservice.model.event.participant.Participant;
 import app.sportahub.eventservice.model.event.participant.ParticipantAttendStatus;
-import app.sportahub.eventservice.repository.event.EventRepository;
-import app.sportahub.eventservice.model.event.reactor.ReactionType;
 import app.sportahub.eventservice.model.event.reactor.Reaction;
+import app.sportahub.eventservice.model.event.reactor.ReactionType;
+import app.sportahub.eventservice.repository.event.EventRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service("eventService")
@@ -66,6 +85,43 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<EventResponse> getAllEvents() {
         return eventRepository.findAll().stream().map(eventMapper::eventToEventResponse).toList();
+    }
+
+    /** 
+     * Returns either a paginated list or a regular list of EventResponse objects that are within a certain radius of a given location. 
+     * 
+     * @param longitude the longitude of the location to search around
+     * @param latitude the latitude of the location to search around
+     * @param radius the radius around the location to search within
+     * @param radiusExpansion whether to expand the radius if no events are found
+     * @param paginate whether to return a paginated list or not
+     * @param page the page number to return if paginated
+     * @param size the number of events per page if paginated
+     * 
+     * @return a {@Link Pageable}  or {@Link List} of {@Link EventResponse} objects 
+     * @throws EventsNotFoundException if no events are found within the specified radius
+    */
+    @Override
+    public ResponseEntity<?> getRelevantEvents(double longitude, double latitude ,double radius, boolean radiusExpansion, boolean paginate, int page, int size){
+        
+        GeoJsonPoint point = new GeoJsonPoint(longitude, latitude);
+        Distance distance = new Distance(radius, Metrics.KILOMETERS);
+        Pageable pageable =  paginate ? PageRequest.of(page, size) : Pageable.unpaged();
+
+        Page<Event> events = eventRepository.findByLocationCoordinatesNear(point, distance, pageable);
+
+        while(events.isEmpty() && radius < 100 && radiusExpansion){
+            radius = radius*2;
+            distance = new Distance(radius, Metrics.KILOMETERS);
+            events = eventRepository.findByLocationCoordinatesNear(point, distance, pageable);
+        }
+
+        if(events.isEmpty()){
+            throw new EventsNotFoundException();
+        }
+
+        return ResponseEntity.ok(paginate ? events.map(eventMapper::eventToEventResponse): 
+                events.getContent().stream().map(eventMapper::eventToEventResponse).toList());
     }
 
     /**
