@@ -1,8 +1,8 @@
 import React from 'react';
-import { Tabs } from 'expo-router';
+import ChatList from '@/components/chat/ChatList';
 const Chats =() => {
     return (
-        <Tabs />
+        <ChatList />
     )
 }
 
