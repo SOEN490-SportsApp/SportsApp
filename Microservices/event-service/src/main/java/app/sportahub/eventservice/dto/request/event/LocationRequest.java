@@ -1,5 +1,7 @@
 package app.sportahub.eventservice.dto.request.event;
 
+import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mongodb.lang.Nullable;
 import jakarta.validation.constraints.NotBlank;
@@ -31,10 +33,7 @@ public record LocationRequest(@NotBlank(message = "Location name must be provide
 
                               @Nullable
                               String phoneNumber,
-
-                              @Nullable
-                              String latitude,
-
-                              @Nullable
-                              String longitude) {
+                              
+                              @NotBlank(message = "Coordinates must be provided")
+                              GeoJsonPoint coordinates ) {
 }
