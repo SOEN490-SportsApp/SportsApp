@@ -42,33 +42,58 @@ const RegisterProfileSports: React.FC<sportSelection> = ({ selectedSports = [], 
 
   const handleConfirm = () => {
     if (currentSport) {
-        setSelectedIcons((prevState) => {
-            const newSelectedIcons = prevState.includes(currentSport.id)
-                ? prevState
-                : [...prevState, currentSport.id];
+        setSelectedIcons((prevState) => 
+            prevState.includes(currentSport.id) ? prevState : [...prevState, currentSport.id]
+        );
 
-            const selectedNames = user.profile.sportsOfPreference ? [...user.profile.sportsOfPreference] : [];
+        // Get the existing selected sports from Redux or fallback to an empty array
+        let updatedSports = user.profile.sportsOfPreference ? [...user.profile.sportsOfPreference] : [];
 
-            const existingSportIndex = selectedNames.findIndex(sport => sport.name === currentSport.name);
+        // Find the sport in the selected list
+        const existingSportIndex = updatedSports.findIndex(sport => sport.name === currentSport.name);
 
-            if (existingSportIndex !== -1) {
-                selectedNames[existingSportIndex].ranking = ranking;
-            } else {
-                selectedNames.push({ name: currentSport.name, ranking });
+        if (existingSportIndex !== -1) {
+            // If the sport exists, update its ranking
+            updatedSports[existingSportIndex] = {
+                ...updatedSports[existingSportIndex], 
+                ranking: ranking 
+            };
+        } else {
+            // If the sport does not exist, add it with the new ranking
+            updatedSports.push({ name: currentSport.name, ranking });
+        }
+        dispatch(setUser({
+            ...user,
+            profile: {
+                ...user.profile,
+                sportsOfPreference: updatedSports
             }
-            dispatch(setUser({
-                ...user,
-                profile: {
-                    ...user.profile,
-                    sportsOfPreference: selectedNames 
-                }
-            }));
-            onChange(selectedNames);
-
-            return newSelectedIcons;
-        });
+        }));
+        onChange([...updatedSports]);
     }
     setModalVisible(false);
+};
+
+const handleRemoveSport = () => {
+  if (currentSport) {
+    setSelectedIcons((prevIcons) => prevIcons.filter((id) => id !== currentSport.id));
+
+    const updatedSports = user.profile.sportsOfPreference
+      ? user.profile.sportsOfPreference.filter((sport) => sport.name !== currentSport.name)
+      : [];
+
+    dispatch(setUser({
+      ...user,
+      profile: {
+        ...user.profile,
+        sportsOfPreference: updatedSports,
+      }
+    }));
+
+    onChange(updatedSports);
+  }
+
+  setModalVisible(false);
 };
 
 const selectedIconRankings = (name: string): string => {
@@ -172,13 +197,14 @@ const selectedIconRankings = (name: string): string => {
               <View style={styles.selectSkillButtonContainer}>
                 <TouchableOpacity
                   testID="remove-sport"
-                  onPress={() => setModalVisible(false)}
+                  onPress={handleRemoveSport} 
                   style={[
                     styles.baseSelectNRemoveButton,
                     styles.selectSkillsButtons,
                     { backgroundColor: themeColors.background.light, borderColor: themeColors.text.grey },
                   ]}
                 >
+                
                   <Text style={{ color: themeColors.text.grey }}>Remove</Text>
                 </TouchableOpacity>
                 <TouchableOpacity

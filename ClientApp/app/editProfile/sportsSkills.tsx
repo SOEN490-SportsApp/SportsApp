@@ -39,13 +39,9 @@ const SportsSkillsPage: React.FC = () => {
         API_ENDPOINTS.UPDATE_PROFILE.replace("{userId}", user.id),
         { sportsOfPreference: sports }
       );
-
-      //console.log("Profile updated successfully:", sports);
-
-      // Update Redux immediately after saving
       dispatch(setUser({ ...user, profile: { ...user.profile, sportsOfPreference: sports } }));
 
-      //Ensure the state is updated
+
       setSelectedSports(sports);
       
     } catch (error) {
@@ -54,7 +50,7 @@ const SportsSkillsPage: React.FC = () => {
     }
   };
 
-  // Handle save and ensure Redux updates
+
   const handleSaveChanges = async () => {
     try {
       await updateSportsOfPreferenceAPI(selectedSports);
