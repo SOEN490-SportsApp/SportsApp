@@ -17,7 +17,10 @@
       "bundleIdentifier": "com.nchelico.ClientApp",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "LSApplicationQueriesSchemes" : [ "myapp" ]
+        "LSApplicationQueriesSchemes": [
+          "myapp",
+          "myapp"
+        ]
       }
     },
     "android": {
@@ -25,7 +28,13 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "softwareKeyboardLayoutMode": "pan"
+      "softwareKeyboardLayoutMode": "pan",
+      "permissions": [
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -39,7 +48,7 @@
         "expo-location",
         {
           "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location.",
-          "locationWhenInUsePermission" : "Allow $(PRODUCT_NAME) to use your location."
+          "locationWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
         }
       ]
     ],
@@ -53,6 +62,13 @@
       "eas": {
         "projectId": "0a493fac-f7b6-4eee-a154-9cc7280a3dad"
       }
+    },
+    "owner": "sportaapp",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/0a493fac-f7b6-4eee-a154-9cc7280a3dad"
     }
   }
 }
