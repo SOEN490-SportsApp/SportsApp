@@ -2,22 +2,25 @@ package app.sportahub.eventservice.service.event;
 
 import java.util.List;
 
-import app.sportahub.eventservice.dto.response.ReactionResponse;
-import app.sportahub.eventservice.model.event.reactor.ReactionType;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 
-import app.sportahub.eventservice.dto.request.event.EventRequest;
 import app.sportahub.eventservice.dto.request.event.EventCancellationRequest;
+import app.sportahub.eventservice.dto.request.event.EventRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.dto.response.ParticipantResponse;
+import app.sportahub.eventservice.dto.response.ReactionResponse;
 import app.sportahub.eventservice.enums.EventSortingField;
 import app.sportahub.eventservice.enums.SortDirection;
+import app.sportahub.eventservice.model.event.reactor.ReactionType;
 
 public interface EventService {
 
     EventResponse getEventById(String id);
 
     List<EventResponse> getAllEvents();
+
+    ResponseEntity<?> getRelevantEvents(double longitude, double latitude, double radius, boolean radiusExpansion, boolean paginate, int page, int size);
 
     EventResponse createEvent(EventRequest eventRequest);
 
