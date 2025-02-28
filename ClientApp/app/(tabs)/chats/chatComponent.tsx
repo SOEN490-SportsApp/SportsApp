@@ -1,25 +1,41 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, Button, FlatList } from "react-native";
-import { useWebSocket } from "./webSocketProvider"; // Adjust the path as needed
+import React, { useEffect, useState } from "react";
+import { View, Text, Button } from "react-native";
+import { Client } from "@stomp/stompjs";
 
-const ChatComponent: React.FC = () => {
-    const { sendMessage, messages } = useWebSocket();
-    const [message, setMessage] = useState("");
+const ChatComponent: React.FC<{ token: string }> = ({ token }) => {
+    const [messages, setMessages] = useState<string[]>([]);
+    const [connected, setConnected] = useState(false);
+
+    useEffect(() => {
+        const client = new Client({
+            brokerURL: "ws://localhost:8080/api/messaging-service/ws",
+            connectHeaders: {
+                Authorization: `Bearer ${token}`,
+            },
+            onWebSocketError: (error) => console.error("WebSocket error:", error),
+            onConnect: () => {
+                setConnected(true);
+                client.subscribe("/user/testReceiverId1/queue/messages", (message) => {
+                    setMessages((prev) => [...prev, message.body]);
+                });
+            },
+            onDisconnect: () => setConnected(false),
+            debug: (msg) => console.log(msg),
+            onStompError: (frame) => console.error("Broker error:", frame.body),
+        });
+
+        client.activate();
+
+
+        return () => client.deactivate();
+    }, [token]);
 
     return (
         <View style={{ padding: 20 }}>
-            <Text style={{ fontSize: 20, marginBottom: 10 }}>WebSocket Chat</Text>
-            <FlatList
-                data={messages}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={({ item }) => <Text>{item}</Text>}
-            />
-            <TextInput
-                style={{ borderWidth: 1, padding: 10, marginVertical: 10 }}
-                value={message}
-                onChangeText={setMessage}
-            />
-            <Button title="Send" onPress={() => sendMessage("/app/message", message)} />
+            <Text>WebSocket Status: {connected ? "Connected" : "Disconnected"}</Text>
+            {messages.map((msg, index) => (
+                <Text key={index}>{msg}</Text>
+            ))}
         </View>
     );
 };

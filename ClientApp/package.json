@@ -60,6 +60,7 @@
     "@react-navigation/native": "^7.0.14",
     "@react-navigation/native-stack": "^7.2.0",
     "@reduxjs/toolkit": "^2.4.0",
+    "@stomp/stompjs": "^7.0.0",
     "@testing-library/react": "^16.0.1",
     "expo": "~52.0.24",
     "expo-checkbox": "~4.0.0",
@@ -102,7 +103,10 @@
     "react-native-vector-icons": "^10.2.0",
     "react-native-web": "~0.19.10",
     "react-redux": "^9.1.2",
-    "tailwindcss": "^3.4.14"
+    "sockjs-client": "^1.6.1",
+    "stompjs": "^2.3.3",
+    "tailwindcss": "^3.4.14",
+    "text-encoding": "^0.7.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
@@ -113,6 +117,7 @@
     "@types/react-native": "^0.73.0",
     "@types/react-test-renderer": "^18.0.7",
     "@types/redux-mock-store": "^1.5.0",
+    "@types/sockjs-client": "^1.5.4",
     "axios": "^1.7.7",
     "axios-mock-adapter": "^2.1.0",
     "babel-jest": "^29.7.0",
