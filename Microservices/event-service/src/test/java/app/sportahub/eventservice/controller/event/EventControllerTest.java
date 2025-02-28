@@ -20,6 +20,8 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -125,6 +127,62 @@ public class EventControllerTest {
 
         assertEquals(eventList, response);
         Mockito.verify(eventService).getAllEvents();
+    }
+
+    @Test
+    public void testGetEventsByLocationReturnList() {
+        List<EventResponse> eventList = Arrays.asList(eventResponse);
+        Mockito.when(eventService.getRelevantEvents(
+                any(double.class),
+                any(double.class),
+                any(double.class),
+                any(boolean.class),
+                any(boolean.class),
+                any(int.class),
+                any(int.class)
+        )).thenReturn((ResponseEntity) ResponseEntity.ok(eventList));
+
+        ResponseEntity<?> response = eventController.getEventsByLocation(-74.0060,40.7128, 25.0, false, false, 0, 10);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(eventList, response.getBody());
+        Mockito.verify(eventService).getRelevantEvents(
+                Mockito.eq(-74.0060),
+                Mockito.eq(40.7128),
+                Mockito.eq(25.0),
+                Mockito.eq(false),
+                Mockito.eq(false),
+                Mockito.eq(0),
+                Mockito.eq(10)
+        );
+    }
+
+    @Test
+    public void testGetEventsByLocationReturnPage() {
+        Page<EventResponse> eventList = new PageImpl<>(Collections.singletonList(eventResponse));
+        Mockito.when(eventService.getRelevantEvents(
+                any(double.class),
+                any(double.class),
+                any(double.class),
+                any(boolean.class),
+                any(boolean.class),
+                any(int.class),
+                any(int.class)
+        )).thenReturn((ResponseEntity) ResponseEntity.ok(eventList));
+
+        ResponseEntity<?> response = eventController.getEventsByLocation(-74.0060,40.7128, 25.0, false, true, 0, 10);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(eventList, response.getBody());
+        Mockito.verify(eventService).getRelevantEvents(
+                Mockito.eq(-74.0060),
+                Mockito.eq(40.7128),
+                Mockito.eq(25.0),
+                Mockito.eq(false),
+                Mockito.eq(true),
+                Mockito.eq(0),
+                Mockito.eq(10)
+        );
     }
 
     @Test
