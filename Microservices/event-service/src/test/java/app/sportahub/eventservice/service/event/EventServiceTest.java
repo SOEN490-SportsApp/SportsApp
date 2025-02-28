@@ -24,7 +24,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.geo.Distance;
+import org.springframework.data.geo.Metrics;
+import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -37,10 +42,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -156,6 +161,92 @@ class EventServiceTest {
         assertEquals(1, events.size());
         assertEquals(eventResponse, events.get(0));
         verify(eventRepository, times(1)).findAll();
+    }
+
+    @Test
+    void getRelevantEventsShouldReturnEventsPage() {
+        when(eventRepository.findByLocationCoordinatesNear(any(GeoJsonPoint.class), any(Distance.class), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(Collections.singletonList(event)));
+        when(eventMapper.eventToEventResponse(any(Event.class))).thenReturn(eventResponse);
+
+        ResponseEntity<?> eventsResponse =  eventServiceImpl.getRelevantEvents(0, 0, 25, false, true, 0, 5);
+        Object events = eventsResponse.getBody();
+        assertTrue(events instanceof Page);
+        assertNotNull(events);
+        Page<EventResponse> eventsPage = (Page<EventResponse>) events;
+        assertFalse(eventsPage.isEmpty());
+        assertEquals(1, eventsPage.getTotalElements());
+        assertEquals(eventResponse, eventsPage.getContent().get(0));
+        verify(eventRepository, times(1)).findByLocationCoordinatesNear(any(GeoJsonPoint.class), any(Distance.class), any(Pageable.class));
+    }
+
+    @Test
+    void getRelevantEventsShouldReturnEventsList() {
+        when(eventRepository.findByLocationCoordinatesNear(any(GeoJsonPoint.class), any(Distance.class), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(Collections.singletonList(event)));
+        when(eventMapper.eventToEventResponse(any(Event.class))).thenReturn(eventResponse);
+
+        ResponseEntity<?> eventsResponse = eventServiceImpl.getRelevantEvents(0, 0, 25, false, false, 0, 5);
+        Object events = eventsResponse.getBody();
+        assertTrue(events instanceof List);
+        assertNotNull(events);
+        List<EventResponse> eventList;
+        if (events instanceof List<?>) {
+            eventList = ((List<?>) events).stream()
+                    .filter(EventResponse.class::isInstance)
+                    .map(EventResponse.class::cast)
+                    .collect(Collectors.toList());
+        } else {
+            throw new ClassCastException("Expected a List<EventResponse>");
+        }
+        assertEquals(1, eventList.size());
+        assertEquals(eventResponse, eventList.get(0));
+        verify(eventRepository, times(1)).findByLocationCoordinatesNear(any(GeoJsonPoint.class), any(Distance.class), any(Pageable.class));
+    }
+
+    @Test
+    public void testGetRelevantEvents_EmptyResult() {
+        when(eventRepository.findByLocationCoordinatesNear(any(GeoJsonPoint.class), any(Distance.class), any(Pageable.class)))
+                .thenReturn(Page.empty());
+
+        assertThrows(EventsNotFoundException.class, () -> {
+            eventServiceImpl.getRelevantEvents(0.0, 0.0, 10.0, false, true, 0, 10);
+        });
+    }
+
+    @Test
+    public void testGetRelevantEventsWithExpandedRadius_EmptyResult() {
+        when(eventRepository.findByLocationCoordinatesNear(any(GeoJsonPoint.class), any(Distance.class), any(Pageable.class)))
+                .thenReturn(Page.empty());
+
+        assertThrows(EventsNotFoundException.class, () -> {
+            eventServiceImpl.getRelevantEvents(0.0, 0.0, 10.0, true, true, 0, 10);
+        });
+    }
+
+    @Test
+    void getRelevantEventsShouldExpandRadiusAndReturnEvents() {
+        GeoJsonPoint point = new GeoJsonPoint(0, 0);
+        Distance initialDistance = new Distance(25, Metrics.KILOMETERS);
+        Distance expandedDistance = new Distance(50, Metrics.KILOMETERS);
+        Pageable pageable = PageRequest.of(0, 5);
+
+        when(eventRepository.findByLocationCoordinatesNear(eq(point), eq(initialDistance), eq(pageable)))
+                .thenReturn(Page.empty());
+        when(eventRepository.findByLocationCoordinatesNear(eq(point), eq(expandedDistance), eq(pageable)))
+                .thenReturn(new PageImpl<>(Collections.singletonList(event)));
+        when(eventMapper.eventToEventResponse(any(Event.class))).thenReturn(eventResponse);
+
+        ResponseEntity<?> eventsResponse = eventServiceImpl.getRelevantEvents(0, 0, 25, true, true, 0, 5);
+        Object events = eventsResponse.getBody();
+        assertTrue(events instanceof Page);
+        assertNotNull(events);
+        Page<EventResponse> eventsPage = (Page<EventResponse>) events;
+        assertFalse(eventsPage.isEmpty());
+        assertEquals(1, eventsPage.getTotalElements());
+        assertEquals(eventResponse, eventsPage.getContent().get(0));
+        verify(eventRepository, times(1)).findByLocationCoordinatesNear(eq(point), eq(initialDistance), eq(pageable));
+        verify(eventRepository, times(1)).findByLocationCoordinatesNear(eq(point), eq(expandedDistance), eq(pageable));
     }
 
     @Test
