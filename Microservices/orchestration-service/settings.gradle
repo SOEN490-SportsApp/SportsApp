@@ -1,0 +1,2 @@
+rootProject.name = 'orchestration-service'
+includeBuild('../kafka-events')

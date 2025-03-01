@@ -1,6 +1,7 @@
 package app.sportahub.emailservice;
 
 import org.springframework.boot.SpringApplication;
+import org.testcontainers.utility.TestcontainersConfiguration;
 
 public class TestEmailserviceApplication {
 
