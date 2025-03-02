@@ -196,15 +196,6 @@ const EventPage: React.FC = () => {
         <View style={styles.headerTextContainer}>
           <View style={styles.eventTitle}>
             <Text style={styles.eventName}>{event.eventName}</Text>
-            <View style={styles.joinButtonContainer}>
-              {!isUserParticipant ? (
-                <ConfirmButtonEventPage text="Join" onPress={handleJoinEvent} icon={undefined} iconPlacement={null} />
-              ) : (
-                <View style={styles.joinedTextContainer}>
-                  <MaterialCommunityIcons name="check-circle" size={20} color={themeColors.primary} />
-                </View>
-              )}
-            </View>
           </View>
           <View style={styles.details}>
             <Text style={styles.detailText}>
@@ -227,10 +218,22 @@ const EventPage: React.FC = () => {
               />
               {event.sportType} • {event.eventType}
             </Text>
-            <View style={styles.skillTags}>
-              {event.requiredSkillLevel.map((level, index) => (
-                <SkillTag key={index} level={level} />
-              ))}
+            <View style={styles.joinButtonView}>
+              <View style={styles.skillTags}>
+                {event.requiredSkillLevel.map((level, index) => (
+                  <SkillTag key={index} level={level} />
+                ))}
+              </View>
+              <View style={styles.joinButtonContainer}>
+                {!isUserParticipant ? (
+                  <ConfirmButtonEventPage text="Join" onPress={handleJoinEvent} icon={undefined} iconPlacement={null} />
+                ) : (
+                  <View style={styles.joinedTextContainer}>
+                    {/* <MaterialCommunityIcons name="check-circle" size={20} color={themeColors.primary} /> */}
+                    <Text style={styles.joinedText}>Joined</Text>
+                  </View>
+                )}
+              </View>
             </View>
           </View>
         </View>
@@ -288,7 +291,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
     padding: mhs(10),
     borderRadius: mhs(10),
-    marginLeft: mhs(15),
+    marginLeft: mhs(5),
   },
   detailText: {
     fontSize: mvs(13),
@@ -362,11 +365,19 @@ const styles = StyleSheet.create({
   },
   joinedTextContainer: {
     backgroundColor: "white",
-    height: vs(5),
+    height: vs(15),
     justifyContent: "center",
     marginBottom: vs(16),
-    marginLeft: mhs(15),
     minHeight: 40,
+    borderWidth: 1,
+    borderColor: themeColors.primary,
+    borderRadius: mhs(25),
+    alignItems: 'center',
+    shadowColor: '#475569',
+    shadowOffset: { width: 0, height: vs(2) },
+    shadowOpacity: 0.25,
+    shadowRadius: hs(4),
+    width: mhs(60),
   },
   joinedText: {
     color: themeColors.primary,
@@ -380,5 +391,10 @@ const styles = StyleSheet.create({
   eventTitle: {
     flexDirection: "row",
     alignItems: "center",
+  },
+  joinButtonView: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
 });
