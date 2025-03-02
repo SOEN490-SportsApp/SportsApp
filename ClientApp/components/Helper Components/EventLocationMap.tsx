@@ -6,11 +6,13 @@ import { Ionicons } from "@expo/vector-icons";
 interface EventLocationMapProps {
   latitude: number;
   longitude: number;
+  showFullScreenButton?: boolean;
 }
 
 const EventLocationMap: React.FC<EventLocationMapProps> = ({
   latitude,
   longitude,
+  showFullScreenButton = true,
 }) => {
   const [isFullScreen, setIsFullScreen] = useState(false);
 
@@ -21,22 +23,22 @@ const EventLocationMap: React.FC<EventLocationMapProps> = ({
         initialRegion={{
           latitude: latitude,
           longitude: longitude,
-          latitudeDelta: 0.01, // Zoom level
+          latitudeDelta: 0.01,
           longitudeDelta: 0.01,
         }}
       >
         <Marker coordinate={{ latitude, longitude }} />
       </MapView>
 
-      {/* Full Screen Toggle Button */}
-      <TouchableOpacity
-        style={styles.fullScreenButton}
-        onPress={() => setIsFullScreen(true)}
-      >
-        <Ionicons name="expand" size={24} color="#fff" />
-      </TouchableOpacity>
+      {showFullScreenButton && (
+        <TouchableOpacity
+          style={styles.fullScreenButton}
+          onPress={() => setIsFullScreen(true)}
+        >
+          <Ionicons name="expand" size={24} color="#fff" />
+        </TouchableOpacity>
+      )}
 
-      {/* Full Screen Modal */}
       {isFullScreen && (
         <Modal visible={isFullScreen} animationType="slide">
           <View style={styles.fullScreenContainer}>
@@ -66,7 +68,7 @@ const EventLocationMap: React.FC<EventLocationMapProps> = ({
 
 const styles = StyleSheet.create({
   mapContainer: {
-    height: 200, // Default height
+    height: 200,
     width: "100%",
     borderRadius: 10,
     overflow: "hidden",
