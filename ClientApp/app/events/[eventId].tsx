@@ -91,6 +91,7 @@ const EventDetails = ({ event, handleJoinEvent }: { event: Event; handleJoinEven
           <EventLocationMap 
             latitude={parseFloat(event.locationResponse.latitude)} 
             longitude={parseFloat(event.locationResponse.longitude)} 
+            showFullScreenButton={false}
           />
         </View>
       )}
@@ -200,7 +201,7 @@ const EventPage: React.FC = () => {
                 <ConfirmButtonEventPage text="Join" onPress={handleJoinEvent} icon={undefined} iconPlacement={null} />
               ) : (
                 <View style={styles.joinedTextContainer}>
-                  <Text style={styles.joinedText}>Joined</Text>
+                  <MaterialCommunityIcons name="check-circle" size={20} color={themeColors.primary} />
                 </View>
               )}
             </View>
@@ -278,7 +279,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   eventName: {
-    fontSize: mvs(23),
+    fontSize: mvs(28),
     fontWeight: "bold",
     marginLeft: mhs(8),
     color: "#333",
@@ -361,18 +362,11 @@ const styles = StyleSheet.create({
     marginTop: mvs(15),
   },
   joinedTextContainer: {
-    borderWidth: 1,
-    borderColor: themeColors.primary,
     backgroundColor: "white",
-    height: vs(10),
-    borderRadius: mhs(25),
+    height: vs(5),
     alignItems: 'center',
     justifyContent: "center",
     marginBottom: vs(16),
-    shadowColor: '#475569',
-    shadowOffset: { width: 0, height: vs(2) },
-    shadowOpacity: 0.25,
-    shadowRadius: hs(4),
     minHeight: 40
   },
   joinedText: {
