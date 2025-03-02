@@ -356,18 +356,17 @@ const styles = StyleSheet.create({
     marginLeft: mhs(8),
   },
   joinButtonContainer: {
-    marginRight: mhs(60),
-    marginLeft: mhs(46),
+    marginLeft: mhs(20),
     width: mhs(60),
     marginTop: mvs(15),
   },
   joinedTextContainer: {
     backgroundColor: "white",
     height: vs(5),
-    alignItems: 'center',
     justifyContent: "center",
     marginBottom: vs(16),
-    minHeight: 40
+    marginLeft: mhs(15),
+    minHeight: 40,
   },
   joinedText: {
     color: themeColors.primary,
