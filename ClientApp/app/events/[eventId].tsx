@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Image, Pressable, SafeAreaView, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Image, Pressable, SafeAreaView, TouchableOpacity, Alert, Platform, ToastAndroid } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useSelector } from "react-redux";
 import { Event } from "@/types/event";
-import ConfirmButton from "@/components/Helper Components/ConfirmButton";
+import ConfirmButtonEventPage from "@/components/Helper Components/ConfirmButtonEventPage";
 import themeColors from "@/utils/constants/colors";
 import { hs, mhs, mvs, vs } from "@/utils/helpers/uiScaler";
 import { sportIconMap } from "@/utils/mappers/eventIconsMappers";
@@ -12,6 +12,9 @@ import { getEventById, joinEvent } from "@/utils/api/eventApiClient";
 import SkillTag from "@/components/Event/SkillTag";
 import CustomTabMenu from "@/components/Helper Components/CustomTabMenu";
 import EventLocationMap from "@/components/Helper Components/EventLocationMap";
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import Octicons from '@expo/vector-icons/Octicons';
+import * as Clipboard from 'expo-clipboard';
 
 const EventPosts = () => {
   return (
@@ -134,6 +137,18 @@ const EventPage: React.FC = () => {
     }
   };
 
+  const handleCopyLocation = () => {
+    const locationText = `${event?.locationResponse?.streetNumber} ${event?.locationResponse?.streetName}, ${event?.locationResponse?.city}, ${event?.locationResponse?.province} ${event?.locationResponse?.postalCode}`;
+  
+    Clipboard.setStringAsync(locationText);
+  
+    if (Platform.OS === 'android') {
+      ToastAndroid.show("Location copied to clipboard!", ToastAndroid.SHORT);
+    } else {
+      Alert.alert("Copied!", "Location has been copied to clipboard.");
+    }
+  };
+
   if (loading) {
     return (
       <View style={styles.loaderContainer}>
@@ -165,25 +180,44 @@ const EventPage: React.FC = () => {
   let sportIcon = sportIconMap[event.sportType];
 
   const routes = [
-    { key: "eventDetails", title: "Details", testID: "eventDetails" },
     { key: "eventPosts", title: "Posts", testID: "eventPosts" },
+    { key: "eventDetails", title: "Details", testID: "eventDetails" },
   ];
   
   const scenes = {
-    eventDetails: <EventDetails event={event} handleJoinEvent={handleJoinEvent} />,
     eventPosts: <EventPosts />,
+    eventDetails: <EventDetails event={event} handleJoinEvent={handleJoinEvent} />,
   };
 
   return (
     <SafeAreaView className="flex-1 bg-white pt-6">
       <View style={styles.header}>
         <View style={styles.headerTextContainer}>
-          <Text style={styles.eventName}>{event.eventName}</Text>
+          <View style={styles.eventTitle}>
+            <Text style={styles.eventName}>{event.eventName}</Text>
+            <View style={styles.joinButtonContainer}>
+              {!isUserParticipant ? (
+                <ConfirmButtonEventPage text="Join" onPress={handleJoinEvent} icon={undefined} iconPlacement={null} />
+              ) : (
+                <View style={styles.joinedTextContainer}>
+                  <Text style={styles.joinedText}>Joined</Text>
+                </View>
+              )}
+            </View>
+          </View>
           <View style={styles.details}>
+            <Text style={styles.detailText}>
+              <FontAwesome6 name="map-pin" size={16} color="black" />{" "}
+              {event.locationResponse?.streetNumber} {event.locationResponse?.streetName}, {event.locationResponse?.city}
+              <Pressable onPress={handleCopyLocation}>
+                <Octicons name="copy" size={16} color="black" style={{ marginLeft: 8 }} />
+              </Pressable>
+            </Text>
             <Text style={styles.detailText}>
               📅 {new Date(event.date).toDateString()} •
               ⏰ {`${event.startTime.slice(0, -3)} - ${event.endTime.slice(0, -3)}`}
             </Text>
+            
             <Text style={styles.detailText}>
               <MaterialCommunityIcons
                 name={event.sportType ? sportIcon as any : "help-circle-outline"}
@@ -197,15 +231,6 @@ const EventPage: React.FC = () => {
                 <SkillTag key={index} level={level} />
               ))}
             </View>
-          </View>
-          <View style={styles.joinButtonContainer}>
-            {!isUserParticipant ? (
-              <ConfirmButton text="Join Event" onPress={handleJoinEvent} icon={undefined} iconPlacement={null} />
-            ) : (
-              <View style={styles.joinedTextContainer}>
-                <Text style={styles.joinedText}>Joined</Text>
-              </View>
-            )}
           </View>
         </View>
       </View>
@@ -332,12 +357,14 @@ const styles = StyleSheet.create({
   joinButtonContainer: {
     marginRight: mhs(60),
     marginLeft: mhs(46),
+    width: mhs(60),
+    marginTop: mvs(15),
   },
   joinedTextContainer: {
-    borderWidth: 2,
-    borderColor: "green",
+    borderWidth: 1,
+    borderColor: themeColors.primary,
     backgroundColor: "white",
-    height: vs(50),
+    height: vs(10),
     borderRadius: mhs(25),
     alignItems: 'center',
     justifyContent: "center",
@@ -349,12 +376,16 @@ const styles = StyleSheet.create({
     minHeight: 40
   },
   joinedText: {
-    color: "green",
+    color: themeColors.primary,
     fontWeight: "bold",
     fontSize: mvs(16),
   },
   participantsScrollContainer: {
     flexDirection: "row",
     paddingVertical: vs(10),
+  },
+  eventTitle: {
+    flexDirection: "row",
+    alignItems: "center",
   },
 });
