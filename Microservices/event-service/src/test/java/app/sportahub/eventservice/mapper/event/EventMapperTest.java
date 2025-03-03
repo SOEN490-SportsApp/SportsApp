@@ -11,6 +11,7 @@ import app.sportahub.eventservice.model.event.participant.Participant;
 import app.sportahub.eventservice.model.event.participant.ParticipantAttendStatus;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
+import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -78,6 +79,7 @@ public class EventMapperTest {
 
     @Test
     public void testPatchEventFromRequest() {
+        GeoJsonPoint coordinates = new GeoJsonPoint(1, 1);
         //Arrange
         Location location = Location.builder()
                 .withName("locationName")
@@ -89,8 +91,7 @@ public class EventMapperTest {
                 .withPostalCode("postalCode")
                 .withAddressLine2("addressLine2")
                 .withPhoneNumber("phoneNumber")
-                .withLatitude("latitude")
-                .withLongitude("longitude")
+                .withCoordinates(coordinates)
                 .build();
 
         Participant participant = Participant.builder()
@@ -165,6 +166,7 @@ public class EventMapperTest {
     @Test
     public void testLocationRequestToLocation1() {
         // Arrange
+        GeoJsonPoint coordinates = new GeoJsonPoint(1, 1);
         Event event = new Event();
         event.setLocation(new Location(
                 "name",
@@ -176,11 +178,10 @@ public class EventMapperTest {
                 "postalCode",
                 "addressLine2",
                 "phoneNumber",
-                "latitude",
-                "longitude"));
+                coordinates
+                ));
 
         LocationRequest locationRequest = new LocationRequest(
-                null,
                 null,
                 null,
                 null,
@@ -227,7 +228,6 @@ public class EventMapperTest {
         assertNotNull(event.getLocation().getPostalCode());
         assertNotNull(event.getLocation().getAddressLine2());
         assertNotNull(event.getLocation().getPhoneNumber());
-        assertNotNull(event.getLocation().getLatitude());
-        assertNotNull(event.getLocation().getLongitude());
+        assertNotNull(event.getLocation().getCoordinates());
     }
 }
