@@ -15,6 +15,8 @@ import EventLocationMap from "@/components/Helper Components/EventLocationMap";
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Octicons from '@expo/vector-icons/Octicons';
 import * as Clipboard from 'expo-clipboard';
+import PostCreationComponent from "@/components/Posts/PostCreationComponent";
+import EventPostsTab from "@/components/Event/EventPostsTab";
 
 const EventPosts = () => {
   return (
@@ -185,7 +187,7 @@ const EventPage: React.FC = () => {
   ];
   
   const scenes = {
-    eventPosts: <EventPosts />,
+    eventPosts: [<EventPostsTab />],
     eventDetails: <EventDetails event={event} handleJoinEvent={handleJoinEvent} />,
   };
 

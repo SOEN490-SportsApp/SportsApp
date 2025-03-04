@@ -206,7 +206,7 @@ const PostCreationComponent: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
+    padding: 12,
     backgroundColor: '#fff',
     borderRadius: 12,
     shadowColor: '#000',
