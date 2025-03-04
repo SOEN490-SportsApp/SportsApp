@@ -26,4 +26,7 @@ export const API_ENDPOINTS = {
   GET_ALL_FRIENDS: 'user-service/user/{userId}/friends',
   RESPOND_TO_FRIEND_REQUEST: 'user-service/user/{userId}/friend-requests/{requestId}',
   GET_PROFILE_BY_ID: 'user-service/user/{userId}/profile',
+
+  GET_ALL_POSTS: "event-service/event/{eventId}/social/post",
+  CREATE_POST: "event-service/event/{eventId}/social/post",
 };

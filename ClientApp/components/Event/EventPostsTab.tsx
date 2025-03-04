@@ -3,10 +3,9 @@ import PostCreationComponent from '@/components/Posts/PostCreationComponent';
 import { SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
 import { Post } from '@/types/post';
 import PostComponent from '@/components/Posts/PostComponent';
-import { Divider } from 'react-native-elements/dist/divider/Divider';
 
 
-const EventPostsTab = () => {
+const EventPostsTab = ({ eventId } : { eventId: string })=> {
 
     // Hardcoded posts data
     const posts: Post[] = [
@@ -47,7 +46,7 @@ const EventPostsTab = () => {
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView>
-                <PostCreationComponent />
+                <PostCreationComponent eventId={eventId}/>
                 <View style={{ height: 16 }} />
                 {posts.map((post) => (
                     <PostComponent key={post.id} post={post} />
