@@ -15,10 +15,15 @@ import {
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import themeColors from '@/utils/constants/colors';
+import { createPost } from '@/utils/api/postApiClient';
 
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
 
-const PostCreationComponent: React.FC = () => {
+interface PostCreationProps {
+  eventId: string;
+}
+
+const PostCreationComponent: React.FC<PostCreationProps> = ({ eventId }) => {
   const [comment, setComment] = useState<string>('');
   const [images, setImages] = useState<{ uri: string; width: number; height: number }[]>([]);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
@@ -49,11 +54,18 @@ const PostCreationComponent: React.FC = () => {
     }
   };
 
-  const handlePost = () => {
-    // Handle post submission here
-    console.log('Comment:', comment);
+  const handlePost = async () => {
+    try {
+      const attachments = images.map((image) => image.uri); // Convert images to an array of URIs
+      await createPost(eventId, comment, attachments); // Call the createPost function
+      console.log('Post created successfully');
+      resetModal();
+    } catch (error) {
+      console.error('Failed to create post:', error);
+    }
     console.log('Images:', images);
     resetModal();
+
   };
 
   const removeImage = () => {
