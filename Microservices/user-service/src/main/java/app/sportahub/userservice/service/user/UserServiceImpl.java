@@ -493,7 +493,7 @@ public class UserServiceImpl implements UserService {
 
         List<UserProfileResponse> userProfileResponses = users.stream()
                 .map(user -> new UserProfileResponse(user.getId(), profileMapper.profileToProfileResponse(user.getProfile())))
-                .collect(toList());
+                .collect(Collectors.toList());
         return new PageImpl<>(userProfileResponses, users.getPageable(), users.getTotalElements());
     }
 }
