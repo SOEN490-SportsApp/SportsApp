@@ -30,6 +30,7 @@ import app.sportahub.userservice.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
 import reactor.core.publisher.Mono;
 
 @Slf4j
@@ -40,6 +41,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final KeycloakApiClient keycloakApiClient;
     private final UserMapper userMapper;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @SneakyThrows
     @Override
