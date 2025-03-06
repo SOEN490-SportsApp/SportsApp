@@ -24,6 +24,7 @@ import { Event } from "@/types/event";
 import * as Location from "expo-location";
 import { Linking } from "react-native";
 import { Platform } from "react-native";
+import EventList from "@/components/Event/EventList";
 
 export default function searchPage() {
   const router = useRouter();
@@ -100,6 +101,7 @@ export default function searchPage() {
     const router = useRouter();
     const mapRef = useRef<MapView | null>(null);
     const [userLocation, setUserLocation] = useState<Location.LocationObjectCoords | null>(null);
+    const [isMapExpanded, setIsMapExpanded] = useState(true);
 
     useEffect(() => {
       const fetchEvents = async () => {
@@ -167,11 +169,17 @@ export default function searchPage() {
 
     return (
       <View style={{ flex: 1 }}>
+        <TouchableOpacity
+          style={styles.expandButton}
+          onPress={() => setIsMapExpanded(!isMapExpanded)}
+        >
+          <MaterialCommunityIcons name={isMapExpanded ? "chevron-down" : "chevron-up"} size={24} color="white" />
+        </TouchableOpacity>
         <MapView
           // mapType="hybrid"
           showsUserLocation
           ref={mapRef}
-          style={{ flex: 1 }}
+          style={{ flex: isMapExpanded ? 1 : 0.3 }}
           initialRegion={{
             latitude: events.length && events[0].locationResponse.latitude !== undefined
               ? Number(events[0].locationResponse.latitude)
@@ -196,22 +204,30 @@ export default function searchPage() {
           ))}
         </MapView>
 
-        <TouchableOpacity style={styles.centerButton} onPress={centerOnUser}>
-          <MaterialCommunityIcons name="crosshairs-gps" size={24} color="white" />
-        </TouchableOpacity>
+        {isMapExpanded && (
+          <>
+            <TouchableOpacity style={styles.centerButton} onPress={centerOnUser}>
+              <MaterialCommunityIcons name="crosshairs-gps" size={24} color="white" />
+            </TouchableOpacity>
+            <View style={styles.eventListContainer}>
+              <FlatList
+                data={events}
+                horizontal
+                keyExtractor={(item) => item.id}
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ paddingHorizontal: 16 }}
+                renderItem={({ item }) => (
+                  <EventCard event={item} onPress={() => onEventCardPress(item)} />
+                )} />
+            </View>
+          </>
+        )}
 
-        <View style={styles.eventListContainer}>
-          <FlatList
-            data={events}
-            horizontal
-            keyExtractor={(item) => item.id}
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ paddingHorizontal: 16 }}
-            renderItem={({ item }) => (
-              <EventCard event={item} onPress={() => onEventCardPress(item)} />
-            )}
-          />
+      {!isMapExpanded && (
+        <View style={styles.eventListSection}>
+          <EventList fetchEventsFunction={() => getAllEvents().then(data => ({ data: { content: data, totalElements: data.length, totalPages: 1, pageable: { pageNumber: 0, pageSize: data.length } } }))} />
         </View>
+      )}
       </View>
     );
   };
@@ -477,5 +493,22 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "bold",
     marginLeft: 5,
+  },
+  expandButton: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    backgroundColor: themeColors.primary,
+    padding: 10,
+    borderRadius: 20,
+    zIndex: 10,
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+  },
+  eventListSection: {
+    flex: 1,
   },
 });
