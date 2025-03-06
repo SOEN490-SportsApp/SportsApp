@@ -101,7 +101,8 @@ export default function searchPage() {
     const router = useRouter();
     const mapRef = useRef<MapView | null>(null);
     const [userLocation, setUserLocation] = useState<Location.LocationObjectCoords | null>(null);
-    const [isMapExpanded, setIsMapExpanded] = useState(true);
+    const [isMapExpanded, setIsMapExpanded] = useState(false);
+    const [viewMode, setViewMode] = useState<"map" | "list">("list");
 
     useEffect(() => {
       const fetchEvents = async () => {
@@ -132,8 +133,8 @@ export default function searchPage() {
     const onEventCardPress = (event: Event) => {
       mapRef.current?.animateToRegion(
         {
-          latitude: Number(event.locationResponse.latitude),
-          longitude: Number(event.locationResponse.longitude),
+          latitude: Number(event.locationResponse.coordinates?.y),
+          longitude: Number(event.locationResponse.coordinates?.x),
           latitudeDelta: 0.05,
           longitudeDelta: 0.05,
         },
@@ -170,22 +171,30 @@ export default function searchPage() {
     return (
       <View style={{ flex: 1 }}>
         <TouchableOpacity
-          style={styles.expandButton}
-          onPress={() => setIsMapExpanded(!isMapExpanded)}
+          style={styles.toggleButton}
+          onPress={() => {
+            setViewMode(viewMode === "map" ? "list" : "map");
+            setIsMapExpanded(!isMapExpanded);
+          }}
         >
-          <MaterialCommunityIcons name={isMapExpanded ? "chevron-down" : "chevron-up"} size={24} color="white" />
+          <MaterialCommunityIcons
+            name={viewMode === "map" ? "format-list-bulleted" : "map"}
+            size={24}
+            color="white"
+          />
         </TouchableOpacity>
+
         <MapView
           // mapType="hybrid"
           showsUserLocation
           ref={mapRef}
           style={{ flex: isMapExpanded ? 1 : 0.3 }}
           initialRegion={{
-            latitude: events.length && events[0].locationResponse.latitude !== undefined
-              ? Number(events[0].locationResponse.latitude)
+            latitude: events.length && events[0].locationResponse.coordinates?.y !== undefined
+              ? Number(events[0].locationResponse.coordinates.y)
               : 45.5017,
-            longitude: events.length && events[0].locationResponse.longitude !== undefined
-              ? Number(events[0].locationResponse.longitude)
+            longitude: events.length && events[0].locationResponse.coordinates?.x !== undefined
+              ? Number(events[0].locationResponse.coordinates.x)
               : -73.5673,
             latitudeDelta: 0.1,
             longitudeDelta: 0.1,
@@ -195,8 +204,8 @@ export default function searchPage() {
             <Marker
               key={event.id}
               coordinate={{
-                latitude: event.locationResponse.latitude ? Number(event.locationResponse.latitude) : 0,
-                longitude: event.locationResponse.longitude ? Number(event.locationResponse.longitude) : 0,
+                latitude: event.locationResponse.coordinates?.y ? Number(event.locationResponse.coordinates.y) : 0,
+                longitude: event.locationResponse.coordinates?.x ? Number(event.locationResponse.coordinates.x) : 0,
               }}
               title={event.eventName}
               onPress={() => handleEventPress(event.id)}
@@ -204,7 +213,7 @@ export default function searchPage() {
           ))}
         </MapView>
 
-        {isMapExpanded && (
+        {viewMode === "map" ? (
           <>
             <TouchableOpacity style={styles.centerButton} onPress={centerOnUser}>
               <MaterialCommunityIcons name="crosshairs-gps" size={24} color="white" />
@@ -221,13 +230,11 @@ export default function searchPage() {
                 )} />
             </View>
           </>
+        ) : (
+          <View style={styles.eventListSection}>
+            <EventList fetchEventsFunction={() => getAllEvents().then(data => ({ data: { content: data, totalElements: data.length, totalPages: 1, pageable: { pageNumber: 0, pageSize: data.length } } }))} />
+          </View>
         )}
-
-      {!isMapExpanded && (
-        <View style={styles.eventListSection}>
-          <EventList fetchEventsFunction={() => getAllEvents().then(data => ({ data: { content: data, totalElements: data.length, totalPages: 1, pageable: { pageNumber: 0, pageSize: data.length } } }))} />
-        </View>
-      )}
       </View>
     );
   };
@@ -258,8 +265,8 @@ export default function searchPage() {
             <TouchableOpacity 
               style={styles.navigateButton} 
               onPress={() => {
-                const latitude = Number(event.locationResponse.latitude);
-                const longitude = Number(event.locationResponse.longitude);
+                const latitude = Number(event.locationResponse.coordinates?.y);
+                const longitude = Number(event.locationResponse.coordinates?.x);
                 if (!isNaN(latitude) && !isNaN(longitude)) {
                   openNavigation(latitude, longitude);
                 }
@@ -510,5 +517,22 @@ const styles = StyleSheet.create({
   },
   eventListSection: {
     flex: 1,
+  },
+  toggleButton: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    backgroundColor: themeColors.primary,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    zIndex: 10,
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
   },
 });

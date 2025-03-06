@@ -25,8 +25,12 @@ export interface Event {
       postalCode: string; 
       addressLine2?: string; 
       phoneNumber?: string; 
-      latitude?: string; 
-      longitude?: string; 
+      coordinates?: {
+        x: number;
+        y: number;
+        coordinates: number[];
+        type: string;
+      }
     };
     createdBy: string; 
     teams?: {
