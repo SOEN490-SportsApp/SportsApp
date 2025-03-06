@@ -58,8 +58,10 @@ const Create = () => {
     city: string;
     province: string;
     country: string;
-    latitude: string;
-    longitude: string;
+    coordinates: {
+      coordinates: number[];
+      type: string;
+    };
   }
 
   const [location, setLocation] = useState<Location | null>(null);
@@ -663,14 +665,14 @@ const Create = () => {
                 clearTrigger={clearLocationTrigger}
               />
 
-              {location?.latitude && location?.longitude && (
+              {location?.coordinates?.coordinates?.[0] && location?.coordinates?.coordinates?.[1] && (
                 <View
-                  key={`${location.latitude}-${location.longitude}`}
+                  key={`${location.coordinates.coordinates[0]}-${location.coordinates.coordinates[1]}`}
                   style={styles.mapContainer}
                 >
                   <EventLocationMap
-                    latitude={parseFloat(location.latitude)}
-                    longitude={parseFloat(location.longitude)}
+                    latitude={location.coordinates.coordinates[1]}
+                    longitude={location.coordinates.coordinates[0]}
                   />
                 </View>
               )}
