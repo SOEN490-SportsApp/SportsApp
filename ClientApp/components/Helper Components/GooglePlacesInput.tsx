@@ -16,8 +16,10 @@ interface LocationData {
   province: string;
   country: string;
   postalCode: string;
-  latitude: string;
-  longitude: string;
+  coordinates: {
+    coordinates: [number, number];
+    type: string;
+  }
 }
 
 const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
@@ -68,8 +70,10 @@ const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
                 details.address_components.find((comp) =>
                   comp.types.includes("postal_code")
                 )?.long_name || "",
-              latitude: details.geometry.location.lat.toString(),
-              longitude: details.geometry.location.lng.toString(),
+              coordinates: {
+                coordinates: [details.geometry.location.lng, details.geometry.location.lat] as [number, number],
+                type: "Point",
+              },
             };
 
             setSelectedLocation(locationData);

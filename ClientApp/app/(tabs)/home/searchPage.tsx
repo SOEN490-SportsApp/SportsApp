@@ -189,16 +189,25 @@ export default function searchPage() {
           showsUserLocation
           ref={mapRef}
           style={{ flex: isMapExpanded ? 1 : 0.3 }}
-          initialRegion={{
-            latitude: events.length && events[0].locationResponse.coordinates?.y !== undefined
-              ? Number(events[0].locationResponse.coordinates.y)
-              : 45.5017,
-            longitude: events.length && events[0].locationResponse.coordinates?.x !== undefined
-              ? Number(events[0].locationResponse.coordinates.x)
-              : -73.5673,
-            latitudeDelta: 0.1,
-            longitudeDelta: 0.1,
-          }}
+          initialRegion={
+            userLocation
+            ? {
+                latitude: userLocation.latitude,
+                longitude: userLocation.longitude,
+                latitudeDelta: 0.05,
+                longitudeDelta: 0.05,
+              }
+            : {
+                latitude: events.length && events[0].locationResponse.coordinates?.y !== undefined
+                  ? Number(events[0].locationResponse.coordinates.y)
+                  : 45.5017,
+                longitude: events.length && events[0].locationResponse.coordinates?.x !== undefined
+                  ? Number(events[0].locationResponse.coordinates.x)
+                  : -73.5673,
+                latitudeDelta: 0.1,
+                longitudeDelta: 0.1,
+              }
+            }
         >
           {events.map((event) => (
             <Marker
