@@ -18,6 +18,12 @@ import CustomTabMenu from "@/components/Helper Components/CustomTabMenu";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import FriendCard from "@/components/Helper Components/FriendCard";
 import { Profile } from "@/types";
+import MapView, { Marker } from "react-native-maps";
+import { getAllEvents } from "@/services/eventService";
+import { Event } from "@/types/event";
+import * as Location from "expo-location";
+import { Linking } from "react-native";
+import { Platform } from "react-native";
 
 export default function searchPage() {
   const router = useRouter();
@@ -88,12 +94,169 @@ export default function searchPage() {
     </View>
   )
 
+  const EventsTab = () => {
+    const [events, setEvents] = useState<Event[]>([]);
+    const [loading, setLoading] = useState(false);
+    const router = useRouter();
+    const mapRef = useRef<MapView | null>(null);
+    const [userLocation, setUserLocation] = useState<Location.LocationObjectCoords | null>(null);
 
-  const EventsTab = () => (
-    <View>
-      <CenterMessage message={"Events incoming... "} />
-    </View>
-  );
+    useEffect(() => {
+      const fetchEvents = async () => {
+        setLoading(true);
+        try {
+          const response = await getAllEvents();
+          setEvents(response);
+        } catch (err) {
+          console.log("Error fetching events:", err);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchEvents();
+    }, []);
+
+    useEffect(() => {
+      const getLocation = async () => {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status === "granted") {
+          const location = await Location.getCurrentPositionAsync({});
+          setUserLocation(location.coords);
+        }
+      };
+      getLocation();
+    }, []);
+
+    const onEventCardPress = (event: Event) => {
+      mapRef.current?.animateToRegion(
+        {
+          latitude: Number(event.locationResponse.latitude),
+          longitude: Number(event.locationResponse.longitude),
+          latitudeDelta: 0.05,
+          longitudeDelta: 0.05,
+        },
+        1000
+      );
+    };
+
+    if (loading) {
+      return (
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+          <ActivityIndicator size="large" color="blue" />
+        </View>
+      );
+    }
+
+    const handleEventPress = (eventId: string) => {
+      router.push(`/events/${eventId}`);
+    };
+
+    const centerOnUser = () => {
+      if (userLocation && mapRef.current) {
+        mapRef.current.animateToRegion(
+          {
+            latitude: userLocation.latitude,
+            longitude: userLocation.longitude,
+            latitudeDelta: 0.05,
+            longitudeDelta: 0.05,
+          },
+          1000
+        );
+      }
+    };
+
+    return (
+      <View style={{ flex: 1 }}>
+        <MapView
+          // mapType="hybrid"
+          showsUserLocation
+          ref={mapRef}
+          style={{ flex: 1 }}
+          initialRegion={{
+            latitude: events.length && events[0].locationResponse.latitude !== undefined
+              ? Number(events[0].locationResponse.latitude)
+              : 45.5017,
+            longitude: events.length && events[0].locationResponse.longitude !== undefined
+              ? Number(events[0].locationResponse.longitude)
+              : -73.5673,
+            latitudeDelta: 0.1,
+            longitudeDelta: 0.1,
+          }}
+        >
+          {events.map((event) => (
+            <Marker
+              key={event.id}
+              coordinate={{
+                latitude: event.locationResponse.latitude ? Number(event.locationResponse.latitude) : 0,
+                longitude: event.locationResponse.longitude ? Number(event.locationResponse.longitude) : 0,
+              }}
+              title={event.eventName}
+              onPress={() => handleEventPress(event.id)}
+            />
+          ))}
+        </MapView>
+
+        <TouchableOpacity style={styles.centerButton} onPress={centerOnUser}>
+          <MaterialCommunityIcons name="crosshairs-gps" size={24} color="white" />
+        </TouchableOpacity>
+
+        <View style={styles.eventListContainer}>
+          <FlatList
+            data={events}
+            horizontal
+            keyExtractor={(item) => item.id}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ paddingHorizontal: 16 }}
+            renderItem={({ item }) => (
+              <EventCard event={item} onPress={() => onEventCardPress(item)} />
+            )}
+          />
+        </View>
+      </View>
+    );
+  };
+
+  const openNavigation = (latitude: number, longitude: number) => {
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
+    Linking.openURL(url);
+  };
+  
+  const EventCard = ({ event, onPress }: { event: Event; onPress: () => void }) => {
+    const router = useRouter();
+  
+    return (
+      <TouchableOpacity style={styles.eventCard} onPress={onPress}>
+        <View style={styles.eventInfo}>
+          <Text style={styles.eventName}>{event.eventName}</Text>
+          <Text style={styles.eventType}>{event.sportType} • {event.eventType}</Text>
+          <Text style={styles.eventLocation}>📍 {event.locationResponse.city || "Unknown Location"}</Text>
+  
+          <View style={styles.buttonContainer}>
+          <TouchableOpacity 
+              style={styles.detailsButton} 
+              onPress={() => router.push(`/events/${event.id}`)}
+            >
+              <Text style={styles.buttonText2}>Details</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={styles.navigateButton} 
+              onPress={() => {
+                const latitude = Number(event.locationResponse.latitude);
+                const longitude = Number(event.locationResponse.longitude);
+                if (!isNaN(latitude) && !isNaN(longitude)) {
+                  openNavigation(latitude, longitude);
+                }
+              }}
+            >
+              <Text style={styles.buttonText}>Navigate</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+  
 
   const routes = [
     { key: "users", title: "Users", testID: "Users" },
@@ -214,5 +377,105 @@ const styles = StyleSheet.create({
     color: themeColors.sportIcons.lightGrey,
     fontSize: 24,
     fontWeight: "bold",
-  }
+  },
+  eventListContainer: {
+    position: "absolute",
+    bottom: 20,
+    left: 0,
+    right: 0,
+  },
+  eventCard: {
+    width: 250,
+    height: Platform.OS === "ios" ? 100 : 110,
+    backgroundColor: "white",
+    borderRadius: 10,
+    marginRight: 10,
+    padding: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  eventInfo: {
+    flex: 1,
+  },
+  eventName: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 4,
+  },
+  eventType: {
+    fontSize: 14,
+    color: "gray",
+  },
+  eventLocation: {
+    fontSize: 12,
+    color: "gray",
+  },
+  navigateText: {
+    color: "white",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  navigateButton: {
+    marginTop: 5,
+    backgroundColor: themeColors.primary,
+    padding: 8,
+    borderRadius: 5,
+    alignItems: "center",
+    width: "30%",
+    marginLeft: "auto",
+    marginRight: 0,
+  },
+  detailsButton: {
+    marginTop: 5,
+    backgroundColor: "white",
+    padding: 8,
+    borderRadius: 5,
+    alignItems: "center",
+    width: "25%",
+    marginLeft: 100,
+    marginRight: 0,
+    borderWidth: 1,
+    borderColor: themeColors.primary,
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 11,
+    fontWeight: "bold",
+  },
+  buttonText2: {
+    color: themeColors.primary,
+    fontSize: 11,
+    fontWeight: "bold",
+  },
+  centerButton: {
+    position: "absolute",
+    top: Platform.OS === "ios" ? 470 : 360,
+    right: 20,
+    backgroundColor: themeColors.primary,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+  },
+  centerButtonText: {
+    color: "white",
+    fontSize: 14,
+    fontWeight: "bold",
+    marginLeft: 5,
+  },
 });
