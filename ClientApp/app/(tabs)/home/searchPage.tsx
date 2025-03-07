@@ -33,6 +33,7 @@ export default function searchPage() {
   const [results, setResults] = useState<Profile[]>([]);
   const [cancel, setCancel] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [viewMode, setViewMode] = useState<"map" | "list">("list");
 
   const location = useSelector((state: { location: Location.LocationObjectCoords | null }) => state.location);
   const [userLocation, setUserLocation] = useState<Location.LocationObjectCoords | null>(location);
@@ -116,8 +117,7 @@ export default function searchPage() {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     const mapRef = useRef<MapView | null>(null);
-    const [isMapExpanded, setIsMapExpanded] = useState(false);
-    const [viewMode, setViewMode] = useState<"map" | "list">("list");
+    const [isMapExpanded, setIsMapExpanded] = useState(viewMode === "map");;
 
     useEffect(() => {
       const fetchEvents = async () => {
@@ -172,14 +172,17 @@ export default function searchPage() {
       }
     };
 
+    const handleToggleViewMode = () => {
+      const newMode = viewMode === "map" ? "list" : "map";
+      setViewMode(newMode);
+      setIsMapExpanded(newMode === "map");
+    };
+
     return (
       <View style={{ flex: 1 }}>
         <TouchableOpacity
           style={styles.toggleButton}
-          onPress={() => {
-            setViewMode(viewMode === "map" ? "list" : "map");
-            setIsMapExpanded(!isMapExpanded);
-          }}
+          onPress={handleToggleViewMode}
         >
           <MaterialCommunityIcons
             name={viewMode === "map" ? "format-list-bulleted" : "map"}
