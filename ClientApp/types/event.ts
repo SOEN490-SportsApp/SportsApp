@@ -26,8 +26,6 @@ export interface Event {
       addressLine2?: string; 
       phoneNumber?: string; 
       coordinates?: {
-        x: number;
-        y: number;
         coordinates: number[];
         type: string;
       }
