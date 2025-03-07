@@ -128,7 +128,7 @@ const locale = i18n.language === 'fr' ? 'fr' : 'en';
       {showDetailPreview &&
         <Text style={styles.eventDetails}>
           {/*TODO - Add distance calculation after backend does it*/}
-          {showSportType ? `${event.sportType} - X ${t('event_card.km_away')}` : `X ${t('event_card.km_away')}`}
+          {showSportType ? `${event.sportType} - ${event.far} ${t('event_card.km_away')}` : `${event.far} ${t('event_card.km_away')}`}
         </Text>}
 
       {showSportType &&

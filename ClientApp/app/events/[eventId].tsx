@@ -23,7 +23,7 @@ import { Participant } from '@/types/event';
 
 import ClosedButtonEventPage from "@/components/Helper Components/ClosedButtonEventPage";
 import { useTranslation } from "react-i18next";
-import i18n from "i18next";
+import i18n, { t } from "i18next";
 import { format } from 'date-fns';
 import { fr, enUS } from 'date-fns/locale';
 

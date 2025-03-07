@@ -1,7 +1,9 @@
 import * as Location from "expo-location";
 import { AppDispatch } from "../state/store";
-import { setLocation, setPermissionDenied } from "../state/location/locationSlice";
+import { LocationState, setLocation, setPermissionDenied } from "../state/location/locationSlice";
 import { getCoordinatesFromPostalCode } from "../utils/location/location";
+import { Event } from "../types/event";
+import { getDistance } from 'geolib';
 
 
 export const requestAndStoreLocation = async (dispatch: AppDispatch, zipCode: string) => {
@@ -39,3 +41,16 @@ export const requestAndStoreLocation = async (dispatch: AppDispatch, zipCode: st
     console.error("Error in requestAndStoreLocation:", error);
   }
 };
+
+export const  calculateDistanceBetweenEventAndUserLocation = (event:Event, userLocation: LocationState) => {
+    let distance = 0;
+    if(event.locationResponse.coordinates){
+      distance = getDistance(
+      {latitude: userLocation.latitude, longitude: userLocation.longitude},
+      {latitude: event.locationResponse.coordinates.coordinates[1] , longitude: event.locationResponse.coordinates.coordinates[0]}
+    )
+    distance = Math.round((distance / 1000)* 10) / 10 ;
+    return distance;
+    }
+    return -1
+  }

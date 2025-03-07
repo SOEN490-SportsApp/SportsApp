@@ -17,15 +17,19 @@ const Feed = () => {
       setIsLocationFetching(true);
       await requestAndStoreLocation(dispatch, user.profile.postalCode);
       setTimeout(() => setIsLocationFetching(false), 700);
+      // console.log("isLocationFetching is now ", isLocationFetching);
+      // console.log("location from the store", Location);
     };
     fetchLocation();
   }, [user.id]);
+
+  console.log("location from the store", Location);
   
   return (
     <View testID = 'feed-container' style={styles.container}>
       {isLocationFetching ? (
         <FlatList
-          data={[1, 2, 3]} // Temporary data to render multiple skeletons
+          data={[1, 2, 3]}
           keyExtractor={(item) => item.toString()}
           renderItem={() => <EventCardSkeleton />}
         />

@@ -77,6 +77,7 @@
     "expo-system-ui": "~4.0.6",
     "expo-updates": "~0.27.1",
     "expo-web-browser": "~14.0.2",
+    "geolib": "^3.3.4",
     "hermes-parser": "^0.25.0",
     "i18next": "^24.2.3",
     "jest-expo": "~52.0.2",
