@@ -25,6 +25,7 @@ import * as Location from "expo-location";
 import { Linking } from "react-native";
 import { Platform } from "react-native";
 import EventList from "@/components/Event/EventList";
+import { useSelector } from "react-redux";
 
 export default function searchPage() {
   const router = useRouter();
@@ -33,6 +34,21 @@ export default function searchPage() {
   const [cancel, setCancel] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const location = useSelector((state: { location: Location.LocationObjectCoords | null }) => state.location);
+  const [userLocation, setUserLocation] = useState<Location.LocationObjectCoords | null>(location);
+
+  useEffect(() => {
+    if (!location) {
+      const getLocation = async () => {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status === "granted") {
+          const location = await Location.getCurrentPositionAsync({});
+          setUserLocation(location.coords);
+        }
+      };
+      getLocation();
+    }
+  }, [location]);
 
   useEffect(() => {
     const timer = setTimeout(async () => {
@@ -95,12 +111,11 @@ export default function searchPage() {
     </View>
   )
 
-  const EventsTab = () => {
+  const EventsTab = ({ userLocation }: { userLocation: Location.LocationObjectCoords | null }) => {
     const [events, setEvents] = useState<Event[]>([]);
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     const mapRef = useRef<MapView | null>(null);
-    const [userLocation, setUserLocation] = useState<Location.LocationObjectCoords | null>(null);
     const [isMapExpanded, setIsMapExpanded] = useState(false);
     const [viewMode, setViewMode] = useState<"map" | "list">("list");
 
@@ -117,17 +132,6 @@ export default function searchPage() {
         }
       };
       fetchEvents();
-    }, []);
-
-    useEffect(() => {
-      const getLocation = async () => {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status === "granted") {
-          const location = await Location.getCurrentPositionAsync({});
-          setUserLocation(location.coords);
-        }
-      };
-      getLocation();
     }, []);
 
     const onEventCardPress = (event: Event) => {
@@ -183,8 +187,8 @@ export default function searchPage() {
             color="white"
           />
         </TouchableOpacity>
+        
         <MapView
-          // mapType="hybrid"
           showsMyLocationButton = {false}
           showsUserLocation
           ref={mapRef}
@@ -297,7 +301,7 @@ export default function searchPage() {
 
   const scenes = {
     users: <UsersTab />,
-    events: <EventsTab />,
+    events: <EventsTab userLocation={userLocation} />,
   };
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f5f5f5" }}>
