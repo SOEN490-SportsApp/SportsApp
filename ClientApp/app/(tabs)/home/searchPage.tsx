@@ -133,8 +133,8 @@ export default function searchPage() {
     const onEventCardPress = (event: Event) => {
       mapRef.current?.animateToRegion(
         {
-          latitude: Number(event.locationResponse.coordinates?.y),
-          longitude: Number(event.locationResponse.coordinates?.x),
+          latitude: Number(event.locationResponse.coordinates?.coordinates?.[1]),
+          longitude: Number(event.locationResponse.coordinates?.coordinates?.[0]),
           latitudeDelta: 0.05,
           longitudeDelta: 0.05,
         },
@@ -198,11 +198,11 @@ export default function searchPage() {
                 longitudeDelta: 0.05,
               }
             : {
-                latitude: events.length && events[0].locationResponse.coordinates?.y !== undefined
-                  ? Number(events[0].locationResponse.coordinates.y)
+                latitude: events.length && events[0].locationResponse.coordinates?.coordinates?.[1] !== undefined
+                  ? Number(events[0].locationResponse.coordinates.coordinates[1])
                   : 45.5017,
-                longitude: events.length && events[0].locationResponse.coordinates?.x !== undefined
-                  ? Number(events[0].locationResponse.coordinates.x)
+                longitude: events.length && events[0].locationResponse.coordinates?.coordinates?.[0] !== undefined
+                  ? Number(events[0].locationResponse.coordinates.coordinates[0])
                   : -73.5673,
                 latitudeDelta: 0.1,
                 longitudeDelta: 0.1,
@@ -213,8 +213,8 @@ export default function searchPage() {
             <Marker
               key={event.id}
               coordinate={{
-                latitude: event.locationResponse.coordinates?.y ? Number(event.locationResponse.coordinates.y) : 0,
-                longitude: event.locationResponse.coordinates?.x ? Number(event.locationResponse.coordinates.x) : 0,
+                latitude: event.locationResponse.coordinates?.coordinates?.[1] ? Number(event.locationResponse.coordinates.coordinates[1]) : 0,
+                longitude: event.locationResponse.coordinates?.coordinates?.[0] ? Number(event.locationResponse.coordinates.coordinates[0]) : 0,
               }}
               title={event.eventName}
               onPress={() => handleEventPress(event.id)}
@@ -274,8 +274,8 @@ export default function searchPage() {
             <TouchableOpacity 
               style={styles.navigateButton} 
               onPress={() => {
-                const latitude = Number(event.locationResponse.coordinates?.y);
-                const longitude = Number(event.locationResponse.coordinates?.x);
+                const latitude = Number(event.locationResponse.coordinates?.coordinates?.[1]);
+                const longitude = Number(event.locationResponse.coordinates?.coordinates?.[0]);
                 if (!isNaN(latitude) && !isNaN(longitude)) {
                   openNavigation(latitude, longitude);
                 }
@@ -529,8 +529,8 @@ const styles = StyleSheet.create({
   },
   toggleButton: {
     position: "absolute",
-    top: 10,
-    right: 10,
+    top: 20,
+    right: 20,
     backgroundColor: themeColors.primary,
     flexDirection: "row",
     alignItems: "center",

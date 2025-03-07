@@ -27,13 +27,6 @@ const EventPosts = () => {
 const EventDetails = ({ event, handleJoinEvent }: { event: Event; handleJoinEvent: () => void }) => {
   const router = useRouter();
   const user = useSelector((state: { user: any }) => state.user);
-  const { eventId } = useLocalSearchParams<{ eventId: string }>();
-  const currentLongitude = -73.5673;
-  const currentLatitude = 45.5017;
-
-  console.log("current longitude", currentLongitude);
-  console.log("current latitude", currentLatitude);
-  console.log("event location", event.locationResponse);
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -92,11 +85,11 @@ const EventDetails = ({ event, handleJoinEvent }: { event: Event; handleJoinEven
       </View>
       
       {/* Event Location Map */}
-      {event.locationResponse?.coordinates?.y && event.locationResponse?.coordinates?.x && (
+      {event.locationResponse?.coordinates?.coordinates?.[1] && event.locationResponse?.coordinates?.coordinates?.[0] && (
         <View style={styles.section}>
           <EventLocationMap 
-            latitude={event.locationResponse.coordinates.y} 
-            longitude={event.locationResponse.coordinates.x} 
+            latitude={event.locationResponse.coordinates.coordinates[1]} 
+            longitude={event.locationResponse.coordinates.coordinates[0]}
             showFullScreenButton={false}
           />
         </View>
