@@ -490,11 +490,11 @@ const styles = StyleSheet.create({
   },
   centerButton: {
     position: "absolute",
-    top: Platform.OS === "ios" ? 470 : 360,
+    top: Platform.OS === "ios" ? vs(400) : vs(380),
     right: 20,
     backgroundColor: themeColors.primary,
     paddingVertical: 10,
-    paddingHorizontal: 15,
+    paddingHorizontal: 10,
     borderRadius: 20,
     flexDirection: "row",
     alignItems: "center",
