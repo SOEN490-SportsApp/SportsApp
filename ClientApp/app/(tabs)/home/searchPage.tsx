@@ -183,12 +183,12 @@ export default function searchPage() {
             color="white"
           />
         </TouchableOpacity>
-
         <MapView
           // mapType="hybrid"
+          showsMyLocationButton = {false}
           showsUserLocation
           ref={mapRef}
-          style={{ flex: isMapExpanded ? 1 : 0.3 }}
+          style={{ flex: isMapExpanded ? 1 : 0.3, margin: isMapExpanded ? 0 : 10 }}
           initialRegion={
             userLocation
             ? {
@@ -535,7 +535,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: 8,
-    paddingHorizontal: 12,
+    paddingHorizontal: 8,
     borderRadius: 20,
     zIndex: 10,
     elevation: 5,
@@ -544,4 +544,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 5,
   },
+  mapView: {
+    padding: 1,
+  }
 });
