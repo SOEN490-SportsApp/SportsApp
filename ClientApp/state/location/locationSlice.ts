@@ -8,8 +8,8 @@ const initialState: LocationState = {
 };
 
 export interface LocationState {
-  latitude: number | undefined;
-  longitude: number | undefined;
+  latitude: number;
+  longitude: number;
   permissionStatus: "granted" | "denied" | "zip_code_based";
   lastUpdated: number | null;
 }

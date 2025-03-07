@@ -28,6 +28,30 @@ export const getAllEvents = async () => {
     throw error;
   }
 };
+
+export const getAllRelevantEvents = async (longitude:number, latitude:number, radius = 15, radiusExpansion: boolean, paginate: boolean, page = 0 , size = 10) => {
+  try {
+    const axiosInstance = getAxiosInstance();
+    const response = await axiosInstance.get(API_ENDPOINTS.GET_RELEVANT_EVENTS_FOR_CALENDAR, {
+      params: {
+        longitude: longitude,
+        latitude: latitude,
+        radius: radius,
+        radiusExpansion: radiusExpansion,
+        paginate: paginate,
+        page: page,
+        size: size
+      }
+    });
+    if (paginate) {
+      return response.data.content
+    }
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching events:", error);
+    throw error;
+  }
+};
 export const getEventDetails = async (eventId: string) => {
   try {
     const axiosInstance = getAxiosInstance();
