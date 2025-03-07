@@ -109,7 +109,7 @@ return (
     {showDetailPreview && 
     <Text style={styles.eventDetails}>
       {/*TODO - Add distance calculation after backend does it*/}
-      {showSportType ? `${event.sportType} - X km away` : `X km away`}
+      {showSportType ? `${event.sportType} - ${event.far} km away` : `${event.far} km away`}
       </Text>}
     
     {showSportType && 
