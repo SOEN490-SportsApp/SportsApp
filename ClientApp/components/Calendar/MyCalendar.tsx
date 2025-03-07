@@ -1,4 +1,4 @@
-import { getAllEvents, getEventsJoined } from "@/services/eventService";
+import { getAllEvents, getAllRelevantEvents, getEventsJoined } from "@/services/eventService";
 import themeColors from "@/utils/constants/colors";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -17,6 +17,7 @@ import { Event } from "@/types/event";
 import { useFocusEffect, useRouter } from "expo-router";
 import CalendarEventCard from "./CalendarEventCard";
 import { mhs, mvs, vs } from "@/utils/helpers/uiScaler";
+import { useSelector } from "react-redux";
 
 interface EventList {
   userId: string;
@@ -38,7 +39,7 @@ const MyCalendar: React.FC<EventList> = ({ userId, isVisible }) => {
       selectedColor: themeColors.primary,
     },
   });
-
+  const Location = useSelector((state: { location: any }) => state.location);
   const heightAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -52,27 +53,27 @@ const MyCalendar: React.FC<EventList> = ({ userId, isVisible }) => {
   useFocusEffect(
     useCallback(() => {
       setSelectedDate("");
-      // const fetchEvents = async () => {
-      //   const response = await getAllEvents();
-      //   events.current = response;
-      //   const eventDates = events.current.map((event) => event.date);
-      //   const updatedMarkedDates = eventDates.reduce(
-      //     (acc: any, date: string) => {
-      //       acc[date] = {
-      //         marked: true,
-      //         dotColor: themeColors.primary,
-      //         activeOpacity: 0,
-      //       };
-      //       return acc;
-      //     },
-      //     {}
-      //   );
-      //   setMarkedDates((prevMarkedDates: any) => ({
-      //     ...prevMarkedDates,
-      //     ...updatedMarkedDates,
-      //   }));
-      // };
-      // fetchEvents();
+      const fetchEvents = async () => {
+        const response = await getAllRelevantEvents(Location.longitude, Location.latitude, 25, false, false);
+        events.current = response;
+        const eventDates = events.current.map((event) => event.date);
+        const updatedMarkedDates = eventDates.reduce(
+          (acc: any, date: string) => {
+            acc[date] = {
+              marked: true,
+              dotColor: themeColors.primary,
+              activeOpacity: 0,
+            };
+            return acc;
+          },
+          {}
+        );
+        setMarkedDates((prevMarkedDates: any) => ({
+          ...prevMarkedDates,
+          ...updatedMarkedDates,
+        }));
+      };
+      fetchEvents();
     }, [])
   );
 

@@ -12,25 +12,27 @@ import {
 import EventCard from "./EventCard";
 import { Event } from "@/types/event";
 import { router } from "expo-router";
-import { getAllEvents } from "@/services/eventService";
+import { getAllRelevantEvents } from "@/services/eventService";
+import { useSelector } from "react-redux";
+import { calculateDistanceBetweenEventAndUserLocation } from "@/services/locationService";
 
 const EventsList = () => {
   const scrollY = useRef(new Animated.Value(0)).current;
   const [refreshing, setRefreshing] = React.useState(false);
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const Location = useSelector((state: { location: any }) => state.location);
 
   const fetchEvents = async () => {
     try {
       setLoading(true);
-      const eventsData = await getAllEvents();
-
-      const validEvents = eventsData.filter((event: Event) => {
-        const cutoffTime = new Date(event.cutOffTime);
-        return !isNaN(cutoffTime.getTime());
-      });
-
-      setEvents(validEvents);
+      const eventsData = await getAllRelevantEvents(Location.longitude, Location.latitude, 25, true, false, 0, 10);
+      const measuredEvents = eventsData.map((event:Event) => {
+        return {
+          ...event,
+          far: calculateDistanceBetweenEventAndUserLocation(event, Location)
+        }})
+      setEvents(measuredEvents);
     } catch (error) {
       Alert.alert("Error", "Failed to fetch events. Please try again later.");
     } finally {
@@ -40,7 +42,7 @@ const EventsList = () => {
 
   useEffect(() => {
     fetchEvents();
-  }, []);
+    }, [Location]);
 
   const onRefresh = async () => {
     setRefreshing(true);
