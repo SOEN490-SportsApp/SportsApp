@@ -13,6 +13,7 @@ import {
 import QRCode from "react-native-qrcode-svg";
 import * as Linking from "expo-linking";
 import { deepLinks } from "@/utils/Deeplinks/Deeplinks";
+import BottomModal from "../Helper Components/BottomModal";
 
 interface QRProps {
   id: string;
@@ -31,25 +32,14 @@ const QR: React.FC<QRProps> = ({ id, isVisible, setIsVisible, isProfile }) => {
   const userURL = isProfile && id ? deepLinks.Profile.replace("{id}", id): deepLinks.Event.replace("{id}", id);
  
   return (
-    <Modal
-      visible={isVisible}
-      animationType="slide"
-      transparent={true}
-      onRequestClose={() => setIsVisible(false)}
-    >
-      <TouchableWithoutFeedback onPress={() => setIsVisible(false)} testID="modalOverlay">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <QRCode value={userURL} size={250} logo={logo} testID="QRCode" />
+    <BottomModal isVisible={isVisible} setIsVisible={setIsVisible} height={undefined}>
+      <QRCode value={userURL} size={250} logo={logo} testID="QRCode" />
             <View style={styles.closeButton}>
               <Text style={styles.closeButtonText}>
                 Share your {isProfile ? "profile" : "event"} with friends
               </Text>
             </View>
-          </View>
-        </View>
-      </TouchableWithoutFeedback>
-    </Modal>
+    </BottomModal>
   );
 };
 

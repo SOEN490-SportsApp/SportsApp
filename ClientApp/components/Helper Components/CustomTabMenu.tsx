@@ -46,13 +46,18 @@ import { TabView, TabBar, Route, SceneRendererProps, NavigationState } from 'rea
 interface CustomTabMenuProps {
     routes: Route[]; // Array of routes with keys and titles
     scenes: { [key: string]: React.ReactNode };
-    backgroundColor: string | null // Scenes without swipe control logic
+    backgroundColor: string | null // Scenes without swipe control logic;
+    setActiveIndex?: (index: number) => void  
 }
 
-const CustomTabMenu: React.FC<CustomTabMenuProps> = ({ routes, scenes, backgroundColor }) => {
+const CustomTabMenu: React.FC<CustomTabMenuProps> = ({ routes, scenes, backgroundColor, setActiveIndex = () => {} }) => {
     const layout = useWindowDimensions();
     const [index, setIndex] = useState(0);
-
+    const handleIndexChange = (index: number) => {
+        setIndex(index)
+        setActiveIndex(index)
+        
+    }
     // Function to render the tab bar with custom styling
     const renderTabBar = (props: any) => (
         <TabBar
@@ -69,7 +74,7 @@ const CustomTabMenu: React.FC<CustomTabMenuProps> = ({ routes, scenes, backgroun
         <TabView
             navigationState={{ index, routes }}
             renderScene={({ route }) => scenes[route.key]}
-            onIndexChange={setIndex}
+            onIndexChange={(index:number) => handleIndexChange(index)}
             initialLayout={{ width: layout.width }}
             renderTabBar={renderTabBar}
             swipeEnabled={true} // Disable swipe between tabs
