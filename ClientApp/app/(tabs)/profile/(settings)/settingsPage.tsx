@@ -57,17 +57,16 @@ const settingsPage: React.FC = () => {
           <Ionicons name="help-circle-outline" size={mvs(24)} color="black" style={styles.icon} />
           <Text style={styles.text}>Help</Text>
         </TouchableOpacity>
+                {/* Log out */}
+        <TouchableOpacity style={styles.option} onPress={handleLogout}>
+          <Ionicons name="log-out-outline" size={mvs(24)} color="black" style={styles.icon} />
+          <Text style={styles.text}>Log out</Text>
+        </TouchableOpacity>
          {/* Delete Account */}
         <TouchableOpacity style={[styles.option, styles.deleteOption]} onPress={() => router.push('/(tabs)/profile/(settings)/deleteAccountPage')}>
           <Ionicons name="trash-outline" size={mvs(24)} color="red" style={styles.icon} />
           <Text style={[styles.text, styles.deleteText]}>Delete Account</Text>
         </TouchableOpacity>
-        {/* Log out */}
-        <TouchableOpacity style={styles.option} onPress={handleLogout}>
-          <Ionicons name="log-out-outline" size={mvs(24)} color="black" style={styles.icon} />
-          <Text style={styles.text}>Log out</Text>
-        </TouchableOpacity>
-          
       </ScrollView>
     </View>
   );

@@ -26,6 +26,8 @@ import { Linking } from "react-native";
 import { Platform } from "react-native";
 import EventList from "@/components/Event/EventList";
 import { useSelector } from "react-redux";
+import supportedSports from "@/utils/constants/supportedSports";
+import FilterModal from "@/components/Helper Components/FilterSection/FilterModal";
 
 export default function searchPage() {
   const router = useRouter();
@@ -49,8 +51,20 @@ export default function searchPage() {
       };
       getLocation();
     }
-  }, [location]);
+  }, [location]);  const [filter, setFilter] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [filterState, setFilterState] = useState({
+    filterType: "All",
+    minDate: new Date(),
+    maxDate: new Date(),
+  });
 
+  const handleFilterToggle = () => {
+    setFilter(true);
+    setIsVisible(false);
+  };
+
+  // const filters
   useEffect(() => {
     const timer = setTimeout(async () => {
       if (searchText) {
@@ -84,31 +98,36 @@ export default function searchPage() {
   const LoadingScreen = () => {
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="large" color={themeColors.sportIcons.lightGrey} />
+        <ActivityIndicator
+          size="large"
+          color={themeColors.sportIcons.lightGrey}
+        />
       </View>
     );
-  }
+  };
   const UsersTab = () => (
-    <View >
+    <View>
       {loading ? (
         <View>
           <LoadingScreen />
         </View>
-      ) : (searchText.length >= 1) ? (
+      ) : searchText.length >= 1 ? (
         <FlatList
           data={results}
           renderItem={({ item }) => <FriendCard user={item} />}
-          ListEmptyComponent={<CenterMessage  message={"No users found"}/>}
+          ListEmptyComponent={<CenterMessage message={"No users found"} />}
         />
       ) : (
-        <CenterMessage  message={"Connect with others and plan events!"}/>
+        <CenterMessage message={"Connect with others and plan events!"} />
       )}
     </View>
   );
 
-  const CenterMessage = ({message}: {message:string}) => (
-    <View style={{paddingTop:'50%'}}>
-      <Text style={[{textAlign:"center"}, styles.initialSearchText]}>{message} </Text>
+  const CenterMessage = ({ message }: { message: string }) => (
+    <View style={{ paddingTop: "50%" }}>
+      <Text style={[{ textAlign: "center" }, styles.initialSearchText]}>
+        {message}{" "}
+      </Text>
     </View>
   )
 
@@ -306,6 +325,9 @@ export default function searchPage() {
     users: <UsersTab />,
     events: <EventsTab userLocation={userLocation} />,
   };
+
+  const [activeIndex, setActiveIndex] = useState(0);
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f5f5f5" }}>
       <Animated.View style={styles.header}>
@@ -325,37 +347,188 @@ export default function searchPage() {
           value={searchText}
           onChangeText={(text) => handleChangeText(text)}
           placeholderTextColor="#999"
+          clearButtonMode="while-editing"
         />
-        {cancel && (
+
+        <View style={{}}>
           <TouchableOpacity
-            style={styles.iconButton}
-            onPress={() => setSearchText("")}
+            style={{
+              marginLeft: 4,
+              borderColor: filter
+                ? themeColors.primary
+                : themeColors.border.dark,
+              borderRadius: 20,
+              borderWidth: 1,
+              padding: 4,
+              backgroundColor: filter ? themeColors.primary : "white",
+            }}
+            onPress={() => setIsVisible(true)}
           >
-            <View style={styles.iconCircle}>
             <MaterialCommunityIcons
-              name="window-close"
-              testID="window-close"
-              size={30}
-              color="#aaa"
+              name="filter-variant"
+              size={28}
+              color={filter ? "white" : themeColors.border.dark}
             />
-            </View>
           </TouchableOpacity>
-        )}
+        </View>
       </Animated.View>
       <View style={{ flex: 1 }}>
-        <CustomTabMenu routes={routes} scenes={scenes} backgroundColor="#f5f5f5"/>
+        <CustomTabMenu
+          routes={routes}
+          scenes={scenes}
+          backgroundColor="#f5f5f5"
+          setActiveIndex={setActiveIndex}
+        />
+        {/* <BottomModal
+          isVisible={isVisible}
+          setIsVisible={setIsVisible}
+          height={500}
+        >
+          <View style={{ flex: 1, width: "100%" }}>
+            <View
+              style={{
+                display: "flex",
+                flex: 1,
+                flexDirection: "column",
+                width: "100%",
+                gap: 24,
+              }}
+            >
+              <View
+                style={{ display: "flex", flexDirection: "column", gap: 16 }}
+              >
+                <View
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "baseline",
+                  }}
+                >
+                  <View>
+                    <Text
+                      style={{
+                        color: themeColors.background.dark,
+                        fontSize: 18,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {" "}
+                      Sport type
+                    </Text>
+                  </View>
+                  <View>
+                    <TouchableOpacity>
+                      <Text style={{ color: themeColors.border.dark }}>
+                        {" "}
+                        clear filters
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                <View
+                  style={{
+                    width: "100%",
+                    display: "flex",
+                    flexDirection: "row",
+                    flexWrap: "wrap",
+                    gap: 2,
+                  }}
+                >
+                  {adjustedSportMap &&
+                    adjustedSportMap.map((item: any) => (
+                      <View key={item.name}>
+                        <SportFilterButton
+                          sport={item.name}
+                          icon={item.icon}
+                          isSelected={filterState.filterType === item.name}
+                          onPress={() =>
+                            setFilterState((prev) => ({
+                              ...prev,
+                              filterType: item.name,
+                            }))
+                          }
+                        />
+                      </View>
+                    ))}
+                </View>
+              </View>
+              <View
+                style={{ display: "flex", flexDirection: "column", gap: 18 }}
+              >
+                <Text
+                  style={{
+                    color: themeColors.background.dark,
+                    fontSize: 18,
+                    fontWeight: "bold",
+                  }}
+                >
+                  Select Date Range
+                </Text>
+                <View
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 4,
+                  }}
+                >
+                  <CustomDateTimePicker
+                    value={filterState.minDate}
+                    mode="date"
+                    label=""
+                    onChange={(selectedDate: Date) =>
+                      setFilterState((prev) => ({
+                        ...prev,
+                        minDate: selectedDate,
+                      }))
+                    }
+                  />
+                  <Text>To: </Text>
+                  <CustomDateTimePicker
+                    value={filterState.maxDate}
+                    mode="date"
+                    label=""
+                    onChange={(selectedDate: Date) =>
+                      setFilterState((prev) => ({
+                        ...prev,
+                        maxDate: selectedDate,
+                      }))
+                    }
+                  />
+                </View>
+              </View>
+            </View>
+            <ConfirmButton
+              icon={null}
+              text="Apply Filters"
+              iconPlacement={null}
+              onPress={handleFilterToggle}
+            />
+          </View>
+        </BottomModal> */}
+        <FilterModal
+          isVisible={isVisible}
+          setIsVisible={setIsVisible}
+          setFilterState={setFilterState}
+          handleFilterToggle={handleFilterToggle}
+          filterState={filterState}
+        />
       </View>
     </SafeAreaView>
   );
 }
+// four block, event name, sport type, location, skill level
+// date range
+// increaase range
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      justifyContent: "center",
-      alignItems: "center",
-      marginTop: vs(128)
-    },
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: vs(128),
+  },
   header1: {
     padding: 15,
     marginTop: vs(50),
@@ -385,7 +558,7 @@ const styles = StyleSheet.create({
     borderColor: "#d3d3d3",
   },
   iconButton: {
-    marginLeft: vs(15),
+    marginLeft: vs(10),
   },
   searchInput: {
     flex: 1,
@@ -412,7 +585,7 @@ const styles = StyleSheet.create({
     paddingLeft: hs(8),
     minHeight: vs(56),
   },
-  initialSearchText:{
+  initialSearchText: {
     color: themeColors.sportIcons.lightGrey,
     fontSize: 24,
     fontWeight: "bold",
@@ -553,5 +726,35 @@ const styles = StyleSheet.create({
   },
   mapView: {
     padding: 1,
-  }
+  },
+  modalFilterButton: {
+    backgroundColor: "white", // Important for shadows
+    borderRadius: 20,
+    paddingHorizontal: 28,
+    paddingVertical: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 10,
+  },
+  filterButtonText: {
+    textAlign: "center",
+    color: themeColors.background.dark,
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  mapContainer: {
+    marginTop: 10,
+    marginBottom: 200,
+    borderRadius: 10,
+    overflow: "hidden",
+  },
+  inputLabel: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: themeColors.primary,
+    marginBottom: 5,
+    marginLeft: 5,
+  },
 });
