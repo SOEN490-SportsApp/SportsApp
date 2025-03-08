@@ -592,7 +592,6 @@ const Create = () => {
                   onChange={(selectedDate) => setEventDate(selectedDate)}
                 />
               </View>
-
               <View style={styles.sideBySideContainer}>
                 <View style={styles.inputHalfContainer}>
                   <Text style={styles.inputLabel}>Start Time</Text>
