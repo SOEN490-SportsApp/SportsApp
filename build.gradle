@@ -1,0 +1,9 @@
+plugins {
+    id 'pl.allegro.tech.build.axion-release' version '1.18.17'
+}
+
+scmVersion {
+    monorepo {
+        exclude(project.subprojects.collect { it.name })
+    }
+}

@@ -1,0 +1,8 @@
+rootProject.name = 'sporta'
+
+include 'microservices:gateway'
+include 'microservices:user-service'
+include 'microservices:event-service'
+include 'microservices:email-service'
+include 'microservices:messaging-service'
+include 'microservices:storage-service'
