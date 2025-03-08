@@ -95,6 +95,7 @@ jobs:
       - name: Build with Gradle
         working-directory: Microservices/${{ matrix.service }}
         run: ./gradlew clean build
+
       - name: Determine JAR File Name
         id: jar
         working-directory: Microservices/${{ matrix.service }}
@@ -118,10 +119,35 @@ jobs:
           echo "service_name=$SERVICE_NAME" >> $GITHUB_ENV
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v6
         with:
           context: ./Microservices/${{ matrix.service }}
           file: ./Microservices/${{ matrix.service }}/Dockerfile
           push: true
           tags: ghcr.io/${{ env.repo_name }}-${{ env.service_name }}:latest
-          build-args: JAR_FILE=${{ env.jar_file }}
+
+      - name: Install Helm
+        run: |
+          curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: '${{ secrets.GCP_KEY }}'
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: 'latest'
+
+      - name: Install gke-gcloud-auth-plugin
+        run: |
+          gcloud components install gke-gcloud-auth-plugin
+
+      - name: Get GKE credentials
+        run: |
+          gcloud container clusters get-credentials cluster-1 --zone us-central1-c --project sporta-447819 --dns-endpoint
+
+      - name: Update Helm release
+        run: |
+          helm upgrade --install ${{ matrix.service }} ./.helm/${{ matrix.service }}-chart
