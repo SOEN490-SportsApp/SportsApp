@@ -27,7 +27,6 @@ import supportedSports from "@/utils/constants/supportedSports";
 import GooglePlacesInput from "@/components/Helper Components/GooglePlacesInput";
 import CustomDateTimePicker from "@/components/Helper Components/CustomDateTimePicker";
 import { Ionicons } from "@expo/vector-icons";
-import EventLocationMap from "@/components/Helper Components/EventLocationMap";
 import MapView, { Marker } from 'react-native-maps';
 
 const Create = () => {
@@ -360,7 +359,7 @@ const Create = () => {
       useNativeDriver: false,
     }).start();
   
-    setIsGooglePlacesActive(toValue === 1);  // Track if Google Places is active
+    setIsGooglePlacesActive(toValue === 1);
   };
 
   return (
@@ -679,7 +678,7 @@ const Create = () => {
             <TouchableWithoutFeedback
               onPress={() => {
                 Keyboard.dismiss();
-                googlePlacesRef.current?.blur(); // Ensure the Google Places Input loses focus
+                googlePlacesRef.current?.blur();
               }}
               accessible={false}
             >
@@ -732,15 +731,15 @@ const Create = () => {
                         });
                       }
             
-                      animateGooglePlaces(0);  // Animate back to bottom after location selection
+                      animateGooglePlaces(0);
                     }}
                     clearTrigger={clearLocationTrigger}
                     onFocus={() => {
-                      if (!isGooglePlacesActive) { // Prevent multiple animations
+                      if (!isGooglePlacesActive) {
                         animateGooglePlaces(1);
                       }
                     }}
-                    onBlur={() => animateGooglePlaces(0)}  // Deselect when tapping outside
+                    onBlur={() => animateGooglePlaces(0)}
                   />
                 </Animated.View>
               </View>
