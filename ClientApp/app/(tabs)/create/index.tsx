@@ -373,7 +373,7 @@ const Create = () => {
       endTimeTemp.setHours(now.getHours() + 2);
       return endTimeTemp;
     }
-  };
+  };  
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -606,7 +606,13 @@ const Create = () => {
                       value={startTime}
                       mode="time"
                       label=""
-                      onChange={(selectedTime) => setStartTime(selectedTime)}
+                      onChange={(selectedTime) => {
+                        setStartTime(selectedTime);
+
+                        const autoEndTime = new Date(selectedTime);
+                        autoEndTime.setHours(autoEndTime.getHours() + 2);
+                        setEndTime(autoEndTime);
+                      }}
                     />
                   </View>
                 </View>
