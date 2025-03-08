@@ -362,6 +362,19 @@ const Create = () => {
     setIsGooglePlacesActive(toValue === 1);
   };
 
+  const getDefaultEndTime = () => {
+    if (startTime) {
+      const endTimeTemp = new Date(startTime);
+      endTimeTemp.setHours(endTimeTemp.getHours() + 2);
+      return endTimeTemp;
+    } else {
+      const now = new Date();
+      const endTimeTemp = new Date(now);
+      endTimeTemp.setHours(now.getHours() + 2);
+      return endTimeTemp;
+    }
+  };
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <SafeAreaView style={styles.safeArea}>
@@ -607,7 +620,7 @@ const Create = () => {
                       color={themeColors.primary}
                     />
                     <CustomDateTimePicker
-                      value={endTime}
+                      value={endTime || getDefaultEndTime()}
                       mode="time"
                       label=""
                       onChange={(selectedTime) => setEndTime(selectedTime)}
