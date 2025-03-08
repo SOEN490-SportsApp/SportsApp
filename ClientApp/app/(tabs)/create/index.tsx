@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   View,
   Text,
@@ -13,6 +13,8 @@ import {
   TouchableWithoutFeedback,
   ScrollView,
   Keyboard,
+  Animated,
+  Platform,
 } from "react-native";
 import { useForm, Controller, useWatch } from "react-hook-form";
 import { useRouter } from "expo-router";
@@ -25,7 +27,7 @@ import supportedSports from "@/utils/constants/supportedSports";
 import GooglePlacesInput from "@/components/Helper Components/GooglePlacesInput";
 import CustomDateTimePicker from "@/components/Helper Components/CustomDateTimePicker";
 import { Ionicons } from "@expo/vector-icons";
-import EventLocationMap from "@/components/Helper Components/EventLocationMap";
+import MapView, { Marker } from 'react-native-maps';
 
 const Create = () => {
   const {
@@ -53,6 +55,11 @@ const Create = () => {
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [endTime, setEndTime] = useState<Date | null>(null);
   const [showLocationPage, setShowLocationPage] = useState(false);
+  const mapRef = useRef<MapView | null>(null);
+  const googlePlacesPosition = useRef(new Animated.Value(0)).current;
+  const [isGooglePlacesActive, setIsGooglePlacesActive] = useState(false);
+  const googlePlacesRef = useRef<any>(null);
+
   interface Location {
     name: string;
     city: string;
@@ -343,6 +350,16 @@ const Create = () => {
     }
 
     return true;
+  };
+
+  const animateGooglePlaces = (toValue: number) => {
+    Animated.timing(googlePlacesPosition, {
+      toValue,
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
+  
+    setIsGooglePlacesActive(toValue === 1);
   };
 
   return (
@@ -658,25 +675,75 @@ const Create = () => {
           )}
 
           {step === 3 && (
-            <View style={{ flex: 1, paddingHorizontal: 20, paddingTop: 10 }}>
-              <Text style={styles.inputLabel}>Select Location</Text>
-              <GooglePlacesInput
-                setLocation={setLocation}
-                clearTrigger={clearLocationTrigger}
-              />
-
-              {location?.coordinates?.coordinates?.[0] && location?.coordinates?.coordinates?.[1] && (
-                <View
-                  key={`${location.coordinates.coordinates[0]}-${location.coordinates.coordinates[1]}`}
-                  style={styles.mapContainer}
+            <TouchableWithoutFeedback
+              onPress={() => {
+                Keyboard.dismiss();
+                googlePlacesRef.current?.blur();
+              }}
+              accessible={false}
+            >
+              <View style={{ flex: 1 }}>
+                <MapView
+                  ref={(ref) => (mapRef.current = ref)}
+                  style={{ flex: 1 }}
+                  initialRegion={{
+                    latitude: location?.coordinates?.coordinates?.[1] || 45.5017,
+                    longitude: location?.coordinates?.coordinates?.[0] || -73.5673,
+                    latitudeDelta: 0.01,
+                    longitudeDelta: 0.01,
+                  }}
+                  showsUserLocation={true}
+                  showsMyLocationButton={false}
                 >
-                  <EventLocationMap
-                    latitude={location.coordinates.coordinates[1]}
-                    longitude={location.coordinates.coordinates[0]}
+                  {location && (
+                    <Marker
+                      coordinate={{
+                        latitude: location.coordinates.coordinates[1],
+                        longitude: location.coordinates.coordinates[0],
+                      }}
+                      title={location.name}
+                      description={`${location.city}, ${location.province}`}
+                    />
+                  )}
+                </MapView>
+            
+                <Animated.View
+                  style={[
+                    styles.googlePlacesContainer,
+                    {
+                      bottom: googlePlacesPosition.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [vs(50), Platform.OS === "ios" ? vs(570) : vs(570)],
+                      }),
+                    },
+                  ]}
+                >
+                  <GooglePlacesInput
+                    setLocation={(selectedLocation) => {
+                      setLocation(selectedLocation);
+            
+                      if (mapRef.current) {
+                        mapRef.current.animateToRegion({
+                          latitude: selectedLocation.coordinates.coordinates[1],
+                          longitude: selectedLocation.coordinates.coordinates[0],
+                          latitudeDelta: 0.01,
+                          longitudeDelta: 0.01,
+                        });
+                      }
+            
+                      animateGooglePlaces(0);
+                    }}
+                    clearTrigger={clearLocationTrigger}
+                    onFocus={() => {
+                      if (!isGooglePlacesActive) {
+                        animateGooglePlaces(1);
+                      }
+                    }}
+                    onBlur={() => animateGooglePlaces(0)}
                   />
-                </View>
-              )}
-            </View>
+                </Animated.View>
+              </View>
+            </TouchableWithoutFeedback>          
           )}
 
           {step === 4 && (
@@ -1160,6 +1227,12 @@ const styles = StyleSheet.create({
   skillLevelSelected: {
     backgroundColor: themeColors.primary,
     borderColor: themeColors.primary,
+  },
+  googlePlacesContainer: {
+    position: "absolute",
+    left: 20,
+    right: 20,
+    borderRadius: 15,
   },
 });
 
