@@ -1,3 +1,4 @@
+import { FilterState } from '@/components/Helper Components/FilterSection/FilterModal';
 import {getAxiosInstance} from '@/services/axiosInstance';
 import { API_ENDPOINTS } from '@/utils/api/endpoints';
 //API_ENDPOINTS.CREATE_EVENT
@@ -83,3 +84,22 @@ export const getEventsCreated = async (userId: string, page: number = 0, size: n
     throw error;
   }
 };
+
+export const searchEventsWithFilter = async (searchText: string, params: FilterState) => {
+  try{
+    const axiosInstance = getAxiosInstance()
+    const endpoint = API_ENDPOINTS.SEARCH_EVENTS;
+    const sportType = params.filterType === "All" ? "": params.filterType 
+    
+    const response = axiosInstance.get(endpoint, {
+      params: {
+        eventName: searchText || "",
+        sportType,
+
+      }
+    })
+  }catch(error){
+    console.error("Error fetching parametered events:", error);
+    throw error;
+  }
+}

@@ -5,29 +5,42 @@ import supportedSports from "@/utils/constants/supportedSports";
 import themeColors from "@/utils/constants/colors";
 import ConfirmButton from "../ConfirmButton";
 import CustomDateTimePicker from "../CustomDateTimePicker";
-import SportFilterButton from "./SportFilterButton";
+import SportFilterButton from "./FilterButtonBadge";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import FilterButtonBadge from "./FilterButtonBadge";
 
-interface FilterState {
-    filterType: string;
-    minDate: Date;
-    maxDate: Date;
-  }
+export interface FilterState {
+  filterType: string;
+  skillLevel: "All" | "Beginner" | "Intermediate" | "Advanced";
+  minDate: Date;
+  maxDate: Date;
+}
 
 interface FilterModalInterface {
-    isVisible: boolean;
-    setIsVisible: React.Dispatch<React.SetStateAction<boolean>>;
-    filterState: FilterState;
-    setFilterState: React.Dispatch<React.SetStateAction<FilterState>>
-    handleFilterToggle: () => void;
+  isVisible: boolean;
+  setIsVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  filterState: FilterState;
+  setFilterState: React.Dispatch<React.SetStateAction<FilterState>>;
+  handleFilterToggle: () => void;
+  handleCleanFilter: () => void;
 }
-const FilterModal: React.FC<FilterModalInterface> = ({isVisible, setIsVisible, setFilterState, handleFilterToggle, filterState}) => {
-    
-    const adjustedSportMap = [
-        { name: "All", icon: "check-circle-outline" },
-        ...supportedSports,
-      ];
+const FilterModal: React.FC<FilterModalInterface> = ({
+  isVisible,
+  setIsVisible,
+  setFilterState,
+  handleFilterToggle,
+  filterState,
+  handleCleanFilter,
+}) => {
+  const adjustedSportMap = [
+    { name: "All", icon: "check-circle-outline" },
+    ...supportedSports,
+  ];
+
+  const skillLevels = ["All", "Beginner", "Intermediate", "Advanced"];
+
   return (
-    <BottomModal isVisible={isVisible} setIsVisible={setIsVisible} height={500}>
+    <BottomModal isVisible={isVisible} setIsVisible={setIsVisible} height={650}>
       <View style={{ flex: 1, width: "100%" }}>
         <View
           style={{
@@ -60,7 +73,7 @@ const FilterModal: React.FC<FilterModalInterface> = ({isVisible, setIsVisible, s
                 </Text>
               </View>
               <View>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={handleCleanFilter}>
                   <Text style={{ color: themeColors.border.dark }}>
                     {" "}
                     clear filters
@@ -82,7 +95,17 @@ const FilterModal: React.FC<FilterModalInterface> = ({isVisible, setIsVisible, s
                   <View key={item.name}>
                     <SportFilterButton
                       sport={item.name}
-                      icon={item.icon}
+                      icon={
+                        <MaterialCommunityIcons
+                          name={item.icon}
+                          size={16}
+                          color={
+                            filterState.filterType === item.name
+                              ? "#fff"
+                              : themeColors.primary
+                          }
+                        />
+                      }
                       isSelected={filterState.filterType === item.name}
                       onPress={() =>
                         setFilterState((prev) => ({
@@ -90,6 +113,46 @@ const FilterModal: React.FC<FilterModalInterface> = ({isVisible, setIsVisible, s
                           filterType: item.name,
                         }))
                       }
+                    />
+                  </View>
+                ))}
+            </View>
+          </View>
+          <View style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            <View>
+              <Text
+                style={{
+                  color: themeColors.background.dark,
+                  fontSize: 18,
+                  fontWeight: "bold",
+                }}
+              >
+                {" "}
+                Skill Level
+              </Text>
+            </View>
+            <View
+              style={{
+                width: "100%",
+                display: "flex",
+                flexDirection: "row",
+                flexWrap: "wrap",
+                gap: 2,
+              }}
+            >
+              {skillLevels &&
+                skillLevels.map((item: any) => (
+                  <View key={item.index}>
+                    <FilterButtonBadge
+                      sport={item}
+                      isSelected={filterState.skillLevel === item}
+                      onPress={() =>
+                        setFilterState((prev) => ({
+                          ...prev,
+                          skillLevel: item,
+                        }))
+                      }
+                      icon={undefined}
                     />
                   </View>
                 ))}
