@@ -26,19 +26,40 @@ import { Linking } from "react-native";
 import { Platform } from "react-native";
 import EventList from "@/components/Event/EventList";
 import { useSelector } from "react-redux";
-import supportedSports from "@/utils/constants/supportedSports";
-import FilterModal from "@/components/Helper Components/FilterSection/FilterModal";
+import FilterModal, { FilterState } from "@/components/Helper Components/FilterSection/FilterModal";
 
 export default function searchPage() {
   const router = useRouter();
+  const initialState: FilterState = {
+    filterType: "All",
+    skillLevel: "All",
+    minDate: new Date(),
+    maxDate: new Date(),
+  };
+
   const [searchText, setSearchText] = useState("");
   const [results, setResults] = useState<Profile[]>([]);
   const [cancel, setCancel] = useState(false);
   const [loading, setLoading] = useState(false);
   const [viewMode, setViewMode] = useState<"map" | "list">("list");
-
-  const location = useSelector((state: { location: Location.LocationObjectCoords | null }) => state.location);
-  const [userLocation, setUserLocation] = useState<Location.LocationObjectCoords | null>(location);
+  const location = useSelector(
+    (state: { location: Location.LocationObjectCoords | null }) =>
+      state.location
+  );
+  const [userLocation, setUserLocation] =
+    useState<Location.LocationObjectCoords | null>(location);
+  const [isVisible, setIsVisible] = useState(false);
+  const [filter, setFilter] = useState(false);
+  const [filterState, setFilterState] = useState(initialState);
+  console.log(filterState)
+  const handleFilterToggle = () => {
+    setFilter(true);
+    setIsVisible(false);
+  };
+  const handleCleanFilters = () => {
+    setFilterState(initialState);
+    setFilter(false);
+  };
 
   useEffect(() => {
     if (!location) {
@@ -51,24 +72,13 @@ export default function searchPage() {
       };
       getLocation();
     }
-  }, [location]);  const [filter, setFilter] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
-  const [filterState, setFilterState] = useState({
-    filterType: "All",
-    minDate: new Date(),
-    maxDate: new Date(),
-  });
-
-  const handleFilterToggle = () => {
-    setFilter(true);
-    setIsVisible(false);
-  };
+  }, [location]);
 
   // const filters
   useEffect(() => {
     const timer = setTimeout(async () => {
       if (searchText) {
-        await fetchResults(searchText);
+        await fetchUserResults(searchText);
       } else {
         setResults([]);
       }
@@ -76,7 +86,7 @@ export default function searchPage() {
     return () => clearTimeout(timer);
   }, [searchText]);
 
-  const fetchResults = async (searchText: string) => {
+  const fetchUserResults = async (searchText: string) => {
     setLoading(true);
     try {
       const response = await searchUser(searchText);
@@ -105,23 +115,27 @@ export default function searchPage() {
       </View>
     );
   };
-  const UsersTab = () => (
-    <View>
-      {loading ? (
-        <View>
-          <LoadingScreen />
-        </View>
-      ) : searchText.length >= 1 ? (
-        <FlatList
-          data={results}
-          renderItem={({ item }) => <FriendCard user={item} />}
-          ListEmptyComponent={<CenterMessage message={"No users found"} />}
-        />
-      ) : (
-        <CenterMessage message={"Connect with others and plan events!"} />
-      )}
-    </View>
-  );
+  const UsersTab = () => {
+
+    
+    return (
+      <View>
+        {loading ? (
+          <View>
+            <LoadingScreen />
+          </View>
+        ) : searchText.length >= 1 ? (
+          <FlatList
+            data={results}
+            renderItem={({ item }) => <FriendCard user={item} />}
+            ListEmptyComponent={<CenterMessage message={"No users found"} />}
+          />
+        ) : (
+          <CenterMessage message={"Connect with others and plan events!"} />
+        )}
+      </View>
+    );
+  };
 
   const CenterMessage = ({ message }: { message: string }) => (
     <View style={{ paddingTop: "50%" }}>
@@ -129,19 +143,31 @@ export default function searchPage() {
         {message}{" "}
       </Text>
     </View>
-  )
+  );
 
-  const EventsTab = ({ userLocation }: { userLocation: Location.LocationObjectCoords | null }) => {
+  const EventsTab = ({
+    userLocation,
+    searchText
+  }: {
+    userLocation: Location.LocationObjectCoords | null;
+    searchText: string
+  }) => {
     const [events, setEvents] = useState<Event[]>([]);
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     const mapRef = useRef<MapView | null>(null);
-    const [isMapExpanded, setIsMapExpanded] = useState(viewMode === "map");;
+    const [isMapExpanded, setIsMapExpanded] = useState(viewMode === "map");
 
     useEffect(() => {
       const fetchEvents = async () => {
         setLoading(true);
         try {
+          
+          // if (filter) {
+          //   const otherUsers = await fetchUserResults(searchText);
+          //   console.log(otherUsers)
+          // } 
+          
           const response = await getAllEvents();
           setEvents(response);
         } catch (err) {
@@ -151,13 +177,29 @@ export default function searchPage() {
         }
       };
       fetchEvents();
-    }, []);
+    }, [searchText]);
+
+    // useEffect(() => {
+    //   const timer = setTimeout(async () => {
+    //     if (searchText) {
+    //       await fetchUserResults(searchText);
+    //     } else {
+    //       setResults([]);
+    //     }
+    //     console.log(results)
+    //   }, 300);
+    //   return () => clearTimeout(timer);
+    // }, [searchText]);
 
     const onEventCardPress = (event: Event) => {
       mapRef.current?.animateToRegion(
         {
-          latitude: Number(event.locationResponse.coordinates?.coordinates?.[1]),
-          longitude: Number(event.locationResponse.coordinates?.coordinates?.[0]),
+          latitude: Number(
+            event.locationResponse.coordinates?.coordinates?.[1]
+          ),
+          longitude: Number(
+            event.locationResponse.coordinates?.coordinates?.[0]
+          ),
           latitudeDelta: 0.05,
           longitudeDelta: 0.05,
         },
@@ -167,7 +209,9 @@ export default function searchPage() {
 
     if (loading) {
       return (
-        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
           <ActivityIndicator size="large" color="blue" />
         </View>
       );
@@ -209,38 +253,55 @@ export default function searchPage() {
             color="white"
           />
         </TouchableOpacity>
-        
+
         <MapView
-          showsMyLocationButton = {false}
+          showsMyLocationButton={false}
           showsUserLocation
           ref={mapRef}
-          style={{ flex: isMapExpanded ? 1 : 0.3, margin: isMapExpanded ? 0 : 10 }}
+          style={{
+            flex: isMapExpanded ? 1 : 0.3,
+            margin: isMapExpanded ? 0 : 10,
+          }}
           initialRegion={
             userLocation
-            ? {
-                latitude: userLocation.latitude,
-                longitude: userLocation.longitude,
-                latitudeDelta: 0.05,
-                longitudeDelta: 0.05,
-              }
-            : {
-                latitude: events.length && events[0].locationResponse.coordinates?.coordinates?.[1] !== undefined
-                  ? Number(events[0].locationResponse.coordinates.coordinates[1])
-                  : 45.5017,
-                longitude: events.length && events[0].locationResponse.coordinates?.coordinates?.[0] !== undefined
-                  ? Number(events[0].locationResponse.coordinates.coordinates[0])
-                  : -73.5673,
-                latitudeDelta: 0.1,
-                longitudeDelta: 0.1,
-              }
-            }
+              ? {
+                  latitude: userLocation.latitude,
+                  longitude: userLocation.longitude,
+                  latitudeDelta: 0.05,
+                  longitudeDelta: 0.05,
+                }
+              : {
+                  latitude:
+                    events.length &&
+                    events[0].locationResponse.coordinates?.coordinates?.[1] !==
+                      undefined
+                      ? Number(
+                          events[0].locationResponse.coordinates.coordinates[1]
+                        )
+                      : 45.5017,
+                  longitude:
+                    events.length &&
+                    events[0].locationResponse.coordinates?.coordinates?.[0] !==
+                      undefined
+                      ? Number(
+                          events[0].locationResponse.coordinates.coordinates[0]
+                        )
+                      : -73.5673,
+                  latitudeDelta: 0.1,
+                  longitudeDelta: 0.1,
+                }
+          }
         >
           {events.map((event) => (
             <Marker
               key={event.id}
               coordinate={{
-                latitude: event.locationResponse.coordinates?.coordinates?.[1] ? Number(event.locationResponse.coordinates.coordinates[1]) : 0,
-                longitude: event.locationResponse.coordinates?.coordinates?.[0] ? Number(event.locationResponse.coordinates.coordinates[0]) : 0,
+                latitude: event.locationResponse.coordinates?.coordinates?.[1]
+                  ? Number(event.locationResponse.coordinates.coordinates[1])
+                  : 0,
+                longitude: event.locationResponse.coordinates?.coordinates?.[0]
+                  ? Number(event.locationResponse.coordinates.coordinates[0])
+                  : 0,
               }}
               title={event.eventName}
               onPress={() => handleEventPress(event.id)}
@@ -250,8 +311,15 @@ export default function searchPage() {
 
         {viewMode === "map" ? (
           <>
-            <TouchableOpacity style={styles.centerButton} onPress={centerOnUser}>
-              <MaterialCommunityIcons name="crosshairs-gps" size={24} color="white" />
+            <TouchableOpacity
+              style={styles.centerButton}
+              onPress={centerOnUser}
+            >
+              <MaterialCommunityIcons
+                name="crosshairs-gps"
+                size={24}
+                color="white"
+              />
             </TouchableOpacity>
             <View style={styles.eventListContainer}>
               <FlatList
@@ -261,13 +329,28 @@ export default function searchPage() {
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={{ paddingHorizontal: 16 }}
                 renderItem={({ item }) => (
-                  <EventCard event={item} onPress={() => onEventCardPress(item)} />
-                )} />
+                  <EventCard
+                    event={item}
+                    onPress={() => onEventCardPress(item)}
+                  />
+                )}
+              />
             </View>
           </>
         ) : (
           <View style={styles.eventListSection}>
-            <EventList fetchEventsFunction={() => getAllEvents().then(data => ({ data: { content: data, totalElements: data.length, totalPages: 1, pageable: { pageNumber: 0, pageSize: data.length } } }))} />
+            <EventList
+              fetchEventsFunction={() =>
+                getAllEvents().then((data) => ({
+                  data: {
+                    content: data,
+                    totalElements: data.length,
+                    totalPages: 1,
+                    pageable: { pageNumber: 0, pageSize: data.length },
+                  },
+                }))
+              }
+            />
           </View>
         )}
       </View>
@@ -278,30 +361,44 @@ export default function searchPage() {
     const url = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
     Linking.openURL(url);
   };
-  
-  const EventCard = ({ event, onPress }: { event: Event; onPress: () => void }) => {
+
+  const EventCard = ({
+    event,
+    onPress,
+  }: {
+    event: Event;
+    onPress: () => void;
+  }) => {
     const router = useRouter();
-  
+
     return (
       <TouchableOpacity style={styles.eventCard} onPress={onPress}>
         <View style={styles.eventInfo}>
           <Text style={styles.eventName}>{event.eventName}</Text>
-          <Text style={styles.eventType}>{event.sportType} • {event.eventType}</Text>
-          <Text style={styles.eventLocation}>📍 {event.locationResponse.city || "Unknown Location"}</Text>
-  
+          <Text style={styles.eventType}>
+            {event.sportType} • {event.eventType}
+          </Text>
+          <Text style={styles.eventLocation}>
+            📍 {event.locationResponse.city || "Unknown Location"}
+          </Text>
+
           <View style={styles.buttonContainer}>
-          <TouchableOpacity 
-              style={styles.detailsButton} 
+            <TouchableOpacity
+              style={styles.detailsButton}
               onPress={() => router.push(`/events/${event.id}`)}
             >
               <Text style={styles.buttonText2}>Details</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity 
-              style={styles.navigateButton} 
+            <TouchableOpacity
+              style={styles.navigateButton}
               onPress={() => {
-                const latitude = Number(event.locationResponse.coordinates?.coordinates?.[1]);
-                const longitude = Number(event.locationResponse.coordinates?.coordinates?.[0]);
+                const latitude = Number(
+                  event.locationResponse.coordinates?.coordinates?.[1]
+                );
+                const longitude = Number(
+                  event.locationResponse.coordinates?.coordinates?.[0]
+                );
                 if (!isNaN(latitude) && !isNaN(longitude)) {
                   openNavigation(latitude, longitude);
                 }
@@ -314,7 +411,6 @@ export default function searchPage() {
       </TouchableOpacity>
     );
   };
-  
 
   const routes = [
     { key: "users", title: "Users", testID: "Users" },
@@ -323,7 +419,7 @@ export default function searchPage() {
 
   const scenes = {
     users: <UsersTab />,
-    events: <EventsTab userLocation={userLocation} />,
+    events: <EventsTab userLocation={userLocation} searchText={searchText}/>,
   };
 
   const [activeIndex, setActiveIndex] = useState(0);
@@ -351,168 +447,49 @@ export default function searchPage() {
         />
 
         <View style={{}}>
-          <TouchableOpacity
-            style={{
-              marginLeft: 4,
-              borderColor: filter
-                ? themeColors.primary
-                : themeColors.border.dark,
-              borderRadius: 20,
-              borderWidth: 1,
-              padding: 4,
-              backgroundColor: filter ? themeColors.primary : "white",
-            }}
-            onPress={() => setIsVisible(true)}
-          >
-            <MaterialCommunityIcons
-              name="filter-variant"
-              size={28}
-              color={filter ? "white" : themeColors.border.dark}
-            />
-          </TouchableOpacity>
+          {activeIndex === 1 && (
+            <TouchableOpacity
+              style={{
+                marginLeft: 4,
+                borderColor: filter
+                  ? themeColors.primary
+                  : themeColors.border.dark,
+                borderRadius: 20,
+                borderWidth: 1,
+                padding: 4,
+                backgroundColor: filter ? themeColors.primary : "white",
+              }}
+              onPress={() => setIsVisible(true)}
+            >
+              <MaterialCommunityIcons
+                name="filter-variant"
+                size={28}
+                color={filter ? "white" : themeColors.border.dark}
+              />
+            </TouchableOpacity>
+          )}
         </View>
       </Animated.View>
-      <View style={{ flex: 1 }}>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: "#fff",
+          minHeight: viewMode === "list" ? "100%" : 0,
+        }}
+      >
         <CustomTabMenu
           routes={routes}
           scenes={scenes}
           backgroundColor="#f5f5f5"
           setActiveIndex={setActiveIndex}
         />
-        {/* <BottomModal
-          isVisible={isVisible}
-          setIsVisible={setIsVisible}
-          height={500}
-        >
-          <View style={{ flex: 1, width: "100%" }}>
-            <View
-              style={{
-                display: "flex",
-                flex: 1,
-                flexDirection: "column",
-                width: "100%",
-                gap: 24,
-              }}
-            >
-              <View
-                style={{ display: "flex", flexDirection: "column", gap: 16 }}
-              >
-                <View
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "baseline",
-                  }}
-                >
-                  <View>
-                    <Text
-                      style={{
-                        color: themeColors.background.dark,
-                        fontSize: 18,
-                        fontWeight: "bold",
-                      }}
-                    >
-                      {" "}
-                      Sport type
-                    </Text>
-                  </View>
-                  <View>
-                    <TouchableOpacity>
-                      <Text style={{ color: themeColors.border.dark }}>
-                        {" "}
-                        clear filters
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-                <View
-                  style={{
-                    width: "100%",
-                    display: "flex",
-                    flexDirection: "row",
-                    flexWrap: "wrap",
-                    gap: 2,
-                  }}
-                >
-                  {adjustedSportMap &&
-                    adjustedSportMap.map((item: any) => (
-                      <View key={item.name}>
-                        <SportFilterButton
-                          sport={item.name}
-                          icon={item.icon}
-                          isSelected={filterState.filterType === item.name}
-                          onPress={() =>
-                            setFilterState((prev) => ({
-                              ...prev,
-                              filterType: item.name,
-                            }))
-                          }
-                        />
-                      </View>
-                    ))}
-                </View>
-              </View>
-              <View
-                style={{ display: "flex", flexDirection: "column", gap: 18 }}
-              >
-                <Text
-                  style={{
-                    color: themeColors.background.dark,
-                    fontSize: 18,
-                    fontWeight: "bold",
-                  }}
-                >
-                  Select Date Range
-                </Text>
-                <View
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: 4,
-                  }}
-                >
-                  <CustomDateTimePicker
-                    value={filterState.minDate}
-                    mode="date"
-                    label=""
-                    onChange={(selectedDate: Date) =>
-                      setFilterState((prev) => ({
-                        ...prev,
-                        minDate: selectedDate,
-                      }))
-                    }
-                  />
-                  <Text>To: </Text>
-                  <CustomDateTimePicker
-                    value={filterState.maxDate}
-                    mode="date"
-                    label=""
-                    onChange={(selectedDate: Date) =>
-                      setFilterState((prev) => ({
-                        ...prev,
-                        maxDate: selectedDate,
-                      }))
-                    }
-                  />
-                </View>
-              </View>
-            </View>
-            <ConfirmButton
-              icon={null}
-              text="Apply Filters"
-              iconPlacement={null}
-              onPress={handleFilterToggle}
-            />
-          </View>
-        </BottomModal> */}
         <FilterModal
           isVisible={isVisible}
           setIsVisible={setIsVisible}
           setFilterState={setFilterState}
           handleFilterToggle={handleFilterToggle}
           filterState={filterState}
+          handleCleanFilter={handleCleanFilters}
         />
       </View>
     </SafeAreaView>

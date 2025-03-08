@@ -8,14 +8,14 @@ interface Sport {
   ranking: string;
 }
 
-interface FavoriteSportsBadgesProps {
+interface FavoriteFilterButtonBadgeProps {
   sport: string;
-  icon: string;
+  icon: React.ReactNode | null;
   isSelected: boolean;
   onPress: () => void
 }
 
-const SportFilterButton: React.FC<FavoriteSportsBadgesProps> = ({
+const FilterButtonBadge: React.FC<FavoriteFilterButtonBadgeProps> = ({
   sport,
   icon,
   isSelected,
@@ -37,11 +37,7 @@ const SportFilterButton: React.FC<FavoriteSportsBadgesProps> = ({
           >
             {sport}
           </Text>
-          <MaterialCommunityIcons
-            name={icon}
-            size={16}
-            color={isSelected ? "#fff" : themeColors.primary}
-          />
+          {icon && icon}
         </View>
         </TouchableOpacity>
       </View>
@@ -49,7 +45,7 @@ const SportFilterButton: React.FC<FavoriteSportsBadgesProps> = ({
   );
 };
 
-export default SportFilterButton;
+export default FilterButtonBadge;
 
 const styles = StyleSheet.create({
   container: {
