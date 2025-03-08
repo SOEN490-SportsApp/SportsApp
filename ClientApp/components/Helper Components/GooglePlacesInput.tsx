@@ -49,43 +49,47 @@ const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
         minLength={2}
         fetchDetails={true}
         onPress={(data, details = null) => {
-          if (details) {
-            const locationData = {
-              name: details.name,
-              streetNumber:
-                details.address_components.find((comp) =>
-                  comp.types.includes("street_number")
-                )?.long_name || "",
-              streetName:
-                details.address_components.find((comp) =>
-                  comp.types.includes("route")
-                )?.long_name || "",
-              city:
-                details.address_components.find((comp) =>
-                  comp.types.includes("locality")
-                )?.long_name || "",
-              province:
-                details.address_components.find((comp) =>
-                  comp.types.includes("administrative_area_level_1")
-                )?.long_name || "",
-              country:
-                details.address_components.find((comp) =>
-                  comp.types.includes("country")
-                )?.long_name || "",
-              postalCode:
-                details.address_components.find((comp) =>
-                  comp.types.includes("postal_code")
-                )?.long_name || "",
-              coordinates: {
-                coordinates: [details.geometry.location.lng, details.geometry.location.lat] as [number, number],
-                type: "Point",
-              },
-            };
+    if (details) {
+      const fullAddress = details.formatted_address || ""; // Full address as fallback
+      const locationData = {
+        name: details.name || fullAddress,
+        streetNumber:
+          details.address_components.find((comp) =>
+            comp.types.includes("street_number")
+          )?.long_name || "",
+        streetName:
+          details.address_components.find((comp) =>
+            comp.types.includes("route")
+          )?.long_name || "",
+        city:
+          details.address_components.find((comp) =>
+            comp.types.includes("locality")
+          )?.long_name || "",
+        province:
+          details.address_components.find((comp) =>
+            comp.types.includes("administrative_area_level_1")
+          )?.long_name || "",
+        country:
+          details.address_components.find((comp) =>
+            comp.types.includes("country")
+          )?.long_name || "",
+        postalCode:
+          details.address_components.find((comp) =>
+            comp.types.includes("postal_code")
+          )?.long_name || "",
+        coordinates: {
+          coordinates: [
+            details.geometry.location.lng as number,
+            details.geometry.location.lat as number,
+          ] as [number, number],
+          type: "Point",
+        },
+      };
 
-            setSelectedLocation(locationData);
-            setLocation(locationData);
-          }
-        }}
+      setSelectedLocation(locationData);
+      setLocation(locationData);  // Ensure location is properly updated
+    }
+}}
         textInputProps={{
           onFocus,
           onBlur: () => {
