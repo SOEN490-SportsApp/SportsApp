@@ -1,7 +1,7 @@
 replicaCount: 2
 
 image:
-  repository: ghcr.io/walidoow/email-service
+  repository: ghcr.io/soen490-sportsapp/sportsapp-email-service
   pullPolicy: Always
   tag: "latest"
 
@@ -17,9 +17,6 @@ serviceAccount:
 service:
   type: ClusterIP
   port: 8080
-
-networkPolicy:
-  enabled: true
 
 ingress:
   enabled: false
@@ -111,11 +108,6 @@ env:
       secretKeyRef:
         name: shared-secrets
         key: keycloak-realm
-  - name: MONGODB_URI
-    valueFrom:
-      secretKeyRef:
-        name: shared-secrets
-        key: mongodb-uri
 
 livenessProbe:
   enabled: true

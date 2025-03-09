@@ -1,7 +1,7 @@
 replicaCount: 2
 
 image:
-  repository: ghcr.io/walidoow/user-service
+  repository: ghcr.io/soen490-sportsapp/sportsapp-user-service
   pullPolicy: Always
   tag: "latest"
 
@@ -17,9 +17,6 @@ serviceAccount:
 service:
   type: ClusterIP
   port: 8080
-
-networkPolicy:
-  enabled: true
 
 ingress:
   enabled: false
@@ -115,7 +112,7 @@ env:
     valueFrom:
       secretKeyRef:
         name: shared-secrets
-        key: mongodb-uri
+        key: mongodb-uri-user-service
 
 livenessProbe:
   enabled: true
