@@ -44,6 +44,7 @@ export default function searchPage() {
   const [cancel, setCancel] = useState(false);
   const [loading, setLoading] = useState(false);
   const [viewMode, setViewMode] = useState<"map" | "list">("list");
+  const [activeIndex, setActiveIndex] = useState(0)
   const location = useSelector(
     (state: { location: Location.LocationObjectCoords | null }) =>
       state.location
@@ -405,11 +406,12 @@ export default function searchPage() {
   ];
 
   const scenes = {
-    users: <UsersTab />,
     events: <EventsTab userLocation={userLocation} />,
+    users: <UsersTab />,
+    
   };
 
-  const [activeIndex, setActiveIndex] = useState(0);
+  
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f5f5f5" }}>

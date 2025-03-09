@@ -1,12 +1,7 @@
 import themeColors from "@/utils/constants/colors";
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
-interface Sport {
-  name: string;
-  ranking: string;
-}
 
 interface FavoriteFilterButtonBadgeProps {
   sport: string;
