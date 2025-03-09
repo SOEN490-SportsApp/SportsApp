@@ -8,7 +8,6 @@ plugins {
 }
 
 group = 'app.sportahub'
-version = scmVersion.version
 
 scmVersion {
     tag {
