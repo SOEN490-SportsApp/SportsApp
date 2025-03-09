@@ -36,7 +36,7 @@ export default function UserProfilesLayout() {
         closeMenu();
         switch (option) {
             case "add":
-                console.log("Send friend request selected");
+                
                 if (!user?.id) {
                     Alert.alert("Error", "User not found. Please log in.");
                     return;

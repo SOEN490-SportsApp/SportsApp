@@ -63,7 +63,7 @@ export default function searchPage() {
     };
     fetchInitialEvents();
   },[])
-  
+
   const fetchEvents = useCallback(async (): Promise<void> => {
     setLoading(true);
     try {
@@ -72,9 +72,7 @@ export default function searchPage() {
         await fetchUserResults(searchText);
       } else {        
         response = await handleEventListData();
-        console.log("response ", response);
         setEvents(Array.isArray(response) ? response : []);       
-        console.log("Events: ", events)
       }
     } catch (err) {
       console.error("Error fetching events:", err);

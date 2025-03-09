@@ -17,12 +17,9 @@ const Feed = () => {
       setIsLocationFetching(true);
       await requestAndStoreLocation(dispatch, user.profile.postalCode);
       setTimeout(() => setIsLocationFetching(false), 700);
-      console.log("isLocationFetching is now ", isLocationFetching);
     };
     fetchLocation();
   }, [user.id]);
-
-  console.log("location from the store", Location);
   
   return (
     <View testID = 'feed-container' style={styles.container}>

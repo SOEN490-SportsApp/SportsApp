@@ -34,11 +34,10 @@ const FilterModal: React.FC<FilterModalInterface> = ({
   handleCleanFilter,
 }) => {
   const adjustedSportMap = [
-    { name: "All", icon: "check-circle-outline" },
     ...supportedSports,
   ];
 
-  const skillLevels = ["All", "Beginner", "Intermediate", "Advanced"];
+  const skillLevels = ["Beginner", "Intermediate", "Advanced"];
 
   return (
     <BottomModal isVisible={isVisible} setIsVisible={setIsVisible} height={650}>
@@ -52,7 +51,9 @@ const FilterModal: React.FC<FilterModalInterface> = ({
             gap: vs(24),
           }}
         >
-          <View style={{ display: "flex", flexDirection: "column", gap: vs(16) }}>
+          <View
+            style={{ display: "flex", flexDirection: "column", gap: vs(16) }}
+          >
             <View
               style={{
                 display: "flex",
@@ -75,7 +76,7 @@ const FilterModal: React.FC<FilterModalInterface> = ({
               </View>
               <View>
                 <TouchableOpacity onPress={handleCleanFilter}>
-                  <Text style={{ color: themeColors.border.dark }}>
+                  <Text style={{ color: "#0096FF",  fontWeight: "bold" }}>
                     {" "}
                     clear filters
                   </Text>
@@ -119,7 +120,9 @@ const FilterModal: React.FC<FilterModalInterface> = ({
                 ))}
             </View>
           </View>
-          <View style={{ display: "flex", flexDirection: "column", gap: vs(4) }}>
+          <View
+            style={{ display: "flex", flexDirection: "column", gap: vs(4) }}
+          >
             <View>
               <Text
                 style={{
@@ -159,7 +162,9 @@ const FilterModal: React.FC<FilterModalInterface> = ({
                 ))}
             </View>
           </View>
-          <View style={{ display: "flex", flexDirection: "column", gap: vs(18) }}>
+          <View
+            style={{ display: "flex", flexDirection: "column", gap: vs(18) }}
+          >
             <Text
               style={{
                 color: themeColors.background.dark,

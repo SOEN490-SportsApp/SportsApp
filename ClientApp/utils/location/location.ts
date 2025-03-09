@@ -10,7 +10,6 @@ export const getCoordinatesFromPostalCode = async (postalCode: string) => {
       },
     });
     
-    console.log(response.data);
     if (response.data.length > 0) {
       const location = response.data[0];
       return { latitude: parseFloat(location.lat), longitude: parseFloat(location.lon) };
