@@ -7,9 +7,10 @@ import { Post } from '@/types/post';
 
 type PostComponentProps = {
   post: Post;
+  userProfile?: any; // Add userProfile to props
 };
 
-const PostComponent: React.FC<PostComponentProps> = ({ post }) => {
+const PostComponent: React.FC<PostComponentProps> = ({ post, userProfile }) => {
   const [liked, setLiked] = useState<boolean>(false);
   const [likeCount, setLikeCount] = useState<number>(post.likes); // Track like count
 
@@ -23,55 +24,55 @@ const PostComponent: React.FC<PostComponentProps> = ({ post }) => {
   };
 
   return (
-      <TouchableOpacity activeOpacity={0.8} onPress={() => {
-        router.push({
-            pathname: `/posts/[id]`,
-            params: { id: post.id },
-          });
-      }}>
-        <View style={styles.container}>
-          {/* User Info Section */}
-          <View style={styles.userInfoContainer}>
-            <Image
-              source={{ uri: 'https://via.placeholder.com/150' }} // Replace with user profile picture URL
-              style={styles.profilePicture}
-            />
-            <View style={styles.userInfoText}>
-              <Text style={styles.userName}>{post.createdBy}</Text>
-              <Text style={styles.timeAgo}>{timeAgo}</Text>
-            </View>
-          </View>
-
-          {/* Post Content */}
-          <Text style={styles.postContent}>{post.content}</Text>
-
-          {/* Post Images */}
-          {post.attachments.length > 0 && (
-            <FlatList
-              data={post.attachments}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              keyExtractor={(item) => item}
-              renderItem={({ item }) => (
-                <Image source={{ uri: item }} style={styles.postImage} resizeMode="cover" />
-              )}
-            />
-          )}
-
-          {/* Like and Comment Buttons */}
-          <View style={styles.actionsContainer}>
-            <TouchableOpacity onPress={handleLike} style={styles.actionButton}>
-              <Ionicons name={liked ? 'heart' : 'heart-outline'} size={24} color={liked ? 'red' : '#555'} />
-              <Text style={styles.actionText}>{likeCount} Likes</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.actionButton}>
-              <Ionicons name="chatbubble-outline" size={24} color="#555" />
-              <Text style={styles.actionText}>{post.comments.length} Comments</Text>
-            </TouchableOpacity>
+    <TouchableOpacity activeOpacity={0.8} onPress={() => {
+      router.push({
+        pathname: `/posts/[id]`,
+        params: { id: post.id },
+      });
+    }}>
+      <View style={styles.container}>
+        {/* User Info Section */}
+        <View style={styles.userInfoContainer}>
+          <Image
+            source={require("@/assets/images/avatar-placeholder.png")}
+            style={styles.profilePicture}
+          />
+          <View style={styles.userInfoText}>
+            <Text style={styles.userName}>{userProfile?.profile?.firstName} {userProfile?.profile?.lastName}</Text>
+            <Text style={styles.timeAgo}>{timeAgo}</Text>
           </View>
         </View>
-      </TouchableOpacity>
+
+        {/* Post Content */}
+        <Text style={styles.postContent}>{post.content}</Text>
+
+        {/* Post Images */}
+        {(post.attachments.length > 0 && post.attachments[0] != '') && (
+          <FlatList
+            data={post.attachments}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(item) => item}
+            renderItem={({ item }) => (
+              <Image source={{ uri: item }} style={styles.postImage} resizeMode="cover" />
+            )}
+          />
+        )}
+
+        {/* Like and Comment Buttons */}
+        <View style={styles.actionsContainer}>
+          <TouchableOpacity onPress={handleLike} style={styles.actionButton}>
+            <Ionicons name={liked ? 'heart' : 'heart-outline'} size={24} color={liked ? 'red' : '#555'} />
+            <Text style={styles.actionText}>{likeCount} Likes</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.actionButton}>
+            <Ionicons name="chatbubble-outline" size={24} color="#555" />
+            <Text style={styles.actionText}>{post.comments.length} Comments</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </TouchableOpacity>
   );
 };
 
