@@ -141,8 +141,8 @@ const FilterModal: React.FC<FilterModalInterface> = ({
               }}
             >
               {skillLevels &&
-                skillLevels.map((item: any) => (
-                  <View key={item.index}>
+                skillLevels.map((item: any, index) => (
+                  <View key={index}>
                     <FilterButtonBadge
                       sport={item}
                       isSelected={filterState.skillLevel === item}

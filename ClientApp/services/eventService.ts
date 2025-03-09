@@ -1,16 +1,15 @@
-import { FilterState } from '@/components/Helper Components/FilterSection/FilterModal';
-import {getAxiosInstance} from '@/services/axiosInstance';
-import { API_ENDPOINTS } from '@/utils/api/endpoints';
+import { FilterState } from "@/components/Helper Components/FilterSection/FilterModal";
+import { getAxiosInstance } from "@/services/axiosInstance";
+import { API_ENDPOINTS } from "@/utils/api/endpoints";
+import { accessibilityProps } from "react-native-paper/lib/typescript/components/MaterialCommunityIcon";
 //API_ENDPOINTS.CREATE_EVENT
 export const createEvent = async (eventData: any) => {
   try {
     const axiosInstance = getAxiosInstance();
     const response = await axiosInstance.post(
-      
-      API_ENDPOINTS.CREATE_EVENT, 
-     
+      API_ENDPOINTS.CREATE_EVENT,
+
       eventData
-    
     );
     return response.data;
   } catch (error) {
@@ -35,7 +34,7 @@ export const getEventDetails = async (eventId: string) => {
       API_ENDPOINTS.GET_EVENT_BY_ID.replace("{id}", eventId)
     );
 
-   // console.log("API Response Event Data:", response.data);
+    // console.log("API Response Event Data:", response.data);
 
     return response.data;
   } catch (error) {
@@ -57,10 +56,17 @@ export const deleteEvent = async (eventId: string) => {
 };
 
 // API function that fetches paginated events
-export const getEventsJoined = async (userId: string, page: number = 0, size: number = 5) => {
+export const getEventsJoined = async (
+  userId: string,
+  page: number = 0,
+  size: number = 5
+) => {
   try {
     const axiosInstance = getAxiosInstance();
-    const endpoint = API_ENDPOINTS.GET_EVENTS_BY_USER_ID.replace("{userId}", userId);
+    const endpoint = API_ENDPOINTS.GET_EVENTS_BY_USER_ID.replace(
+      "{userId}",
+      userId
+    );
     const url = `${endpoint}?page=${page}&size=${size}`;
     const response = await axiosInstance.get(url);
     return response;
@@ -70,14 +76,20 @@ export const getEventsJoined = async (userId: string, page: number = 0, size: nu
   }
 };
 
-
 //API_ENDPOINTS.GET_ALL_EVENTS_CREATED_BY
-export const getEventsCreated = async (userId: string, page: number = 0, size: number = 5) => {
+export const getEventsCreated = async (
+  userId: string,
+  page: number = 0,
+  size: number = 5
+) => {
   try {
     const axiosInstance = getAxiosInstance();
-    const endpoint = API_ENDPOINTS.GET_ALL_EVENTS_CREATED_BY.replace("{userId}", userId);
+    const endpoint = API_ENDPOINTS.GET_ALL_EVENTS_CREATED_BY.replace(
+      "{userId}",
+      userId
+    );
     const url = `${endpoint}?page=${page}&size=${size}`;
-    const response = await axiosInstance.get(url);    
+    const response = await axiosInstance.get(url);
     return response;
   } catch (error) {
     console.error("Error fetching created events:", error);
@@ -85,21 +97,57 @@ export const getEventsCreated = async (userId: string, page: number = 0, size: n
   }
 };
 
-export const searchEventsWithFilter = async (searchText: string, params: FilterState) => {
-  try{
-    const axiosInstance = getAxiosInstance()
-    const endpoint = API_ENDPOINTS.SEARCH_EVENTS;
-    const sportType = params.filterType === "All" ? "": params.filterType 
-    
-    const response = axiosInstance.get(endpoint, {
-      params: {
-        eventName: searchText || "",
-        sportType,
+export const searchEventsWithFilter = async (
+  searchText: string,
+  params: FilterState
+) => {
 
+  try {
+    const axiosInstance = getAxiosInstance();
+    const endpoint = API_ENDPOINTS.SEARCH_EVENTS;
+    const queryParams: Record<string, string> = {};
+
+    if (searchText) {
+      queryParams.eventName = searchText;
+    }
+    if (params.skillLevel !== "All") {
+      queryParams.requiredSkillLevel = params.skillLevel.toUpperCase();
+    }
+
+    //queryParams.date = addAdjustedDate(params);
+
+    if (params.filterType !== "All") {
+      queryParams.sportType = params.filterType;
+    }
+    console.log(queryParams)
+    if (Object.keys(queryParams).length > 0) {
+      const response = axiosInstance.get(endpoint, {
+        params: queryParams,
+      });
+      if (response) {
+        return (await response).data.content;
       }
-    })
-  }catch(error){
+    }
+    return [];
+  } catch (error) {
     console.error("Error fetching parametered events:", error);
     throw error;
   }
-}
+};
+
+const addAdjustedDate = (params: FilterState) => {
+  const minDate =
+    params.minDate.getFullYear() +
+    "-" +
+    params.minDate.getMonth() +
+    "-" +
+    params.minDate.getDate();
+  const maxDate =
+    params.maxDate.getFullYear() +
+    "-" +
+    params.maxDate.getMonth() +
+    "-" +
+    params.maxDate.getDate();
+
+  return minDate + "-" + maxDate;
+};

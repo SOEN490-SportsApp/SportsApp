@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "expo-router";
 import {
   View,
@@ -19,14 +19,16 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import FriendCard from "@/components/Helper Components/FriendCard";
 import { Profile } from "@/types";
 import MapView, { Marker } from "react-native-maps";
-import { getAllEvents } from "@/services/eventService";
+import { getAllEvents, searchEventsWithFilter } from "@/services/eventService";
 import { Event } from "@/types/event";
 import * as Location from "expo-location";
 import { Linking } from "react-native";
 import { Platform } from "react-native";
 import EventList from "@/components/Event/EventList";
 import { useSelector } from "react-redux";
-import FilterModal, { FilterState } from "@/components/Helper Components/FilterSection/FilterModal";
+import FilterModal, {
+  FilterState,
+} from "@/components/Helper Components/FilterSection/FilterModal";
 
 export default function searchPage() {
   const router = useRouter();
@@ -36,9 +38,9 @@ export default function searchPage() {
     minDate: new Date(),
     maxDate: new Date(),
   };
-
+  const [events, setEvents] = useState<Event[]>([]);
   const [searchText, setSearchText] = useState("");
-  const [results, setResults] = useState<Profile[]>([]);
+  const [userResults, setUserResults] = useState<Profile[]>([]);
   const [cancel, setCancel] = useState(false);
   const [loading, setLoading] = useState(false);
   const [viewMode, setViewMode] = useState<"map" | "list">("list");
@@ -51,14 +53,39 @@ export default function searchPage() {
   const [isVisible, setIsVisible] = useState(false);
   const [filter, setFilter] = useState(false);
   const [filterState, setFilterState] = useState(initialState);
-  console.log(filterState)
-  const handleFilterToggle = () => {
+
+  const fetchEvents = useCallback(async (): Promise<void> => {
+    setLoading(true);
+    try {
+      let response;
+      if (activeIndex === 0) {
+        await fetchUserResults(searchText);
+      } else {        
+        response = await handleEventListData();
+        setEvents(Array.isArray(response) ? response : []);       
+      }
+    } catch (err) {
+      console.error("Error fetching events:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [searchText, filter]);
+
+  useEffect(() => {
+    const fetchAndSetEvents = async () => {
+      await fetchEvents();
+    };
+    fetchAndSetEvents();
+  }, [fetchEvents]);
+
+  const handleFilterToggle = async () => {
     setFilter(true);
     setIsVisible(false);
   };
   const handleCleanFilters = () => {
     setFilterState(initialState);
     setFilter(false);
+    setIsVisible(false);
   };
 
   useEffect(() => {
@@ -74,24 +101,21 @@ export default function searchPage() {
     }
   }, [location]);
 
-  // const filters
-  useEffect(() => {
-    const timer = setTimeout(async () => {
-      if (searchText) {
-        await fetchUserResults(searchText);
-      } else {
-        setResults([]);
-      }
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [searchText]);
-
+  const handleEventListData = async () => {
+    let response;
+    if (filter || searchText) {
+      response = await searchEventsWithFilter(searchText, filterState);
+    } else {
+      response = await getAllEvents();
+    }
+    return response;
+  };
   const fetchUserResults = async (searchText: string) => {
     setLoading(true);
     try {
       const response = await searchUser(searchText);
       if (response) {
-        setResults(response);
+        setUserResults(response);
       }
     } catch (err) {
       console.log(err);
@@ -116,8 +140,6 @@ export default function searchPage() {
     );
   };
   const UsersTab = () => {
-
-    
     return (
       <View>
         {loading ? (
@@ -126,7 +148,7 @@ export default function searchPage() {
           </View>
         ) : searchText.length >= 1 ? (
           <FlatList
-            data={results}
+            data={userResults}
             renderItem={({ item }) => <FriendCard user={item} />}
             ListEmptyComponent={<CenterMessage message={"No users found"} />}
           />
@@ -147,49 +169,14 @@ export default function searchPage() {
 
   const EventsTab = ({
     userLocation,
-    searchText
   }: {
     userLocation: Location.LocationObjectCoords | null;
-    searchText: string
+
   }) => {
-    const [events, setEvents] = useState<Event[]>([]);
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     const mapRef = useRef<MapView | null>(null);
     const [isMapExpanded, setIsMapExpanded] = useState(viewMode === "map");
-
-    useEffect(() => {
-      const fetchEvents = async () => {
-        setLoading(true);
-        try {
-          
-          // if (filter) {
-          //   const otherUsers = await fetchUserResults(searchText);
-          //   console.log(otherUsers)
-          // } 
-          
-          const response = await getAllEvents();
-          setEvents(response);
-        } catch (err) {
-          console.log("Error fetching events:", err);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchEvents();
-    }, [searchText]);
-
-    // useEffect(() => {
-    //   const timer = setTimeout(async () => {
-    //     if (searchText) {
-    //       await fetchUserResults(searchText);
-    //     } else {
-    //       setResults([]);
-    //     }
-    //     console.log(results)
-    //   }, 300);
-    //   return () => clearTimeout(timer);
-    // }, [searchText]);
 
     const onEventCardPress = (event: Event) => {
       mapRef.current?.animateToRegion(
@@ -341,7 +328,7 @@ export default function searchPage() {
           <View style={styles.eventListSection}>
             <EventList
               fetchEventsFunction={() =>
-                getAllEvents().then((data) => ({
+                handleEventListData().then((data) => ({
                   data: {
                     content: data,
                     totalElements: data.length,
@@ -419,7 +406,7 @@ export default function searchPage() {
 
   const scenes = {
     users: <UsersTab />,
-    events: <EventsTab userLocation={userLocation} searchText={searchText}/>,
+    events: <EventsTab userLocation={userLocation} />,
   };
 
   const [activeIndex, setActiveIndex] = useState(0);
@@ -474,7 +461,7 @@ export default function searchPage() {
         style={{
           flex: 1,
           backgroundColor: "#fff",
-          minHeight: viewMode === "list" ? "100%" : 0,
+          //  minHeight: (viewMode === "list" && EventList.length <= 3) ? "100%" : 0,
         }}
       >
         <CustomTabMenu
