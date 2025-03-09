@@ -8,6 +8,7 @@ import CustomDateTimePicker from "../CustomDateTimePicker";
 import SportFilterButton from "./FilterButtonBadge";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import FilterButtonBadge from "./FilterButtonBadge";
+import { hs, vs } from "@/utils/helpers/uiScaler";
 
 export interface FilterState {
   filterType: string;
@@ -48,10 +49,10 @@ const FilterModal: React.FC<FilterModalInterface> = ({
             flex: 1,
             flexDirection: "column",
             width: "100%",
-            gap: 24,
+            gap: vs(24),
           }}
         >
-          <View style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <View style={{ display: "flex", flexDirection: "column", gap: vs(16) }}>
             <View
               style={{
                 display: "flex",
@@ -87,7 +88,7 @@ const FilterModal: React.FC<FilterModalInterface> = ({
                 display: "flex",
                 flexDirection: "row",
                 flexWrap: "wrap",
-                gap: 2,
+                gap: hs(2),
               }}
             >
               {adjustedSportMap &&
@@ -118,7 +119,7 @@ const FilterModal: React.FC<FilterModalInterface> = ({
                 ))}
             </View>
           </View>
-          <View style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          <View style={{ display: "flex", flexDirection: "column", gap: vs(4) }}>
             <View>
               <Text
                 style={{
@@ -158,7 +159,7 @@ const FilterModal: React.FC<FilterModalInterface> = ({
                 ))}
             </View>
           </View>
-          <View style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+          <View style={{ display: "flex", flexDirection: "column", gap: vs(18) }}>
             <Text
               style={{
                 color: themeColors.background.dark,
