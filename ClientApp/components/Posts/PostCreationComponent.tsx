@@ -15,7 +15,7 @@ import {
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import themeColors from '@/utils/constants/colors';
-import { createPost } from '@/utils/api/postApiClient';
+import { createPost, uploadImage } from '@/utils/api/postApiClient';
 
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -25,7 +25,7 @@ interface PostCreationProps {
 
 const PostCreationComponent: React.FC<PostCreationProps> = ({ eventId }) => {
   const [comment, setComment] = useState<string>('');
-  const [images, setImages] = useState<{ uri: string; width: number; height: number }[]>([]);
+  const [images, setImages] = useState<{ uri: string; width: number; height: number, type: "image" | "video" | "livePhoto" | "pairedVideo" | undefined, file: File|undefined, fileName: string|null|undefined }[]>([]);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
 
@@ -34,39 +34,43 @@ const PostCreationComponent: React.FC<PostCreationProps> = ({ eventId }) => {
     if (source === 'gallery') {
       result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ['images'],
-        allowsEditing: false, // Disable editing to retain original size
+        allowsEditing: false,
         aspect: [4, 3],
         quality: 1,
       });
     } else if (source === 'camera') {
       result = await ImagePicker.launchCameraAsync({
         mediaTypes: ['images'],
-        allowsEditing: false, // Disable editing to retain original size
+        allowsEditing: false,
         aspect: [4, 3],
         quality: 1,
       });
     }
 
     if (result && !result.canceled) {
-      const { uri, width, height } = result.assets[0];
-      setImages((prev) => [...prev, { uri, width, height }]); // Add the new image to the list
+      const { uri, width, height, type, file, fileName,  } = result.assets[0];
+      setImages((prev) => [...prev, { uri, width, height, type, file, fileName }]); // Add the new image to the list
       setCurrentImageIndex(images.length); // Set the current index to the newly added image
     }
   };
 
   const handlePost = async () => {
     try {
-      const attachments = images.map((image) => image.uri); // Convert images to an array of URIs
-      await createPost(eventId, comment, attachments); // Call the createPost function
+      // const uploadPromises = images.map((image) => uploadImage(image.uri));
+      // const downloadPaths = await Promise.all(uploadPromises); // Upload all images before creating the post
+      const downloadPaths = [''];
+      await createPost(eventId, comment, downloadPaths);
+
       console.log('Post created successfully');
       resetModal();
     } catch (error) {
       console.error('Failed to create post:', error);
     }
+
     console.log('Images:', images);
     resetModal();
-
   };
+
 
   const removeImage = () => {
     setImages((prev) => prev.filter((_, i) => i !== currentImageIndex)); // Remove the current image
@@ -74,24 +78,24 @@ const PostCreationComponent: React.FC<PostCreationProps> = ({ eventId }) => {
   };
 
   const goToPreviousImage = () => {
-    setCurrentImageIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1)); // Loop to the last image if at the start
+    setCurrentImageIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1));
   };
 
   const goToNextImage = () => {
-    setCurrentImageIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0)); // Loop to the first image if at the end
+    setCurrentImageIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0));
   };
 
   const resetModal = () => {
     setComment('');
     setImages([]);
     setCurrentImageIndex(0);
-    setIsModalVisible(false); // Close the modal
+    setIsModalVisible(false);
   };
 
   // Calculate the displayed height of the image based on its aspect ratio
   const getImageHeight = (width: number, height: number) => {
     const aspectRatio = height / width;
-    return Math.min(SCREEN_WIDTH * 0.9 * aspectRatio, SCREEN_HEIGHT * 0.4); // Limit height to 40% of screen height
+    return Math.min(SCREEN_WIDTH * 0.9 * aspectRatio, SCREEN_HEIGHT * 0.4);
   };
 
   return (
