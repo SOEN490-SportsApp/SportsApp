@@ -31,4 +31,18 @@ public class Routes {
                 .route(RequestPredicates.path("/api/email-service/**"), HandlerFunctions.http("http://email-service:8080"))
                 .build();
     }
+
+    @Bean
+    public RouterFunction<ServerResponse> messagingServiceRoute() {
+        return GatewayRouterFunctions.route("messaging_service")
+                .route(RequestPredicates.path("/api/messaging-service/**"), HandlerFunctions.http("http://messaging-service:8080"))
+                .build();
+    }
+
+    @Bean
+    public RouterFunction<ServerResponse> storageServiceRoute() {
+        return GatewayRouterFunctions.route("storage_service")
+                .route(RequestPredicates.path("/api/storage-service/**"), HandlerFunctions.http("http://storage-service:8080"))
+                .build();
+    }
 }
