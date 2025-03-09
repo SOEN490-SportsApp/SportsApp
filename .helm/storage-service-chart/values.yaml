@@ -1,7 +1,7 @@
 replicaCount: 2
 
 image:
-  repository: ghcr.io/walidoow/storage-service
+  repository: ghcr.io/soen490-sportsapp/sportsapp-storage-service
   pullPolicy: Always
   tag: "latest"
 
@@ -18,19 +18,16 @@ service:
   type: ClusterIP
   port: 8080
 
-networkPolicy:
-  enabled: true
-
 ingress:
   enabled: false
 
 resources:
-   limits:
-     cpu: 1000m
-     memory: 1Gi
-   requests:
-     cpu: 500m
-     memory: 500Mi
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 500m
+    memory: 500Mi
 
 autoscaling:
   enabled: true
@@ -38,8 +35,8 @@ autoscaling:
   maxReplicas: 10
   targetCPUUtilizationPercentage: 70
 
-volumes: []
-volumeMounts: []
+volumes: [ ]
+volumeMounts: [ ]
 
 env:
   - name: SPRING_APPLICATION_NAME
@@ -115,7 +112,27 @@ env:
     valueFrom:
       secretKeyRef:
         name: shared-secrets
-        key: mongodb-uri
+        key: mongodb-uri-storage-service
+  - name: MINIO_CLIENT_ID
+    valueFrom:
+      secretKeyRef:
+        name: shared-secrets
+        key: minio-client-id
+  - name: MINIO_CLIENT_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: shared-secrets
+        key: minio-client-secret
+  - name: MINIO_URL
+    valueFrom:
+      secretKeyRef:
+        name: shared-secrets
+        key: minio-url
+  - name: MINIO_BUCKET
+    valueFrom:
+      secretKeyRef:
+        name: shared-secrets
+        key: minio-bucket
 
 livenessProbe:
   enabled: true
