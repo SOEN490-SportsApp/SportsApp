@@ -29,6 +29,7 @@ import { useSelector } from "react-redux";
 import FilterModal, {
   FilterState,
 } from "@/components/Helper Components/FilterSection/FilterModal";
+import { set } from "react-hook-form";
 
 export default function searchPage() {
   const router = useRouter();
@@ -55,6 +56,14 @@ export default function searchPage() {
   const [filter, setFilter] = useState(false);
   const [filterState, setFilterState] = useState(initialState);
 
+  useEffect(() => {
+    const fetchInitialEvents = async () => {
+      const response = await getAllEvents();
+      setEvents(response);
+    };
+    fetchInitialEvents();
+  },[])
+  
   const fetchEvents = useCallback(async (): Promise<void> => {
     setLoading(true);
     try {
@@ -63,7 +72,9 @@ export default function searchPage() {
         await fetchUserResults(searchText);
       } else {        
         response = await handleEventListData();
+        console.log("response ", response);
         setEvents(Array.isArray(response) ? response : []);       
+        console.log("Events: ", events)
       }
     } catch (err) {
       console.error("Error fetching events:", err);
@@ -79,6 +90,7 @@ export default function searchPage() {
     fetchAndSetEvents();
   }, [fetchEvents]);
 
+  
   const handleFilterToggle = async () => {
     setFilter(true);
     setIsVisible(false);
@@ -108,9 +120,10 @@ export default function searchPage() {
       response = await searchEventsWithFilter(searchText, filterState);
     } else {
       response = await getAllEvents();
-    }
+    } 
     return response;
   };
+
   const fetchUserResults = async (searchText: string) => {
     setLoading(true);
     try {
@@ -174,7 +187,6 @@ export default function searchPage() {
     userLocation: Location.LocationObjectCoords | null;
 
   }) => {
-    const [loading, setLoading] = useState(false);
     const router = useRouter();
     const mapRef = useRef<MapView | null>(null);
     const [isMapExpanded, setIsMapExpanded] = useState(viewMode === "map");
