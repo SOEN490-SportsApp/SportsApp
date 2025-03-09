@@ -13,7 +13,6 @@ export async function searchUser(searchText: string){
         })
         return response.data.content
     }catch(error: any){
-        console.log('here')
         console.log(error)
     }
 } 

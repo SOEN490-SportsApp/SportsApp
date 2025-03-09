@@ -33,12 +33,8 @@ export const getEventDetails = async (eventId: string) => {
     const response = await axiosInstance.get(
       API_ENDPOINTS.GET_EVENT_BY_ID.replace("{id}", eventId)
     );
-
-    // console.log("API Response Event Data:", response.data);
-
     return response.data;
-  } catch (error) {
-    //console.error("Error fetching event details:", error);
+  } catch (error) {    
     throw error;
   }
 };
@@ -115,11 +111,10 @@ export const searchEventsWithFilter = async (
     }
 
     //queryParams.date = addAdjustedDate(params);
-
+    
     if (params.filterType !== "All") {
       queryParams.sportType = params.filterType;
     }
-    console.log(queryParams)
     if (Object.keys(queryParams).length > 0) {
       const response = axiosInstance.get(endpoint, {
         params: queryParams,
