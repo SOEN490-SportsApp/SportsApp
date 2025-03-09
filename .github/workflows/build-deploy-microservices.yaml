@@ -125,6 +125,7 @@ jobs:
           file: ./Microservices/${{ matrix.service }}/Dockerfile
           push: true
           tags: ghcr.io/${{ env.repo_name }}-${{ env.service_name }}:latest
+          build-args: JAR_FILE=${{ env.jar_file }}
 
       - name: Install Helm
         run: |
