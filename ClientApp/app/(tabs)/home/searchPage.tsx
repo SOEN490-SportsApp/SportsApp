@@ -463,7 +463,7 @@ export default function searchPage() {
         style={{
           flex: 1,
           backgroundColor: "#fff",
-          //  minHeight: (viewMode === "list" && EventList.length <= 3) ? "100%" : 0,
+          
         }}
       >
         <CustomTabMenu
@@ -542,14 +542,6 @@ const styles = StyleSheet.create({
     height: hs(40),
     justifyContent: "center",
     alignItems: "center",
-  },
-  inputContainer2: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: themeColors.background.lightGrey,
-    borderRadius: 24,
-    paddingLeft: hs(8),
-    minHeight: vs(56),
   },
   initialSearchText: {
     color: themeColors.sportIcons.lightGrey,

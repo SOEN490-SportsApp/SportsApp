@@ -1,5 +1,5 @@
 import themeColors from "@/utils/constants/colors";
-import { hs, mhs, vs } from "@/utils/helpers/uiScaler";
+import { hs, mhs, vs, mvs } from "@/utils/helpers/uiScaler";
 import { useRouter } from "expo-router";
 import React, { ReactNode, useEffect, useState } from "react";
 import {
@@ -27,7 +27,7 @@ const BottomModal: React.FC<BottomModalProps> = ({ isVisible, setIsVisible, chil
     >
       <TouchableWithoutFeedback onPress={() => setIsVisible(false)} testID="modalOverlay">
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, {height: vs(height)}]}>
+          <View style={[styles.modalContent, {height: mvs(height)}]}>
             <TouchableWithoutFeedback>
             {children}
             </TouchableWithoutFeedback>
