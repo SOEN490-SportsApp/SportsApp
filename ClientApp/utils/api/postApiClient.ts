@@ -38,3 +38,22 @@ export async function uploadImage(fileUri: string): Promise<string> {
         throw error.response?.data || error;
     }
 }
+
+export async function fetchPosts(eventId: string, page: number, size: number): Promise<any> {
+    const axiosInstance = getAxiosInstance();
+    try {
+        const response = await axiosInstance.get(
+            API_ENDPOINTS.GET_ALL_POSTS.replace("{eventId}", eventId),
+            {
+                params: {
+                    page,
+                    size,
+                },
+            }
+        );
+        return response.data;
+    } catch (error: any) {
+        console.error("Error fetching posts:", error);
+        throw error.response?.data || error;
+    }
+}

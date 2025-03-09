@@ -21,9 +21,10 @@ const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
 
 interface PostCreationProps {
   eventId: string;
+  onNewPost: () => void;
 }
 
-const PostCreationComponent: React.FC<PostCreationProps> = ({ eventId }) => {
+const PostCreationComponent: React.FC<PostCreationProps> = ({ eventId, onNewPost}) => {
   const [comment, setComment] = useState<string>('');
   const [images, setImages] = useState<{ uri: string; width: number; height: number, type: "image" | "video" | "livePhoto" | "pairedVideo" | undefined, file: File|undefined, fileName: string|null|undefined }[]>([]);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
@@ -60,7 +61,7 @@ const PostCreationComponent: React.FC<PostCreationProps> = ({ eventId }) => {
       // const downloadPaths = await Promise.all(uploadPromises); // Upload all images before creating the post
       const downloadPaths = [''];
       await createPost(eventId, comment, downloadPaths);
-
+      onNewPost(); // Notify the parent component that a new post has been created
       console.log('Post created successfully');
       resetModal();
     } catch (error) {
