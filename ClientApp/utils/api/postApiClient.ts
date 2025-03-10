@@ -23,15 +23,11 @@ export async function uploadImage(fileUri: string): Promise<string> {
 
     try {
         const response = await fetch(fileUri);
-        console.log("=====> Response", response);
         const blob = await response.blob();
-        console.log("=====> Blob:", blob);
         const fileName = fileUri.split('/').pop() || `upload_${Date.now()}`;
         const formData = new FormData();
         formData.append('file', blob, fileName);
-        console.log("=====> Form Data: ", formData);
         const uploadResponse = await axiosInstance.post(API_ENDPOINTS.UPLOAD_FILE, formData);
-        console.log("=====>", uploadResponse);
         return uploadResponse.data.downloadPath;
     } catch (error: any) {
         console.error('Error uploading image:', error);
