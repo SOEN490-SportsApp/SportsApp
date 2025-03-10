@@ -18,6 +18,9 @@ jobs:
       RUN_EMAILSERVICE_PIPELINE: ${{ steps.set-env.outputs.RUN_EMAILSERVICE_PIPELINE }}
       RUN_GATEWAYSERVICE_PIPELINE: ${{ steps.set-env.outputs.RUN_GATEWAYSERVICE_PIPELINE }}
       RUN_CLIENTAPP_PIPELINE: ${{ steps.set-env.outputs.RUN_CLIENTAPP_PIPELINE }}
+      RUN_ORCHESTRATIONSERVICE_PIPELINE: ${{ steps.set-env.outputs.RUN_ORCHESTRATIONSERVICE_PIPELINE }}
+      RUN_STORAGESERVICE_PIPELINE: ${{ steps.set-env.outputs.RUN_STORAGESERVICE_PIPELINE }}
+      RUN_MESSAGINGSERVICE_PIPELINE: ${{ steps.set-env.outputs.RUN_MESSAGINGSERVICE_PIPELINE }}
       BRANCH: ${{ steps.extract-branch.outputs.BRANCH }}
     steps:
       - name: Checkout Code
@@ -55,6 +58,15 @@ jobs:
           fi
           if [[ "${{ steps.changed-files.outputs.all_changed_files }}" =~ "ClientApp/" ]]; then
             echo "RUN_CLIENTAPP_PIPELINE=true" >> $GITHUB_OUTPUT
+          fi
+          if [[ "${{ steps.changed-files.outputs.all_changed_files }}" =~ "Microservices/orchestration-service/" ]]; then
+            echo "RUN_ORCHESTRATIONSERVICE_PIPELINE=true" >> $GITHUB_OUTPUT
+          fi
+          if [[ "${{ steps.changed-files.outputs.all_changed_files }}" =~ "Microservices/storage-service/" ]]; then
+            echo "RUN_STORAGESERVICE_PIPELINE=true" >> $GITHUB_OUTPUT
+          fi
+          if [[ "${{ steps.changed-files.outputs.all_changed_files }}" =~ "Microservices/messaging-service/" ]]; then
+            echo "RUN_MESSAGINGSERVICE_PIPELINE=true" >> $GITHUB_OUTPUT
           fi
 
   run-pipelines:
@@ -101,5 +113,29 @@ jobs:
         uses: benc-uk/workflow-dispatch@v1
         with:
           workflow: frontend-ci-cd.yml
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+          token: ${{ secrets.PAT_TOKEN }}
+
+      - name: Run OrchestrationService Pipeline
+        if: ${{ needs.determine-pipelines.outputs.RUN_ORCHESTRATIONSERVICE_PIPELINE == 'true' }}
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: orchestration-service-ci-cd.yml
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+          token: ${{ secrets.PAT_TOKEN }}
+
+      - name: Run StorageService Pipeline
+        if: ${{ needs.determine-pipelines.outputs.RUN_STORAGESERVICE_PIPELINE == 'true' }}
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: storage-service-ci-cd.yml
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+          token: ${{ secrets.PAT_TOKEN }}
+
+      - name: Run MessagingService Pipeline
+        if: ${{ needs.determine-pipelines.outputs.RUN_MESSAGINGSERVICE_PIPELINE == 'true' }}
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: messaging-ci-cd.yml
           ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
           token: ${{ secrets.PAT_TOKEN }}
