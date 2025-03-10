@@ -55,9 +55,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 
 @Slf4j
@@ -219,6 +222,11 @@ public class UserServiceImpl implements UserService {
             if (friendRequest.getUserId().equals(userReceiver.getId()))
                 throw new UserAlreadyInFriendRequestListException(userReceiver.getUsername(),
                         friendRequest.getFriendRequestStatus());
+        }
+
+        for (Friend friend : userSender.getFriendList()) {
+            if (friend.getUserId().equals(userReceiver.getId()))
+                throw new UserAlreadyInFriendListException(userReceiver.getUsername(), friend.getFriendRequestStatus());
         }
 
         FriendRequest newSenderFriendRequest = FriendRequest.builder()
@@ -394,9 +402,12 @@ public class UserServiceImpl implements UserService {
 
         return friendRequestList.stream()
                 .filter(s -> typeList.contains(s.getFriendRequestStatus()) )
-                .map(friendRequest -> new ViewFriendRequestsResponse(
-                        getUserById(friendRequest.getUserId()).username(),friendRequest.getUserId(),
-                        friendRequest.getFriendRequestStatus(), friendRequest.getId())).toList();
+                .map(friendRequest -> {
+                    Optional<User> friendRequestUser = userRepository.findUserById(friendRequest.getUserId());
+                    return friendRequestUser.map(value -> new ViewFriendRequestsResponse(
+                            value.getUsername(), friendRequest.getUserId(),
+                            friendRequest.getFriendRequestStatus(), friendRequest.getId())).orElse(null);
+                } ).filter(Objects::nonNull).toList();
     }
 
     /**
@@ -407,6 +418,7 @@ public class UserServiceImpl implements UserService {
      * @throws UserDoesNotExistException if the given user id doesn't correspond to a user in the database
      */
     @Override
+    @Transactional
     public List<ViewFriendResponse> getFriends(String userId) {
 
         User user = userRepository.findUserById(userId)
@@ -414,13 +426,17 @@ public class UserServiceImpl implements UserService {
         List<Friend> friendList = user.getFriendList();
 
         return friendList.stream()
-                .map(friend -> new ViewFriendResponse(getUserById(friend.getUserId()).username(), friend.getUserId(),
-                        friend.getId())).toList();
+                .map(friend -> {
+                    Optional<User> friendUser = userRepository.findUserById(friend.getUserId());
+                    return friendUser.map(value -> new ViewFriendResponse(value.getUsername(), friend.getUserId(),
+                            friend.getId())).orElse(null);
+                }).filter(Objects::nonNull).toList();
     }
 
     @Transactional
     @Override
     public void deleteFriend(String userId, String friendId) {
+
         User requester = userRepository.findUserById(userId)
                 .orElseThrow(() -> new UserDoesNotExistException(userId));
         List<Friend> requesterFriendList = requester.getFriendList();
@@ -428,27 +444,30 @@ public class UserServiceImpl implements UserService {
         Friend requesterFriend = requesterFriendList.stream().filter(f -> f.getId().equals(friendId))
                 .findFirst().orElseThrow(() -> new FriendNotFoundInFriendListException(userId,friendId));
 
-        User friend = userRepository.findUserById(requesterFriend.getUserId())
-                        .orElseThrow(() -> new UserDoesNotExistException(requesterFriend.getUserId()));
-        List<Friend> friendFriendList = friend.getFriendList();
+        Friend friendFriend = null;
+        List<Friend> friendFriendList = null;
 
-        Friend friendFriend = friendFriendList.stream().filter(friendF -> friendF.getUserId().equals(requester.getId()))
-                        .findFirst().orElseThrow(() -> new FriendNotFoundInFriendListException(friend.getId(), requester.getId()));
+        Optional<User> friend = userRepository.findUserById(requesterFriend.getUserId());
+        if (friend.isPresent()) {
+            friendFriendList = friend.get().getFriendList();
+            friendFriend = friendFriendList.stream().filter(friendF -> friendF.getUserId().equals(requester.getId()))
+                    .findFirst().orElse(null);
+        }
 
         requesterFriendList.remove(requesterFriend);
-        friendFriendList.remove(friendFriend);
-
         friendRepository.deleteById(requesterFriend.getId());
-        friendRepository.deleteById(friendFriend.getId());
-
         requester.setFriendList(requesterFriendList);
-        friend.setFriendList(friendFriendList);
-
         userRepository.save(requester);
-        userRepository.save(friend);
 
         log.info("deleteFriend: Friend with id: {} was successfully deleted", requesterFriend.getId());
-        log.info("deleteFriend: Friend with id: {} was successfully deleted", friendFriend.getId());
+
+        if (friendFriend != null) {
+            friendFriendList.remove(friendFriend);
+            friendRepository.deleteById(friendFriend.getId());
+            friend.get().setFriendList(friendFriendList);
+            userRepository.save(friend.get());
+            log.info("deleteFriend: Friend with id: {} was successfully deleted", friendFriend.getId());
+        }
 
     }
 
