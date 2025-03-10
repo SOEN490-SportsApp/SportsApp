@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   TextInput,
@@ -11,11 +11,16 @@ import {
   Keyboard,
   Dimensions,
   ScrollView,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import themeColors from '@/utils/constants/colors';
 import { createPost, uploadImage } from '@/utils/api/postApiClient';
+import { useSelector } from 'react-redux';
+import { UserState } from '@/types';
+import { mhs, mvs } from '@/utils/helpers/uiScaler';
 
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -24,11 +29,13 @@ interface PostCreationProps {
   onNewPost: () => void;
 }
 
-const PostCreationComponent: React.FC<PostCreationProps> = ({ eventId, onNewPost}) => {
+const PostCreationComponent: React.FC<PostCreationProps> = ({ eventId, onNewPost }) => {
+  const user = useSelector((state: { user: UserState }) => state.user);
   const [comment, setComment] = useState<string>('');
-  const [images, setImages] = useState<{ uri: string; width: number; height: number, type: "image" | "video" | "livePhoto" | "pairedVideo" | undefined, file: File|undefined, fileName: string|null|undefined }[]>([]);
+  const [images, setImages] = useState<{ uri: string; width: number; height: number }[]>([]);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
 
   const pickImage = async (source: 'gallery' | 'camera') => {
     let result;
@@ -49,9 +56,9 @@ const PostCreationComponent: React.FC<PostCreationProps> = ({ eventId, onNewPost
     }
 
     if (result && !result.canceled) {
-      const { uri, width, height, type, file, fileName,  } = result.assets[0];
-      setImages((prev) => [...prev, { uri, width, height, type, file, fileName }]); // Add the new image to the list
-      setCurrentImageIndex(images.length); // Set the current index to the newly added image
+      const { uri, width, height, type, file, fileName } = result.assets[0];
+      setImages((prev) => [...prev, { uri, width, height, type, file, fileName }]);
+      setCurrentImageIndex(images.length);
     }
   };
 
@@ -61,21 +68,18 @@ const PostCreationComponent: React.FC<PostCreationProps> = ({ eventId, onNewPost
       // const downloadPaths = await Promise.all(uploadPromises); // Upload all images before creating the post
       const downloadPaths = [''];
       await createPost(eventId, comment, downloadPaths);
-      onNewPost(); // Notify the parent component that a new post has been created
+      onNewPost();
       console.log('Post created successfully');
       resetModal();
     } catch (error) {
       console.error('Failed to create post:', error);
     }
-
-    console.log('Images:', images);
     resetModal();
   };
 
-
   const removeImage = () => {
-    setImages((prev) => prev.filter((_, i) => i !== currentImageIndex)); // Remove the current image
-    setCurrentImageIndex((prev) => (prev > 0 ? prev - 1 : 0)); // Adjust the current index
+    setImages((prev) => prev.filter((_, i) => i !== currentImageIndex));
+    setCurrentImageIndex((prev) => (prev > 0 ? prev - 1 : 0));
   };
 
   const goToPreviousImage = () => {
@@ -93,11 +97,31 @@ const PostCreationComponent: React.FC<PostCreationProps> = ({ eventId, onNewPost
     setIsModalVisible(false);
   };
 
-  // Calculate the displayed height of the image based on its aspect ratio
   const getImageHeight = (width: number, height: number) => {
     const aspectRatio = height / width;
     return Math.min(SCREEN_WIDTH * 0.9 * aspectRatio, SCREEN_HEIGHT * 0.4);
   };
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      (event) => {
+        setKeyboardHeight(event.endCoordinates.height);
+      }
+    );
+
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setKeyboardHeight(0);
+      }
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -124,10 +148,14 @@ const PostCreationComponent: React.FC<PostCreationProps> = ({ eventId, onNewPost
         transparent={true}
         onDismiss={resetModal}
         onRequestClose={resetModal}
+        statusBarTranslucent={true}
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={styles.modalOverlay}>
-            <View style={[styles.modalContent, { height: SCREEN_HEIGHT * 0.85 }]}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            style={styles.modalOverlay}
+          >
+            <View style={[styles.modalContent, { height: keyboardHeight == 0 ? SCREEN_HEIGHT * 0.90 : SCREEN_HEIGHT - keyboardHeight }]}>
               <View style={styles.modalHeader}>
                 <Text style={styles.modalTitle}>Create Post</Text>
                 <TouchableOpacity onPress={resetModal}>
@@ -136,17 +164,21 @@ const PostCreationComponent: React.FC<PostCreationProps> = ({ eventId, onNewPost
               </View>
 
               {/* Scrollable Content */}
-              <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+              <ScrollView
+                style={styles.scrollContainer}
+                showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled"
+              >
                 {/* User Info Section */}
                 <View style={styles.userInfoContainer}>
                   <Image
                     source={require("@/assets/images/avatar-placeholder.png")}
                     style={styles.modalAvatar}
                   />
-                  <Text style={styles.userName}>John Dffoe</Text>
+                  <Text style={styles.userName}>{user.username}</Text>
                 </View>
 
-
+                {/* Text Input with Fixed Height */}
                 <TextInput
                   style={styles.modalInput}
                   placeholder="What's on your mind?"
@@ -214,7 +246,7 @@ const PostCreationComponent: React.FC<PostCreationProps> = ({ eventId, onNewPost
                 <Text style={styles.modalPostButtonText}>Post</Text>
               </TouchableOpacity>
             </View>
-          </View>
+          </KeyboardAvoidingView>
         </TouchableWithoutFeedback>
       </Modal>
     </View>
@@ -223,36 +255,36 @@ const PostCreationComponent: React.FC<PostCreationProps> = ({ eventId, onNewPost
 
 const styles = StyleSheet.create({
   container: {
-    padding: 12,
+    padding: mhs(8),
     backgroundColor: '#fff',
-    borderRadius: 12,
+    borderRadius: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: mvs(2) },
     shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowRadius: mhs(4),
+    elevation: 4,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#f5f5f5',
     borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: mhs(12),
+    paddingVertical: mvs(8),
   },
   avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 12,
+    width: mhs(36),
+    height: mhs(36),
+    borderRadius: 25,
+    marginRight: mhs(12),
   },
   placeholderText: {
     flex: 1,
-    fontSize: 14,
+    fontSize: mhs(12),
     color: '#888',
   },
   attachmentButton: {
-    padding: 8,
+    padding: mhs(8),
   },
   modalOverlay: {
     flex: 1,
@@ -263,33 +295,33 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
-    padding: 16,
+    padding: mhs(16),
     width: '100%',
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: mvs(16),
   },
   modalTitle: {
-    fontSize: 18,
+    fontSize: mvs(18),
     fontWeight: 'bold',
     color: '#333',
   },
   userInfoContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: mvs(16),
   },
   modalAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 12,
+    width: mhs(36),
+    height: mhs(36),
+    borderRadius: 25,
+    marginRight: mhs(12),
   },
   userName: {
-    fontSize: 16,
+    fontSize: mhs(15),
     fontWeight: 'bold',
     color: '#333',
   },
@@ -300,17 +332,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 16,
-    padding: 12,
-    minHeight: 100,
-    marginBottom: 16,
-    fontSize: 14,
+    padding: mvs(12),
+    minHeight: mvs(100),
+    maxHeight: mvs(120),
+    marginBottom: mvs(16),
+    fontSize: mhs(13),
     color: '#333',
   },
   imageSection: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 16,
+    marginBottom: mvs(16),
   },
   imageContainer: {
     position: 'relative',
@@ -324,45 +357,44 @@ const styles = StyleSheet.create({
   },
   removeImageButton: {
     position: 'absolute',
-    top: 8,
-    right: 8,
+    top: mvs(8),
+    right: mvs(8),
     backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    borderRadius: 12,
-    padding: 4,
+    borderRadius: 16,
+    padding: mhs(4),
   },
   arrowButton: {
-    // padding: 8,
   },
   imageButtonsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 16,
+    marginBottom: mvs(16),
   },
   imageButton: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#f5f5f5',
-    padding: 12,
+    padding: mvs(12),
     borderRadius: 8,
     flex: 1,
-    marginHorizontal: 4,
+    marginHorizontal: mhs(4),
     justifyContent: 'center',
   },
   imageButtonText: {
-    marginLeft: 8,
-    fontSize: 14,
+    marginLeft: mhs(8),
+    fontSize: mhs(13),
     color: '#555',
   },
   modalPostButton: {
     backgroundColor: themeColors.primary,
-    padding: 12,
-    borderRadius: 8,
+    padding: mhs(12),
+    borderRadius: 25,
     alignItems: 'center',
   },
   modalPostButtonText: {
-    color: '#fff',
+    color: themeColors.text.light,
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: mvs(16),
   },
 });
 

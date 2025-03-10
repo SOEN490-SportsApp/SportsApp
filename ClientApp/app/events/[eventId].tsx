@@ -186,7 +186,7 @@ const EventPage: React.FC = () => {
   ];
   
   const scenes = {
-    eventPosts: [<EventPostsTab eventId={eventId} />],
+    eventPosts: [<EventPostsTab eventId={eventId} key={eventId} />],
     eventDetails: <EventDetails event={event} handleJoinEvent={handleJoinEvent} />,
   };
 
