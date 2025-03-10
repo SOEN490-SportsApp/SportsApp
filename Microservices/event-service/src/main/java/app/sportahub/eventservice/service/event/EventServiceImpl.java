@@ -44,13 +44,6 @@ import app.sportahub.eventservice.repository.event.EventRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
 
 
 @Slf4j
@@ -464,6 +457,29 @@ public class EventServiceImpl implements EventService {
         return eventMapper.eventToEventResponse(savedEvent);
     }
 
+    /**
+     * Searches for events based on various filter criteria.
+     *
+     * @param eventName          The name of the event (optional).
+     * @param eventType          The type of the event (optional).
+     * @param sportType          The sport type associated with the event (optional).
+     * @param locationName       The name of the event location (optional).
+     * @param city              The city where the event is held (optional).
+     * @param province          The province or state where the event is held (optional).
+     * @param country           The country where the event is held (optional).
+     * @param postalCode        The postal code of the event location (optional).
+     * @param date              The date of the event in a specific format (optional).
+     * @param startTime         The start time of the event in a specific format (optional).
+     * @param endTime           The end time of the event in a specific format (optional).
+     * @param duration          The duration of the event in hours or minutes (optional).
+     * @param maxParticipants   The maximum number of participants allowed for the event (optional).
+     * @param createdBy         The identifier of the user who created the event (optional).
+     * @param isPrivate         Whether the event is private (optional).
+     * @param requiredSkillLevel A list of required skill levels for participants (optional).
+     * @param pageable          The pagination and sorting information.
+     * @return A paginated list of {@link EventResponse} objects matching the search criteria.
+     * @throws NoSearchCriteriaProvidedException if all search parameters are null.
+     */
     @Override
     public Page<EventResponse> searchEvents(String eventName,
                                             String eventType,
@@ -510,8 +526,16 @@ public class EventServiceImpl implements EventService {
         return new PageImpl<>(eventResponses, events.getPageable(), events.getTotalElements());
     }
 
-
-
+    /**
+     * Allows a user to react to an event or remove their reaction.
+     *
+     * @param eventId     The unique identifier of the event.
+     * @param newReaction The reaction type to be submitted. Must be either {@code ReactionType.LIKE} or {@code ReactionType.NO_REACTION}.
+     * @return A {@link ReactionResponse} containing the user's reaction details.
+     * @throws InvalidReactionException If the reaction type is not "LIKE" or "NO_REACTION".
+     * @throws EventDoesNotExistException If the event with the given ID does not exist.
+     * @throws ReactionAlreadySubmittedException If the user has already reacted with "LIKE" and tries to react again.
+     */
     @Override
     public ReactionResponse reactToEvent(String eventId, ReactionType newReaction) {
 
