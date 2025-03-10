@@ -1131,41 +1131,6 @@ public class UserServiceTest {
     }
 
     @Test
-    void deleteFriendShouldThrowFriendUserDoesNotExistException() {
-        // Arrange
-        User requester = new User();
-        requester.setId("userId1");
-
-        User friend = new User();
-        String friendFriendUserId = new ObjectId().toHexString();
-        friend.setId(friendFriendUserId);
-
-        Friend requesterFriend = new Friend(friendFriendUserId, FriendRequestStatusEnum.ACCEPTED);
-        requesterFriend.setId("friend1Id");
-
-        Friend friendFriend = new Friend(requester.getId(), FriendRequestStatusEnum.ACCEPTED);
-        friendFriend.setId("friend2Id");
-
-        List<Friend> requesterFriendList = new ArrayList<>();
-        requesterFriendList.add(requesterFriend);
-        requester.setFriendList(requesterFriendList);
-
-        List<Friend> friendFriendList = new ArrayList<>();
-        friendFriendList.add(friendFriend);
-        friend.setFriendList(friendFriendList);
-
-        when(userRepository.findUserById(requester.getId())).thenReturn(Optional.of(requester));
-
-        // Act
-        UserDoesNotExistException exception = assertThrows(UserDoesNotExistException.class, () ->
-                userService.deleteFriend(requester.getId(), requesterFriend.getId()));
-
-        // Assert
-        assertEquals("404 NOT_FOUND \"User with identifier: " + friendFriendUserId + " does not exist.\"",
-                exception.getMessage());
-    }
-
-    @Test
     void deleteFriendShouldReturnRequesterFriendNotFoundInFriendListException() {
         // Arrange
         String wrongId = new ObjectId().toHexString();
@@ -1202,35 +1167,4 @@ public class UserServiceTest {
                 exception.getMessage());
     }
 
-    @Test
-    void deleteFriendShouldReturnFriendFriendNotFoundInFriendListException() {
-        // Arrange
-        User requester = new User();
-        requester.setId("userId1");
-
-        User friend = new User();
-        friend.setId("userId2");
-
-        Friend requesterFriend = new Friend(friend.getId(), FriendRequestStatusEnum.ACCEPTED);
-        requesterFriend.setId("friend1Id");
-
-        Friend friendFriend = new Friend(friend.getId(), FriendRequestStatusEnum.ACCEPTED);
-        friendFriend.setId("friend2Id");
-
-        List<Friend> requesterFriendList = new ArrayList<>();
-        requesterFriendList.add(requesterFriend);
-        requester.setFriendList(requesterFriendList);
-
-        lenient().when(userRepository.findUserById(requester.getId())).thenReturn(Optional.of(requester));
-        lenient().when(userRepository.findUserById(friend.getId())).thenReturn(Optional.of(friend));
-
-        // Act
-        FriendNotFoundInFriendListException exception = assertThrows(FriendNotFoundInFriendListException.class, () ->
-                userService.deleteFriend(requester.getId(), requesterFriend.getId()));
-
-        // Assert
-        assertEquals("404 NOT_FOUND \"User with identifier: " + friend.getId()
-                        + " does not have friend with identifier: " + requester.getId() + " in their friend list.\"",
-                exception.getMessage());
-    }
 }
