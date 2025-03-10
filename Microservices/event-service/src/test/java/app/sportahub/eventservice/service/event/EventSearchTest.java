@@ -95,7 +95,7 @@ public class EventSearchTest {
         when(eventRepository.searchEvents("Soccer Match", "Friendly", "Soccer", "Central Park", "New York", "NY", "USA", "10001", "2023-10-15", "14:00", "16:00", "120", "20", "user123", false, List.of(SkillLevelEnum.INTERMEDIATE), pageable))
                 .thenReturn(mockEventPage);
 
-        LocationResponse locationResponse = new LocationResponse("Central Park", "", "", "New York", "NY", "USA", "10001", "", "", "", "");
+        LocationResponse locationResponse = new LocationResponse("Central Park", "", "", "New York", "NY", "USA", "10001", "", "", null);
 
         EventResponse eventResponse = new EventResponse(
                 "event123",
@@ -109,6 +109,7 @@ public class EventSearchTest {
                 LocalTime.of(16, 0),
                 "120",
                 20,
+                Collections.emptyList(),
                 Collections.emptyList(),
                 "user123",
                 Collections.emptyList(),
@@ -196,7 +197,7 @@ public class EventSearchTest {
         when(eventRepository.searchEvents("Soccer Match", null, "Soccer", null, "New York", null, null, null, "2023-10-15", null, null, null, null, null, null, null, pageable))
                 .thenReturn(mockEventPage);
 
-        LocationResponse locationResponse = new LocationResponse("Central Park", "", "", "New York", "NY", "USA", "10001", "", "", "", "");
+        LocationResponse locationResponse = new LocationResponse("Central Park", "", "", "New York", "NY", "USA", "10001", "", "", null);
 
         EventResponse eventResponse = new EventResponse(
                 "event123",
@@ -211,6 +212,7 @@ public class EventSearchTest {
                 "120",
                 20,
                 Collections.emptyList(), // participants
+                Collections.emptyList(),
                 "user123",
                 Collections.emptyList(), // teams
                 "18:00", // cutOffTime
@@ -268,6 +270,7 @@ public class EventSearchTest {
                 null,
                 null,
                 LocalDate.of(2023, 10, 15),
+                null,
                 null,
                 null,
                 null,
@@ -347,6 +350,7 @@ public class EventSearchTest {
                 null,
                 null,
                 null,
+                null,
                 null
         );
 
@@ -404,6 +408,7 @@ public class EventSearchTest {
                 null,
                 null,
                 15,
+                null,
                 null,
                 null,
                 null,

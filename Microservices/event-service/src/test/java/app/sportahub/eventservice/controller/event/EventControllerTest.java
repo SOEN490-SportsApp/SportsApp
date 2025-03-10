@@ -282,13 +282,14 @@ public class EventControllerTest {
                 "Soccer Match",
                 "Friendly",
                 "Soccer",
-                new LocationResponse("Central Park", "", "", "New York", "NY", "USA", "10001", "", "", "", ""),
+                new LocationResponse("Central Park", "", "", "New York", "NY", "USA", "10001", "", "", null),
                 LocalDate.of(2023, 10, 15),
                 LocalTime.of(14, 0),
                 LocalTime.of(16, 0),
                 "120",
                 20,
-                Collections.emptyList(), // participants
+                Collections.emptyList(),
+                Collections.emptyList(),
                 "user123",
                 Collections.emptyList(), // teams
                 "18:00", // cutOffTime
