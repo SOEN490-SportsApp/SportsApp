@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import app.sportahub.eventservice.exception.event.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,21 +30,9 @@ import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.dto.response.ParticipantResponse;
 import app.sportahub.eventservice.dto.response.ReactionResponse;
 import app.sportahub.eventservice.enums.EventSortingField;
+import app.sportahub.eventservice.enums.SkillLevelEnum;
 import app.sportahub.eventservice.enums.EventState;
 import app.sportahub.eventservice.enums.SortDirection;
-import app.sportahub.eventservice.exception.event.EventAlreadyCancelledException;
-import app.sportahub.eventservice.exception.event.EventAlreadyExistsException;
-import app.sportahub.eventservice.exception.event.EventAlreadyStartedException;
-import app.sportahub.eventservice.exception.event.EventCreatorCannotLeaveEventException;
-import app.sportahub.eventservice.exception.event.EventDoesNotExistException;
-import app.sportahub.eventservice.exception.event.EventFullException;
-import app.sportahub.eventservice.exception.event.EventRegistrationClosedException;
-import app.sportahub.eventservice.exception.event.EventsNotFoundException;
-import app.sportahub.eventservice.exception.event.InvalidReactionException;
-import app.sportahub.eventservice.exception.event.ReactionAlreadySubmittedException;
-import app.sportahub.eventservice.exception.event.UserAlreadyParticipantException;
-import app.sportahub.eventservice.exception.event.UserIsNotEventWhitelistedException;
-import app.sportahub.eventservice.exception.event.UserNotAParticipantException;
 import app.sportahub.eventservice.mapper.event.EventMapper;
 import app.sportahub.eventservice.model.event.Event;
 import app.sportahub.eventservice.model.event.EventCancellation;
@@ -54,6 +43,7 @@ import app.sportahub.eventservice.model.event.reactor.ReactionType;
 import app.sportahub.eventservice.repository.event.EventRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.*;
 
 
 @Slf4j
@@ -87,9 +77,9 @@ public class EventServiceImpl implements EventService {
         return eventRepository.findAll().stream().map(eventMapper::eventToEventResponse).toList();
     }
 
-    /** 
-     * Returns either a paginated list or a regular list of EventResponse objects that are within a certain radius of a given location. 
-     * 
+    /**
+     * Returns either a paginated list or a regular list of EventResponse objects that are within a certain radius of a given location.
+     *
      * @param longitude the longitude of the location to search around
      * @param latitude the latitude of the location to search around
      * @param radius the radius around the location to search within
@@ -97,13 +87,13 @@ public class EventServiceImpl implements EventService {
      * @param paginate whether to return a paginated list or not
      * @param page the page number to return if paginated
      * @param size the number of events per page if paginated
-     * 
-     * @return a {@Link Pageable}  or {@Link List} of {@Link EventResponse} objects 
+     *
+     * @return a {@Link Pageable}  or {@Link List} of {@Link EventResponse} objects
      * @throws EventsNotFoundException if no events are found within the specified radius
     */
     @Override
     public ResponseEntity<?> getRelevantEvents(double longitude, double latitude ,double radius, boolean radiusExpansion, boolean paginate, int page, int size){
-        
+
         GeoJsonPoint point = new GeoJsonPoint(longitude, latitude);
         Distance distance = new Distance(radius, Metrics.KILOMETERS);
         Pageable pageable =  paginate ? PageRequest.of(page, size) : Pageable.unpaged();
@@ -120,7 +110,7 @@ public class EventServiceImpl implements EventService {
             throw new EventsNotFoundException();
         }
 
-        return ResponseEntity.ok(paginate ? events.map(eventMapper::eventToEventResponse): 
+        return ResponseEntity.ok(paginate ? events.map(eventMapper::eventToEventResponse):
                 events.getContent().stream().map(eventMapper::eventToEventResponse).toList());
     }
 
@@ -467,6 +457,85 @@ public class EventServiceImpl implements EventService {
         return eventMapper.eventToEventResponse(savedEvent);
     }
 
+    /**
+     * Searches for events based on various filter criteria.
+     *
+     * @param eventName          The name of the event (optional).
+     * @param eventType          The type of the event (optional).
+     * @param sportType          The sport type associated with the event (optional).
+     * @param locationName       The name of the event location (optional).
+     * @param city              The city where the event is held (optional).
+     * @param province          The province or state where the event is held (optional).
+     * @param country           The country where the event is held (optional).
+     * @param postalCode        The postal code of the event location (optional).
+     * @param date              The date of the event in a specific format (optional).
+     * @param startTime         The start time of the event in a specific format (optional).
+     * @param endTime           The end time of the event in a specific format (optional).
+     * @param duration          The duration of the event in hours or minutes (optional).
+     * @param maxParticipants   The maximum number of participants allowed for the event (optional).
+     * @param createdBy         The identifier of the user who created the event (optional).
+     * @param isPrivate         Whether the event is private (optional).
+     * @param requiredSkillLevel A list of required skill levels for participants (optional).
+     * @param pageable          The pagination and sorting information.
+     * @return A paginated list of {@link EventResponse} objects matching the search criteria.
+     * @throws NoSearchCriteriaProvidedException if all search parameters are null.
+     */
+    @Override
+    public Page<EventResponse> searchEvents(String eventName,
+                                            String eventType,
+                                            String sportType,
+                                            String locationName,
+                                            String city,
+                                            String province,
+                                            String country,
+                                            String postalCode,
+                                            String date,
+                                            String startTime,
+                                            String endTime,
+                                            String duration,
+                                            String maxParticipants,
+                                            String createdBy,
+                                            Boolean isPrivate,
+                                            List<SkillLevelEnum> requiredSkillLevel,
+                                            Pageable pageable) {
+        if (eventName == null &&
+            eventType == null &&
+            sportType == null &&
+            locationName == null &&
+            city == null &&
+            province == null &&
+            country == null &&
+            postalCode == null &&
+            date == null &&
+            startTime == null &&
+            endTime == null &&
+            duration == null &&
+            maxParticipants == null &&
+            createdBy == null &&
+            isPrivate == null &&
+            requiredSkillLevel == null) {
+            throw new NoSearchCriteriaProvidedException();
+        }
+        log.info("UserServiceImpl::searchUsers: User created a search query");
+
+        Page<Event> events = eventRepository.searchEvents(eventName, eventType, sportType, locationName, city, province, country, postalCode, date, startTime, endTime, duration, maxParticipants, createdBy, isPrivate, requiredSkillLevel, pageable);
+
+        List<EventResponse> eventResponses = events.stream()
+                .map(eventMapper::eventToEventResponse).toList();
+
+        return new PageImpl<>(eventResponses, events.getPageable(), events.getTotalElements());
+    }
+
+    /**
+     * Allows a user to react to an event or remove their reaction.
+     *
+     * @param eventId     The unique identifier of the event.
+     * @param newReaction The reaction type to be submitted. Must be either {@code ReactionType.LIKE} or {@code ReactionType.NO_REACTION}.
+     * @return A {@link ReactionResponse} containing the user's reaction details.
+     * @throws InvalidReactionException If the reaction type is not "LIKE" or "NO_REACTION".
+     * @throws EventDoesNotExistException If the event with the given ID does not exist.
+     * @throws ReactionAlreadySubmittedException If the user has already reacted with "LIKE" and tries to react again.
+     */
     @Override
     public ReactionResponse reactToEvent(String eventId, ReactionType newReaction) {
 

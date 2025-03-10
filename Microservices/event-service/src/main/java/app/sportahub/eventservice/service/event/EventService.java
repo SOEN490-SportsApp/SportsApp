@@ -1,7 +1,10 @@
 package app.sportahub.eventservice.service.event;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
+import app.sportahub.eventservice.enums.SkillLevelEnum;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 
@@ -13,6 +16,7 @@ import app.sportahub.eventservice.dto.response.ReactionResponse;
 import app.sportahub.eventservice.enums.EventSortingField;
 import app.sportahub.eventservice.enums.SortDirection;
 import app.sportahub.eventservice.model.event.reactor.ReactionType;
+import org.springframework.data.domain.Pageable;
 
 public interface EventService {
 
@@ -43,6 +47,25 @@ public interface EventService {
     Page<EventResponse> getEventsCreatedByUserId(String userId, int page, int size, SortDirection sort, EventSortingField field);
 
     EventResponse cancelEvent(String id, EventCancellationRequest cancelRequest);
+
+    Page<EventResponse> searchEvents(String eventName,
+                                     String eventType,
+                                     String sportType,
+                                     String locationName,
+                                     String city,
+                                     String province,
+                                     String country,
+                                     String postalCode,
+                                     String date,
+                                     String startTime,
+                                     String endTime,
+                                     String duration,
+                                     String maxParticipants,
+                                     String createdBy,
+                                     Boolean isPrivate,
+                                     List<SkillLevelEnum> requiredSkillLevel,
+                                     Pageable pageable);
+
 
     ReactionResponse reactToEvent(String id, ReactionType reaction);
 }
