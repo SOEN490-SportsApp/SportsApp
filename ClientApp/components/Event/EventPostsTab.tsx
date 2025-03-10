@@ -20,15 +20,11 @@ const EventPostsTab = ({ eventId }: { eventId: string }) => {
             const size = 10;
             const response = await fetchPosts(eventId, page, size);
 
-            // If page is 0, replace the posts with the new ones
             if (page === 0) {
                 setPosts(response.content);
             } else {
-                // Otherwise, append the new posts to the existing list
                 setPosts((prevPosts) => [...prevPosts, ...response.content]);
             }
-
-            // Fetch user profiles for the new posts
             const profiles: { [userId: string]: any } = { ...userProfiles };
             for (const post of response.content) {
                 if (!profiles[post.createdBy]) {
@@ -37,8 +33,6 @@ const EventPostsTab = ({ eventId }: { eventId: string }) => {
                 }
             }
             setUserProfiles(profiles);
-
-            // Check if there are more posts to fetch
             if (response.content.length < size) {
                 setHasMore(false);
             }
@@ -51,11 +45,11 @@ const EventPostsTab = ({ eventId }: { eventId: string }) => {
     };
 
     const handleNewPost = () => {
-        // Reset pagination state and clear posts
-        setPage(0); // Reset to the first page
-        setHasMore(true); // Assume there are more posts to fetch
-        setUserProfiles({}); // Clear user profiles cache
-        setPosts([]); // Clear posts
+        setPage(0);
+        setHasMore(true); 
+        setUserProfiles({});
+        setPosts([]);
+        loadPosts();
     };
 
     const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -74,7 +68,6 @@ const EventPostsTab = ({ eventId }: { eventId: string }) => {
         }
     };
 
-    // Fetch posts whenever the page changes
     useEffect(() => {
         loadPosts();
     }, [page]);
