@@ -60,7 +60,6 @@ export default function EventDetailsLayout() {
         console.log("Leave event selected");
         break;
       case "edit":
-        console.log("Edit event selected");
         setEditModalVisible(true);
         break;
       case "delete":

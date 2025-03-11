@@ -157,7 +157,7 @@ const addAdjustedDate = (params: FilterState) => {
 export const editEvent = async (eventId: string, eventData: any) => {
   try {
     const axiosInstance = getAxiosInstance();
-    const response = await axiosInstance.put(
+    const response = await axiosInstance.patch(
       API_ENDPOINTS.EDIT_EVENT_BY_ID.replace("{id}", eventId),
       eventData
     );

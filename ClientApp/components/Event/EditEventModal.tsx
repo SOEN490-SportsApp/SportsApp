@@ -1,6 +1,6 @@
 import themeColors from "@/utils/constants/colors";
 import React, { useEffect, useState } from "react";
-import { Modal, View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, TextInput } from "react-native";
+import { Modal, View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, TextInput, Alert } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { getAxiosInstance } from "@/services/axiosInstance";
 import { API_ENDPOINTS } from "@/utils/api/endpoints";
@@ -9,6 +9,7 @@ import { hs, vs, mhs } from "@/utils/helpers/uiScaler";
 import supportedSports from "@/utils/constants/supportedSports";
 import GooglePlacesInput from "../Helper Components/GooglePlacesInput";
 import CustomDateTimePicker from "../Helper Components/CustomDateTimePicker";
+import { editEvent } from "@/services/eventService";
 
 interface EditEventModalProps {
   visible: boolean;
@@ -20,20 +21,64 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
 
   interface EventDetails {
     eventName: string;
-    eventType: string;
+    // eventType: string;
     sportType: string;
-    locationName: string;
-    // city: string;
-    province: string;
-    country: string;
-    cutOffTime: string;
-    description: string;
+    // location: {
+    //   name: string;
+    //   streetNumber: string;
+    //   streetName: string;
+    //   city: string;
+    //   province: string;
+    //   country: string;
+    //   postalCode: string;
+    //   addressLine2: string;
+    //   phoneNumber: string;
+    //   coordinates: {
+    //     x: number;
+    //     y: number;
+    //     coordinates: number[];
+    //     type: string;
+    //   }
+    // };
+    // date: string;
+    // startTime: {
+    //   hour: number;
+    //   minute: number;
+    //   second: number;
+    //   nano: number;
+    // };
+    // endTime: {
+    //   hour: number;
+    //   minute: number;
+    //   second: number;
+    //   nano: number;
+    // };
+    // duration: string;
     maxParticipants: string;
-    requiredSkillLevel: string[];
-    locationResponse: {
-      name: string;
-      city: string;
-    };
+    // participants: [
+    //   {
+    //     userId: string;
+    //     attendStatus: string;
+    //     joinedOn: string;
+    //   }
+    // ];
+    // createdBy: string;
+    // teams: [
+    //   {
+    //     teamId: string;
+    //   }
+    // ];
+    // cutOffTime: string;
+    description: string;
+    // isPrivate: boolean;
+    // whiteListedUsers: string[];
+    // requiredSkillLevel: string[];
+    // reactors: [
+    //   {
+    //     userId: string;
+    //     reactionType: string;
+    //   }
+    // ];
   }
 
   useEffect(() => {
@@ -49,12 +94,10 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
       handleSubmit,
       formState: { errors },
       reset,
-      // watch,
-      // setValue,
     } = useForm<EventDetails>({
       defaultValues: {
         eventName: "",
-        eventType: "",
+        // eventType: "",
         sportType: "",
         maxParticipants: "",
         description: "",
@@ -67,7 +110,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
   const [requiredSkillLevel, setRequiredSkillLevel] = useState<string[]>([]);
   const [isSportTypeModalVisible, setSportTypeModalVisible] = useState(false);
   const [isLocationModalVisible, setLocationModalVisible] = useState(false);
-  const [selectedLocation, setSelectedLocation] = useState<string>("");
+  // const [selectedLocation, setSelectedLocation] = useState<string>("");
   const [eventDate, setEventDate] = useState<Date | null>(null);
   const [eventStartTime, setEventStartTime] = useState<Date | null>(null);
   const [eventEndTime, setEventEndTime] = useState<Date | null>(null);
@@ -89,7 +132,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
         sportType: eventDetails.sportType || "",
         maxParticipants: eventDetails.maxParticipants ? String(eventDetails.maxParticipants) : "",
       });
-      setSelectedLocation(`${eventDetails.locationResponse.name}, ${eventDetails.locationResponse.city}`);
+      // setSelectedLocation(`${eventDetails.locationResponse.name}, ${eventDetails.locationResponse.city}`);
     }
   }, [eventDetails, reset]);
 
@@ -145,6 +188,41 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
       setLoading(false);
     }
   };
+
+  const handleUpdateEvent = async (formData: any) => {
+    try {
+      const updatedEventData: any = {};
+  
+      if (formData.eventName && formData.eventName !== eventDetails.eventName) {
+        updatedEventData.eventName = formData.eventName;
+      }
+      
+      if (selectedSport && selectedSport !== eventDetails.sportType) {
+        updatedEventData.sportType = selectedSport;
+      }
+      
+      if (formData.maxParticipants && formData.maxParticipants !== eventDetails.maxParticipants) {
+        updatedEventData.maxParticipants = parseInt(formData.maxParticipants);
+      }
+      
+      if (description && description !== eventDetails.description) {
+        updatedEventData.description = description;
+      }
+  
+      console.log("Payload Sent to API: ", JSON.stringify(updatedEventData, null, 2)); // For Debugging
+  
+      await editEvent(eventId, updatedEventData);
+      Alert.alert("Success", "Event updated successfully!");
+      onClose();
+    } catch (error) {
+      Alert.alert("Error", "Failed to update event. Please try again.");
+      if (error instanceof Error) {
+        console.error("Error updating event:", (error as any).response?.data || error.message);
+      } else {
+        console.error("Error updating event:", error);
+      }
+    }
+  };  
 
   const toggleSkillLevel = (level: string) => {
     let updatedLevels = [...selectedSkillLevels];
@@ -223,7 +301,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
                     )}
                   />
                   {/* event type */}
-                  <View style={styles.segmentedControl}>
+                  {/* <View style={styles.segmentedControl}>
                     {["public", "private"].map((type) => (
                       <TouchableOpacity
                         key={type}
@@ -243,7 +321,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
                         </Text>
                       </TouchableOpacity>
                     ))}
-                  </View>
+                  </View> */}
                   {/* sport type */}
                   <View style={styles.sportTypeContainer}>
                     <Text style={styles.bold}>Sport Type:</Text>
@@ -273,7 +351,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
                     />
                   </View>
                   {/* skill level */}
-                  <Text style={styles.bold}>Skill Level:</Text>
+                  {/* <Text style={styles.bold}>Skill Level:</Text>
                   <View style={styles.skillLevelGroup}>
                     {["Beginner", "Intermediate", "Advanced"].map((level) => (
                       <TouchableOpacity
@@ -295,11 +373,11 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
                         </Text>
                       </TouchableOpacity>
                     ))}
-                  </View>
+                  </View> */}
                   {/* location */}
-                  <Text><Text style={styles.bold}>Location:</Text> {eventDetails.locationResponse.name}, {eventDetails.locationResponse.city}</Text>
+                  {/* <Text><Text style={styles.bold}>Location:</Text> {eventDetails.locationResponse.name}, {eventDetails.locationResponse.city}</Text> */}
                   {/* date and time */}
-                  <Text style={styles.bold}>Date:</Text>
+                  {/* <Text style={styles.bold}>Date:</Text>
                   <CustomDateTimePicker
                     value={eventDate}
                     mode="date"
@@ -319,9 +397,9 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
                     mode="time"
                     onChange={(newTime) => setEventEndTime(newTime)}
                     label="Select End Time"
-                  />
+                  /> */}
                   {/* cut off time */}
-                  <Text style={styles.bold}>Register by:</Text>
+                  {/* <Text style={styles.bold}>Register by:</Text>
                   <CustomDateTimePicker
                     value={cutOffDate}
                     mode="date"
@@ -333,7 +411,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
                     mode="time"
                     onChange={(newTime) => setCutOffTime(newTime)}
                     label="Select Cut-off Time"
-                  />
+                  /> */}
                   {/* description */}
                   <Text style={styles.bold}>Description:</Text>
                   <Controller
@@ -364,6 +442,12 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
           )}
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
             <Text style={styles.closeButtonText}>Close</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.submitButton}
+            onPress={handleSubmit(handleUpdateEvent)}
+          >
+            <Text style={styles.submitButtonText}>Save Changes</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -497,6 +581,18 @@ const styles = StyleSheet.create({
     padding: 10,
     minHeight: 60,
     maxHeight: 200,
+  },
+  submitButton: {
+    marginTop: 20,
+    backgroundColor: themeColors.primary,
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  submitButtonText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 16,
   },
 });
 
