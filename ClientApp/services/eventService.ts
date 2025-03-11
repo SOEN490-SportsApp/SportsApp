@@ -2,6 +2,7 @@ import { FilterState } from "@/components/Helper Components/FilterSection/Filter
 import { getAxiosInstance } from "@/services/axiosInstance";
 import { API_ENDPOINTS } from "@/utils/api/endpoints";
 import { accessibilityProps } from "react-native-paper/lib/typescript/components/MaterialCommunityIcon";
+
 //API_ENDPOINTS.CREATE_EVENT
 export const createEvent = async (eventData: any) => {
   try {
@@ -110,11 +111,14 @@ export const searchEventsWithFilter = async (
       queryParams.requiredSkillLevel = params.skillLevel.toUpperCase();
     }
 
-    //queryParams.date = addAdjustedDate(params);
+    if(params.minDate !== params.maxDate){
+      queryParams.date = addAdjustedDate(params);
+    }
     
     if (params.filterType !== "All") {
       queryParams.sportType = params.filterType;
     }
+
     if (Object.keys(queryParams).length > 0) {
       const response = axiosInstance.get(endpoint, {
         params: queryParams,
@@ -131,16 +135,19 @@ export const searchEventsWithFilter = async (
 };
 
 const addAdjustedDate = (params: FilterState) => {
+  const minMonth = params.minDate.getMonth() <= 9 ? "0" + params.minDate.getMonth() : params.minDate.getMonth();
+  const maxMonth = params.maxDate.getMonth() <= 9 ? "0" + params.maxDate.getMonth() : params.maxDate.getMonth();
+  
   const minDate =
     params.minDate.getFullYear() +
     "-" +
-    params.minDate.getMonth() +
+    minMonth +
     "-" +
     params.minDate.getDate();
   const maxDate =
     params.maxDate.getFullYear() +
     "-" +
-    params.maxDate.getMonth() +
+    maxMonth +
     "-" +
     params.maxDate.getDate();
 
