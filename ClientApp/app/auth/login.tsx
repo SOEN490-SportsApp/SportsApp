@@ -33,7 +33,7 @@ const LoginPage: React.FC = () => {
         if (firstName === '' && lastName === '') {
             router.push({ pathname: '/auth/registerProfile', params: { userID: res.userID } });
         } else {
-            router.push('/(tabs)/home');
+            router.replace('/(tabs)/home');
         }
     } catch (error: any) {
         console.log(error);
