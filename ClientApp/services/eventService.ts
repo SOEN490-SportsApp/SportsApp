@@ -153,3 +153,30 @@ const addAdjustedDate = (params: FilterState) => {
 
   return minDate + "-" + maxDate;
 };
+
+export const editEvent = async (eventId: string, eventData: any) => {
+  try {
+    const axiosInstance = getAxiosInstance();
+    const response = await axiosInstance.put(
+      API_ENDPOINTS.EDIT_EVENT_BY_ID.replace("{id}", eventId),
+      eventData
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error editing event:", error);
+    throw error;
+  }
+}
+
+export const getEventById = async (eventId: string) => {
+  try {
+    const axiosInstance = getAxiosInstance();
+    const response = await axiosInstance.get(
+      API_ENDPOINTS.GET_EVENT_BY_ID.replace("{id}", eventId)
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching event by ID:", error);
+    throw error;
+  }
+}
