@@ -317,21 +317,23 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
               {eventDetails ? (
                 <>
                   {/* event name */}
-                  <Text style={styles.eventDetail}><Text style={styles.bold}>Name:</Text></Text>
-                  <Controller
-                    control={control}
-                    name="eventName"
-                    render={({ field: { onChange, onBlur, value } }) => (
-                      <TextInput
-                        placeholder={eventDetails.eventName}
-                        placeholderTextColor="black"
-                        style={styles.inputField}
-                        onBlur={onBlur}
-                        onChangeText={onChange}
-                        value={value || ""}
-                      />
-                    )}
-                  />
+                  <View style={styles.rowView}>
+                    <Text style={styles.eventDetail}><Text style={styles.bold}>Name:</Text></Text>
+                    <Controller
+                      control={control}
+                      name="eventName"
+                      render={({ field: { onChange, onBlur, value } }) => (
+                        <TextInput
+                          placeholder={eventDetails.eventName}
+                          placeholderTextColor="black"
+                          style={styles.inputField}
+                          onBlur={onBlur}
+                          onChangeText={onChange}
+                          value={value || ""}
+                        />
+                      )}
+                    />
+                  </View>
                   {/* event type */}
                   {/* <View style={styles.segmentedControl}>
                     {["public", "private"].map((type) => (
@@ -409,41 +411,47 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
                   {/* location */}
                   {/* <Text><Text style={styles.bold}>Location:</Text> {eventDetails.locationResponse.name}, {eventDetails.locationResponse.city}</Text> */}
                   {/* date and time */}
-                  <Text style={styles.bold}>Date:</Text>
-                  <CustomDateTimePicker
-                    value={eventDate}
-                    mode="date"
-                    onChange={(newDate) => setEventDate(newDate)}
-                    label="Select Event Date"
-                  />
-                  <Text style={styles.bold}>From:</Text>
-                  <CustomDateTimePicker
-                    value={eventStartTime}
-                    mode="time"
-                    onChange={(newTime) => setEventStartTime(newTime)}
-                    label="Select Start Time"
-                  />
-                  <Text style={styles.bold}>To:</Text>
-                  <CustomDateTimePicker
-                    value={eventEndTime}
-                    mode="time"
-                    onChange={(newTime) => setEventEndTime(newTime)}
-                    label="Select End Time"
-                  />
+                  <View style={styles.rowView}>
+                    <Text style={styles.bold}>Date:</Text>
+                    <CustomDateTimePicker
+                      value={eventDate}
+                      mode="date"
+                      onChange={(newDate) => setEventDate(newDate)}
+                      label="Select Event Date"
+                    />
+                  </View>
+                  <View style={styles.rowView}>
+                    <Text style={styles.bold}>From:</Text>
+                    <CustomDateTimePicker
+                      value={eventStartTime}
+                      mode="time"
+                      onChange={(newTime) => setEventStartTime(newTime)}
+                      label="Select Start Time"
+                    />
+                    <Text style={styles.bold}>To:</Text>
+                    <CustomDateTimePicker
+                      value={eventEndTime}
+                      mode="time"
+                      onChange={(newTime) => setEventEndTime(newTime)}
+                      label="Select End Time"
+                    />
+                  </View>
                   {/* cut off time */}
                   <Text style={styles.bold}>Register by:</Text>
-                  <CustomDateTimePicker
-                    value={cutOffDate}
-                    mode="date"
-                    onChange={(newDate) => setCutOffDate(newDate)}
-                    label="Select Cut-off Date"
-                  />
-                  <CustomDateTimePicker
-                    value={cutOffTime}
-                    mode="time"
-                    onChange={(newTime) => setCutOffTime(newTime)}
-                    label="Select Cut-off Time"
-                  />
+                  <View style={styles.rowView}>
+                    <CustomDateTimePicker
+                      value={cutOffDate}
+                      mode="date"
+                      onChange={(newDate) => setCutOffDate(newDate)}
+                      label="Select Cut-off Date"
+                    />
+                    <CustomDateTimePicker
+                      value={cutOffTime}
+                      mode="time"
+                      onChange={(newTime) => setCutOffTime(newTime)}
+                      label="Select Cut-off Time"
+                    />
+                  </View>
                   {/* description */}
                   <Text style={styles.bold}>Description:</Text>
                   <Controller
@@ -472,15 +480,17 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
               )}
             </ScrollView>
           )}
-          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-            <Text style={styles.closeButtonText}>Close</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.submitButton}
-            onPress={handleSubmit(handleUpdateEvent)}
-          >
-            <Text style={styles.submitButtonText}>Save Changes</Text>
-          </TouchableOpacity>
+          <View style={styles.rowView}>
+            <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+              <Text style={styles.closeButtonText}>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.submitButton}
+              onPress={handleSubmit(handleUpdateEvent)}
+            >
+              <Text style={styles.submitButtonText}>Save</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </Modal>
@@ -508,7 +518,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   closeButton: {
-    marginTop: 10,
     padding: 10,
     backgroundColor: themeColors.button.primaryBackground,
     borderRadius: 5,
@@ -538,8 +547,7 @@ const styles = StyleSheet.create({
     color: themeColors.text.dark,
     backgroundColor: "#f5f5f5",
     borderRadius: 10,
-    padding: 5,
-    marginBottom: 15,
+    marginLeft: 10,
   },
   segmentedControl: {
     flexDirection: "row",
@@ -605,6 +613,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 5,
     marginRight: 115,
+    width: 40,
+    textAlign: "center",
   },
   descriptionInput: {
     fontSize: 16,
@@ -616,16 +626,22 @@ const styles = StyleSheet.create({
     maxHeight: 200,
   },
   submitButton: {
-    marginTop: 20,
     backgroundColor: themeColors.primary,
     padding: 10,
     borderRadius: 5,
     alignItems: 'center',
+    marginLeft: 70,
   },
   submitButtonText: {
     color: "white",
     fontWeight: "bold",
-    fontSize: 16,
+  },
+  rowView: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+    marginTop: 10,
   },
 });
 
