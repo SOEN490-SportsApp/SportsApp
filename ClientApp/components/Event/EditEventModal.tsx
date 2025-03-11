@@ -40,7 +40,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
     //     type: string;
     //   }
     // };
-    // date: string;
+    date: string;
     // startTime: {
     //   hour: number;
     //   minute: number;
@@ -101,6 +101,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
         sportType: "",
         maxParticipants: "",
         description: "",
+        date: "",
       },
     });
 
@@ -207,6 +208,10 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
       
       if (description && description !== eventDetails.description) {
         updatedEventData.description = description;
+      }
+
+      if (eventDate && eventDate !== new Date(eventDetails.date)) {
+        updatedEventData.date = eventDate.toISOString();
       }
   
       console.log("Payload Sent to API: ", JSON.stringify(updatedEventData, null, 2)); // For Debugging
@@ -377,14 +382,14 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
                   {/* location */}
                   {/* <Text><Text style={styles.bold}>Location:</Text> {eventDetails.locationResponse.name}, {eventDetails.locationResponse.city}</Text> */}
                   {/* date and time */}
-                  {/* <Text style={styles.bold}>Date:</Text>
+                  <Text style={styles.bold}>Date:</Text>
                   <CustomDateTimePicker
                     value={eventDate}
                     mode="date"
                     onChange={(newDate) => setEventDate(newDate)}
                     label="Select Event Date"
                   />
-                  <Text style={styles.bold}>From:</Text>
+                  {/* <Text style={styles.bold}>From:</Text>
                   <CustomDateTimePicker
                     value={eventStartTime}
                     mode="time"
