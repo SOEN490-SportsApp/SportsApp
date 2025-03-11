@@ -68,7 +68,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
     //     teamId: string;
     //   }
     // ];
-    // cutOffTime: string;
+    cutOffTime: string;
     description: string;
     // isPrivate: boolean;
     // whiteListedUsers: string[];
@@ -114,6 +114,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
           second: 0,
           nano: 0,
         },
+        cutOffTime: "",
       },
     });
 
@@ -232,6 +233,12 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
 
       if (eventEndTime && eventEndTime !== new Date(`1970-01-01T${eventDetails.endTime}`)) {
         updatedEventData.endTime = eventEndTime.toTimeString().slice(0, 8);
+      }
+
+      if (cutOffDate && cutOffTime && cutOffDate !== new Date(eventDetails.cutOffTime) || cutOffTime !== new Date(eventDetails.cutOffTime)) {
+        if (cutOffDate && cutOffTime) {
+          updatedEventData.cutOffTime = new Date(`${cutOffDate.toDateString()} ${cutOffTime.toTimeString().slice(0, 8)}`).toISOString();
+        }
       }
   
       console.log("Payload Sent to API: ", JSON.stringify(updatedEventData, null, 2)); // For Debugging
@@ -424,7 +431,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
                     label="Select End Time"
                   />
                   {/* cut off time */}
-                  {/* <Text style={styles.bold}>Register by:</Text>
+                  <Text style={styles.bold}>Register by:</Text>
                   <CustomDateTimePicker
                     value={cutOffDate}
                     mode="date"
@@ -436,7 +443,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
                     mode="time"
                     onChange={(newTime) => setCutOffTime(newTime)}
                     label="Select Cut-off Time"
-                  /> */}
+                  />
                   {/* description */}
                   <Text style={styles.bold}>Description:</Text>
                   <Controller
@@ -488,7 +495,8 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    width: 300,
+    width: 330,
+    height: 700,
     backgroundColor: "white",
     padding: 20,
     borderRadius: 10,
@@ -510,7 +518,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   scrollView: {
-    maxHeight: 300,
+    maxHeight: 500,
     width: "100%",
   },
   eventDetail: {
