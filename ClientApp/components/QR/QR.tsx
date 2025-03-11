@@ -29,16 +29,25 @@ const QR: React.FC<QRProps> = ({ id, isVisible, setIsVisible, isProfile }) => {
     Linking.canOpenURL("myapp://").then((result) => setCanOpenLink(true));
   }, []);
   const logo = require("@/assets/images/sporta_logo.png");
-  const userURL = isProfile && id ? deepLinks.Profile.replace("{id}", id): deepLinks.Event.replace("{id}", id);
- 
+  const userURL =
+    isProfile && id
+      ? deepLinks.Profile.replace("{id}", id)
+      : deepLinks.Event.replace("{id}", id);
+
   return (
-    <BottomModal isVisible={isVisible} setIsVisible={setIsVisible} height={undefined}>
-      <QRCode value={userURL} size={250} logo={logo} testID="QRCode" />
-            <View style={styles.closeButton}>
-              <Text style={styles.closeButtonText}>
-                Share your {isProfile ? "profile" : "event"} with friends
-              </Text>
-            </View>
+    <BottomModal
+      isVisible={isVisible}
+      setIsVisible={setIsVisible}
+      height={undefined}
+    >
+      <View>
+        <QRCode value={userURL} size={250} logo={logo} testID="QRCode" />
+        <View style={styles.closeButton}>
+          <Text style={styles.closeButtonText}>
+            Share your {isProfile ? "profile" : "event"} with friends
+          </Text>
+        </View>
+      </View>
     </BottomModal>
   );
 };
