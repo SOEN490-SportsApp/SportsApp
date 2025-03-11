@@ -7,7 +7,7 @@ import { Post } from '@/types/post';
 import { getProfile } from '@/utils/api/profileApiClient';
 import { mhs, mvs } from '@/utils/helpers/uiScaler';
 
-const EventPostsTab = ({ eventId }: { eventId: string }) => {
+const EventPostsTab = ({ eventId, isUserParticipant }: { eventId: string, isUserParticipant: boolean }) => {
     const [posts, setPosts] = useState<Post[]>([]);
     const [userProfiles, setUserProfiles] = useState<{ [userId: string]: any }>({});
     const [loading, setLoading] = useState<boolean>(true);
@@ -94,16 +94,23 @@ const EventPostsTab = ({ eventId }: { eventId: string }) => {
                 onScroll={handleScroll}
                 scrollEventThrottle={16}
             >
-                <PostCreationComponent eventId={eventId} onNewPost={handleNewPost} />
+                {isUserParticipant && <PostCreationComponent eventId={eventId} onNewPost={handleNewPost} />}
                 <View style={{ height: 16 }} />
-                {posts.map((post) => (
-                    <PostComponent key={post.id} post={post} userProfile={userProfiles[post.createdBy]} />
-                ))}
+    
+                {posts.length === 0 ? (
+                    <Text style={styles.noPostsText}>Be the first one to post!</Text>
+                ) : (
+                    posts.map((post) => (
+                        <PostComponent key={post.id} post={post} userProfile={userProfiles[post.createdBy]} />
+                    ))
+                )}
+    
                 {loading && <ActivityIndicator size="small" color="#0000ff" />}
-                {!hasMore && <Text style={styles.noMorePostsText}>You have reached the end!</Text>}
+                {posts.length > 0 && !hasMore && <Text style={styles.noMorePostsText}>You have reached the end!</Text>}
             </ScrollView>
         </SafeAreaView>
     );
+    
 };
 
 const styles = StyleSheet.create({
@@ -111,6 +118,11 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: mhs(16),
         backgroundColor: '#fafafa',
+    },
+    noPostsText: {
+        textAlign: 'center',
+        marginVertical: mvs(12),
+        color: '#888',
     },
     noMorePostsText: {
         textAlign: 'center',

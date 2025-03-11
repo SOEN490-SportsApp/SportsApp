@@ -17,14 +17,6 @@ import Octicons from '@expo/vector-icons/Octicons';
 import * as Clipboard from 'expo-clipboard';
 import EventPostsTab from "@/components/Event/EventPostsTab";
 
-const EventPosts = () => {
-  return (
-    <View>
-      <Text>Event Posts</Text>
-    </View>
-  );
-}
-
 const EventDetails = ({ event, handleJoinEvent }: { event: Event; handleJoinEvent: () => void }) => {
   const router = useRouter();
   const user = useSelector((state: { user: any }) => state.user);
@@ -186,7 +178,7 @@ const EventPage: React.FC = () => {
   ];
   
   const scenes = {
-    eventPosts: [<EventPostsTab eventId={eventId} key={eventId} />],
+    eventPosts: [<EventPostsTab eventId={eventId} key={eventId} isUserParticipant={isUserParticipant}/>],
     eventDetails: <EventDetails event={event} handleJoinEvent={handleJoinEvent} />,
   };
 
