@@ -16,6 +16,7 @@ export default function EventDetailsLayout() {
   const [menuVisible, setMenuVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [isCreator, setIsCreator] = useState(false);
+  const [isParticipant, setIsParticipant] = useState(false);
   
   const user = useSelector(selectUser); 
   const userId = user.id; 
@@ -26,10 +27,15 @@ export default function EventDetailsLayout() {
         if (!userId) return;
     
         const eventDetails = await getEventDetails(eventId);
-    
         if (userId === eventDetails.createdBy) {
           setIsCreator(true);
         }
+
+        const hasJoined = eventDetails.participants.some(
+          (participant: { userId: string }) => participant.userId === userId
+        );
+        setIsParticipant(hasJoined);
+
       } catch (error) {
         console.error("Error fetching event details:", error);
       }
@@ -101,12 +107,12 @@ export default function EventDetailsLayout() {
                 <QR id={eventId} isVisible={modalVisible} setIsVisible={setModalVisible} isProfile={false} />
               </View>
               <Menu
-            style={{
-            backgroundColor: themeColors.background.lightGrey,
-            position: "absolute",
-            top: 50,
-            right: 10,
-           } }
+            contentStyle={{
+              backgroundColor: themeColors.background.lightGrey,
+              borderRadius: 8,
+              elevation: 3,
+              top: mvs(80),
+            }}
           visible={menuVisible}
           onDismiss={closeMenu}
           anchor={
@@ -115,10 +121,10 @@ export default function EventDetailsLayout() {
     </TouchableOpacity>
   } 
 >
-  <Menu.Item onPress={() => handleOptionPress("invite")} title="Invite Friend" />
-  <Menu.Item onPress={() => handleOptionPress("leave")} title="Leave Event" />
-  
-  {/* Only show "Delete Event" if the user is the creator */}
+  <Menu.Item onPress={() => handleOptionPress("invite")} title="Invite Friend" titleStyle={{ color: "black" }} />
+  {!isCreator && isParticipant && (
+    <Menu.Item onPress={() => handleOptionPress("leave")} title="Leave Event" titleStyle={{ color: "black" }} />
+        )}
   {isCreator && (
     <Menu.Item onPress={() => handleOptionPress("delete")} title="Delete Event" titleStyle={{ color: "red" }} />
         )}
