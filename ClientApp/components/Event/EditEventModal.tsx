@@ -41,18 +41,18 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
     //   }
     // };
     date: string;
-    // startTime: {
-    //   hour: number;
-    //   minute: number;
-    //   second: number;
-    //   nano: number;
-    // };
-    // endTime: {
-    //   hour: number;
-    //   minute: number;
-    //   second: number;
-    //   nano: number;
-    // };
+    startTime: {
+      hour: number;
+      minute: number;
+      second: number;
+      nano: number;
+    };
+    endTime: {
+      hour: number;
+      minute: number;
+      second: number;
+      nano: number;
+    };
     // duration: string;
     maxParticipants: string;
     // participants: [
@@ -102,6 +102,18 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
         maxParticipants: "",
         description: "",
         date: "",
+        startTime: {
+          hour: 0,
+          minute: 0,
+          second: 0,
+          nano: 0,
+        },
+        endTime: {
+          hour: 0,
+          minute: 0,
+          second: 0,
+          nano: 0,
+        },
       },
     });
 
@@ -212,6 +224,14 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
 
       if (eventDate && eventDate !== new Date(eventDetails.date)) {
         updatedEventData.date = eventDate.toISOString();
+      }
+
+      if (eventStartTime && eventStartTime !== new Date(`1970-01-01T${eventDetails.startTime}`)) {
+        updatedEventData.startTime = eventStartTime.toTimeString().slice(0, 8);
+      }
+
+      if (eventEndTime && eventEndTime !== new Date(`1970-01-01T${eventDetails.endTime}`)) {
+        updatedEventData.endTime = eventEndTime.toTimeString().slice(0, 8);
       }
   
       console.log("Payload Sent to API: ", JSON.stringify(updatedEventData, null, 2)); // For Debugging
@@ -389,7 +409,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
                     onChange={(newDate) => setEventDate(newDate)}
                     label="Select Event Date"
                   />
-                  {/* <Text style={styles.bold}>From:</Text>
+                  <Text style={styles.bold}>From:</Text>
                   <CustomDateTimePicker
                     value={eventStartTime}
                     mode="time"
@@ -402,7 +422,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
                     mode="time"
                     onChange={(newTime) => setEventEndTime(newTime)}
                     label="Select End Time"
-                  /> */}
+                  />
                   {/* cut off time */}
                   {/* <Text style={styles.bold}>Register by:</Text>
                   <CustomDateTimePicker
