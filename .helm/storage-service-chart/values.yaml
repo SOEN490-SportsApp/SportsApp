@@ -133,6 +133,16 @@ env:
       secretKeyRef:
         name: shared-secrets
         key: minio-bucket
+  - name: LOGSTASH_HOST
+    valueFrom:
+      secretKeyRef:
+        name: shared-secrets
+        key: logstash-host
+  - name: LOGSTASH_PORT
+    valueFrom:
+      secretKeyRef:
+        name: shared-secrets
+        key: logstash-port
 
 livenessProbe:
   enabled: true
