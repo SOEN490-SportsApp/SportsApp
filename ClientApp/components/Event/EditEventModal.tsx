@@ -72,7 +72,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
     description: string;
     // isPrivate: boolean;
     // whiteListedUsers: string[];
-    // requiredSkillLevel: string[];
+    requiredSkillLevel: string[];
     // reactors: [
     //   {
     //     userId: string;
@@ -115,6 +115,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
           nano: 0,
         },
         cutOffTime: "",
+        requiredSkillLevel: [],
       },
     });
 
@@ -239,6 +240,13 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
         if (cutOffDate && cutOffTime) {
           updatedEventData.cutOffTime = new Date(`${cutOffDate.toDateString()} ${cutOffTime.toTimeString().slice(0, 8)}`).toISOString();
         }
+      }
+
+      if (selectedSkillLevels.length > 0) {
+        updatedEventData.requiredSkillLevel = selectedSkillLevels;
+      } else {
+        alert("Please select at least one skill level.");
+        return;
       }
   
       console.log("Payload Sent to API: ", JSON.stringify(updatedEventData, null, 2)); // For Debugging
@@ -385,7 +393,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
                     />
                   </View>
                   {/* skill level */}
-                  {/* <Text style={styles.bold}>Skill Level:</Text>
+                  <Text style={styles.bold}>Skill Level:</Text>
                   <View style={styles.skillLevelGroup}>
                     {["Beginner", "Intermediate", "Advanced"].map((level) => (
                       <TouchableOpacity
@@ -395,7 +403,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
                           styles.skillLevelOption,
                           selectedSkillLevels.includes(level.toUpperCase()) && styles.skillLevelSelected,
                         ]}
-                        onPress={() => toggleSkillLevel(level.toUpperCase())} // Convert to uppercase to match stored values
+                        onPress={() => toggleSkillLevel(level.toUpperCase())}
                       >
                         <Text
                           style={[
@@ -407,7 +415,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
                         </Text>
                       </TouchableOpacity>
                     ))}
-                  </View> */}
+                  </View>
                   {/* location */}
                   {/* <Text><Text style={styles.bold}>Location:</Text> {eventDetails.locationResponse.name}, {eventDetails.locationResponse.city}</Text> */}
                   {/* date and time */}
@@ -505,7 +513,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    width: 330,
+    width: 350,
     height: 700,
     backgroundColor: "white",
     padding: 20,
@@ -589,10 +597,11 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   skillLevelGroup: {
-    flexDirection: "column",
-    justifyContent: "space-between",
+    flexDirection: "row",  // Changed from column to row
+    justifyContent: "space-around", // Ensures even spacing between buttons
     marginBottom: vs(10),
-    width: "42%",
+    width: "100%", // Ensures they align properly in a row
+    flexWrap: "wrap" // Ensures they wrap on smaller screens if necessary
   },
   skillLevelSelected: {
     backgroundColor: themeColors.primary,
