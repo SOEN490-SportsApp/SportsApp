@@ -286,7 +286,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
     >
       <View style={styles.modalOverlay}>
         <View style={styles.modalWrapper}>
-          <Text style={styles.modalTitle}>Select a Sport</Text>
+          {/* <Text style={styles.modalTitle}>Select a Sport</Text> */}
           <ScrollView style={styles.scrollableList}>
             {supportedSports.map((sport) => (
               <TouchableOpacity
@@ -353,19 +353,37 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
                 <>
                   {/* event name */}
                   <View style={styles.rowView}>
-                    <Text style={styles.eventDetail}><Text style={styles.bold}>Name:</Text></Text>
+                    <Text style={styles.eventDetail}>
+                      <Text style={styles.bold}>Name:</Text>
+                    </Text>
                     <Controller
                       control={control}
                       name="eventName"
+                      rules={{
+                        maxLength: {
+                          value: 20,
+                          message: "Event name cannot exceed 20 characters.",
+                        },
+                      }}
                       render={({ field: { onChange, onBlur, value } }) => (
-                        <TextInput
-                          placeholder={eventDetails.eventName}
-                          placeholderTextColor="black"
-                          style={styles.inputField}
-                          onBlur={onBlur}
-                          onChangeText={onChange}
-                          value={value || ""}
-                        />
+                        <View style={{ flex: 1 }}>
+                          <TextInput
+                            placeholder={eventDetails.eventName}
+                            placeholderTextColor="black"
+                            style={styles.inputField}
+                            onBlur={onBlur}
+                            onChangeText={(text) => {
+                              if (text.length <= 20) {
+                                onChange(text);
+                              }
+                            }}
+                            value={value || ""}
+                            maxLength={20}  // Enforces the limit
+                          />
+                          <Text style={styles.charCount}>
+                            {value?.length || 0}/20
+                          </Text>
+                        </View>
                       )}
                     />
                   </View>
@@ -448,44 +466,54 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
                   {/* date and time */}
                   <View style={styles.rowView}>
                     <Text style={styles.bold}>Date:</Text>
-                    <CustomDateTimePicker
-                      value={eventDate}
-                      mode="date"
-                      onChange={(newDate) => setEventDate(newDate)}
-                      label="Select Event Date"
-                    />
+                    <View style={styles.dateView}>
+                      <CustomDateTimePicker
+                        value={eventDate}
+                        mode="date"
+                        onChange={(newDate) => setEventDate(newDate)}
+                        label="Select Event Date"
+                      />
+                    </View>
                   </View>
                   <View style={styles.rowView}>
                     <Text style={styles.bold}>From:</Text>
-                    <CustomDateTimePicker
-                      value={eventStartTime}
-                      mode="time"
-                      onChange={(newTime) => setEventStartTime(newTime)}
-                      label="Select Start Time"
-                    />
+                    <View style={styles.timeView}>
+                      <CustomDateTimePicker
+                        value={eventStartTime}
+                        mode="time"
+                        onChange={(newTime) => setEventStartTime(newTime)}
+                        label="Select Start Time"
+                      />
+                    </View>
                     <Text style={styles.bold}>To:</Text>
-                    <CustomDateTimePicker
-                      value={eventEndTime}
-                      mode="time"
-                      onChange={(newTime) => setEventEndTime(newTime)}
-                      label="Select End Time"
-                    />
+                    <View style={styles.timeView}>
+                      <CustomDateTimePicker
+                        value={eventEndTime}
+                        mode="time"
+                        onChange={(newTime) => setEventEndTime(newTime)}
+                        label="Select End Time"
+                      />
+                    </View>
                   </View>
                   {/* cut off time */}
                   <Text style={styles.bold}>Register by:</Text>
                   <View style={styles.rowView}>
-                    <CustomDateTimePicker
-                      value={cutOffDate}
-                      mode="date"
-                      onChange={(newDate) => setCutOffDate(newDate)}
-                      label="Select Cut-off Date"
-                    />
-                    <CustomDateTimePicker
-                      value={cutOffTime}
-                      mode="time"
-                      onChange={(newTime) => setCutOffTime(newTime)}
-                      label="Select Cut-off Time"
-                    />
+                    <View style={styles.registerDateView}>
+                      <CustomDateTimePicker
+                        value={cutOffDate}
+                        mode="date"
+                        onChange={(newDate) => setCutOffDate(newDate)}
+                        label="Select Cut-off Date"
+                      />
+                    </View>
+                    <View style={styles.registerTimeView}>
+                      <CustomDateTimePicker
+                        value={cutOffTime}
+                        mode="time"
+                        onChange={(newTime) => setCutOffTime(newTime)}
+                        label="Select Cut-off Time"
+                      />
+                    </View>
                   </View>
                   {/* description */}
                   <Text style={styles.bold}>Description:</Text>
@@ -515,7 +543,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
               )}
             </ScrollView>
           )}
-          <View style={styles.rowView}>
+          <View style={styles.rowViewButtons}>
             <TouchableOpacity style={styles.closeButton} onPress={handleCancel}>
               <Text style={styles.closeButtonText}>Cancel</Text>
             </TouchableOpacity>
@@ -583,6 +611,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
     borderRadius: 10,
     marginLeft: 10,
+    marginTop: 15,
   },
   segmentedControl: {
     flexDirection: "row",
@@ -609,7 +638,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   skillLevelOption: {
-    padding: hs(12),
+    padding: hs(9),
     borderWidth: 1,
     borderColor: themeColors.border.light,
     borderRadius: mhs(8),
@@ -628,22 +657,22 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     marginBottom: vs(10),
     width: "100%",
-    flexWrap: "wrap"
+    flexWrap: "wrap",
   },
   skillLevelSelected: {
     backgroundColor: themeColors.primary,
     borderColor: themeColors.primary,
   },
   modalOverlay: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0, 0, 0, 0.5)" },
-  modalWrapper: { width: "80%", backgroundColor: "white", padding: 20, borderRadius: 10, alignItems: "center" },
+  modalWrapper: { width: "40%", backgroundColor: "white", padding: 20, borderRadius: 10, alignItems: "center" },
   scrollableList: { maxHeight: 250, width: "100%" },
   modalItem: { padding: 12, borderBottomWidth: 1, borderBottomColor: "#ccc", alignItems: "center" },
   modalItemText: { fontSize: 16 },
   modalCloseButton: { marginTop: 10, padding: 10, backgroundColor: themeColors.primary, borderRadius: 5 },
   modalCloseButtonText: { color: "white", fontWeight: "bold", textAlign: "center" },
   sportTypeContainer: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 10 },
-  sportDropdown: { padding: 10, backgroundColor: "#f5f5f5", borderRadius: 5, marginRight: 90 },
-  maxParticipantsContainer: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 10 },
+  sportDropdown: { padding: 10, backgroundColor: "#f5f5f5", borderRadius: 10, marginRight: 140 },
+  maxParticipantsContainer: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 10, marginRight: 35 },
   inputFieldPar: {
     backgroundColor: "#f5f5f5",
     borderRadius: 10,
@@ -678,6 +707,34 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 10,
     marginTop: 10,
+  },
+  dateView: {
+    flex: 1,
+    marginLeft: 10,
+    marginRight: 110,
+  },
+  timeView: {
+    flex: 1,
+    marginLeft: 10,
+    marginRight: 30,
+  },
+  registerDateView: {
+    marginLeft: 10,
+  },
+  registerTimeView: {
+    marginLeft: 10,
+    marginRight: 33,
+  },
+  charCount: {
+    textAlign: 'right',
+    fontSize: 12,
+    color: themeColors.text.lightGrey,
+    marginTop: 2,
+    marginRight: 10,
+  },
+  rowViewButtons: {
+    flexDirection: "row",
+    marginTop: 50,
   },
 });
 
