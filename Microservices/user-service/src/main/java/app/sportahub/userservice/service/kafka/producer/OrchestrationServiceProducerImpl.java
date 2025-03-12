@@ -1,10 +1,10 @@
 package app.sportahub.userservice.service.kafka.producer;
 
-import app.sportahub.BaseEvent;
-import app.sportahub.ForgotPasswordRequestedEvent;
-import app.sportahub.userservice.client.KeycloakApiClient;
-import app.sportahub.userservice.repository.user.UserRepository;
+import app.sportahub.kafkevents.BaseEvent;
+import app.sportahub.kafkevents.forgotPassword.ForgotPasswordRequestedEvent;
+import app.sportahub.kafkevents.forgotPassword.ForgotPasswordEvent;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -19,6 +19,7 @@ public class OrchestrationServiceProducerImpl implements OrchestrationServicePro
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
+    @SneakyThrows
     @Override
     public void sendPasswordResetEmailUsingKafka(String email) {
         BaseEvent baseEvent = new BaseEvent(
@@ -28,7 +29,7 @@ public class OrchestrationServiceProducerImpl implements OrchestrationServicePro
                 Instant.now(),
                 UUID.randomUUID().toString());
         ForgotPasswordRequestedEvent forgotPasswordRequestedEvent = new ForgotPasswordRequestedEvent(baseEvent, email);
-        kafkaTemplate.send("forgot-password.request", forgotPasswordRequestedEvent);
+        kafkaTemplate.send(ForgotPasswordEvent.SEND_REQUEST_TOPIC, forgotPasswordRequestedEvent);
         log.info("AuthServiceImpl::sendPasswordResetEmail: forgot password reset email sent to 'forgot-password.request' topic");
     }
 }

@@ -41,7 +41,6 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final KeycloakApiClient keycloakApiClient;
     private final UserMapper userMapper;
-    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @SneakyThrows
     @Override
