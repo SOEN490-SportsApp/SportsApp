@@ -2,18 +2,19 @@ import React, { useEffect } from "react";
 import { View, Text, FlatList, TouchableOpacity, ActivityIndicator } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/state/store";
-import { setLoading, setNotifications } from "@/state/notifications/notificationSlice";
+import { setLoading, setNotifications, addFriendRequestNotification, addPushNotification } from "@/state/notifications/notificationSlice";
 import FriendRequestNotification from "@/components/Helper Components/FriendRequestNotification";
 import { router } from "expo-router";
 import themeColors from "@/utils/constants/colors";
 import { getReceivedFriendRequests } from "@/utils/api/profileApiClient";
+import * as Notifications from "expo-notifications";
 
 const NotificationsScreen: React.FC = () => {
     const user = useSelector((state: RootState) => state.user);
     const notifications = useSelector((state: RootState) => state.notifications.notifications);
     const loading = useSelector((state: RootState) => state.notifications.loading);
     const dispatch = useDispatch();
-
+ 
     useEffect(() => {
         async function fetchFriendRequests() {
             dispatch(setLoading(true));
@@ -29,6 +30,7 @@ const NotificationsScreen: React.FC = () => {
                     type: "friend_request",
                     status: request.status,
                 }));
+
                 const existingNotifications = notifications.filter(n => n.type !== "friend_request");
                 dispatch(setNotifications([...existingNotifications, ...formattedRequests]));
             } catch (error) {
@@ -37,14 +39,35 @@ const NotificationsScreen: React.FC = () => {
                 dispatch(setLoading(false));
             }
         }
-
         fetchFriendRequests();
+        
+        const subscription = Notifications.addNotificationReceivedListener(notification => {
+            
+            const newNotification = {
+                id: notification.request.identifier,
+                title: (notification.request.content.title ?? "No Title") as string, 
+                message: (notification.request.content.body ?? "No message available") as string, 
+                timeAgo: "Just now",
+                type: "push_notification" as "push_notification", 
+            };
+                        
+            dispatch(addPushNotification(newNotification));            
+            
+             });
+
+        return () => {
+            Notifications.removeNotificationSubscription(subscription);
+        };
     }, [dispatch]);
+
+    
+    const friendRequests = notifications.filter(n => n.type === "friend_request");
+    const pushNotifications = notifications.filter(n => n.type === "push_notification").slice(0, 3);
 
     return (
         <View style={{ flex: 1, padding: 20, backgroundColor: "#f9f9f9" }}>
             <View style={{ flex: 1, flexDirection: "column" }}>
-                {/* Friend Requests Section */}
+                {/* Friend Requests Section  */}
                 <View style={{ flex: 1, backgroundColor: "#fff", borderRadius: 10, padding: 15 }}>
                     <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
                         <Text style={{ fontSize: 20, fontWeight: "bold" }}>Friend Requests</Text>
@@ -56,7 +79,7 @@ const NotificationsScreen: React.FC = () => {
                         <ActivityIndicator size="large" color="blue" style={{ marginTop: 20 }} />
                     ) : (
                         <FlatList
-                            data={notifications.filter(n => n.type === "friend_request")}
+                            data={friendRequests}
                             keyExtractor={(item) => item.id}
                             renderItem={({ item }) => (
                                 <FriendRequestNotification
@@ -80,7 +103,6 @@ const NotificationsScreen: React.FC = () => {
                     )}
                 </View>
 
-
                 {/* What's New Section */}
                 <View style={{ flex: 1, backgroundColor: "#fff", borderRadius: 10, padding: 15, marginTop: 20 }}>
                     <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
@@ -90,12 +112,13 @@ const NotificationsScreen: React.FC = () => {
                         </TouchableOpacity>
                     </View>
                     <FlatList
-                        data={notifications.filter(n=> n.type !== "friend_request")}
+                        data={pushNotifications}
                         keyExtractor={(item) => item.id}
                         renderItem={({ item }) => (
                             <View style={{ padding: 15, backgroundColor: "#fff", borderRadius: 10, marginVertical: 8 }}>
-                                <Text style={{ fontSize: 16 }}>Placeholder</Text>
-                                <Text style={{ fontSize: 14, color: "gray", marginTop: 5 }}>{item.timeAgo}</Text>
+                                <Text style={{ fontSize: 16, fontWeight: "bold" }}>{item.title}</Text>
+                                <Text style={{ fontSize: 14, color: "gray", marginTop: 5 }}>{item.message}</Text>
+                                <Text style={{ fontSize: 12, color: "gray", marginTop: 2 }}>{item.timeAgo}</Text>
                             </View>
                         )}
                         style={{ flex: 1 }}
@@ -107,7 +130,6 @@ const NotificationsScreen: React.FC = () => {
                         }
                     />
                 </View>
-
             </View>
         </View>
     );

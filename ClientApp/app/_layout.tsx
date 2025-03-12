@@ -4,11 +4,36 @@ import { store } from '@/state/store';
 import "../global.css";
 import { setupAxiosInstance } from '@/services/axiosInstance';
 import 'react-native-get-random-values';
+import React, { useEffect } from 'react';
+import * as Notifications from "expo-notifications";
+import registerForPushNotificationsAsync from '@/utils/notifications/registerForPushNotifications';
 
 export default function RootLayout() {
-    // Inject Redux dispatch into Axios
+    
     const { dispatch } = store;
     setupAxiosInstance(dispatch);
+
+    useEffect(() => {
+        async function setupPushNotifications() {
+            try {
+                const token = await registerForPushNotificationsAsync();
+                console.log("Push Notification Token:", token);
+            } catch (error) {
+                console.error("Error setting up push notifications:", error);
+            }
+        }
+
+        setupPushNotifications();
+
+        // Handle incoming notifications
+        const notificationListener = Notifications.addNotificationReceivedListener(notification => {
+            console.log("Received Notification:", notification);
+        });
+
+        return () => {
+            Notifications.removeNotificationSubscription(notificationListener);
+        };
+    }, []);
 
     return (
         <Provider store={store}>

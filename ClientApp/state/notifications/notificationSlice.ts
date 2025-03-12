@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
+
 type FriendRequestNotification = {
   status: string;
   id: string;
@@ -7,11 +8,20 @@ type FriendRequestNotification = {
   senderName: string;
   senderProfilePic?: string;
   timeAgo: string;
-  type: string;
+  type: "friend_request";
 };
 
+type PushNotification = {
+  id: string;
+  title: string;
+  message: string;
+  timeAgo: string;
+  type: "push_notification";
+};
+
+type Notification = FriendRequestNotification | PushNotification;
 type NotificationsState = {
-  notifications: FriendRequestNotification[];
+  notifications: Notification[];
   loading: boolean;
 };
 
@@ -24,11 +34,15 @@ const notificationsSlice = createSlice({
   name: "notifications",
   initialState,
   reducers: {
-    setNotifications: (state, action: PayloadAction<FriendRequestNotification[]>) => {
-      state.notifications = action.payload;
+    setNotifications: (state, action: PayloadAction<Notification[]>) => {
+      state.notifications = [...state.notifications, ...action.payload]; 
     },
-    addNotification: (state, action: PayloadAction<FriendRequestNotification>) => {
+    
+    addFriendRequestNotification: (state, action: PayloadAction<FriendRequestNotification>) => {
       state.notifications.push(action.payload);
+    },
+    addPushNotification: (state, action: PayloadAction<PushNotification>) => {
+      state.notifications.unshift(action.payload); 
     },
     removeNotification: (state, action: PayloadAction<string>) => {
       state.notifications = state.notifications.filter((n) => n.id !== action.payload);
@@ -39,5 +53,12 @@ const notificationsSlice = createSlice({
   },
 });
 
-export const { setNotifications, addNotification, removeNotification, setLoading } = notificationsSlice.actions;
+export const {
+  setNotifications,
+  addFriendRequestNotification,
+  addPushNotification,
+  removeNotification,
+  setLoading,
+} = notificationsSlice.actions;
+
 export default notificationsSlice.reducer;
