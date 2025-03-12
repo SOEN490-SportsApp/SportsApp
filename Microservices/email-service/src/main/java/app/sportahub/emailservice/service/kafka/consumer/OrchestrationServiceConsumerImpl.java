@@ -1,8 +1,8 @@
 package app.sportahub.emailservice.service.kafka.consumer;
 
-import app.sportahub.ForgotPasswordSendEmailEvent;
+import app.sportahub.kafkevents.forgotPassword.ForgotPasswordSendEmailEvent;
 import app.sportahub.emailservice.service.EmailService;
-import jakarta.mail.MessagingException;
+import app.sportahub.kafkevents.forgotPassword.ForgotPasswordEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -16,9 +16,8 @@ public class OrchestrationServiceConsumerImpl implements OrchestrationServiceCon
     private final EmailService emailService;
 
     @Override
-    @KafkaListener(topics = "forgot-password.email-send", groupId ="OrchServiceKafkaConsumer")
-    public void listenForForgotPasswordSendEmailEvent(ForgotPasswordSendEmailEvent forgotPasswordSendEmailEvent) throws MessagingException {
+    @KafkaListener(topics = ForgotPasswordEvent.SEND_EMAIL_TOPIC, groupId ="OrchServiceKafkaConsumer")
+    public void listenForForgotPasswordSendEmailEvent(ForgotPasswordSendEmailEvent forgotPasswordSendEmailEvent){
         log.info("OrchestrationServiceConsumerImpl::ForgotPasswordSendEmailEvent: received forgot password request with email: {}", forgotPasswordSendEmailEvent.getEmail());
-        emailService.sendForgotPasswordEmail(forgotPasswordSendEmailEvent.getEmail());
     }
 }
