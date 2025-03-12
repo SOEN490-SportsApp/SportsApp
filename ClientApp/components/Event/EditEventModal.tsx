@@ -159,18 +159,18 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
 
   useEffect(() => {
     if (eventDetails?.startTime) {
-      setEventStartTime(new Date(`1970-01-01T${eventDetails.startTime}`)); // Convert to Date object
+      setEventStartTime(new Date(`1970-01-01T${eventDetails.startTime}`));
     }
     if (eventDetails?.endTime) {
-      setEventEndTime(new Date(`1970-01-01T${eventDetails.endTime}`)); // Convert to Date object
+      setEventEndTime(new Date(`1970-01-01T${eventDetails.endTime}`));
     }
   }, [eventDetails]);
 
   useEffect(() => {
     if (eventDetails?.cutOffTime) {
       const cutOffDateTime = new Date(eventDetails.cutOffTime);
-      setCutOffDate(new Date(cutOffDateTime.toDateString())); // Extract date
-      setCutOffTime(new Date(`1970-01-01T${cutOffDateTime.toTimeString().slice(0, 8)}`)); // Extract time
+      setCutOffDate(new Date(cutOffDateTime.toDateString()));
+      setCutOffTime(new Date(`1970-01-01T${cutOffDateTime.toTimeString().slice(0, 8)}`));
     }
   }, [eventDetails]);
 
@@ -249,7 +249,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
         return;
       }
   
-      console.log("Payload Sent to API: ", JSON.stringify(updatedEventData, null, 2)); // For Debugging
+      console.log("Payload Sent to API: ", JSON.stringify(updatedEventData, null, 2));
   
       await editEvent(eventId, updatedEventData);
       Alert.alert("Success", "Event updated successfully!");
@@ -312,6 +312,33 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
       </View>
     </Modal>
   );
+
+  const handleCancel = () => {
+    if (eventDetails) {
+      reset({
+        eventName: eventDetails.eventName || "",
+        sportType: eventDetails.sportType || "",
+        maxParticipants: eventDetails.maxParticipants ? String(eventDetails.maxParticipants) : "",
+        description: eventDetails.description || "",
+        date: eventDetails.date || "",
+        startTime: eventDetails.startTime || { hour: 0, minute: 0, second: 0, nano: 0 },
+        endTime: eventDetails.endTime || { hour: 0, minute: 0, second: 0, nano: 0 },
+        cutOffTime: eventDetails.cutOffTime || "",
+        requiredSkillLevel: eventDetails.requiredSkillLevel || [],
+      });
+    }
+  
+    setEventDate(eventDetails?.date ? new Date(eventDetails.date) : null);
+    setEventStartTime(eventDetails?.startTime ? new Date(`1970-01-01T${eventDetails.startTime}`) : null);
+    setEventEndTime(eventDetails?.endTime ? new Date(`1970-01-01T${eventDetails.endTime}`) : null);
+    setCutOffDate(eventDetails?.cutOffTime ? new Date(eventDetails.cutOffTime) : null);
+    setCutOffTime(eventDetails?.cutOffTime ? new Date(`1970-01-01T${eventDetails.cutOffTime.split('T')[1]}`) : null);
+    setDescription(eventDetails?.description || "");
+    setSelectedSport(eventDetails?.sportType || "");
+    setSelectedSkillLevels(eventDetails?.requiredSkillLevel || []);
+  
+    onClose();
+  };  
 
   return (
     <Modal animationType="slide" transparent={true} visible={visible} onRequestClose={onClose}>
@@ -489,7 +516,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
             </ScrollView>
           )}
           <View style={styles.rowView}>
-            <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+            <TouchableOpacity style={styles.closeButton} onPress={handleCancel}>
               <Text style={styles.closeButtonText}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -597,11 +624,11 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   skillLevelGroup: {
-    flexDirection: "row",  // Changed from column to row
-    justifyContent: "space-around", // Ensures even spacing between buttons
+    flexDirection: "row",
+    justifyContent: "space-around",
     marginBottom: vs(10),
-    width: "100%", // Ensures they align properly in a row
-    flexWrap: "wrap" // Ensures they wrap on smaller screens if necessary
+    width: "100%",
+    flexWrap: "wrap"
   },
   skillLevelSelected: {
     backgroundColor: themeColors.primary,
