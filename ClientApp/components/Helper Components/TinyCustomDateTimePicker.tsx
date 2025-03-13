@@ -57,7 +57,7 @@ const CustomDateTimePicker: React.FC<CustomDateTimePickerProps> = ({
 
 const styles = StyleSheet.create({
   label: {
-    fontSize: mhs(12),
+    fontSize: mhs(13),
     color: themeColors.text.dark,
   },
   input: {
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   inputText: {
-    fontSize: mhs(12),
+    fontSize: mhs(13),
     color: themeColors.text.dark,
   },
 });
