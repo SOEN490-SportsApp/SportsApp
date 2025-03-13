@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Alert, TouchableOpacity, View } from "react-native";
+import { Alert, Platform, TouchableOpacity, View } from "react-native";
 import { router, Stack } from "expo-router";
 import { Menu, Provider } from "react-native-paper";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
@@ -111,7 +111,7 @@ export default function EventDetailsLayout() {
               backgroundColor: themeColors.background.lightGrey,
               borderRadius: 8,
               elevation: 3,
-              top: mvs(80),
+              top: Platform.OS === "ios" ? mvs(80) : mvs(35)
             }}
           visible={menuVisible}
           onDismiss={closeMenu}
