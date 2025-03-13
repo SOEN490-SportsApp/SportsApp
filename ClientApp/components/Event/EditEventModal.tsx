@@ -8,7 +8,7 @@ import { Controller, useForm, useWatch } from "react-hook-form";
 import { hs, vs, mhs } from "@/utils/helpers/uiScaler";
 import supportedSports from "@/utils/constants/supportedSports";
 import GooglePlacesInput from "../Helper Components/GooglePlacesInput";
-import CustomDateTimePicker from "../Helper Components/CustomDateTimePicker";
+import TinyCustomDateTimePicker from "../Helper Components/TinyCustomDateTimePicker";
 import { editEvent } from "@/services/eventService";
 
 interface EditEventModalProps {
@@ -344,7 +344,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
     <Modal animationType="slide" transparent={true} visible={visible} onRequestClose={onClose}>
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Edit Event</Text>
+          <Text style={styles.modalTitle}>Editing Event ...</Text>
           {loading ? (
             <ActivityIndicator size="large" color="#007BFF" />
           ) : (
@@ -353,9 +353,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
                 <>
                   {/* event name */}
                   <View style={styles.rowView}>
-                    <Text style={styles.eventDetail}>
                       <Text style={styles.bold}>Name:</Text>
-                    </Text>
                     <Controller
                       control={control}
                       name="eventName"
@@ -378,7 +376,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
                               }
                             }}
                             value={value || ""}
-                            maxLength={20}  // Enforces the limit
+                            maxLength={20}
                           />
                           <Text style={styles.charCount}>
                             {value?.length || 0}/20
@@ -416,7 +414,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
                       style={styles.sportDropdown}
                       onPress={() => setSportTypeModalVisible(true)}
                     >
-                      <Text>{selectedSport || "Select a Sport"}</Text>
+                      <Text style={{ fontSize: mhs(12) }}>{selectedSport || "Select a Sport"}</Text>
                     </TouchableOpacity>
                     {renderSportTypeModal()}
                   </View>
@@ -438,28 +436,30 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
                     />
                   </View>
                   {/* skill level */}
-                  <Text style={styles.bold}>Skill Level:</Text>
-                  <View style={styles.skillLevelGroup}>
-                    {["Beginner", "Intermediate", "Advanced"].map((level) => (
-                      <TouchableOpacity
-                        key={level}
-                        testID={`skill-level-${level}`}
-                        style={[
-                          styles.skillLevelOption,
-                          selectedSkillLevels.includes(level.toUpperCase()) && styles.skillLevelSelected,
-                        ]}
-                        onPress={() => toggleSkillLevel(level.toUpperCase())}
-                      >
-                        <Text
+                  <View style={styles.rowView}>
+                    <Text style={styles.bold}>Skill Level:</Text>
+                    <View style={styles.skillLevelGroup}>
+                      {["Beginner", "Intermediate", "Advanced"].map((level) => (
+                        <TouchableOpacity
+                          key={level}
+                          testID={`skill-level-${level}`}
                           style={[
-                            styles.skillLevelText,
-                            selectedSkillLevels.includes(level.toUpperCase()) && styles.skillLevelTextSelected,
+                            styles.skillLevelOption,
+                            selectedSkillLevels.includes(level.toUpperCase()) && styles.skillLevelSelected,
                           ]}
+                          onPress={() => toggleSkillLevel(level.toUpperCase())}
                         >
-                          {level}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
+                          <Text
+                            style={[
+                              styles.skillLevelText,
+                              selectedSkillLevels.includes(level.toUpperCase()) && styles.skillLevelTextSelected,
+                            ]}
+                          >
+                            {level}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
                   </View>
                   {/* location */}
                   {/* <Text><Text style={styles.bold}>Location:</Text> {eventDetails.locationResponse.name}, {eventDetails.locationResponse.city}</Text> */}
@@ -467,7 +467,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
                   <View style={styles.rowView}>
                     <Text style={styles.bold}>Date:</Text>
                     <View style={styles.dateView}>
-                      <CustomDateTimePicker
+                      <TinyCustomDateTimePicker
                         value={eventDate}
                         mode="date"
                         onChange={(newDate) => setEventDate(newDate)}
@@ -478,7 +478,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
                   <View style={styles.rowView}>
                     <Text style={styles.bold}>From:</Text>
                     <View style={styles.timeView}>
-                      <CustomDateTimePicker
+                      <TinyCustomDateTimePicker
                         value={eventStartTime}
                         mode="time"
                         onChange={(newTime) => setEventStartTime(newTime)}
@@ -487,7 +487,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
                     </View>
                     <Text style={styles.bold}>To:</Text>
                     <View style={styles.timeView}>
-                      <CustomDateTimePicker
+                      <TinyCustomDateTimePicker
                         value={eventEndTime}
                         mode="time"
                         onChange={(newTime) => setEventEndTime(newTime)}
@@ -496,24 +496,20 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
                     </View>
                   </View>
                   {/* cut off time */}
-                  <Text style={styles.bold}>Register by:</Text>
                   <View style={styles.rowView}>
-                    <View style={styles.registerDateView}>
-                      <CustomDateTimePicker
-                        value={cutOffDate}
-                        mode="date"
-                        onChange={(newDate) => setCutOffDate(newDate)}
-                        label="Select Cut-off Date"
-                      />
-                    </View>
-                    <View style={styles.registerTimeView}>
-                      <CustomDateTimePicker
-                        value={cutOffTime}
-                        mode="time"
-                        onChange={(newTime) => setCutOffTime(newTime)}
-                        label="Select Cut-off Time"
-                      />
-                    </View>
+                    <Text style={styles.bold}>Register by:</Text>
+                    <TinyCustomDateTimePicker
+                      value={cutOffDate}
+                      mode="date"
+                      onChange={(newDate) => setCutOffDate(newDate)}
+                      label="Select Cut-off Date"
+                    />
+                    <TinyCustomDateTimePicker
+                      value={cutOffTime}
+                      mode="time"
+                      onChange={(newTime) => setCutOffTime(newTime)}
+                      label="Select Cut-off Time"
+                    />
                   </View>
                   {/* description */}
                   <Text style={styles.bold}>Description:</Text>
@@ -572,29 +568,31 @@ const styles = StyleSheet.create({
     height: 700,
     backgroundColor: "white",
     padding: 20,
-    borderRadius: 10,
+    borderRadius: 20,
     alignItems: "center",
   },
   modalTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 20,
+    marginBottom: 10,
   },
   closeButton: {
-    padding: 10,
-    backgroundColor: themeColors.button.primaryBackground,
-    borderRadius: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: "red",
+    borderRadius: 20,
   },
   closeButtonText: {
     color: "white",
     fontWeight: "bold",
+    fontSize: 16,
   },
   scrollView: {
     maxHeight: 500,
     width: "100%",
   },
   eventDetail: {
-    fontSize: 16,
+    fontSize: 14,
     marginBottom: 5,
   },
   bold: {
@@ -602,50 +600,27 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: "red",
-    fontSize: 16,
+    fontSize: mhs(12),
   },
   inputField: {
     flex: 1,
-    fontSize: 16,
+    fontSize: mhs(12),
     color: themeColors.text.dark,
-    backgroundColor: "#f5f5f5",
-    borderRadius: 10,
+    backgroundColor: themeColors.background.lightGrey,
+    borderRadius: 20,
     marginLeft: 10,
     marginTop: 15,
   },
-  segmentedControl: {
-    flexDirection: "row",
-    backgroundColor: "#f5f5f5",
-    borderRadius: 10,
-    padding: 5,
-    marginBottom: 15,
-  },
-  segmentButton: {
-    flex: 1,
-    alignItems: "center",
-    paddingVertical: 10,
-    borderRadius: 10,
-  },
-  segmentButtonSelected: {
-    backgroundColor: themeColors.primary,
-  },
-  segmentButtonText: {
-    fontSize: 16,
-    color: themeColors.text.dark,
-  },
-  segmentButtonTextSelected: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
   skillLevelOption: {
-    padding: hs(9),
+    padding: hs(5),
     borderWidth: 1,
     borderColor: themeColors.border.light,
-    borderRadius: mhs(8),
+    borderRadius: 20,
     backgroundColor: themeColors.background.lightGrey,
+    marginRight: 3.8,
   },
   skillLevelText: {
-    fontSize: mhs(14),
+    fontSize: mhs(12),
     color: themeColors.text.dark,
   },
   skillLevelTextSelected: {
@@ -655,8 +630,7 @@ const styles = StyleSheet.create({
   skillLevelGroup: {
     flexDirection: "row",
     justifyContent: "space-around",
-    marginBottom: vs(10),
-    width: "100%",
+    width: "75%",
     flexWrap: "wrap",
   },
   skillLevelSelected: {
@@ -664,42 +638,45 @@ const styles = StyleSheet.create({
     borderColor: themeColors.primary,
   },
   modalOverlay: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0, 0, 0, 0.5)" },
-  modalWrapper: { width: "40%", backgroundColor: "white", padding: 20, borderRadius: 10, alignItems: "center" },
+  modalWrapper: { width: "40%", backgroundColor: "white", padding: 20, borderRadius: 20, alignItems: "center" },
   scrollableList: { maxHeight: 250, width: "100%" },
   modalItem: { padding: 12, borderBottomWidth: 1, borderBottomColor: "#ccc", alignItems: "center" },
   modalItemText: { fontSize: 16 },
-  modalCloseButton: { marginTop: 10, padding: 10, backgroundColor: themeColors.primary, borderRadius: 5 },
+  modalCloseButton: { marginTop: 10, padding: 8, backgroundColor: "red", borderRadius: 20 },
   modalCloseButtonText: { color: "white", fontWeight: "bold", textAlign: "center" },
   sportTypeContainer: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 10 },
-  sportDropdown: { padding: 10, backgroundColor: "#f5f5f5", borderRadius: 10, marginRight: 140 },
+  sportDropdown: { padding: 10, backgroundColor: themeColors.background.lightGrey, borderRadius: 20, marginRight: 150 },
   maxParticipantsContainer: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 10, marginRight: 35 },
   inputFieldPar: {
-    backgroundColor: "#f5f5f5",
-    borderRadius: 10,
+    backgroundColor: themeColors.background.lightGrey,
+    borderRadius: 20,
     padding: 5,
     marginRight: 115,
     width: 40,
     textAlign: "center",
+    fontSize: mhs(12),
   },
   descriptionInput: {
-    fontSize: 16,
+    fontSize: mhs(12),
     color: themeColors.text.dark,
-    backgroundColor: "#f5f5f5",
-    borderRadius: 10,
-    padding: 10,
+    backgroundColor: themeColors.background.lightGrey,
+    borderRadius: 20,
+    padding: 15,
     minHeight: 60,
     maxHeight: 200,
   },
   submitButton: {
     backgroundColor: themeColors.primary,
-    padding: 10,
-    borderRadius: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
     alignItems: 'center',
-    marginLeft: 70,
+    marginLeft: 20,
   },
   submitButtonText: {
     color: "white",
     fontWeight: "bold",
+    fontSize: 16,
   },
   rowView: {
     flexDirection: "row",
