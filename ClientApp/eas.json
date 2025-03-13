@@ -10,15 +10,17 @@
       "ios": {
         "simulator": true
       },
-      "android":{
-        "buildType": "apk"
+      "android": {
+        "buildType": "apk",
+        "node": "20.18.1"
       }
     },
     "preview": {
       "distribution": "internal"
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "node": "20.18.1"
     }
   },
   "submit": {

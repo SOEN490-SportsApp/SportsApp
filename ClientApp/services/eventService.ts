@@ -31,6 +31,7 @@ export const getAllEvents = async () => {
 export const getEventDetails = async (eventId: string) => {
   try {
     const axiosInstance = getAxiosInstance();
+
     const response = await axiosInstance.get(
       API_ENDPOINTS.GET_EVENT_BY_ID.replace("{id}", eventId)
     );

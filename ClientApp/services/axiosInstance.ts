@@ -31,6 +31,7 @@ export const setupAxiosInstance = (dispatch: any): AxiosInstance => {
             Accept: 'application/json',
         },
     };
+    
 
     axiosInstance = axios.create(config); // Assign to global variable
 

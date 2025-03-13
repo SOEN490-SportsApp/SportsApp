@@ -1,5 +1,6 @@
 plugins {
-    id 'pl.allegro.tech.build.axion-release' version '1.18.17'
+    id 'pl.allegro.tech.build.axion-release' version '1.18.17',
+    id 'org.jetbrains.kotlin.jvm' version '1.9.25'
 }
 
 scmVersion {
@@ -7,3 +8,10 @@ scmVersion {
         exclude(project.subprojects.collect { it.name })
     }
 }
+const response = async () => {
+    const token = await getAccessToken();
+    if(token){
+        setAccessToken(token);
+    }
+} 
+ response()
