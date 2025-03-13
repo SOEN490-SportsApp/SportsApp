@@ -7,7 +7,6 @@ import { API_ENDPOINTS } from "@/utils/api/endpoints";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { hs, vs, mhs } from "@/utils/helpers/uiScaler";
 import supportedSports from "@/utils/constants/supportedSports";
-import GooglePlacesInput from "../Helper Components/GooglePlacesInput";
 import TinyCustomDateTimePicker from "../Helper Components/TinyCustomDateTimePicker";
 import { editEvent } from "@/services/eventService";
 
@@ -181,6 +180,29 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
 
   const handleUpdateEvent = async (formData: any) => {
     try {
+
+      if (eventDate && cutOffDate) {
+        if (cutOffDate > eventDate) {
+          Alert.alert("Ooops..", "Cutoff date cannot be after the event date.");
+          return;
+        }
+
+        if (
+          eventDate.toDateString() === cutOffDate.toDateString() &&
+          eventStartTime &&
+          cutOffTime &&
+          cutOffTime > eventStartTime
+        ) {
+          Alert.alert("Oops..", "Event cutoff time cannot be after the event start time on the same day.");
+          return;
+        }
+      }
+
+      if (description.length === 0) {
+        Alert.alert("Oops..", "Please enter a description for the event.");
+        return;
+      }
+
       const updatedEventData: any = {};
   
       if (formData.eventName && formData.eventName !== eventDetails.eventName) {
