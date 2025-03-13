@@ -1,6 +1,6 @@
 import themeColors from "@/utils/constants/colors";
 import React, { useEffect, useState } from "react";
-import { Modal, View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, TextInput, Alert } from "react-native";
+import { Modal, View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, TextInput, Alert, Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { getAxiosInstance } from "@/services/axiosInstance";
 import { API_ENDPOINTS } from "@/utils/api/endpoints";
@@ -53,32 +53,11 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
       second: number;
       nano: number;
     };
-    // duration: string;
     maxParticipants: string;
-    // participants: [
-    //   {
-    //     userId: string;
-    //     attendStatus: string;
-    //     joinedOn: string;
-    //   }
-    // ];
-    // createdBy: string;
-    // teams: [
-    //   {
-    //     teamId: string;
-    //   }
-    // ];
     cutOffTime: string;
     description: string;
     // isPrivate: boolean;
-    // whiteListedUsers: string[];
     requiredSkillLevel: string[];
-    // reactors: [
-    //   {
-    //     userId: string;
-    //     reactionType: string;
-    //   }
-    // ];
   }
 
   useEffect(() => {
@@ -97,7 +76,6 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
     } = useForm<EventDetails>({
       defaultValues: {
         eventName: "",
-        // eventType: "",
         sportType: "",
         maxParticipants: "",
         description: "",
@@ -122,10 +100,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
   const { eventId } = useLocalSearchParams<{ eventId: string }>();
   const [loading, setLoading] = useState(true);
   const { setValue, watch } = useForm();
-  const [requiredSkillLevel, setRequiredSkillLevel] = useState<string[]>([]);
   const [isSportTypeModalVisible, setSportTypeModalVisible] = useState(false);
-  const [isLocationModalVisible, setLocationModalVisible] = useState(false);
-  // const [selectedLocation, setSelectedLocation] = useState<string>("");
   const [eventDate, setEventDate] = useState<Date | null>(null);
   const [eventStartTime, setEventStartTime] = useState<Date | null>(null);
   const [eventEndTime, setEventEndTime] = useState<Date | null>(null);
@@ -342,216 +317,235 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
 
   return (
     <Modal animationType="slide" transparent={true} visible={visible} onRequestClose={onClose}>
-      <View style={styles.modalContainer}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Editing Event ...</Text>
-          {loading ? (
-            <ActivityIndicator size="large" color="#007BFF" />
-          ) : (
-            <ScrollView style={styles.scrollView}>
-              {eventDetails ? (
-                <>
-                  {/* event name */}
-                  <View style={styles.rowView}>
-                      <Text style={styles.bold}>Name:</Text>
-                    <Controller
-                      control={control}
-                      name="eventName"
-                      rules={{
-                        maxLength: {
-                          value: 20,
-                          message: "Event name cannot exceed 20 characters.",
-                        },
-                      }}
-                      render={({ field: { onChange, onBlur, value } }) => (
-                        <View style={{ flex: 1 }}>
-                          <TextInput
-                            placeholder={eventDetails.eventName}
-                            placeholderTextColor="black"
-                            style={styles.inputField}
-                            onBlur={onBlur}
-                            onChangeText={(text) => {
-                              if (text.length <= 20) {
-                                onChange(text);
-                              }
-                            }}
-                            value={value || ""}
-                            maxLength={20}
-                          />
-                          <Text style={styles.charCount}>
-                            {value?.length || 0}/20
-                          </Text>
-                        </View>
-                      )}
-                    />
-                  </View>
-                  {/* event type */}
-                  {/* <View style={styles.segmentedControl}>
-                    {["public", "private"].map((type) => (
-                      <TouchableOpacity
-                        key={type}
-                        onPress={() => setValue("eventType", type)}
-                        style={[
-                          styles.segmentButton,
-                          watch("eventType") === type && styles.segmentButtonSelected,
-                        ]}
-                      >
-                        <Text
-                          style={[
-                            styles.segmentButtonText,
-                            watch("eventType") === type && styles.segmentButtonTextSelected,
-                          ]}
-                        >
-                          {type.charAt(0).toUpperCase() + type.slice(1)}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View> */}
-                  {/* sport type */}
-                  <View style={styles.sportTypeContainer}>
-                    <Text style={styles.bold}>Sport Type:</Text>
-                    <TouchableOpacity
-                      style={styles.sportDropdown}
-                      onPress={() => setSportTypeModalVisible(true)}
-                    >
-                      <Text style={{ fontSize: mhs(12) }}>{selectedSport || "Select a Sport"}</Text>
-                    </TouchableOpacity>
-                    {renderSportTypeModal()}
-                  </View>
-                  {/* max participants */}
-                  <View style={styles.maxParticipantsContainer}>
-                    <Text style={styles.bold}>Max Participants:</Text>
-                    <Controller
-                      control={control}
-                      name="maxParticipants"
-                      render={({ field: { onChange, onBlur, value } }) => (
-                        <TextInput
-                          style={styles.inputFieldPar}
-                          onBlur={onBlur}
-                          onChangeText={onChange}
-                          value={value}
-                          keyboardType="numeric"
-                        />
-                      )}
-                    />
-                  </View>
-                  {/* skill level */}
-                  <View style={styles.rowView}>
-                    <Text style={styles.bold}>Skill Level:</Text>
-                    <View style={styles.skillLevelGroup}>
-                      {["Beginner", "Intermediate", "Advanced"].map((level) => (
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "position" : undefined} 
+          style={styles.modalContainer}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
+        >
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Editing event ...</Text>
+            {loading ? (
+              <ActivityIndicator size="large" color="#007BFF" />
+            ) : (
+              <ScrollView style={styles.scrollView}>
+                {eventDetails ? (
+                  <>
+                    {/* event name */}
+                    <View style={styles.rowView}>
+                        <Text style={styles.bold}>Name:</Text>
+                      <Controller
+                        control={control}
+                        name="eventName"
+                        rules={{
+                          maxLength: {
+                            value: 20,
+                            message: "Event name cannot exceed 20 characters.",
+                          },
+                        }}
+                        render={({ field: { onChange, onBlur, value } }) => (
+                          <View style={{ flex: 1 }}>
+                            <TextInput
+                              placeholder={eventDetails.eventName}
+                              placeholderTextColor="black"
+                              style={styles.inputField}
+                              onBlur={onBlur}
+                              onChangeText={(text) => {
+                                if (text.length <= 20) {
+                                  onChange(text);
+                                }
+                              }}
+                              value={value || ""}
+                              maxLength={20}
+                            />
+                          </View>
+                        )}
+                      />
+                    </View>
+                    {/* event type */}
+                    {/* <View style={styles.segmentedControl}>
+                      {["public", "private"].map((type) => (
                         <TouchableOpacity
-                          key={level}
-                          testID={`skill-level-${level}`}
+                          key={type}
+                          onPress={() => setValue("eventType", type)}
                           style={[
-                            styles.skillLevelOption,
-                            selectedSkillLevels.includes(level.toUpperCase()) && styles.skillLevelSelected,
+                            styles.segmentButton,
+                            watch("eventType") === type && styles.segmentButtonSelected,
                           ]}
-                          onPress={() => toggleSkillLevel(level.toUpperCase())}
                         >
                           <Text
                             style={[
-                              styles.skillLevelText,
-                              selectedSkillLevels.includes(level.toUpperCase()) && styles.skillLevelTextSelected,
+                              styles.segmentButtonText,
+                              watch("eventType") === type && styles.segmentButtonTextSelected,
                             ]}
                           >
-                            {level}
+                            {type.charAt(0).toUpperCase() + type.slice(1)}
                           </Text>
                         </TouchableOpacity>
                       ))}
+                    </View> */}
+                    {/* sport type */}
+                    <View style={styles.spaceView}>
+                      <View style={styles.sportTypeContainer}>
+                        <Text style={styles.bold}>Sport Type:</Text>
+                        <TouchableOpacity
+                          style={styles.sportDropdown}
+                          onPress={() => setSportTypeModalVisible(true)}
+                        >
+                          <Text style={{ fontSize: mhs(13) }}>{selectedSport || "Select a Sport"}</Text>
+                        </TouchableOpacity>
+                        {renderSportTypeModal()}
+                      </View>
                     </View>
-                  </View>
-                  {/* location */}
-                  {/* <Text><Text style={styles.bold}>Location:</Text> {eventDetails.locationResponse.name}, {eventDetails.locationResponse.city}</Text> */}
-                  {/* date and time */}
-                  <View style={styles.rowView}>
-                    <Text style={styles.bold}>Date:</Text>
-                    <View style={styles.dateView}>
-                      <TinyCustomDateTimePicker
-                        value={eventDate}
-                        mode="date"
-                        onChange={(newDate) => setEventDate(newDate)}
-                        label="Select Event Date"
+                    {/* max participants */}
+                    <View style={styles.spaceView}>
+                      <View style={styles.rowView}>
+                        <View style={styles.maxParticipantsContainer}>
+                          <Text style={styles.bold}>Max Participants:</Text>
+                          <Controller
+                            control={control}
+                            name="maxParticipants"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                              <TextInput
+                                style={styles.inputFieldPar}
+                                onBlur={onBlur}
+                                onChangeText={onChange}
+                                value={value}
+                                keyboardType="numeric"
+                              />
+                            )}
+                          />
+                        </View>
+                      </View>
+                    </View>
+                    {/* skill level */}
+                    <View style={styles.spaceView}>
+                      <View style={styles.rowView}>
+                        <Text style={styles.bold}>Skill Level:</Text>
+                        <View style={styles.skillLevelGroup}>
+                          {["Beginner", "Intermediate", "Advanced"].map((level) => (
+                            <TouchableOpacity
+                              key={level}
+                              testID={`skill-level-${level}`}
+                              style={[
+                                styles.skillLevelOption,
+                                selectedSkillLevels.includes(level.toUpperCase()) && styles.skillLevelSelected,
+                              ]}
+                              onPress={() => toggleSkillLevel(level.toUpperCase())}
+                            >
+                              <Text
+                                style={[
+                                  styles.skillLevelText,
+                                  selectedSkillLevels.includes(level.toUpperCase()) && styles.skillLevelTextSelected,
+                                ]}
+                              >
+                                {level}
+                              </Text>
+                            </TouchableOpacity>
+                          ))}
+                        </View>
+                      </View>
+                    </View>
+                    {/* location */}
+                    {/* <Text><Text style={styles.bold}>Location:</Text> {eventDetails.locationResponse.name}, {eventDetails.locationResponse.city}</Text> */}
+                    {/* date and time */}
+                    <View style={styles.spaceView}>
+                      <View style={styles.rowView}>
+                        <Text style={styles.bold}>Date:</Text>
+                        <View style={styles.dateView}>
+                          <TinyCustomDateTimePicker
+                            value={eventDate}
+                            mode="date"
+                            onChange={(newDate) => setEventDate(newDate)}
+                            label="Select Event Date"
+                          />
+                        </View>
+                      </View>
+                    </View>
+                    <View style={styles.spaceView}>
+                      <View style={styles.rowViewRegister}>
+                        <Text style={styles.bold}>From:</Text>
+                        <View style={styles.timeView}>
+                          <TinyCustomDateTimePicker
+                            value={eventStartTime}
+                            mode="time"
+                            onChange={(newTime) => setEventStartTime(newTime)}
+                            label="Select Start Time"
+                          />
+                        </View>
+                        <Text style={styles.bold}>To:</Text>
+                        <View style={styles.timeView}>
+                          <TinyCustomDateTimePicker
+                            value={eventEndTime}
+                            mode="time"
+                            onChange={(newTime) => setEventEndTime(newTime)}
+                            label="Select End Time"
+                          />
+                        </View>
+                      </View>
+                    </View>
+                    {/* cut off time */}
+                    <View style={styles.spaceView}>
+                      <View style={styles.rowViewRegister}>
+                        <Text style={styles.bold}>Register by:</Text>
+                        <TinyCustomDateTimePicker
+                          value={cutOffDate}
+                          mode="date"
+                          onChange={(newDate) => setCutOffDate(newDate)}
+                          label="Select Cut-off Date"
+                        />
+                        <TinyCustomDateTimePicker
+                          value={cutOffTime}
+                          mode="time"
+                          onChange={(newTime) => setCutOffTime(newTime)}
+                          label="Select Cut-off Time"
+                        />
+                      </View>
+                    </View>
+                    {/* description */}
+                    <View style={styles.spaceView}>
+                      <Text style={styles.bold}>Description:</Text>
+                      <Controller
+                        control={control}
+                        name="description"
+                        render={({ field: { onChange, onBlur, value } }) => (
+                          <TextInput
+                            placeholder="Enter event description..."
+                            placeholderTextColor="black"
+                            style={styles.descriptionInput}
+                            onBlur={onBlur}
+                            onChangeText={(text) => {
+                              onChange(text);
+                              setDescription(text);
+                            }}
+                            value={value || description}
+                            multiline={true}
+                            numberOfLines={4}
+                            textAlignVertical="top"
+                          />
+                        )}
                       />
                     </View>
-                  </View>
-                  <View style={styles.rowView}>
-                    <Text style={styles.bold}>From:</Text>
-                    <View style={styles.timeView}>
-                      <TinyCustomDateTimePicker
-                        value={eventStartTime}
-                        mode="time"
-                        onChange={(newTime) => setEventStartTime(newTime)}
-                        label="Select Start Time"
-                      />
-                    </View>
-                    <Text style={styles.bold}>To:</Text>
-                    <View style={styles.timeView}>
-                      <TinyCustomDateTimePicker
-                        value={eventEndTime}
-                        mode="time"
-                        onChange={(newTime) => setEventEndTime(newTime)}
-                        label="Select End Time"
-                      />
-                    </View>
-                  </View>
-                  {/* cut off time */}
-                  <View style={styles.rowView}>
-                    <Text style={styles.bold}>Register by:</Text>
-                    <TinyCustomDateTimePicker
-                      value={cutOffDate}
-                      mode="date"
-                      onChange={(newDate) => setCutOffDate(newDate)}
-                      label="Select Cut-off Date"
-                    />
-                    <TinyCustomDateTimePicker
-                      value={cutOffTime}
-                      mode="time"
-                      onChange={(newTime) => setCutOffTime(newTime)}
-                      label="Select Cut-off Time"
-                    />
-                  </View>
-                  {/* description */}
-                  <Text style={styles.bold}>Description:</Text>
-                  <Controller
-                    control={control}
-                    name="description"
-                    render={({ field: { onChange, onBlur, value } }) => (
-                      <TextInput
-                        placeholder="Enter event description..."
-                        placeholderTextColor="black"
-                        style={styles.descriptionInput}
-                        onBlur={onBlur}
-                        onChangeText={(text) => {
-                          onChange(text);
-                          setDescription(text);
-                        }}
-                        value={value || description}
-                        multiline={true}
-                        numberOfLines={4}
-                        textAlignVertical="top"
-                      />
-                    )}
-                  />
-                </>
-              ) : (
-                <Text style={styles.errorText}>Failed to load event details.</Text>
-              )}
-            </ScrollView>
-          )}
-          <View style={styles.rowViewButtons}>
-            <TouchableOpacity style={styles.closeButton} onPress={handleCancel}>
-              <Text style={styles.closeButtonText}>Cancel</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.submitButton}
-              onPress={handleSubmit(handleUpdateEvent)}
-            >
-              <Text style={styles.submitButtonText}>Save</Text>
-            </TouchableOpacity>
+                  </>
+                ) : (
+                  <Text style={styles.errorText}>Failed to load event details.</Text>
+                )}
+              </ScrollView>
+            )}
+            <View style={styles.rowViewButtons}>
+              <TouchableOpacity style={styles.closeButton} onPress={handleCancel}>
+                <Text style={styles.closeButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.submitButton}
+                onPress={handleSubmit(handleUpdateEvent)}
+              >
+                <Text style={styles.submitButtonText}>Save</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </View>
+        </KeyboardAvoidingView>
+      </TouchableWithoutFeedback>
     </Modal>
   );
 };
@@ -574,7 +568,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 10,
+    marginBottom: 30,
   },
   closeButton: {
     paddingVertical: 10,
@@ -591,10 +585,6 @@ const styles = StyleSheet.create({
     maxHeight: 500,
     width: "100%",
   },
-  eventDetail: {
-    fontSize: 14,
-    marginBottom: 5,
-  },
   bold: {
     fontWeight: "bold",
   },
@@ -604,12 +594,12 @@ const styles = StyleSheet.create({
   },
   inputField: {
     flex: 1,
-    fontSize: mhs(12),
+    fontSize: mhs(13),
     color: themeColors.text.dark,
     backgroundColor: themeColors.background.lightGrey,
     borderRadius: 20,
-    marginLeft: 10,
-    marginTop: 15,
+    marginLeft: 6,
+    padding: 15,
   },
   skillLevelOption: {
     padding: hs(5),
@@ -644,26 +634,26 @@ const styles = StyleSheet.create({
   modalItemText: { fontSize: 16 },
   modalCloseButton: { marginTop: 10, padding: 8, backgroundColor: "red", borderRadius: 20 },
   modalCloseButtonText: { color: "white", fontWeight: "bold", textAlign: "center" },
-  sportTypeContainer: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 10 },
+  sportTypeContainer: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   sportDropdown: { padding: 10, backgroundColor: themeColors.background.lightGrey, borderRadius: 20, marginRight: 150 },
-  maxParticipantsContainer: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 10, marginRight: 35 },
+  maxParticipantsContainer: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginRight: 35 },
   inputFieldPar: {
     backgroundColor: themeColors.background.lightGrey,
     borderRadius: 20,
-    padding: 5,
-    marginRight: 115,
-    width: 40,
+    marginLeft: 5,
+    width: 50,
     textAlign: "center",
-    fontSize: mhs(12),
+    fontSize: mhs(13),
   },
   descriptionInput: {
-    fontSize: mhs(12),
+    fontSize: mhs(13),
     color: themeColors.text.dark,
     backgroundColor: themeColors.background.lightGrey,
     borderRadius: 20,
     padding: 15,
     minHeight: 60,
     maxHeight: 200,
+    marginTop: 10,
   },
   submitButton: {
     backgroundColor: themeColors.primary,
@@ -682,8 +672,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 10,
-    marginTop: 10,
+  },
+  rowViewRegister: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginRight: 20,
   },
   dateView: {
     flex: 1,
@@ -695,23 +689,12 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginRight: 30,
   },
-  registerDateView: {
-    marginLeft: 10,
-  },
-  registerTimeView: {
-    marginLeft: 10,
-    marginRight: 33,
-  },
-  charCount: {
-    textAlign: 'right',
-    fontSize: 12,
-    color: themeColors.text.lightGrey,
-    marginTop: 2,
-    marginRight: 10,
-  },
   rowViewButtons: {
     flexDirection: "row",
     marginTop: 50,
+  },
+  spaceView: {
+    marginTop: 20,
   },
 });
 
