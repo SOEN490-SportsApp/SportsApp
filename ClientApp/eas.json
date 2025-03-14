@@ -12,7 +12,8 @@
       },
       "android": {
         "buildType": "apk",
-        "node": "20.18.1"
+        "node": "20.18.1",
+        "withoutCredentials": true
       }
     },
     "preview": {
