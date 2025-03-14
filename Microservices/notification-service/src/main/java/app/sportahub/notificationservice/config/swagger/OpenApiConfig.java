@@ -1,4 +1,4 @@
-package app.sportahub.notificationservice.config;
+package app.sportahub.notificationservice.config.swagger;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
