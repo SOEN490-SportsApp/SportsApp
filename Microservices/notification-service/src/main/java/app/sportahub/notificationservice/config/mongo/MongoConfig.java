@@ -1,4 +1,4 @@
-package app.sportahub.notificationservice.config;
+package app.sportahub.notificationservice.config.mongo;
 
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
