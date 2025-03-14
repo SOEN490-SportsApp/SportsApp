@@ -1,4 +1,4 @@
-package app.sportahub.notificationservice.config;
+package app.sportahub.notificationservice.config.auth;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
