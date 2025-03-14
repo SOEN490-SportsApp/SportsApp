@@ -104,8 +104,7 @@
     "react-native-web": "~0.19.10",
     "react-redux": "^9.1.2",
     "tailwindcss": "^3.4.14",
-    "expo-updates": "~0.27.1",
-    "expo-clipboard": "~7.0.1"
+    "expo-updates": "~0.27.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
