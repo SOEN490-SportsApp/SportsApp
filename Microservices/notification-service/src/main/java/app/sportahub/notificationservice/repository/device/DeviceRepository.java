@@ -16,5 +16,8 @@ public interface DeviceRepository extends MongoRepository<Device, String> {
 
     Optional<Device> findDeviceByUserIdAndDeviceToken(String userId, String deviceToken);
 
+    List<Device> findDeviceByUserId(String userId);
+
+    void deleteByDeviceToken(String deviceToken);
 }
 
