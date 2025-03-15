@@ -10,7 +10,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
-import app.sportahub.notificationservice.utils.KeycloakJwtAuthenticationConverter;
+import app.sportahub.notificationservice.util.KeycloakJwtAuthenticationConverter;
 import lombok.SneakyThrows;
 
 @Configuration
