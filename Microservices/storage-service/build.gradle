@@ -19,7 +19,14 @@ configurations {
 }
 
 repositories {
-    mavenCentral()
+	mavenCentral()
+	maven {
+		url = uri("https://maven.pkg.github.com/SOEN490-SportsApp/SportsApp")
+		credentials {
+			username = System.getenv("GITHUB_USERNAME")
+			password = System.getenv("GITHUB_TOKEN")
+		}
+	}
 }
 
 dependencies {
