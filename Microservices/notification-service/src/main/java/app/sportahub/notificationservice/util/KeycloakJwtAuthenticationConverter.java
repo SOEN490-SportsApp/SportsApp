@@ -1,4 +1,4 @@
-package app.sportahub.notificationservice.utils;
+package app.sportahub.notificationservice.util;
 
 import java.util.Collection;
 import java.util.List;
