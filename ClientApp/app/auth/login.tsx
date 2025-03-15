@@ -136,31 +136,8 @@ const LoginPage: React.FC = () => {
             onPress={handleSubmit(onSubmit)}
             iconPlacement={IconPlacement.left}
           />
-          <AuthenticationDivider text="Or" />
-
-          <View style={styles.socialButtonsContainer}>
-            <TouchableOpacity style={styles.socialButton}>
-              <Image
-                source={require("@/assets/images/facebook_social.png")}
-                style={styles.socialIcon}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.socialButton}>
-              <Image
-                source={require("@/assets/images/google_social.png")}
-                style={styles.socialIcon}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.socialButton}>
-              <Image
-                source={require("@/assets/images/apple_social.png")}
-                style={styles.socialIcon}
-              />
-            </TouchableOpacity>
-          </View>
-        </View>
+     </View>
       </View>
-
       <View style={styles.registerContainer}>
         <TouchableOpacity
           onPress={() => router.replace("/auth/registerAccount")}
@@ -248,26 +225,6 @@ const styles = StyleSheet.create({
     color: themeColors.text.link,
     textDecorationLine: "underline",
     marginTop: vs(6),
-  },
-  socialButtonsContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-evenly",
-    marginTop: vs(16),
-  },
-  socialButton: {
-    alignItems: "center",
-    borderWidth: 1.5,
-    borderColor: "#cccccc",
-    borderRadius: mhs(8),
-    padding: hs(6),
-    width: hs(80),
-    minWidth: hs(50),
-    minHeight: vs(30),
-  },
-  socialIcon: {
-    width: vs(24),
-    height: vs(24),
   },
   registerContainer: {
     position: "absolute",
