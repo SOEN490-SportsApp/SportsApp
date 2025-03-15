@@ -2,9 +2,13 @@ package app.sportahub.notificationservice.model.notification;
 
 import app.sportahub.notificationservice.model.BaseEntity;
 import jakarta.validation.constraints.NotBlank;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.Map;
 
 @Document("notification")
 @Data
@@ -12,11 +16,21 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Notification extends BaseEntity {
+
     @NotBlank
     private String userId;
+
     @NotBlank
-    private String message;
+    private String title;
+
     @NotBlank
-    private String type; // e.g., EVENT_CANCELLED, FRIEND_REQUEST_RECEIVED
-    private boolean isRead;
+    private String body;
+
+    private String clickAction;
+
+    private String icon;
+
+    private Map<String, String> data;
+
+    private Boolean isRead;
 }
