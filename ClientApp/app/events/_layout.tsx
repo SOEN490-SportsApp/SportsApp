@@ -10,12 +10,15 @@ import QR from "@/components/QR/QR";
 import { mvs } from "@/utils/helpers/uiScaler";
 import { useSelector } from "react-redux";
 import { selectUser } from "@/state/user/userSlice";
+import EditEventModal from "@/components/Event/EditEventModal";
 
 export default function EventDetailsLayout() {
   const { eventId } = useLocalSearchParams<{ eventId: string }>();
   const [menuVisible, setMenuVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [isCreator, setIsCreator] = useState(false);
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [eventData, setEventData] = useState(null);
   
   const user = useSelector(selectUser); 
   const userId = user.id; 
@@ -49,6 +52,9 @@ export default function EventDetailsLayout() {
         break;
       case "leave":
         console.log("Leave event selected");
+        break;
+      case "edit":
+        setEditModalVisible(true);
         break;
       case "delete":
         handleDeleteEvent(eventId);
@@ -118,10 +124,12 @@ export default function EventDetailsLayout() {
   <Menu.Item onPress={() => handleOptionPress("invite")} title="Invite Friend" />
   <Menu.Item onPress={() => handleOptionPress("leave")} title="Leave Event" />
   
-  {/* Only show "Delete Event" if the user is the creator */}
   {isCreator && (
-    <Menu.Item onPress={() => handleOptionPress("delete")} title="Delete Event" titleStyle={{ color: "red" }} />
-        )}
+    <React.Fragment>
+      <Menu.Item onPress={() => handleOptionPress("edit")} title="Edit Event" />
+      <Menu.Item onPress={() => handleOptionPress("delete")} title="Delete Event" titleStyle={{ color: "red" }} />
+    </React.Fragment>
+  )}
       </Menu>
           </>
           ),
@@ -132,6 +140,7 @@ export default function EventDetailsLayout() {
           ),
         }}
       />
+      <EditEventModal visible={editModalVisible} onClose={() => setEditModalVisible(false)} eventId={eventId} />
     </Provider>
   );
 }
