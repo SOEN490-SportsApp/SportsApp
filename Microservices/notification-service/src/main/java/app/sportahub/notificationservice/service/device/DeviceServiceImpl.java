@@ -2,6 +2,7 @@ package app.sportahub.notificationservice.service.device;
 
 import app.sportahub.notificationservice.dto.request.device.DeviceRequest;
 import app.sportahub.notificationservice.dto.response.device.DeviceResponse;
+import app.sportahub.notificationservice.exception.device.UserDoesNotOwnADeviceException;
 import app.sportahub.notificationservice.mapper.device.DeviceMapper;
 import app.sportahub.notificationservice.model.device.Device;
 import app.sportahub.notificationservice.repository.device.DeviceRepository;
@@ -10,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -69,6 +71,22 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     /**
+     * Deletes a device by its token.
+     * <p>
+     * This method removes the device from the repository if it exists.
+     * No action is taken if the device does not exist.
+     * </p>
+     *
+     * @param deviceToken the token of the device to be deleted
+     */
+    @Override
+    public void deleteDeviceByDeviceToken(String deviceToken) {
+        log.info("DeviceServiceImpl::deleteDeviceByDeviceToken: Deleting device with token {}", deviceToken);
+        deviceRepository.deleteByDeviceToken(deviceToken);
+        log.info("DeviceServiceImpl::deleteDeviceByDeviceToken: Successfully deleted device with token {}", deviceToken);
+    }
+
+    /**
      * Checks if a given user is the owner of a specified device.
      * <p>
      * This method verifies whether the device with the given ID belongs to the specified user.
@@ -80,7 +98,32 @@ public class DeviceServiceImpl implements DeviceService {
      */
     @Override
     public Boolean isDeviceOwner(String userId, String deviceId) {
+        log.info("DeviceServiceImpl::isDeviceOwner: Checking ownership of device {} for user {}", deviceId, userId);
         Optional<Device> optionalDevice = deviceRepository.findDeviceByUserIdAndId(userId, deviceId);
+        log.info("DeviceServiceImpl::isDeviceOwner: User {} {} the owner of device {}",
+                userId, optionalDevice.isPresent() ? "is" : "is not", deviceId);
         return optionalDevice.isPresent();
+    }
+
+    /**
+     * Retrieves all devices associated with a given user.
+     * <p>
+     * If the user does not own any devices, an exception is thrown.
+     * </p>
+     *
+     * @param userId the unique identifier of the user
+     * @return a list of {@link Device} objects belonging to the user
+     * @throws UserDoesNotOwnADeviceException if the user does not own any devices
+     */
+    @Override
+    public List<Device> getDevicesByUserId(String userId) {
+        log.info("DeviceServiceImpl::getDevicesByUserId: Fetching devices for user {}", userId);
+        List<Device> devices = deviceRepository.findDeviceByUserId(userId);
+        if (devices.isEmpty()) {
+            log.info("DeviceServiceImpl::getDevicesByUserId: No devices found for user {}", userId);
+            throw new UserDoesNotOwnADeviceException(userId);
+        }
+        log.info("DeviceServiceImpl::getDevicesByUserId: Found {} devices for user {}", devices.size(), userId);
+        return devices;
     }
 }
