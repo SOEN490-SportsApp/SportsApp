@@ -362,19 +362,6 @@ const Create = () => {
     setIsGooglePlacesActive(toValue === 1);
   };
 
-  const getDefaultEndTime = () => {
-    if (startTime) {
-      const endTimeTemp = new Date(startTime);
-      endTimeTemp.setHours(endTimeTemp.getHours() + 2);
-      return endTimeTemp;
-    } else {
-      const now = new Date();
-      const endTimeTemp = new Date(now);
-      endTimeTemp.setHours(now.getHours() + 2);
-      return endTimeTemp;
-    }
-  };  
-
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <SafeAreaView style={styles.safeArea}>
@@ -619,15 +606,11 @@ const Create = () => {
                 <View style={styles.inputHalfContainer}>
                   <Text style={styles.inputLabel}>End Time</Text>
                   <View style={styles.inputHalf}>
-                    <Ionicons
-                      name="time-outline"
-                      size={16}
-                      color={themeColors.primary}
-                    />
+                    <Ionicons name="time-outline" size={16} color={themeColors.primary} />
                     <CustomDateTimePicker
-                      value={endTime || getDefaultEndTime()}
+                      value={endTime}
                       mode="time"
-                      label=""
+                      label={endTime ? "" : "Select time"}
                       onChange={(selectedTime) => setEndTime(selectedTime)}
                     />
                   </View>

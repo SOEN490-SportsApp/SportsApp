@@ -5,12 +5,10 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from "expo-router";
 import { IconPlacement } from '@/utils/constants/enums';
 import { hs, mhs, mvs, vs } from "@/utils/helpers/uiScaler";
-import { loginUser, registerUser } from "@/services/authService";
+import { registerUser } from "@/services/authService";
 import ConfirmButton from "@/components/Helper Components/ConfirmButton";
-import AuthenticationDivider from "@/components/Helper Components/AuthenticationDivider";
 import Checkbox from 'expo-checkbox';
 import themeColors from "@/utils/constants/colors";
-import { useUpdateUserToStore } from "@/state/user/actions";
 
 interface RegisterAccountPageFormData {
   username: string;
@@ -192,8 +190,6 @@ const RegisterAccountPage: React.FC = () => {
           onPress={handleSubmit(onSubmit)}
           iconPlacement={IconPlacement.left}
         />
-     
-        <AuthenticationDivider text="Or" />
       </View>
 
       {/* Back to Login */}
@@ -268,7 +264,7 @@ const styles = StyleSheet.create({
   checkboxContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: mvs(16),
+    marginTop: vs(15),
   },
   termsText: {
     marginLeft: hs(8),
@@ -281,7 +277,7 @@ const styles = StyleSheet.create({
   },
   loginContainer: {
     position: "absolute",
-    bottom: vs(12),
+    bottom: vs(30),
     alignSelf: "center",
   },
   loginText: {
