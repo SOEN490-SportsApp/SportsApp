@@ -4,6 +4,7 @@ import { store } from '@/state/store';
 import "../global.css";
 import { setupAxiosInstance } from '@/services/axiosInstance';
 import 'react-native-get-random-values';
+import '@/utils/localization/i18n';
 
 export default function RootLayout() {
     // Inject Redux dispatch into Axios
