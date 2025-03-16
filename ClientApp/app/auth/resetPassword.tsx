@@ -6,10 +6,12 @@ import ConfirmButton from "@/components/Helper Components/ConfirmButton";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { IconPlacement } from "@/utils/constants/enums";
 import { resetPassword } from "@/services/authService";
+import { useTranslation } from 'react-i18next';
 
 const ResetPassword: React.FC = () => {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState("idle");
+  const { t } = useTranslation();
   let regex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
   const onSubmit = async () => {
     if (regex.test(email)) {
@@ -68,7 +70,7 @@ const ResetPassword: React.FC = () => {
             style={styles.logo}
           />
           <Text style={styles.joinText}>
-            Join <Text style={styles.sportaText}>Sporta</Text>
+            {t('reset_password.join')} <Text style={styles.sportaText}>Sporta</Text>
           </Text>
         </View>
         <View style={styles.emailSection}>
@@ -95,7 +97,7 @@ const ResetPassword: React.FC = () => {
               >
                 <View>
                   <Text style={styles.slogan}>
-                    Enter your email to reset your password.
+                    {t('reset_password.enter_email')}
                   </Text>
                 </View>
                 <View style={styles.inputContainer}>
@@ -104,7 +106,7 @@ const ResetPassword: React.FC = () => {
                     style={styles.input}
                     onChangeText={(text) => setEmail(text)}
                     value={email}
-                    placeholder="Enter your email"
+                    placeholder={t('reset_password.email_placeholder')}
                     keyboardType="email-address"
                     autoCapitalize="none"
                   />
@@ -125,7 +127,7 @@ const ResetPassword: React.FC = () => {
               <Text></Text>
             ) : (
               <ConfirmButton
-                text={status === "loading" ? "Loading..." : "Send Email"}
+                text={status === "loading" ? "Loading..." : t('reset_password.send_email_button')}
                 onPress={onSubmit}
                 icon={
                   <MaterialCommunityIcons name="login" size={25} color="#fff" />

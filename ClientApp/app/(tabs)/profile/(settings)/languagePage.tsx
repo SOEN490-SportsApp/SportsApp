@@ -1,54 +1,53 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import themeColors from "@/utils/constants/colors";
 import { hs, vs, mvs, mhs } from "@/utils/helpers/uiScaler";
+import { useTranslation } from 'react-i18next';
+import { setLanguage, getLanguage } from "@/utils/localization/i18n";
 
 const languagePage: React.FC = () => {
-  const [selectedLanguage, setSelectedLanguage] = useState<string>('English');
+  const { t, i18n } = useTranslation();
+  const [selectedLanguage, setSelectedLanguage] = useState<string>(i18n.language);
 
-  const handleLanguageSelect = (language: string) => {
+  useEffect(() => {
+    getLanguage();
+  }, []);
+
+  const handleLanguageSelect = async (language: string) => {
+    await setLanguage(language);
     setSelectedLanguage(language);
   };
 
   return (
     <View style={styles.container}>
+      <Text style={styles.title}>{t('settings.language')}</Text>
 
-      <View style={styles.optionsContainer}>
-        {/* English Option */}
-        <TouchableOpacity
-          style={[
-            styles.option,
-            selectedLanguage === 'English' && styles.selectedOption,
-          ]}
-          onPress={() => handleLanguageSelect('English')}
-        >
-          <Ionicons
-            name="checkmark-circle"
-            size={mvs(24)}
-            color={selectedLanguage === 'English' ? themeColors.primary : themeColors.border.light}
-            style={styles.icon}
-          />
-          <Text style={styles.text}>English</Text>
-        </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.option, selectedLanguage === 'en' && styles.selectedOption]}
+        onPress={() => handleLanguageSelect('en')}
+      >
+        <Ionicons
+          name="checkmark-circle"
+          size={mvs(24)}
+          color={selectedLanguage === 'en' ? themeColors.primary : themeColors.border.light}
+          style={styles.icon}
+        />
+        <Text style={styles.text}>{t('settings.english')}</Text>
+      </TouchableOpacity>
 
-        {/* French Option */}
-        <TouchableOpacity
-          style={[
-            styles.option,
-            selectedLanguage === 'French' && styles.selectedOption,
-          ]}
-          onPress={() => handleLanguageSelect('French')}
-        >
-          <Ionicons
-            name="checkmark-circle"
-            size={mvs(24)}
-            color={selectedLanguage === 'French' ? themeColors.primary : themeColors.border.light}
-            style={styles.icon}
-          />
-          <Text style={styles.text}>Français</Text>
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity
+        style={[styles.option, selectedLanguage === 'fr' && styles.selectedOption]}
+        onPress={() => handleLanguageSelect('fr')}
+      >
+        <Ionicons
+          name="checkmark-circle"
+          size={mvs(24)}
+          color={selectedLanguage === 'fr' ? themeColors.primary : themeColors.border.light}
+          style={styles.icon}
+        />
+        <Text style={styles.text}>{t('settings.french')}</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -84,6 +83,11 @@ const styles = StyleSheet.create({
   text: {
     fontSize: mhs(16),
     color: themeColors.text.dark,
+  },
+  title: {
+    fontSize: mhs(20),
+    fontWeight: 'bold',
+    marginBottom: vs(16),
   },
 });
 
