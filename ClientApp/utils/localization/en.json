@@ -1,0 +1,41 @@
+{
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "english": "English",
+    "french": "French"
+  },
+  "login": {
+    "title": "Login",
+    "email_placeholder": "Email/username",
+    "password_placeholder": "Password",
+    "forgot_password": "Forgot your password?",
+    "login_button": "Login",
+    "register_now": "Register Now",
+    "slogan": "Connect, Compete, Conquer",
+    "join": "Join",
+    "first_time_1": "Is this your first time?",
+    "first_time_2": "Register Now"
+  },
+  "register": {
+    "title": "Create an Account",
+    "email_placeholder": "Email",
+    "username_placeholder": "Username",
+    "password_placeholder": "Password",
+    "confirm_password_placeholder": "Confirm Password",
+    "by_continuing_1": "By continuing you agree to our",
+    "by_continuing_2": "Privacy Policy",
+    "by_continuing_3": "and",
+    "by_continuing_4": "Terms of Use",
+    "register_button": "Sign Up",
+    "or": "Or",
+    "already_have_account": "Already have an account?",
+    "login": "Login"
+  },
+  "reset_password": {
+    "join": "Join",
+    "enter_email": "Enter your email to reset your password",
+    "email_placeholder": "Enter your email",
+    "send_email_button": "Send Email"
+  }
+}

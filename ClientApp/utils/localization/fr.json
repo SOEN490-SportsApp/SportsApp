@@ -1,0 +1,41 @@
+{
+  "settings": {
+    "title": "Paramètres",
+    "language": "Langue",
+    "english": "Anglais",
+    "french": "Français"
+  },
+  "login": {
+    "title": "Connexion",
+    "email_placeholder": "E-mail/nom d'utilisateur",
+    "password_placeholder": "Mot de passe",
+    "forgot_password": "Mot de passe oublié?",
+    "login_button": "Connexion",
+    "register_now": "Inscrivez-vous",
+    "slogan": "Connectez-vous, Concurrencez, Conquérez",
+    "join": "Rejoignez",
+    "first_time_1": "Est-ce votre première fois?",
+    "first_time_2": "Inscrivez-vous maintenant"
+  },
+  "register": {
+    "title": "Créer un compte",
+    "email_placeholder": "E-mail",
+    "username_placeholder": "Nom d'utilisateur",
+    "password_placeholder": "Mot de passe",
+    "confirm_password_placeholder": "Confirmez le mot de passe",
+    "by_continuing_1": "En continuant vous acceptez notre",
+    "by_continuing_2": "Politique de confidentialité",
+    "by_continuing_3": "et",
+    "by_continuing_4": "Conditions d'utilisation",
+    "register_button": "S'inscrire",
+    "or": "Ou",
+    "already_have_account": "Vous avez déjà un compte?",
+    "login": "Connexion"
+  },
+  "reset_password": {
+    "join": "Rejoignez",
+    "enter_email": "Entrez votre e-mail pour réinitialiser votre mot de passe",
+    "email_placeholder": "Entrez votre e-mail",
+    "send_email_button": "Envoyer un e-mail"
+  }
+}
