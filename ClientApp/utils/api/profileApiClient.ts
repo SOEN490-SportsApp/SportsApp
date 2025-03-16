@@ -18,7 +18,7 @@ export async function registerProfile(profile: Profile, userId: string) {
 export async function getProfile(userId: string) {
     const axiosInstance = getAxiosInstance();
     try {
-        const response = await axiosInstance.get<Profile>(API_ENDPOINTS.GET_USER_BY_ID.replace('{id}', userId));
+        const response = await axiosInstance.get<Profile>(API_ENDPOINTS.GET_PUBLIC_PROFILE.replace('{userId}', userId));
         return response.data
     } catch (error: any) {
         console.error('Error fetching profile:', error);
