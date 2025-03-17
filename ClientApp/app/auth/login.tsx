@@ -68,7 +68,7 @@ const LoginPage: React.FC = () => {
               control={control}
               name="identifier"
               rules={{
-                required: "Email or username is required",
+                required: t('login.email_username_required'),
               }}
               render={({ field: { onChange, onBlur, value } }) => (
                 <TextInput
@@ -95,8 +95,8 @@ const LoginPage: React.FC = () => {
               control={control}
               name="password"
               rules={{
-                required: "Password is required",
-                minLength: { value: 6, message: "Minimum 6 characters" },
+                required: t('login.password_required'),
+                minLength: { value: 6, message: t('login.minimum_characters') },
               }}
               render={({ field: { onChange, onBlur, value } }) => (
                 <View style={styles.passwordContainer}>
