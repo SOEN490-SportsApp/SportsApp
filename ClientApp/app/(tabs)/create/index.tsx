@@ -28,6 +28,7 @@ import GooglePlacesInput from "@/components/Helper Components/GooglePlacesInput"
 import CustomDateTimePicker from "@/components/Helper Components/CustomDateTimePicker";
 import { Ionicons } from "@expo/vector-icons";
 import MapView, { Marker } from 'react-native-maps';
+import { useTranslation } from 'react-i18next';
 
 const Create = () => {
   const {
@@ -59,6 +60,7 @@ const Create = () => {
   const googlePlacesPosition = useRef(new Animated.Value(0)).current;
   const [isGooglePlacesActive, setIsGooglePlacesActive] = useState(false);
   const googlePlacesRef = useRef<any>(null);
+  const { t } = useTranslation();
 
   interface Location {
     name: string;
@@ -93,18 +95,18 @@ const Create = () => {
 
   const onSubmit = async (data: EventFormData) => {
     if (!location) {
-      Alert.alert("Oops..", "Please select a location.");
+      Alert.alert(t('create.oops'), t('create.select_location_required'));
       return;
     }
 
     try {
       if (!cutOffDate || !cutOffTime || !eventDate || !startTime || !endTime) {
-        Alert.alert("Oops..", "Please select all date and time fields");
+        Alert.alert(t('create.oops'), t('create.date_time_required'));
         return;
       }
 
       if (data.description.length === 0) {
-        Alert.alert("Oops..", "Description is required");
+        Alert.alert(t('create.oops'), t('create.description_required'));
         return;
       }
 
@@ -142,8 +144,8 @@ const Create = () => {
 
       if (combinedCutOffDateTime >= combinedStartDateTime) {
         Alert.alert(
-          "Oops..",
-          "Cutoff time must be before the event start time."
+          t('create.oops'),
+          t('create.cutoff_before_start')
         );
         return;
       }
@@ -190,13 +192,13 @@ const Create = () => {
       setClearLocationTrigger((prev) => !prev);
       setShowLocationPage(false);
       setStep(1);
-      Alert.alert("Success", "Event created successfully!");
+      Alert.alert(t('create.success'), t('create.event_created'));
       router.replace("/(tabs)/home");
     } catch (error: any) {
       if (error.message === "Network Error") {
-        Alert.alert("Error", "Network Error");
+        Alert.alert(t('create.error'), t('create.network_error'));
       } else {
-        Alert.alert("Error", "An unexpected error occurred.");
+        Alert.alert(t('create.error'), t('create.unexpected_error'));
       }
     }
   };
@@ -241,7 +243,7 @@ const Create = () => {
                   onPress={() => setSportTypeModalVisible(false)}
                   style={styles.modalCloseButton}
                 >
-                  <Text style={styles.modalCloseButtonText}>Close</Text>
+                  <Text style={styles.modalCloseButtonText}>{t('create.close_button')}</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -266,7 +268,7 @@ const Create = () => {
     return (
       <SafeAreaView style={{ flex: 1, padding: 20 }}>
         <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-          Select Location
+          {t('create.select_location')}
         </Text>
         <GooglePlacesInput
           setLocation={setLocation}
@@ -276,7 +278,7 @@ const Create = () => {
           style={styles.backButton}
           onPress={() => setShowLocationPage(false)}
         >
-          <Text style={styles.backButtonText}>Back</Text>
+          <Text style={styles.backButtonText}>{t('create.back_button')}</Text>
         </TouchableOpacity>
       </SafeAreaView>
     );
@@ -315,7 +317,7 @@ const Create = () => {
           !formValues.requiredSkillLevel?.length ||
           !formValues.description
         ) {
-          Alert.alert("Oops!", "Please complete all fields before proceeding.");
+          Alert.alert(t('create.oops'), t('create.complete_all_fields_error'));
           return false;
         }
         break;
@@ -328,19 +330,19 @@ const Create = () => {
           !cutOffDate ||
           !cutOffTime
         ) {
-          Alert.alert("Oops!", "Please select all date and time fields.");
+          Alert.alert(t('create.oops'), t('create.date_time_required'));
           return false;
         }
 
         if (cutOffDate.getTime() >= eventDate.getTime()) {
-          Alert.alert("Oops!", "Cutoff date must be before the event date.");
+          Alert.alert(t('create.oops'), t('create.cutoff_before_start'));
           return false;
         }
         break;
 
       case 3:
         if (!location) {
-          Alert.alert("Oops!", "Please select a location.");
+          Alert.alert(t('create.oops'), t('create.select_location_required'));
           return false;
         }
         break;
@@ -374,8 +376,8 @@ const Create = () => {
           {step === 1 && (
             <>
               <View style={styles.sectionContainer}>
-                <Text style={styles.sectionTitle}>General Information</Text>
-                <Text style={styles.inputLabel}>Event Name</Text>
+                <Text style={styles.sectionTitle}>{t('create.general_information')}</Text>
+                <Text style={styles.inputLabel}>{t('create.event_name')}</Text>
                 <View style={styles.inputContainer}>
                   <Ionicons
                     name="calendar-outline"
@@ -387,7 +389,7 @@ const Create = () => {
                     name="eventName"
                     render={({ field: { onChange, onBlur, value } }) => (
                       <TextInput
-                        placeholder="Enter Event Name"
+                        placeholder={t('create.event_name_placeholder')}
                         placeholderTextColor={themeColors.text.placeholder}
                         style={styles.inputField}
                         onBlur={onBlur}
@@ -404,9 +406,9 @@ const Create = () => {
                   </Text>
                 )}
 
-                <Text style={styles.inputLabel}>Event Type</Text>
+                <Text style={styles.inputLabel}>{t('create.event_type')}</Text>
                 <View style={styles.segmentedControl}>
-                  {["public", "private"].map((type) => (
+                  {[t('create.public'), t('create.private')].map((type) => (
                     <TouchableOpacity
                       key={type}
                       onPress={() => setValue("eventType", type)}
@@ -431,7 +433,7 @@ const Create = () => {
 
                 <View style={styles.rowContainer}>
                   <View style={styles.inputHalfContainer}>
-                    <Text style={styles.inputLabel}>Sport Type</Text>
+                    <Text style={styles.inputLabel}>{t('create.sport_type')}</Text>
                     <TouchableOpacity
                       style={[styles.inputContainer, styles.equalHeightInput]}
                       onPress={() => {
@@ -444,7 +446,7 @@ const Create = () => {
                         color={themeColors.primary}
                       />
                       <Text style={styles.inputField}>
-                        {watch.sportType || "Select a Sport"}
+                        {watch.sportType || t('create.select_sport')}
                       </Text>
                     </TouchableOpacity>
                     {errors.sportType && (
@@ -455,7 +457,7 @@ const Create = () => {
                   </View>
 
                   <View style={styles.inputHalfContainer}>
-                    <Text style={styles.inputLabel}>Max Participants</Text>
+                    <Text style={styles.inputLabel}>{t('create.max_participants')}</Text>
                     <View
                       style={[styles.inputContainer, styles.equalHeightInput]}
                     >
@@ -469,11 +471,11 @@ const Create = () => {
                         name="maxParticipants"
                         rules={{
                           validate: (v) =>
-                            parseInt(v, 10) > 1 || "Must be at least 2",
+                            parseInt(v, 10) > 1 || t('create.at_least_2'),
                         }}
                         render={({ field: { onChange, value } }) => (
                           <TextInput
-                            placeholder="Enter max"
+                            placeholder={t('create.enter_max')}
                             placeholderTextColor={themeColors.text.placeholder}
                             style={[
                               styles.inputField,
@@ -500,7 +502,7 @@ const Create = () => {
 
                 {isSportTypeModalVisible && renderSportTypeModal()}
 
-                <Text style={styles.inputLabel}>Required Skill Level</Text>
+                <Text style={styles.inputLabel}>{t('create.required_skill_level')}</Text>
                 <View style={styles.skillLevelGroup}>
                   {["Beginner", "Intermediate", "Advanced"].map((level) => (
                     <TouchableOpacity
@@ -526,7 +528,7 @@ const Create = () => {
                   ))}
                 </View>
 
-                <Text style={styles.inputLabel}>Description</Text>
+                <Text style={styles.inputLabel}>{t('create.description')}</Text>
                 <View
                   style={[styles.inputContainer, styles.descriptionContainer]}
                 >
@@ -540,7 +542,7 @@ const Create = () => {
                     name="description"
                     render={({ field: { onChange, onBlur, value } }) => (
                       <TextInput
-                        placeholder="Enter Description"
+                        placeholder={t('create.description_placeholder')}
                         placeholderTextColor={themeColors.text.placeholder}
                         style={styles.descriptionField}
                         onBlur={onBlur}
@@ -563,9 +565,9 @@ const Create = () => {
 
           {step === 2 && (
             <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Event Date & Time</Text>
+              <Text style={styles.sectionTitle}>{t('create.date_time')}</Text>
 
-              <Text style={styles.inputLabel}>Event Date</Text>
+              <Text style={styles.inputLabel}>{t('create.event_date')}</Text>
               <View style={styles.inputContainer}>
                 <Ionicons
                   name="calendar-outline"
@@ -581,7 +583,7 @@ const Create = () => {
               </View>
               <View style={styles.sideBySideContainer}>
                 <View style={styles.inputHalfContainer}>
-                  <Text style={styles.inputLabel}>Start Time</Text>
+                  <Text style={styles.inputLabel}>{t('create.start_time')}</Text>
                   <View style={styles.inputHalf}>
                     <Ionicons
                       name="time-outline"
@@ -604,7 +606,7 @@ const Create = () => {
                 </View>
 
                 <View style={styles.inputHalfContainer}>
-                  <Text style={styles.inputLabel}>End Time</Text>
+                  <Text style={styles.inputLabel}>{t('create.end_time')}</Text>
                   <View style={styles.inputHalf}>
                     <Ionicons name="time-outline" size={16} color={themeColors.primary} />
                     <CustomDateTimePicker
@@ -617,7 +619,7 @@ const Create = () => {
                 </View>
               </View>
 
-              <Text style={styles.inputLabel}>Register by (Date)</Text>
+              <Text style={styles.inputLabel}>{t('create.register_by_date')}</Text>
               <View style={styles.inputContainer}>
                 <Ionicons
                   name="calendar-outline"
@@ -632,7 +634,7 @@ const Create = () => {
                 />
               </View>
 
-              <Text style={styles.inputLabel}>Register by (Time)</Text>
+              <Text style={styles.inputLabel}>{t('create.register_by_time')}</Text>
               <View style={styles.inputHalfCutoffTime}>
                 <Ionicons
                   name="time-outline"
@@ -657,14 +659,14 @@ const Create = () => {
                     size={28}
                     color={themeColors.primary}
                   />
-                  <Text style={styles.navButtonText}>Back</Text>
+                  <Text style={styles.navButtonText}>{t('create.back_button')}</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   onPress={() => setStep(step + 1)}
                   style={styles.navButton}
                 >
-                  <Text style={styles.navButtonText}>Next</Text>
+                  <Text style={styles.navButtonText}>{t('create.next_button')}</Text>
                   <Ionicons
                     name="arrow-forward-circle"
                     size={28}
@@ -761,17 +763,17 @@ const Create = () => {
                       color={themeColors.primary}
                     />
                   </TouchableOpacity>
-                  <Text style={styles.summaryTitle}>Event Summary</Text>
+                  <Text style={styles.summaryTitle}>{t('create.event_summary')}</Text>
                 </View>
                 <View style={styles.card}>
-                  <Text style={styles.sectionTitle}>General Information</Text>
+                  <Text style={styles.sectionTitle}>{t('create.general_information')}</Text>
                   <SummaryItem
-                    label="Event Name:"
+                    label={`${t('create.event_name')}:`}
                     value={watch.eventName}
                     icon="calendar-outline"
                   />
                   <SummaryItem
-                    label="Event Type:"
+                    label={`${t('create.event_type')}:`}
                     value={watch.eventType}
                     icon="people-outline"
                   />
@@ -781,19 +783,19 @@ const Create = () => {
                     icon="football-outline"
                   />
                   <SummaryItem
-                    label="Participants:"
+                    label={`${t('create.participants')}:`}
                     value={watch.maxParticipants}
                     icon="people-circle-outline"
                   />
                   <SummaryItem
-                    label="Skill Level:"
+                    label={`${t('create.skill_level')}:`}
                     value={requiredSkillLevel.join(", ") || "None"}
                     icon="ribbon-outline"
                   />
                 </View>
 
                 <View style={styles.card}>
-                  <Text style={styles.sectionTitle}>Time & Location</Text>
+                  <Text style={styles.sectionTitle}>{t('create.time_location')}</Text>
                   <SummaryItem
                     label=""
                     value={eventDate?.toDateString()}
@@ -803,16 +805,16 @@ const Create = () => {
                     label=""
                     value={
                       startTime && endTime
-                        ? `From ${startTime.toLocaleTimeString([], {
+                        ? `${t('create.from')} ${startTime.toLocaleTimeString([], {
                             hour: "2-digit",
                             minute: "2-digit",
                             hour12: true,
-                          })} to ${endTime.toLocaleTimeString([], {
+                          })} ${t('create.to')} ${endTime.toLocaleTimeString([], {
                             hour: "2-digit",
                             minute: "2-digit",
                             hour12: true,
                           })}`
-                        : "Not selected"
+                        : t('create.not_selected')
                     }
                     icon="time-outline"
                   />
@@ -820,14 +822,14 @@ const Create = () => {
                     label=""
                     value={
                       startTime && endTime
-                        ? `Register by ${cutOffDate?.toDateString()} at ${cutOffTime?.toLocaleTimeString(
+                        ? `${t('create.register_by')} ${cutOffDate?.toDateString()} ${t('create.at')} ${cutOffTime?.toLocaleTimeString(
                             [],
                             {
                               hour: "2-digit",
                               minute: "2-digit",
                             }
                           )}`
-                        : "Not selected"
+                        : t('create.not_selected')
                     }
                     icon="time-outline"
                   />
@@ -836,24 +838,24 @@ const Create = () => {
                     value={
                       location
                         ? `${location.name}, ${location.city}, ${location.province}`
-                        : "Not Selected"
+                        : t('create.not_selected')
                     }
                     icon="location-outline"
                   />
                 </View>
 
                 <View style={styles.descriptionCard}>
-                  <Text style={styles.sectionTitle}>Description</Text>
+                  <Text style={styles.sectionTitle}>{t('create.description')}</Text>
                   <ScrollView style={styles.descriptionBox}>
                     <Text style={styles.descriptionText}>
-                      {watch.description || "No description provided"}
+                      {watch.description || t('create.no_description')}
                     </Text>
                   </ScrollView>
                 </View>
 
                 <View style={styles.buttonContainer}>
                   <ConfirmButton
-                    text="Create Event"
+                    text={t('create.create_event_button')}
                     onPress={handleSubmit(onSubmit)}
                     icon={undefined}
                     iconPlacement={null}
@@ -874,7 +876,7 @@ const Create = () => {
                   size={32}
                   color={themeColors.primary}
                 />
-                <Text style={styles.navButtonText}>Back</Text>
+                <Text style={styles.navButtonText}>{t('create.back_button')}</Text>
               </TouchableOpacity>
             ) : (
               <View style={{ flex: 1 }} />
@@ -890,7 +892,7 @@ const Create = () => {
                 }}
                 style={styles.navButton}
               >
-                <Text style={styles.navButtonText}>Next</Text>
+                <Text style={styles.navButtonText}>{t('create.next_button')}</Text>
                 <Ionicons
                   name="arrow-forward-circle"
                   size={32}
