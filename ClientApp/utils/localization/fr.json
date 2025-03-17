@@ -60,12 +60,11 @@
     "invalid_email_2": "Veuillez saisir un e-mail valide."
   },
   "register_profile": {
-    "title": "Créez votre profil",
     "first_name": "Prénom",
     "last_name": "Nom de famille",
     "dob": "Date de naissance",
     "gender": "Sexe",
-    "phone_number": "Numéro de téléphone",
+    "phone_number": "Numéro de téléphone (xxx-xxx-xxxx)",
     "postal_code": "Code postal",
     "select_sport": "Ajoutez vos sports préférés",
     "select_sport_subtitle": "Choisissez vos sports préférés dans votre section d'accueil",
@@ -87,6 +86,10 @@
     "postal_code_invalid": "Code postal invalide",
     "selected_sports_required": "Veuillez sélectionner au moins un sport",
     "error_create_profile": "Une erreur s'est produite lors de la création du profil",
-    "select_gender": "Sélectionnez le sexe"
+    "select_gender": "Sélectionnez le sexe",
+    "error": "Erreur",
+    "error_register_profile": "Erreur d'enregistrement du profil:",
+    "first_name_required": "Le prénom est requis",
+    "last_name_required": "Le nom de famille est requis"
   }
 }

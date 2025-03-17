@@ -60,12 +60,11 @@
     "invalid_email_2": "Please enter a valid email."
   },
   "register_profile": {
-    "title": "Create Your Profile",
     "first_name": "First Name",
     "last_name": "Last Name",
     "dob": "Date of Birth",
     "gender": "Gender",
-    "phone_number": "Phone Number",
+    "phone_number": "Phone number (xxx-xxx-xxxx)",
     "postal_code": "Postal Code",
     "select_sport": "Add your Favourite Sports",
     "select_sport_subtitle": "Choose your favourite sports in your home section",
@@ -87,6 +86,10 @@
     "postal_code_invalid": "Enter valid format eg. A1A 1A1",
     "selected_sports_required": "Please select at least one sport",
     "error_create_profile": "Error occurred creating profile",
-    "select_gender": "Select"
+    "select_gender": "Select",
+    "error": "Error",
+    "error_register_profile": "Error registering profile:",
+    "first_name_required": "First name is required",
+    "last_name_required": "Last name is required"
   }
 }
