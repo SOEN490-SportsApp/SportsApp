@@ -3,8 +3,11 @@ import { View, Text, TouchableOpacity, StyleSheet, Linking, ScrollView } from 'r
 import { Ionicons } from '@expo/vector-icons';
 import themeColors from "@/utils/constants/colors";
 import { hs, vs, mvs, mhs } from "@/utils/helpers/uiScaler";
+import { useTranslation } from 'react-i18next';
 
 const helpPage: React.FC = () => {
+  const { t } = useTranslation();
+
   const handleContactSupport = () => {
     Linking.openURL('mailto:yousfino-8@hotmail.com');
   };
@@ -19,18 +22,18 @@ const helpPage: React.FC = () => {
       {/* Contact Support */}
       <TouchableOpacity style={styles.option} onPress={handleContactSupport}>
         <Ionicons name="mail-outline" size={mvs(24)} color={themeColors.text.dark} style={styles.icon} />
-        <Text style={styles.text}>Contact Support</Text>
+        <Text style={styles.text}>{t('help_page.contact_support')}</Text>
       </TouchableOpacity>
 
       {/* Privacy Policy */}
       <TouchableOpacity style={styles.option} onPress={handlePrivacyPolicy}>
         <Ionicons name="document-text-outline" size={mvs(24)} color={themeColors.text.dark} style={styles.icon} />
-        <Text style={styles.text}>Privacy Policy</Text>
+        <Text style={styles.text}>{t('help_page.privacy_policy')}</Text>
       </TouchableOpacity>
 
       <View style={styles.footer}>
         <Text style={styles.footerText}>
-          For further assistance, please contact us at{' '}
+          {t('help_page.for_further_assistance')}{' '}
           <Text style={styles.link} onPress={handleContactSupport}>
             yousfino-8@hotmail.com
           </Text>

@@ -150,5 +150,35 @@
   },
   "google_places_input": {
     "search_for_location": "Rechercher un emplacement"
+  },
+  "settings_page": {
+    "share_profile": "Partager le profil",
+    "notification_settings": "Paramètres de notification",
+    "language": "Langue",
+    "help": "Aide",
+    "logout": "Déconnexion",
+    "delete_account": "Supprimer le compte"
+  },
+  "delete_account_page": {
+    "are_you_sure": "Êtes-vous sûr?",
+    "delete_warning_1": "Cette action supprimera définitivement votre compte et ne pourra pas être annulée.",
+    "cancel_button": "Annuler",
+    "delete_button": "Supprimer",
+    "deleted": "Supprimé",
+    "account_deleted": "Votre compte a été supprimé avec succès.",
+    "error": "Erreur",
+    "delete_failed": "Échec de la suppression du compte",
+    "unexpected_error": "Une erreur inattendue s'est produite. Veuillez réessayer.",
+    "delete_your_account": "Supprimer votre compte",
+    "delete_warning_2": "La suppression de votre compte supprimera toutes vos données de façon permanente. Cette action ne peut pas être annulée.",
+    "delete_my_account": "Supprimer mon compte"
+  },
+  "help_page": {
+    "contact_support": "Contactez le support",
+    "privacy_policy": "Politique de confidentialité",
+    "for_further_assistance": "Pour toute assistance supplémentaire, veuillez nous contacter à"
+  },
+  "notifications_page": {
+    "mute_all": "Tout désactiver"
   }
 }

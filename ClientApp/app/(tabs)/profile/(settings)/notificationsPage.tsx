@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { View, Text, Switch, StyleSheet } from 'react-native';
 import themeColors from "@/utils/constants/colors";
 import { hs, vs, mvs, mhs } from "@/utils/helpers/uiScaler";
+import { useTranslation } from 'react-i18next';
 
 const notificationsPage: React.FC = () => {
   const [isMuted, setIsMuted] = useState(false);
+  const { t } = useTranslation();
 
   const toggleMute = () => {
     setIsMuted((prevState) => !prevState);
@@ -13,7 +15,7 @@ const notificationsPage: React.FC = () => {
   return (
     <View style={styles.container}>
       <View style={styles.option}>
-        <Text style={styles.text}>Mute All</Text>
+        <Text style={styles.text}>{t('notifications_page.mute_all')}</Text>
         <Switch
           trackColor={{ false: themeColors.border.light, true: themeColors.primary }}
           thumbColor={isMuted ? themeColors.text.light : themeColors.text.light}
