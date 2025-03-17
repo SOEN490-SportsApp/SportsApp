@@ -19,7 +19,10 @@
     "invalid_credentials": "The email or password you entered is incorrect. Please try again.",
     "login_failed": "Login Failed",
     "error_1": "Error",
-    "error_2": "An unexpected error occurred. Please try again."
+    "error_2": "An unexpected error occurred. Please try again.",
+    "email_username_required": "Email or username is required",
+    "password_required": "Password is required",
+    "minimum_characters": "Minimum 6 characters"
   },
   "register": {
     "title": "Create an Account",
