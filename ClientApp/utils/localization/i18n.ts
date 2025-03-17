@@ -16,7 +16,7 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: 'en', // Default language
+    lng: 'en',
     fallbackLng: 'en',
     compatibilityJSON: 'v4',
     interpolation: {
@@ -24,13 +24,11 @@ i18n
     }
   });
 
-// Save selected language in AsyncStorage for persistence
 export const setLanguage = async (language: string) => {
   await AsyncStorage.setItem(LANGUAGE_KEY, language);
   await i18n.changeLanguage(language);
 };
 
-// Load saved language from AsyncStorage
 export const getLanguage = async () => {
   const storedLang = await AsyncStorage.getItem(LANGUAGE_KEY);
   if (storedLang) {
