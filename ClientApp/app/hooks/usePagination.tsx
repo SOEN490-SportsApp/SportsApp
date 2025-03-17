@@ -35,7 +35,6 @@ const usePagination = <T,>(
         setPageNo(result.pageable.pageNumber);
         setTotalPages(result.totalPages);
       } else {
-        console.warn("No data received from API.");
       }
     } catch (error) {
       console.error("Error fetching data:", error);
