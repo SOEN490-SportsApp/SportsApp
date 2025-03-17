@@ -26,11 +26,11 @@ const ResetPassword: React.FC = () => {
           console.log("here");
         }
         setStatus("idle");
-        Alert.alert("Email not found.", "User with email does not exist. Please enter a valid email.");
+        Alert.alert(t('reset_password.email_not_found_1'), t('reset_password.email_not_found_2'));
         console.log(err);
       }
     } else {
-      Alert.alert("Invalid Email", "Please enter a valid email.");
+      Alert.alert(t('reset_password.invalid_email_1'), t('reset_password.invalid_email_2'));
     }
   };
 
