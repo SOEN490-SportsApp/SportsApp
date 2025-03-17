@@ -645,7 +645,7 @@ const styles = StyleSheet.create({
   skillLevelGroup: {
     flexDirection: "row",
     justifyContent: "space-around",
-    width: "75%",
+    width: hs(213),
     flexWrap: "wrap",
   },
   skillLevelSelected: {
