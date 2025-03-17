@@ -14,6 +14,7 @@ import themeColors from "@/utils/constants/colors";
 import ConfirmButton from "@/components/Helper Components/ConfirmButton";
 import FormErrorMessage from "@/components/Errors/FormErrorMessage";
 import RegisterProfileSports from "@/components/RegisterProfile/RegisterProfileSports";
+import { useTranslation } from 'react-i18next';
 
 interface RegisterProfilePageFormData {
   firstName: string;
@@ -34,7 +35,8 @@ const RegisterProfilePage: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [showGenderPicker, setShowGenderPicker] = useState(false);
   const [selectedGender, setSelectedGender] = useState("");
-  const genders = ["Male", "Female", "Other"];
+  const { t } = useTranslation();
+  const genders = [t('register_profile.male'), t('register_profile.female'), t('register_profile.other')];
 
   const nextStep = async (currentStep: number) => {
     if (currentStep === 1) {
@@ -49,8 +51,8 @@ const RegisterProfilePage: React.FC = () => {
       isValid
         ? setCurrentStep(2)
         : Alert.alert(
-            "Error Occured",
-            "Please complete form before proceeding."
+            t('register_profile.error_occured'),
+            t('register_profile.error_message_step_1')
           );
     } 
     if (currentStep === 2) {
@@ -58,8 +60,8 @@ const RegisterProfilePage: React.FC = () => {
       isValid
         ? setCurrentStep(1)
         : Alert.alert(
-            "Error Occured",
-            "Please select a sport before proceeding."
+            t('register_profile.error_occured'),
+            t('register_profile.error_message_step_2')
           );
     }
   };
@@ -80,8 +82,8 @@ const RegisterProfilePage: React.FC = () => {
       await updateUserToStore(userID as string);
       router.replace("/(tabs)/home");
     } catch (error: any){
-      Alert.alert('Error', 'Error occured creating profile');
-      throw new Error(`Error regestering profile: ${error}`);
+      Alert.alert(t('register_profile.error'), t('register_profile.error_create_profile'));
+      throw new Error(`${t('register_profile.error_register_profile')} ${error}`);
     }
   };
 
@@ -102,7 +104,7 @@ const RegisterProfilePage: React.FC = () => {
                     size={100}
                     color="#aaa"
                   />
-                  <Text style={styles.imageText}>upload image</Text>
+                  <Text style={styles.imageText}>{t('register_profile.image_upload')}</Text>
                 </View>
               </View>
               <View style={styles.inputParentContainer}>
@@ -116,10 +118,10 @@ const RegisterProfilePage: React.FC = () => {
                     <Controller
                       control={control}
                       name="firstName"
-                      rules={{ required: "First name is required" }}
+                      rules={{ required: t('register_profile.first_name_required') }}
                       render={({ field: { onChange, onBlur, value } }) => (
                         <TextInput
-                          placeholder="First name"
+                          placeholder={t('register_profile.first_name')}
                           onBlur={onBlur}
                           onChangeText={onChange}
                           value={value}
@@ -141,10 +143,10 @@ const RegisterProfilePage: React.FC = () => {
                     <Controller
                       control={control}
                       name="lastName"
-                      rules={{ required: "Last name is required" }}
+                      rules={{ required: t('register_profile.last_name_required') }}
                       render={({ field: { onChange, onBlur, value } }) => (
                         <TextInput
-                          placeholder={"Last name"}
+                          placeholder={t('register_profile.last_name')}
                           onBlur={onBlur}
                           onChangeText={onChange}
                           value={value}
@@ -171,7 +173,7 @@ const RegisterProfilePage: React.FC = () => {
                         control={control}
                         name="dob"
                         rules={{
-                          required: "Date of birth is required",
+                          required: t('register_profile.dob_required'),
                           validate: {
                             validDate: isValidDate,
                             isOverSixteen: isOlderThanSixteen,
@@ -213,7 +215,7 @@ const RegisterProfilePage: React.FC = () => {
                         <Controller
                           control={control}
                           name="gender"
-                          rules={{ required: "Gender is required" }}
+                          rules={{ required: t('register_profile.gender_required') }}
                           render={({ field: { onChange, value } }) => (
                             <View>
                               <Text
@@ -221,7 +223,7 @@ const RegisterProfilePage: React.FC = () => {
                                   value ? themeColors.text.dark : themeColors.text.lightGrey 
                                 }`}
                               >
-                                {value ? value : "Gender"}
+                                {value ? value : t('register_profile.gender')}
                               </Text>
                               {showGenderPicker && (
                                 <Modal
@@ -271,13 +273,13 @@ const RegisterProfilePage: React.FC = () => {
                                           }}
                                           onPress={() => {
                                             if (selectedGender === "") {
-                                              onChange("Male");
+                                              onChange(t('register_profile.male'));
                                             }
                                             setShowGenderPicker(false);
                                           }}
                                         >
                                           <Text style={{ color: themeColors.background.light }}>
-                                            Select
+                                            {t('register_profile.select_gender')}
                                           </Text>
                                         </TouchableOpacity>
                                       </View>
@@ -306,15 +308,15 @@ const RegisterProfilePage: React.FC = () => {
                       control={control}
                       name="phoneNumber"
                       rules={{
-                        required: "Phone number is required",
+                        required: t('register_profile.phone_required'),
                         pattern: {
                           value: /^(\d{3}-\d{3}-\d{4}|\d{10})$/,
-                          message: "Enter valid format xxx-xxx-xxxx",
+                          message: t('register_profile.phone_invalid'),
                         },
                       }}
                       render={({ field: { onChange, onBlur, value } }) => (
                         <TextInput
-                          placeholder="Phone number (xxx-xxx-xxxx)"
+                          placeholder={t('register_profile.phone_number')}
                           onBlur={onBlur}
                           onChangeText={(number) =>
                             onChange(formatPhoneNumber(number))
@@ -340,16 +342,16 @@ const RegisterProfilePage: React.FC = () => {
                       control={control}
                       name="postalCode"
                       rules={{
-                        required: "Postal code is required",
+                        required: t('register_profile.postal_code_required'),
                         pattern: {
                           value:
                             /^([A-Za-z]\d[A-Za-z] \d[A-Za-z]\d|[A-Za-z]\d[A-Za-z]\d[A-Za-z]\d)$/,
-                          message: "Enter valid format eg. A1A 1A1",
+                          message: t('register_profile.postal_code_invalid'),
                         },
                       }}
                       render={({ field: { onChange, onBlur, value } }) => (
                         <TextInput
-                          placeholder="Postal code"
+                          placeholder={t('register_profile.postal_code')}
                           onBlur={onBlur}
                           onChangeText={onChange}
                           value={value ? value : ""}
@@ -365,7 +367,7 @@ const RegisterProfilePage: React.FC = () => {
             </ScrollView>
             <View style={{ bottom: 0, marginTop: vs(4) }}>
               <ConfirmButton
-                text="Continue"
+                text={t('register_profile.continue_button')}
                 onPress={() => {
                   nextStep(1);
                 }}
@@ -404,12 +406,12 @@ const RegisterProfilePage: React.FC = () => {
                 <View style={styles.SportSelectionDialoguecontainer}>
                   <View style={styles.sportSelectionTitleWrapper}>
                     <Text style={styles.sportSelectionTitleText}>
-                      Add your Favourite Sports
+                      {t('register_profile.select_sport')}
                     </Text>
                   </View>
                   <View style={styles.sportSelectionTitleWrapper}>
                     <Text style={styles.sportSelectionSubtitleWrapper}>
-                      Choose your favourite sports in your home section
+                      {t('register_profile.select_sport_subtitle')}
                     </Text>
                   </View>
                 </View>
@@ -418,7 +420,7 @@ const RegisterProfilePage: React.FC = () => {
                 control={control}
                 name="selectedSports"
                 rules={{
-                  required: "Please select at least one sport.",
+                  required: t('register_profile.select_sport_error'),
                 }}
                 render={({ field: { onChange, onBlur, value } }) => (
                   <View style={styles.multiSportContainer}>
@@ -432,13 +434,13 @@ const RegisterProfilePage: React.FC = () => {
               {errors.selectedSports && (
                 <View style={styles.selectedSportsErrorContainer}>
                   <Text style={styles.selectedSportsError}>
-                    Please select at least one sport.{" "}
+                  {t('register_profile.select_sport_error')}{" "}
                   </Text>
                 </View>
               )}
               <View>
                 <ConfirmButton
-                  text="Continue"
+                  text={t('register_profile.continue_button')}
                   onPress={handleSubmit(onSubmit)}
                   icon={
                     <MaterialCommunityIcons
