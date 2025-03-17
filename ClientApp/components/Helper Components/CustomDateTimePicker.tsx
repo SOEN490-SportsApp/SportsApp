@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, Text, TouchableOpacity, Modal, StyleSheet } from "react-native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import themeColors from "@/utils/constants/colors";
+import { useTranslation } from 'react-i18next';
 
 interface CustomDateTimePickerProps {
   value: Date | null;
@@ -17,6 +18,8 @@ const CustomDateTimePicker: React.FC<CustomDateTimePickerProps> = ({
   label,
 }) => {
   const [isPickerVisible, setPickerVisible] = useState(false);
+  const { t } = useTranslation();
+  const currentMode = mode === "date" ? t('custom_date_time_picker.date') : t('custom_date_time_picker.time');
 
   const showPicker = () => setPickerVisible(true);
   const hidePicker = () => setPickerVisible(false);
@@ -28,17 +31,16 @@ const CustomDateTimePicker: React.FC<CustomDateTimePickerProps> = ({
 
   return (
     <View>
-      {/* <Text style={styles.label}>{label}</Text> */}
       <TouchableOpacity onPress={showPicker} style={styles.input}>
         <Text style={styles.inputText}>
           {value
-            ? mode === "date"
+            ? currentMode === t('custom_date_time_picker.date')
               ? value.toDateString()
               : value.toLocaleTimeString([], {
                   hour: "2-digit",
                   minute: "2-digit",
                 })
-            : `Select ${mode}`}
+            : `${t('custom_date_time_picker.select')} ${currentMode}`}
         </Text>
       </TouchableOpacity>
 
@@ -67,7 +69,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   inputText: {
-    fontSize: 16,
+    fontSize: 15,
     color: themeColors.text.dark,
   },
 });

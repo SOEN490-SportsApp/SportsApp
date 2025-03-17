@@ -3,6 +3,7 @@ import { View, TextInput, TouchableOpacity } from "react-native";
 import { GooglePlacesAutocomplete, GooglePlacesAutocompleteRef } from "react-native-google-places-autocomplete";
 import { Ionicons } from "@expo/vector-icons";
 import themeColors from "@/utils/constants/colors";
+import { useTranslation } from 'react-i18next';
 
 interface GooglePlacesInputProps {
   setLocation: (location: any) => void;
@@ -33,6 +34,7 @@ const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
 }) => {
   const [selectedLocation, setSelectedLocation] = useState<LocationData | null>(null);
   const ref = useRef<GooglePlacesAutocompleteRef>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (clearTrigger) {
@@ -45,7 +47,7 @@ const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
     <View style={{ flex: 1, marginBottom: 10 }}>
       <GooglePlacesAutocomplete
         ref={ref}
-        placeholder="Search for a location"
+        placeholder={t('google_places_input.search_for_location')}
         minLength={2}
         fetchDetails={true}
         onPress={(data, details = null) => {
