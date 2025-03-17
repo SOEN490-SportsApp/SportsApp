@@ -73,8 +73,10 @@ const MyCalendar: React.FC<EventList> = ({ userId, isVisible }) => {
           ...updatedMarkedDates,
         }));
       };
+      if (Location.longitude !== 0 && Location.latitude !== 0) {
       fetchEvents();
-    }, [])
+      }
+    }, [Location])
   );
 
   const onDayPress = (day: any) => {

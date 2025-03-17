@@ -41,8 +41,10 @@ const EventsList = () => {
   };
 
   useEffect(() => {
-    fetchEvents();
-    }, [Location]);
+    if (Location.longitude !== 0 && Location.latitude !== 0) {
+      fetchEvents();
+    }
+  }, [Location]);
 
   const onRefresh = async () => {
     setRefreshing(true);
