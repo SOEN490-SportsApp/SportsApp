@@ -10,7 +10,6 @@ import { hs, vs, mvs, mhs } from "@/utils/helpers/uiScaler";
 import { loginUser } from "@/services/authService";
 import { useUpdateUserToStore } from '@/state/user/actions';
 import { getUserById } from "@/state/user/api";
-import { ALERT_MESSAGES } from "@/utils/api/errorHandlers";
 import { useTranslation } from 'react-i18next';
 
 interface LoginPageFormData {
@@ -40,10 +39,10 @@ const LoginPage: React.FC = () => {
         console.log(error);
 
         // Check for specific error message from the backend
-        if (error.message === "The email or password you entered is incorrect. Please try again.") {
-            Alert.alert('Login Failed', error.message);
+        if (error.message === t('login.invalid_credentials')) {
+            Alert.alert(t('login.login_failed'), error.message);
         } else {
-            Alert.alert('Error', 'An unexpected error occurred. Please try again.');
+            Alert.alert(t('login.error_1'), t('login.error_2'));
         }
     }
 };

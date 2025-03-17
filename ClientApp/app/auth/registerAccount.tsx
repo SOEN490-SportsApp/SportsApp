@@ -29,16 +29,16 @@ const RegisterAccountPage: React.FC = () => {
   const { t } = useTranslation();
 
   const onSubmit = async (data: RegisterAccountPageFormData) => {
-    if (data.password !== data.confirmPassword) return Alert.alert("Oh oh!", "Passwords do not match.");
-    if (!data.agreeToTerms) return Alert.alert("", "You must agree to the terms to continue.");
+    if (data.password !== data.confirmPassword) return Alert.alert(t('register.password_mismatch_1'), t('register.password_mismatch_2'));
+    if (!data.agreeToTerms) return Alert.alert("", t('register.must_agree_terms'));
     try{
       const response = await registerUser(data.email, data.username, data.password);
       setUserID(response.data.id);
-      Alert.alert('Account Created', `Check your email at ${data.email} to verify your account.`)
+      Alert.alert(t('register.account_created'), `${t('register.check_email_1')} ${data.email} ${t('register.check_email_2')}`)
       router.push('/auth/login');
     } catch (error: any){
-      Alert.alert("Error", "Failed to create account.");
-      console.error(`Failed to create account: ${error}. ${error.message}`);
+      Alert.alert(t('register.error'), t('register.fail_create_account'));
+      console.error(`${t('register.fail_create_account')}: ${error}. ${error.message}`);
     }
   };
 
@@ -55,7 +55,7 @@ const RegisterAccountPage: React.FC = () => {
           <Controller
             control={control}
             name="username"
-            rules={{ required: "Username is required" }}
+            rules={{ required: t('register.username_required') }}
             render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
                 style={styles.input}
@@ -78,7 +78,7 @@ const RegisterAccountPage: React.FC = () => {
             control={control}
             name="email"
             rules={{
-              required: "Email is required",
+              required: t('register.email_required'),
               pattern: { value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/, message: "Invalid email" }
             }}
             render={({ field: { onChange, onBlur, value } }) => (
@@ -104,7 +104,7 @@ const RegisterAccountPage: React.FC = () => {
           <Controller
             control={control}
             name="password"
-            rules={{ required: "Password is required", minLength: { value: 6, message: "Minimum 6 characters" } }}
+            rules={{ required: t('register.password_required'), minLength: { value: 6, message: t('register.minimum_characters') } }}
             render={({ field: { onChange, onBlur, value } }) => (
               <View style={styles.passwordContainer}>
                 <TextInput
@@ -139,7 +139,7 @@ const RegisterAccountPage: React.FC = () => {
           <Controller
             control={control}
             name="confirmPassword"
-            rules={{ required: "Please confirm your password" }}
+            rules={{ required: t('register.confirm_email_required') }}
             render={({ field: { onChange, onBlur, value } }) => (
               <View style={styles.passwordContainer}>
                 <TextInput
