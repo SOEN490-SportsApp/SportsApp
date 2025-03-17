@@ -150,5 +150,35 @@
   },
   "google_places_input": {
     "search_for_location": "Search for a location"
+  },
+  "settings_page": {
+    "share_profile": "Share Profile",
+    "notification_settings": "Notification Settings",
+    "language": "Language",
+    "help": "Help",
+    "logout": "Log out",
+    "delete_account": "Delete Account"
+  },
+  "delete_account_page": {
+    "are_you_sure": "Are you sure?",
+    "delete_warning_1": "This action will permanently delete your account and cannot be undone.",
+    "cancel_button": "Cancel",
+    "delete_button": "Delete",
+    "deleted": "Deleted",
+    "account_deleted": "Your account has been successfully deleted.",
+    "error": "Error",
+    "delete_failed": "Account deletion was incomplete. Please contact support.",
+    "unexpected_error": "Something went wrong. Please try again.",
+    "delete_your_account": "Delete Your Account",
+    "delete_warning_2": "Deleting your account will remove all your data permanently. This action cannot be undone.",
+    "delete_my_account": "Delete My Account"
+  },
+  "help_page": {
+    "contact_support": "Contact Support",
+    "privacy_policy": "Privacy Policy",
+    "for_further_assistance": "For further assistance, please contact us at"
+  },
+  "notifications_page": {
+    "mute_all": "Mute All"
   }
 }

@@ -16,12 +16,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "@/services/authService";
 import QR from "@/components/QR/QR";
 import * as WebBrowser from 'expo-web-browser';
-
+import { useTranslation } from 'react-i18next';
 
 const settingsPage: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const user = useSelector((state: { user: any }) => state.user);
   const dispatch = useDispatch();
+  const { t } = useTranslation();
   const handleLogout = () => {
     logoutUser(dispatch);
     router.replace("/auth/login");
@@ -46,7 +47,7 @@ const settingsPage: React.FC = () => {
             color="black"
             style={styles.icon}
           />
-          <Text style={styles.text}>Share Profile</Text>
+          <Text style={styles.text}>{t('settings_page.share_profile')}</Text>
         </TouchableOpacity>
 
         <QR
@@ -57,33 +58,15 @@ const settingsPage: React.FC = () => {
         />
 
         {/* Notification Settings */}
-        <TouchableOpacity
-          style={styles.option}
-          onPress={() =>
-            router.push("/(tabs)/profile/(settings)/notificationsPage")
-          }
-        >
-          <Ionicons
-            name="notifications-outline"
-            size={mvs(24)}
-            color="black"
-            style={styles.icon}
-          />
-          <Text style={styles.text}>Notification Settings</Text>
+        <TouchableOpacity style={styles.option} onPress={() => router.push('/(tabs)/profile/(settings)/notificationsPage')}>
+          <Ionicons name="notifications-outline" size={mvs(24)} color="black" style={styles.icon} />
+          <Text style={styles.text}>{t('settings_page.notification_settings')}</Text>
         </TouchableOpacity>
 
         {/* Language Option */}
-        <TouchableOpacity
-          style={styles.option}
-          onPress={() => router.push("/(tabs)/profile/(settings)/languagePage")}
-        >
-          <Ionicons
-            name="language-outline"
-            size={mvs(24)}
-            color="black"
-            style={styles.icon}
-          />
-          <Text style={styles.text}>Language</Text>
+        <TouchableOpacity style={styles.option} onPress={() => router.push('/(tabs)/profile/(settings)/languagePage')}>
+          <Ionicons name="language-outline" size={mvs(24)} color="black" style={styles.icon} />
+          <Text style={styles.text}>{t('settings_page.language')}</Text>
         </TouchableOpacity>
         {/* Submit feedback*/}
         <TouchableOpacity
@@ -99,42 +82,19 @@ const settingsPage: React.FC = () => {
           <Text style={styles.text}>Submit Feedback</Text>
         </TouchableOpacity>
         {/* Help */}
-        <TouchableOpacity
-          style={styles.option}
-          onPress={() => router.push("/(tabs)/profile/(settings)/helpPage")}
-        >
-          <Ionicons
-            name="help-circle-outline"
-            size={mvs(24)}
-            color="black"
-            style={styles.icon}
-          />
-          <Text style={styles.text}>Help</Text>
+        <TouchableOpacity style={styles.option} onPress={() => router.push('/(tabs)/profile/(settings)/helpPage')}>
+          <Ionicons name="help-circle-outline" size={mvs(24)} color="black" style={styles.icon} />
+          <Text style={styles.text}>{t('settings_page.help')}</Text>
         </TouchableOpacity>
         {/* Log out */}
         <TouchableOpacity style={styles.option} onPress={handleLogout}>
-          <Ionicons
-            name="log-out-outline"
-            size={mvs(24)}
-            color="black"
-            style={styles.icon}
-          />
-          <Text style={styles.text}>Log out</Text>
+          <Ionicons name="log-out-outline" size={mvs(24)} color="black" style={styles.icon} />
+          <Text style={styles.text}>{t('settings_page.logout')}</Text>
         </TouchableOpacity>
-        {/* Delete Account */}
-        <TouchableOpacity
-          style={[styles.option, styles.deleteOption]}
-          onPress={() =>
-            router.push("/(tabs)/profile/(settings)/deleteAccountPage")
-          }
-        >
-          <Ionicons
-            name="trash-outline"
-            size={mvs(24)}
-            color="red"
-            style={styles.icon}
-          />
-          <Text style={[styles.text, styles.deleteText]}>Delete Account</Text>
+         {/* Delete Account */}
+        <TouchableOpacity style={[styles.option, styles.deleteOption]} onPress={() => router.push('/(tabs)/profile/(settings)/deleteAccountPage')}>
+          <Ionicons name="trash-outline" size={mvs(24)} color="red" style={styles.icon} />
+          <Text style={[styles.text, styles.deleteText]}>{t('settings_page.delete_account')}</Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
