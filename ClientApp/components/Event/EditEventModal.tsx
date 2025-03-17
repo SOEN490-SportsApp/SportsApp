@@ -143,9 +143,12 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
   useEffect(() => {
     if (eventDetails?.cutOffTime) {
       const cutOffDateTime = new Date(eventDetails.cutOffTime);
-      setCutOffDate(new Date(cutOffDateTime.toDateString()));
-      setCutOffTime(new Date(`1970-01-01T${cutOffDateTime.toTimeString().slice(0, 8)}`));
-    }
+      const utcOffset = cutOffDateTime.getTimezoneOffset() * 60000;
+      const localTime = new Date(cutOffDateTime.getTime() - utcOffset);
+  
+      setCutOffDate(new Date(localTime.toDateString()));
+      setCutOffTime(new Date(`1970-01-01T${localTime.toTimeString().slice(0, 8)}`));
+    }  
   }, [eventDetails]);
 
   useEffect(() => {
