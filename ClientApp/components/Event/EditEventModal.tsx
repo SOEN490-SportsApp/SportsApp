@@ -247,10 +247,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
       } else {
         alert("Please select at least one skill level.");
         return;
-      }
-  
-      console.log("Payload Sent to API: ", JSON.stringify(updatedEventData, null, 2));
-  
+      }  
       await editEvent(eventId, updatedEventData);
       Alert.alert("Success", "Event updated successfully!");
       onClose();
@@ -545,7 +542,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
                             }}
                             value={value || description}
                             multiline={true}
-                            numberOfLines={4}
+                            numberOfLines={2}
                             textAlignVertical="top"
                           />
                         )}
@@ -607,7 +604,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   scrollView: {
-    maxHeight: 500,
+    maxHeight: 550,
     width: "100%",
   },
   bold: {
