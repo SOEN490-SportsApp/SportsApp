@@ -4,7 +4,7 @@ import { router, Stack } from "expo-router";
 import { Menu, Provider } from "react-native-paper";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import themeColors from "@/utils/constants/colors";
-import { deleteEvent, getEventDetails } from "@/services/eventService";
+import { deleteEvent, getEventDetails, leaveEvent } from "@/services/eventService";
 import { useLocalSearchParams } from "expo-router";
 import QR from "@/components/QR/QR";
 import { mvs } from "@/utils/helpers/uiScaler";
@@ -30,24 +30,24 @@ export default function EventDetailsLayout() {
     const fetchEventDetails = async () => {
       try {
         if (!userId) return;
-    
+  
         const eventDetails = await getEventDetails(eventId);
+  
         if (userId === eventDetails.createdBy) {
           setIsCreator(true);
         }
-
+  
         const hasJoined = eventDetails.participants.some(
           (participant: { userId: string }) => participant.userId === userId
         );
         setIsParticipant(hasJoined);
-
       } catch (error) {
         console.error(t('event_details_layout.error_fetching_details'), error);
       }
     };
-    
+  
     fetchEventDetails();
-  }, [eventId, userId]);
+  }, [eventId, userId]);  
 
   const openMenu = () => setMenuVisible(true);
   const closeMenu = () => setMenuVisible(false);
@@ -59,7 +59,7 @@ export default function EventDetailsLayout() {
         console.log("Invite friend selected");
         break;
       case "leave":
-        console.log("Leave event selected");
+        handleLeaveEvent(); 
         break;
       case "edit":
         setEditModalVisible(true);
@@ -71,7 +71,36 @@ export default function EventDetailsLayout() {
         break;
     }
   };
-
+  
+  const handleLeaveEvent = async () => {
+    if (!eventId || !userId) {
+      Alert.alert("Error", "Event ID or User ID is missing.");
+      return;
+    }
+  
+    Alert.alert(
+      "Confirm Leave",
+      "Are you sure you want to leave this event?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Leave",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const response = await leaveEvent(eventId, userId);
+              Alert.alert("Success", "You have left the event.");
+              setIsParticipant(false); 
+            } catch (error: any) {
+              Alert.alert("Error", "Unable to leave event. Please check the request format.");
+            }
+          },
+        },
+      ]
+    );
+  };
+  
+  
   const handleDeleteEvent = async (eventId: string | undefined) => {
     if (!eventId) {
       Alert.alert("Error", "Event ID is missing.");
