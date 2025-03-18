@@ -16,11 +16,15 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.nchelico.ClientApp",
-      "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false,
-        "LSApplicationQueriesSchemes": [
-          "myapp"
-        ]
+     "infoPlist": {
+      "ITSAppUsesNonExemptEncryption": false,
+      "NSCameraUsageDescription": "This app needs access to your camera to take photos.",
+      "NSMicrophoneUsageDescription": "This app needs access to your microphone for video recording.",
+      "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to upload images.",
+      "NSPhotoLibraryAddUsageDescription": "This app needs permission to save photos to your gallery.",
+      "LSApplicationQueriesSchemes": [
+        "myapp"
+      ]
       },
       "config": {
         "googleMapsApiKey":  "process.env.GOOGLE_MAPS_API_KEY"
