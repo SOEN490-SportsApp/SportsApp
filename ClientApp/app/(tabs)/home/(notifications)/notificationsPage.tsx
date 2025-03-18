@@ -7,12 +7,14 @@ import FriendRequestNotification from "@/components/Helper Components/FriendRequ
 import { router } from "expo-router";
 import themeColors from "@/utils/constants/colors";
 import { getReceivedFriendRequests } from "@/utils/api/profileApiClient";
+import { useTranslation } from 'react-i18next';
 
 const NotificationsScreen: React.FC = () => {
     const user = useSelector((state: RootState) => state.user);
     const notifications = useSelector((state: RootState) => state.notifications.notifications);
     const loading = useSelector((state: RootState) => state.notifications.loading);
     const dispatch = useDispatch();
+    const { t } = useTranslation();
 
     useEffect(() => {
         async function fetchFriendRequests() {
@@ -47,9 +49,9 @@ const NotificationsScreen: React.FC = () => {
                 {/* Friend Requests Section */}
                 <View style={{ flex: 1, backgroundColor: "#fff", borderRadius: 10, padding: 15 }}>
                     <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-                        <Text style={{ fontSize: 20, fontWeight: "bold" }}>Friend Requests</Text>
+                        <Text style={{ fontSize: 20, fontWeight: "bold" }}>{t('home_notifications_page.friend_requests')}</Text>
                         <TouchableOpacity onPress={() => router.push("/(tabs)/home/(notifications)/friendRequestsPage")}>
-                            <Text style={{ color: themeColors.background.dark }}>Show All</Text>
+                            <Text style={{ color: themeColors.background.dark }}>{t('home_notifications_page.show_all')}</Text>
                         </TouchableOpacity>
                     </View>
                     {loading ? (
@@ -72,8 +74,8 @@ const NotificationsScreen: React.FC = () => {
                             style={{ flex: 1 }}
                             ListEmptyComponent={
                                 <View style={{ alignItems: "center", padding: 20 }}>
-                                    <Text style={{ fontSize: 16, color: "gray" }}>No new friend requests 🤝</Text>
-                                    <Text style={{ fontSize: 14, color: "gray", marginTop: 5 }}>Check back later!</Text>
+                                    <Text style={{ fontSize: 16, color: "gray" }}>{t('home_notifications_page.now_friends_requests')}</Text>
+                                    <Text style={{ fontSize: 14, color: "gray", marginTop: 5 }}>{t('home_notifications_page.check_later')}</Text>
                                 </View>
                             }
                         />
@@ -84,9 +86,9 @@ const NotificationsScreen: React.FC = () => {
                 {/* What's New Section */}
                 <View style={{ flex: 1, backgroundColor: "#fff", borderRadius: 10, padding: 15, marginTop: 20 }}>
                     <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-                        <Text style={{ fontSize: 20, fontWeight: "bold" }}>What's New?</Text>
+                        <Text style={{ fontSize: 20, fontWeight: "bold" }}>{t('home_notifications_page.whats_new')}</Text>
                         <TouchableOpacity onPress={() => router.push("/(tabs)/home/(notifications)/whatIsNewPage")}>
-                            <Text style={{ color: themeColors.background.dark }}>Show All</Text>
+                            <Text style={{ color: themeColors.background.dark }}>{t('home_notifications_page.show_all')}</Text>
                         </TouchableOpacity>
                     </View>
                     <FlatList
@@ -101,8 +103,8 @@ const NotificationsScreen: React.FC = () => {
                         style={{ flex: 1 }}
                         ListEmptyComponent={
                             <View style={{ alignItems: "center", padding: 20 }}>
-                                <Text style={{ fontSize: 16, color: "gray" }}>No new notifications 🎉</Text>
-                                <Text style={{ fontSize: 14, color: "gray", marginTop: 5 }}>You're all caught up!</Text>
+                                <Text style={{ fontSize: 16, color: "gray" }}>{t('home_notifications_page.no_notifications')}</Text>
+                                <Text style={{ fontSize: 14, color: "gray", marginTop: 5 }}>{t('home_notifications_page.all_caught_up')}</Text>
                             </View>
                         }
                     />
