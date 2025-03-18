@@ -13,6 +13,7 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
@@ -21,6 +22,7 @@ import { createPost, uploadImage } from '@/utils/api/postApiClient';
 import { useSelector } from 'react-redux';
 import { UserState } from '@/types';
 import { mhs, mvs } from '@/utils/helpers/uiScaler';
+import { Camera } from "expo-camera";
 
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -39,29 +41,38 @@ const PostCreationComponent: React.FC<PostCreationProps> = ({ eventId, onNewPost
 
   const pickImage = async (source: 'gallery' | 'camera') => {
     let result;
+  
     if (source === 'gallery') {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission Denied', 'Allow photo library access in settings.');
+        return;
+      }
       result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ['images'],
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: false,
-        aspect: [4, 3],
         quality: 1,
       });
     } else if (source === 'camera') {
+      const { status } = await Camera.requestCameraPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission Denied', 'Allow camera access in settings.');
+        return;
+      }
+  
       result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ['images'],
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: false,
-        aspect: [4, 3],
         quality: 1,
       });
     }
-
-    if (result && !result.canceled) {
-      const { uri, width, height, type, file, fileName } = result.assets[0];
-      setImages((prev) => [...prev, { uri, width, height, type, file, fileName }]);
+  
+    if (result && !result.canceled && result.assets.length > 0) {
+      const { uri, width, height } = result.assets[0];
+      setImages((prev) => [...prev, { uri, width, height }]);
       setCurrentImageIndex(images.length);
     }
   };
-
   const handlePost = async () => {
     try {
       // const uploadPromises = images.map((image) => uploadImage(image.uri));
