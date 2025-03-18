@@ -180,5 +180,24 @@
   },
   "notifications_page": {
     "mute_all": "Tout désactiver"
+  },
+  "filter_modal": {
+    "sport_type": "Type de sport",
+    "clear_filters": "effacer les filtres",
+    "skill_level": "Niveau de compétence",
+    "select_date_range": "Sélectionner la plage de dates",
+    "to": "à"
+  },
+  "search_page": {
+    "search": "Rechercher..."
+  },
+  "home_notifications_page": {
+    "friend_requests": "Demandes d'ami",
+    "show_all": "Tout afficher",
+    "whats_new": "Quoi de neuf?",
+    "no_friend_requests": "Pas de nouvelles demandes d'ami 🤝",
+    "check_later": "Revenez plus tard!",
+    "no_notifications": "Pas de nouvelles notifications 🎉",
+    "all_caught_up": "Vous êtes à jour!"
   }
 }

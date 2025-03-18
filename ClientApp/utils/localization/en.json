@@ -180,5 +180,24 @@
   },
   "notifications_page": {
     "mute_all": "Mute All"
+  },
+  "filter_modal": {
+    "sport_type": "Sport Type",
+    "clear_filters": "clear filters",
+    "skill_level": "Skill Level",
+    "select_date_range": "Select Date Range",
+    "to": "to"
+  },
+  "search_page": {
+    "search": "Search..."
+  },
+  "home_notifications_page": {
+    "friend_requests": "Friend Requests",
+    "show_all": "Show All",
+    "whats_new": "What's New?",
+    "no_friend_requests": "No new friend requests 🤝",
+    "check_later": "Check back later!",
+    "no_notifications": "No new notifications 🎉",
+    "all_caught_up": "You're all caught up!"
   }
 }

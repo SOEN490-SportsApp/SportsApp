@@ -30,6 +30,7 @@ import FilterModal, {
   FilterState,
 } from "@/components/Helper Components/FilterSection/FilterModal";
 import { set } from "react-hook-form";
+import { useTranslation } from 'react-i18next';
 
 export default function searchPage() {
   const router = useRouter();
@@ -55,6 +56,7 @@ export default function searchPage() {
   const [isVisible, setIsVisible] = useState(false);
   const [filter, setFilter] = useState(false);
   const [filterState, setFilterState] = useState(initialState);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchInitialEvents = async () => {
@@ -438,7 +440,7 @@ export default function searchPage() {
         </TouchableOpacity>
         <TextInput
           style={[styles.searchInput]}
-          placeholder="Search..."
+          placeholder={t("search_page.search")}
           value={searchText}
           onChangeText={(text) => handleChangeText(text)}
           placeholderTextColor="#999"
