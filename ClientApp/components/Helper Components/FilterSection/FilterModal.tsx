@@ -9,6 +9,7 @@ import SportFilterButton from "./FilterButtonBadge";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import FilterButtonBadge from "./FilterButtonBadge";
 import { hs, vs } from "@/utils/helpers/uiScaler";
+import { useTranslation } from 'react-i18next';
 
 export interface FilterState {
   filterType: string;
@@ -38,6 +39,7 @@ const FilterModal: React.FC<FilterModalInterface> = ({
   ];
 
   const skillLevels = ["Beginner", "Intermediate", "Advanced"];
+  const { t } = useTranslation();
 
   return (
     <BottomModal isVisible={isVisible} setIsVisible={setIsVisible} height={650}>
@@ -71,14 +73,14 @@ const FilterModal: React.FC<FilterModalInterface> = ({
                   }}
                 >
                   {" "}
-                  Sport type
+                  {t('filter_modal.sport_type')}
                 </Text>
               </View>
               <View>
                 <TouchableOpacity onPress={handleCleanFilter}>
                   <Text style={{ color: "#0096FF",  fontWeight: "bold" }}>
                     {" "}
-                    clear filters
+                    {t('filter_modal.clear_filters')}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -132,7 +134,7 @@ const FilterModal: React.FC<FilterModalInterface> = ({
                 }}
               >
                 {" "}
-                Skill Level
+                {t('filter_modal.skill_level')}
               </Text>
             </View>
             <View
@@ -172,7 +174,7 @@ const FilterModal: React.FC<FilterModalInterface> = ({
                 fontWeight: "bold",
               }}
             >
-              Select Date Range
+              {t('filter_modal.select_date_range')}
             </Text>
             <View
               style={{
@@ -193,7 +195,7 @@ const FilterModal: React.FC<FilterModalInterface> = ({
                   }))
                 }
               />
-              <Text>To: </Text>
+              <Text>{t('filter_modal.to')} </Text>
               <CustomDateTimePicker
                 value={filterState.maxDate}
                 mode="date"
