@@ -29,7 +29,6 @@ const settingsPage: React.FC = () => {
   
   const router = useRouter();
   const handleForm = async () => {
-    console.log('herer')
     await WebBrowser.openBrowserAsync('https://forms.gle/PMPQGNNAh6AuEZUk6');
   }
 
