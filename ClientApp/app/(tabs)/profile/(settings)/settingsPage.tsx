@@ -96,7 +96,7 @@ const settingsPage: React.FC = () => {
             color="black"
             style={styles.icon}
           />
-          <Text style={styles.text}>Feedback</Text>
+          <Text style={styles.text}>Submit Feedback</Text>
         </TouchableOpacity>
         {/* Help */}
         <TouchableOpacity
