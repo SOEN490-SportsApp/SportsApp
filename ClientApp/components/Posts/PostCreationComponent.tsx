@@ -49,10 +49,11 @@ const PostCreationComponent: React.FC<PostCreationProps> = ({ eventId, onNewPost
         return;
       }
       result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ["images"],
         allowsEditing: false,
         quality: 1,
       });
+      
     } else if (source === 'camera') {
       const { status } = await Camera.requestCameraPermissionsAsync();
       if (status !== 'granted') {
@@ -61,7 +62,7 @@ const PostCreationComponent: React.FC<PostCreationProps> = ({ eventId, onNewPost
       }
   
       result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ["images"],
         allowsEditing: false,
         quality: 1,
       });
