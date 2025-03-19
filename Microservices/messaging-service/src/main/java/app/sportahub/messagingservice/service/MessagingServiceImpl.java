@@ -1,6 +1,7 @@
 package app.sportahub.messagingservice.service;
 
 import app.sportahub.messagingservice.dto.request.MessageRequest;
+import app.sportahub.messagingservice.dto.request.chatroom.ChatroomRequest;
 import app.sportahub.messagingservice.dto.response.chatroom.ChatroomResponse;
 import app.sportahub.messagingservice.dto.response.message.MessageResponse;
 import app.sportahub.messagingservice.exception.UserAddingThemselvesToChatroomMemberSetException;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -43,20 +45,19 @@ public class MessagingServiceImpl  implements MessagingService {
                 true).chatroomId();
         message.setChatroomId(chatroomId);
         Message savedMessage = messageRepository.save(message);
+        Chatroom chatroom = chatroomRepository.findByChatroomId(chatroomId);
+        List<Message> messages = chatroom.getMessages();
+        messages.addFirst(savedMessage);
+        chatroom.setMessages(messages);
+        chatroomRepository.save(chatroom);
 
+        messagingTemplate.convertAndSend("/topic/chatroom/" + chatroomId, savedMessage);
+
+        /*
         for (String receiverId : message.getReceiverIds())
             messagingTemplate.convertAndSendToUser(receiverId,"/queue/messages", savedMessage);
-    }
 
-    @Override
-    public List<MessageResponse> getMessages(String senderId) {
-        List<Message> messages = messageRepository.findAllBySenderId(senderId);
-
-        return messages.stream()
-                .map(message -> new MessageResponse(message.getMessageId(), message.getChatroomId(),
-                        message.getSenderId(), message.getReceiverIds(), message.getContent(), message.getCreatedAt(),
-                        message.getAttachments()))
-                .toList();
+         */
     }
 
     @Override
@@ -64,9 +65,7 @@ public class MessagingServiceImpl  implements MessagingService {
         return chatroomMapper.chatroomToChatroomResponse((chatroomRepository.findByCreatedByAndMembersEquals(senderId, members)
                 .or(() -> {
                     if (createNewIfNotExists) {
-                        if(members.contains(senderId))
-                            throw new UserAddingThemselvesToChatroomMemberSetException(senderId);
-
+                        members.add(senderId);
                         Chatroom chatroom = Chatroom.builder()
                                 .createdBy(senderId)
                                 .createdAt(Timestamp.valueOf(LocalDateTime.now()))
@@ -78,5 +77,41 @@ public class MessagingServiceImpl  implements MessagingService {
                     }
                     return Optional.empty();
                 })).orElse(null));
+    }
+
+    @Override
+    public List<MessageResponse> getMessages(String chatroomId) {
+        List<Message> messages = chatroomRepository.findByChatroomId(chatroomId).getMessages();
+
+        return messages.stream()
+                .map(message -> new MessageResponse(message.getMessageId(), message.getChatroomId(),
+                        message.getSenderId(), message.getReceiverIds(), message.getContent(), message.getCreatedAt(),
+                        message.getAttachments()))
+                .toList();
+    }
+
+    @Override
+    public List<ChatroomResponse> getChatrooms(String userId) {
+        Set<String> tempSet = new HashSet<>();
+        tempSet.add(userId);
+        List<Chatroom> chatrooms = chatroomRepository.findAllByMembersContains(tempSet);
+
+        return chatrooms.stream()
+                .map(chatroom -> new ChatroomResponse(chatroom.getChatroomId(), chatroom.getCreatedAt(),
+                        chatroom.getCreatedBy(), chatroom.getMembers(), chatroom.getMessages(), chatroom.getIsEvent(),
+                        chatroom.getUnread()))
+                .toList();
+    }
+
+    @Override
+    public ChatroomResponse createChatroom(ChatroomRequest chatroomRequest) {
+        Chatroom chatroom = chatroomMapper.chatroomRequestToChatroom(chatroomRequest);
+        chatroom.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
+        Set<String> members = chatroom.getMembers();
+        members.add(chatroomRequest.createdBy());
+        chatroom.setMembers(members);
+
+        Chatroom savedChatroom = chatroomRepository.save(chatroom);
+        return chatroomMapper.chatroomToChatroomResponse(savedChatroom);
     }
 }
