@@ -1,31 +1,43 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Modal, TouchableWithoutFeedback } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  Modal,
+  TouchableWithoutFeedback,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import themeColors from "@/utils/constants/colors";
 import { hs, vs, mvs, mhs } from "@/utils/helpers/uiScaler";
-import { useDispatch, useSelector } from 'react-redux';
-import { logoutUser } from '@/services/authService';
-import QR from '@/components/QR/QR';
-
+import { useDispatch, useSelector } from "react-redux";
+import { logoutUser } from "@/services/authService";
+import QR from "@/components/QR/QR";
+import * as WebBrowser from 'expo-web-browser';
 
 
 const settingsPage: React.FC = () => {
-  const [modalVisible, setModalVisible] = useState(false)
+  const [modalVisible, setModalVisible] = useState(false);
   const user = useSelector((state: { user: any }) => state.user);
   const dispatch = useDispatch();
   const handleLogout = () => {
     logoutUser(dispatch);
-    router.replace('/auth/login');
+    router.replace("/auth/login");
   };
-
+  
   const router = useRouter();
+  const handleForm = async () => {
+    console.log('herer')
+    await WebBrowser.openBrowserAsync('https://forms.gle/PMPQGNNAh6AuEZUk6');
+  }
 
   return (
     <View style={styles.container}>
       {/* Scrollable Content */}
       <ScrollView contentContainerStyle={styles.content}>
-      <TouchableOpacity
+        <TouchableOpacity
           style={styles.option}
           onPress={() => setModalVisible(true)}
         >
@@ -38,33 +50,91 @@ const settingsPage: React.FC = () => {
           <Text style={styles.text}>Share Profile</Text>
         </TouchableOpacity>
 
-        <QR id={user.id} isVisible={modalVisible} setIsVisible={setModalVisible} isProfile={true}/>
+        <QR
+          id={user.id}
+          isVisible={modalVisible}
+          setIsVisible={setModalVisible}
+          isProfile={true}
+        />
 
         {/* Notification Settings */}
-        <TouchableOpacity style={styles.option} onPress={() => router.push('/(tabs)/profile/(settings)/notificationsPage')}>
-          <Ionicons name="notifications-outline" size={mvs(24)} color="black" style={styles.icon} />
+        <TouchableOpacity
+          style={styles.option}
+          onPress={() =>
+            router.push("/(tabs)/profile/(settings)/notificationsPage")
+          }
+        >
+          <Ionicons
+            name="notifications-outline"
+            size={mvs(24)}
+            color="black"
+            style={styles.icon}
+          />
           <Text style={styles.text}>Notification Settings</Text>
         </TouchableOpacity>
 
         {/* Language Option */}
-        <TouchableOpacity style={styles.option} onPress={() => router.push('/(tabs)/profile/(settings)/languagePage')}>
-          <Ionicons name="language-outline" size={mvs(24)} color="black" style={styles.icon} />
+        <TouchableOpacity
+          style={styles.option}
+          onPress={() => router.push("/(tabs)/profile/(settings)/languagePage")}
+        >
+          <Ionicons
+            name="language-outline"
+            size={mvs(24)}
+            color="black"
+            style={styles.icon}
+          />
           <Text style={styles.text}>Language</Text>
         </TouchableOpacity>
-
+        {/* Submit feedback*/}
+        <TouchableOpacity
+          style={styles.option}
+          onPress={handleForm}
+        >
+          <Ionicons
+            name="chatbox-ellipses-outline"
+            size={mvs(24)}
+            color="black"
+            style={styles.icon}
+          />
+          <Text style={styles.text}>Feedback</Text>
+        </TouchableOpacity>
         {/* Help */}
-        <TouchableOpacity style={styles.option} onPress={() => router.push('/(tabs)/profile/(settings)/helpPage')}>
-          <Ionicons name="help-circle-outline" size={mvs(24)} color="black" style={styles.icon} />
+        <TouchableOpacity
+          style={styles.option}
+          onPress={() => router.push("/(tabs)/profile/(settings)/helpPage")}
+        >
+          <Ionicons
+            name="help-circle-outline"
+            size={mvs(24)}
+            color="black"
+            style={styles.icon}
+          />
           <Text style={styles.text}>Help</Text>
         </TouchableOpacity>
-                {/* Log out */}
+        {/* Log out */}
         <TouchableOpacity style={styles.option} onPress={handleLogout}>
-          <Ionicons name="log-out-outline" size={mvs(24)} color="black" style={styles.icon} />
+          <Ionicons
+            name="log-out-outline"
+            size={mvs(24)}
+            color="black"
+            style={styles.icon}
+          />
           <Text style={styles.text}>Log out</Text>
         </TouchableOpacity>
-         {/* Delete Account */}
-        <TouchableOpacity style={[styles.option, styles.deleteOption]} onPress={() => router.push('/(tabs)/profile/(settings)/deleteAccountPage')}>
-          <Ionicons name="trash-outline" size={mvs(24)} color="red" style={styles.icon} />
+        {/* Delete Account */}
+        <TouchableOpacity
+          style={[styles.option, styles.deleteOption]}
+          onPress={() =>
+            router.push("/(tabs)/profile/(settings)/deleteAccountPage")
+          }
+        >
+          <Ionicons
+            name="trash-outline"
+            size={mvs(24)}
+            color="red"
+            style={styles.icon}
+          />
           <Text style={[styles.text, styles.deleteText]}>Delete Account</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -82,8 +152,8 @@ const styles = StyleSheet.create({
     paddingBottom: vs(80), // Space for the fixed footer
   },
   option: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: vs(16),
     borderBottomWidth: 1,
     borderBottomColor: themeColors.border.light,
@@ -95,11 +165,9 @@ const styles = StyleSheet.create({
     fontSize: mhs(16),
     color: themeColors.text.dark,
   },
-  deleteOption: {
- 
-  },
+  deleteOption: {},
   deleteText: {
-    color: 'red', 
+    color: "red",
   },
 });
 
