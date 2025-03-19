@@ -24,7 +24,7 @@ public class KeycloakJwtAuthenticationConverter implements Converter<Jwt, Collec
             if (roles instanceof List) {
                 List<String> rolesList = (List<String>) roles;
                 return rolesList.stream()
-                        .map(role -> new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()))
+                        .map(role -> new SimpleGrantedAuthority(role.toUpperCase()))
                         .collect(Collectors.toList());
             }
         }

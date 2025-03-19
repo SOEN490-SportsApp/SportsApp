@@ -1,6 +1,5 @@
 package app.sportahub.messagingservice.model;
 
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -43,4 +42,8 @@ public class Chatroom {
     @NotNull
     @Builder.Default
     private Boolean isEvent = false;
+
+    @NotNull
+    @Builder.Default
+    private Boolean unread = true;
 }
