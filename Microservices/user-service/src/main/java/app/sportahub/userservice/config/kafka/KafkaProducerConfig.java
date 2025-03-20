@@ -20,7 +20,6 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
-@EnableKafka
 @Configuration
 public class KafkaProducerConfig {
 
