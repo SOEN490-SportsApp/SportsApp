@@ -199,5 +199,17 @@
     "check_later": "Check back later!",
     "no_notifications": "No new notifications 🎉",
     "all_caught_up": "You're all caught up!"
+  },
+  "event_card": {
+    "km_away": "km away",
+    "left_to_join": "left to join",
+    "hour": "hour",
+    "day": "day",
+    "week": "week"
+  },
+  "skill_tag": {
+    "beginner": "Beginner",
+    "intermediate": "Intermediate",
+    "advanced": "Advanced"
   }
 }
