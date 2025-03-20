@@ -309,5 +309,20 @@
     "failed_to_fetch_posts": "Failed to fetch posts.",
     "be_the_first_to_post": "Be the first one to post!",
     "reached_the_end": "You've reached the end!"
+  },
+  "event_details_layout": {
+    "error_fetching_details": "Error fetching event details:",
+    "confirm_delete_1": "Confirm Delete",
+    "confirm_delete_2": "Are you sure you want to delete this event?",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "success_1": "Success",
+    "success_2": "Event has been deleted.",
+    "error": "Error",
+    "error_deleting_event": "Unable to delete event. Please try again.",
+    "invite_friend": "Invite Friend",
+    "edit_event": "Edit Event",
+    "delete_event": "Delete Event",
+    "leave_event": "Leave Event"
   }
 }

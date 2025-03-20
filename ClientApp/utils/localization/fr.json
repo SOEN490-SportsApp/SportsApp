@@ -309,5 +309,20 @@
     "failed_to_fetch_posts": "Échec de la récupération des messages",
     "be_the_first_to_post": "Soyez le premier à poster!",
     "reached_the_end": "Vous avez atteint la fin"
+  },
+  "event_details_layout": {
+    "error_fetching_details": "Erreur lors de la récupération des détails de l'événement",
+    "confirm_delete_1": "Confirmer la suppression",
+    "confirm_delete_2": "Voulez-vous vraiment supprimer cet événement?",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "success_1": "Succès",
+    "success_2": "Événement supprimé avec succès",
+    "error": "Erreur",
+    "error_deleting_event": "Erreur lors de la suppression de l'événement",
+    "invite_friend": "Inviter un ami",
+    "edit_event": "Modifier l'événement",
+    "delete_event": "Supprimer l'événement",
+    "leave_event": "Quitter l'événement"
   }
 }
