@@ -227,5 +227,10 @@
     "add": "Add",
     "chats": "Chats",
     "profile": "Profile"
+  },
+  "profile_page": {
+    "activity": "Activity",
+    "friends": "Friends",
+    "my_events": "My Events"
   }
 }
