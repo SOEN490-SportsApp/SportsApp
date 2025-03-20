@@ -251,5 +251,10 @@
     "female": "Femme",
     "other": "Autre",
     "date_of_birth": "Date de naissance"
+  },
+  "edit_profile_sports_skills": {
+    "edit_profile": "Modifier le profil",
+    "add_your_favourite_sports": "Ajoutez vos sports préférés",
+    "save_changes": "Enregistrer les modifications"
   }
 }
