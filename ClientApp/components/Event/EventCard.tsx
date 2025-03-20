@@ -4,6 +4,8 @@ import { Event } from "@/types/event";
 import SkillTag from "./SkillTag";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTranslation } from 'react-i18next';
+import { format } from 'date-fns';
+import { fr, enUS } from 'date-fns/locale';
 
 // all the show props are optional and default to true to modularize the component
 interface EventCardProps {
@@ -24,6 +26,11 @@ export const  stringToDate = (dateString: string) => {
   const [year, month, day] = dateString.split('-');
   return new Date(+year, +month - 1, +day);
 }
+
+export const formatDate = (date: Date, locale: string) => {
+  return format(date, 'EEE MMM dd yyyy', { locale: locale === 'fr' ? fr : enUS });
+};
+
 const EventCard: React.FC<EventCardProps> = ({
   event,
   onPress,
@@ -61,7 +68,8 @@ const cutoffTime = new Date(event.cutOffTime);
 let hoursLeft = 0;
 let minutesLeft = 0;
 
-const { t } = useTranslation();
+const { t, i18n } = useTranslation();
+const locale = i18n.language === 'fr' ? 'fr' : 'en';
 
   // Ensure both currentTime and cutoffTime are valid
   let timeLeftShown = "";
@@ -126,7 +134,7 @@ return (
     
     {showDate && 
     <Text style={styles.date}>
-      📅 {new Date(stringToDate(event.date)).toDateString()}
+      📅 {formatDate(stringToDate(event.date), locale)}
     </Text>}
 
       {showLocation && (
