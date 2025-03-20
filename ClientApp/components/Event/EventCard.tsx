@@ -4,6 +4,8 @@ import { Event } from "@/types/event";
 import SkillTag from "./SkillTag";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTranslation } from 'react-i18next';
+import { format } from 'date-fns';
+import { fr, enUS } from 'date-fns/locale';
 
 // all the show props are optional and default to true to modularize the component
 interface EventCardProps {
@@ -24,6 +26,11 @@ export const stringToDate = (dateString: string) => {
   const [year, month, day] = dateString.split('-');
   return new Date(+year, +month - 1, +day);
 }
+
+export const formatDate = (date: Date, locale: string) => {
+  return format(date, 'EEE MMM dd yyyy', { locale: locale === 'fr' ? fr : enUS });
+};
+
 const EventCard: React.FC<EventCardProps> = ({
   event,
   onPress,
@@ -64,7 +71,8 @@ const EventCard: React.FC<EventCardProps> = ({
   const currentTime = new Date();
   const cutoffTime = new Date(event.cutOffTime);
 
-const { t } = useTranslation();
+const { t, i18n } = useTranslation();
+const locale = i18n.language === 'fr' ? 'fr' : 'en';
 
   let timeLeftShown = "";
   let eventStarted = false;
@@ -136,6 +144,28 @@ const { t } = useTranslation();
         <Text style={styles.date}>
           📅 {new Date(event.date).toDateString()}
         </Text>}
+return (
+  <TouchableOpacity testID = 'event-card' style={[styles.card, dynamicCardStyle]} onPress={() => onPress(event.id)}>
+    <Text style={styles.eventName}>{event.eventName}</Text> 
+    {showDetailPreview && 
+    <Text style={styles.eventDetails}>
+      {/*TODO - Add distance calculation after backend does it*/}
+      {showSportType ? `${event.sportType} - X ${t('event_card.km_away')}` : `X ${t('event_card.km_away')}`}
+      </Text>}
+    
+    {showSportType && 
+    <View style={styles.sportIconContainer}>
+      <MaterialCommunityIcons
+        name={sportIcons[event.sportType] || 'help-circle-outline'} // Fallback icon
+        size={40}
+        color="#94504b"
+      /> 
+    </View>}
+    
+    {showDate && 
+    <Text style={styles.date}>
+      📅 {formatDate(stringToDate(event.date), locale)}
+    </Text>}
 
       {showLocation && (
         <Text style={styles.location}>
