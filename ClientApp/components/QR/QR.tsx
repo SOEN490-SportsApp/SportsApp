@@ -14,6 +14,7 @@ import QRCode from "react-native-qrcode-svg";
 import * as Linking from "expo-linking";
 import { deepLinks } from "@/utils/Deeplinks/Deeplinks";
 import BottomModal from "../Helper Components/BottomModal";
+import { useTranslation } from "react-i18next";
 
 interface QRProps {
   id: string;
@@ -24,6 +25,7 @@ interface QRProps {
 
 const QR: React.FC<QRProps> = ({ id, isVisible, setIsVisible, isProfile }) => {
   const [canOpenLink, setCanOpenLink] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     Linking.canOpenURL("myapp://").then((result) => setCanOpenLink(true));
@@ -44,7 +46,7 @@ const QR: React.FC<QRProps> = ({ id, isVisible, setIsVisible, isProfile }) => {
         <QRCode value={userURL} size={250} logo={logo} testID="QRCode" />
         <View style={styles.closeButton}>
           <Text style={styles.closeButtonText}>
-            Share your {isProfile ? "profile" : "event"} with friends
+            {t('qr.share_your')} {isProfile ? t('qr.profile') : t('qr.event')} {t('qr.with_friends')}
           </Text>
         </View>
       </View>
