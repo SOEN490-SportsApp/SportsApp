@@ -1,11 +1,15 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 interface SkillTagProps {
   level: string;
 }
 
 const SkillTag: React.FC<SkillTagProps> = ({ level }) => {
+
+  const { t } = useTranslation();
+
   // Define colors based on skill levels
   const getColor = (level: string) => {
     switch (level.toUpperCase()) {
@@ -24,7 +28,7 @@ const SkillTag: React.FC<SkillTagProps> = ({ level }) => {
 
   return (
     <View style={[styles.tagContainer, { backgroundColor }]}>
-      <Text style={[styles.tagText, { color: textColor }]}>{level}</Text>
+      <Text style={[styles.tagText, { color: textColor }]}>{t(`skill_tag.${level.toLowerCase()}`)}</Text>
     </View>
   );
 };

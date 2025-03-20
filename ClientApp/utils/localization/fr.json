@@ -118,7 +118,7 @@
     "event_type": "Type d'événement",
     "sport_type": "Type de sport",
     "select_sport": "Sélectionnez",
-    "max_participants": "Max participants",
+    "max_participants": "Nb. de joeurs",
     "at_least_2": "Au moins 2 participants",
     "enter_max": "Entrez max",
     "required_skill_level": "Niveau de compétence requis",
@@ -199,5 +199,17 @@
     "check_later": "Revenez plus tard!",
     "no_notifications": "Pas de nouvelles notifications 🎉",
     "all_caught_up": "Vous êtes à jour!"
+  },
+  "event_card": {
+    "km_away": "km de distance",
+    "left_to_join": "restant pour rejoindre",
+    "hour": "heure",
+    "day": "jour",
+    "week": "semaine"
+  },
+  "skill_tag": {
+    "beginner": "Débutant",
+    "intermediate": "Intermédiaire",
+    "advanced": "Avancé"
   }
 }
