@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, FlatList } from 'react-native';
+import { View, StyleSheet, Alert } from 'react-native';
 import EventsList from '../Event/EventsListHomePage';
 import { useDispatch, useSelector } from 'react-redux';
-import { requestAndStoreLocation } from '@/services/locationService';
-import EventCardSkeleton from '../Event/EventCardSkeleton';
+import { calculateDistanceBetweenEventAndUserLocation, requestAndStoreLocation } from '@/services/locationService';
+import EventListSkeleton from '../Event/EventListSkeleton';
+import { getAllRelevantEvents } from '@/services/eventService';
+import { Event } from "@/types/event";
 
-const Feed = () => {
+
+const HomePageFeed = () => {
 
   const dispatch = useDispatch();
   const user = useSelector((state: { user: any }) => state.user);
-  const Location = useSelector((state: { location: any }) => state.location);
   const [isLocationFetching, setIsLocationFetching] = useState(true);
-
+ 
   useEffect(() => {
     const fetchLocation = async () => {
       setIsLocationFetching(true);
@@ -24,11 +26,7 @@ const Feed = () => {
   return (
     <View testID = 'feed-container' style={styles.container}>
       {isLocationFetching ? (
-        <FlatList
-          data={[1, 2, 3]}
-          keyExtractor={(item) => item.toString()}
-          renderItem={() => <EventCardSkeleton />}
-        />
+        <EventListSkeleton />
       ) : (
         <EventsList />
       )}
@@ -36,7 +34,7 @@ const Feed = () => {
   );
 };
 
-export default Feed;
+export default HomePageFeed;
 
 const styles = StyleSheet.create({
   container: {
