@@ -36,16 +36,16 @@ const EventDetails = ({ event, handleJoinEvent }: { event: Event; handleJoinEven
     <ScrollView contentContainerStyle={styles.container}>
       {/* Description */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Description</Text>
+        <Text style={styles.sectionTitle}>{t('event_page.description')}</Text>
         <Text style={styles.sectionText}>
-          {event.description || "No description provided for this event."}
+          {event.description || t('event_page.no_description')}
         </Text>
       </View>
 
       {/* Participants */}
       <View style={styles.section}>
         <View style={styles.participantsHeader}>
-          <Text style={styles.sectionTitle}>Participants</Text>
+          <Text style={styles.sectionTitle}>{t('event_page.participants')}</Text>
           <Text style={styles.participantsCount}>
             {event.participants.filter((p) => p.attendStatus === "JOINED" || p.attendStatus === "CONFIRMED").length}/
             {event.maxParticipants}
@@ -75,14 +75,14 @@ const EventDetails = ({ event, handleJoinEvent }: { event: Event; handleJoinEven
                       testID="participant-avatar"
                     />
                     {participant.userId === user.id && (
-                      <Text style={styles.currentUserText}>You</Text>
+                      <Text style={styles.currentUserText}>{t('event_page.you')}</Text>
                     )}
                   </View>
                 </Pressable>
               ))
           ) : (
             <Text style={styles.noParticipantsText}>
-              No participants yet. Be the first to join!
+              {t('event_page.no_participants_yet')}
             </Text>
           )}
         </ScrollView>
@@ -116,7 +116,7 @@ const EventPage: React.FC = () => {
         const eventData = await getEventById(eventId!);
         setEvent(eventData);
       } catch (err) {
-        setError("Failed to fetch event details.");
+        setError(t('event_page.failed_to_fetch_event'));
       } finally {
         setLoading(false);
       }
@@ -138,7 +138,7 @@ const EventPage: React.FC = () => {
         };
       });
     } catch (err) {
-      setError("Failed to join the event.");
+      setError(t('event_page.failed_to_join'));
     }
   };
 
@@ -148,9 +148,9 @@ const EventPage: React.FC = () => {
     Clipboard.setStringAsync(locationText);
   
     if (Platform.OS === 'android') {
-      ToastAndroid.show("Location copied to clipboard!", ToastAndroid.SHORT);
+      ToastAndroid.show(t('event_page.location_copied'), ToastAndroid.SHORT);
     } else {
-      Alert.alert("Copied!", "Location has been copied to clipboard.");
+      Alert.alert(t('event_page.copied'), t('event_page.location_copied'));
     }
   };
 
@@ -173,7 +173,7 @@ const EventPage: React.FC = () => {
   if (!event) {
     return (
       <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>Event not found.</Text>
+        <Text style={styles.errorText}>{t('event_page.event_not_found')}</Text>
       </View>
     );
   }
@@ -190,8 +190,8 @@ const EventPage: React.FC = () => {
   let sportIcon = sportIconMap[event.sportType];
 
   const routes = [
-    { key: "eventPosts", title: "Posts", testID: "eventPosts" },
-    { key: "eventDetails", title: "Details", testID: "eventDetails" },
+    { key: "eventPosts", title: t('event_page.posts'), testID: "eventPosts" },
+    { key: "eventDetails", title: t('event_page.details'), testID: "eventDetails" },
   ];
   
   const scenes = {
