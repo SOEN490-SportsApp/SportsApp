@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
   joinedText: {
     color: themeColors.primary,
     fontWeight: "bold",
-    fontSize: mvs(16),
+    fontSize: mvs(12),
   },
   participantsScrollContainer: {
     flexDirection: "row",
