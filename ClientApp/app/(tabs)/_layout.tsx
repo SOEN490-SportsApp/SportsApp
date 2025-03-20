@@ -3,9 +3,11 @@ import { Tabs } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { mvs } from '@/utils/helpers/uiScaler';
 import themeColors from '@/utils/constants/colors';
+import { useTranslation } from 'react-i18next';
 
 export default function TabLayout() {
   const iconStyle = { marginBottom: -5 };
+  const { t } = useTranslation();
 
   return (
     <Tabs
@@ -25,7 +27,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="home"
         options={{
-          title: 'Home',
+          title: t('tab_layout.home'),
           headerShown: false,
           tabBarIcon: ({ color, focused }) => (
             <FontAwesome
@@ -40,7 +42,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="create/index"
         options={{
-          title: 'Add',
+          title: t('tab_layout.add'),
           headerShown: false,
           tabBarIcon: ({ color }) => (
             <FontAwesome size={24} name="plus-circle" color={color} style={iconStyle} />
@@ -50,7 +52,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="chats/index"
         options={{
-          title: 'Chats',
+          title: t('tab_layout.chats'),
           tabBarIcon: ({ color }) => (
             <FontAwesome size={24} name="comments" color={color} style={iconStyle} />
           ),
@@ -64,7 +66,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'Profile',
+          title: t('tab_layout.profile'),
           headerShown: false,
           tabBarIcon: ({ color }) => (
             <FontAwesome size={24} name="user" color={color} style={iconStyle} />

@@ -157,7 +157,8 @@
     "language": "Langue",
     "help": "Aide",
     "logout": "Déconnexion",
-    "delete_account": "Supprimer le compte"
+    "delete_account": "Supprimer le compte",
+    "submit_feedback": "Soumettre des commentaires"
   },
   "delete_account_page": {
     "are_you_sure": "Êtes-vous sûr?",
@@ -220,5 +221,11 @@
     "beginner": "Débutant",
     "intermediate": "Intermédiaire",
     "advanced": "Avancé"
+  },
+  "tab_layout": {
+    "home": "Accueil",
+    "add": "Ajouter",
+    "chats": "Chats",
+    "profile": "Profil"
   }
 }
