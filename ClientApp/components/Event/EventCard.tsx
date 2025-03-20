@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Event } from "@/types/event";
 import SkillTag from "./SkillTag";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useTranslation } from 'react-i18next';
 
 // all the show props are optional and default to true to modularize the component
 interface EventCardProps {
@@ -63,6 +64,8 @@ const EventCard: React.FC<EventCardProps> = ({
   const currentTime = new Date();
   const cutoffTime = new Date(event.cutOffTime);
 
+const { t } = useTranslation();
+
   let timeLeftShown = "";
   let eventStarted = false;
   let canJoin = true;
@@ -81,9 +84,9 @@ const EventCard: React.FC<EventCardProps> = ({
       if (minutesLeft < 60) {
         timeLeftShown = `${minutesLeft} minute${minutesLeft !== 1 ? "s" : ""} left to join`;
       } else if (hoursLeft < 24) {
-        timeLeftShown = `${hoursLeft} hour${hoursLeft !== 1 ? "s" : ""} left to join`;
+        timeLeftShown = `${hoursLeft} ${t('event_card.hour')}${hoursLeft !== 1 ? "s" : ""} left to join`;
       } else if (daysLeft < 7) {
-        timeLeftShown = `${daysLeft} day${daysLeft !== 1 ? "s" : ""} left to join`;
+        timeLeftShown = `${daysLeft} ${t('event_card.day')}${daysLeft !== 1 ? "s" : ""} left to join`;
       } else {
         timeLeftShown = `${weeksLeft} week${weeksLeft !== 1 ? "s" : ""} left to join`;
       }
@@ -117,7 +120,7 @@ const EventCard: React.FC<EventCardProps> = ({
       {showDetailPreview &&
         <Text style={styles.eventDetails}>
           {/*TODO - Add distance calculation after backend does it*/}
-          {showSportType ? `${event.sportType} - X km away` : `X km away`}
+          {showSportType ? `${event.sportType} - X ${t('event_card.km_away')}` : `X ${t('event_card.km_away')}`}
         </Text>}
 
       {showSportType &&
