@@ -231,6 +231,25 @@
   "profile_page": {
     "activity": "Activité",
     "friends": "Amis",
-    "my_events": "Mes événements"
+    "my_events": "Mes événements",
+    "edit": "Modifier"
+  },
+  "edit_profile_page": {
+    "cancel": "Annuler",
+    "edit_profile": "Modifier le profil",
+    "done": "Terminé",
+    "change_profile_photo": "Changer la photo de profil",
+    "first_name": "Prénom",
+    "last_name": "Nom de famille",
+    "sports_and_skills": "Sports et compétences",
+    "private_information": "Informations privées",
+    "email": "Email",
+    "phone": "Téléphone",
+    "gender": "Sexe",
+    "select_gender": "Sélectionnez le sexe",
+    "male": "Homme",
+    "female": "Femme",
+    "other": "Autre",
+    "date_of_birth": "Date de naissance"
   }
 }

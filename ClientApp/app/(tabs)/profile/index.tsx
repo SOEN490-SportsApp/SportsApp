@@ -120,7 +120,7 @@ const ProfilePage: React.FC = () => {
           className="absolute left-4"
         >
           <Text className="text-base font-bold" style={{ color: "#007AFF" }}>
-            Edit
+            {t('profile_page.edit')}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
