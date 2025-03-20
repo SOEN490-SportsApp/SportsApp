@@ -10,6 +10,7 @@ import ConfirmButton from "@/components/Helper Components/ConfirmButton";
 import themeColors from "@/utils/constants/colors";
 import { vs, hs } from "@/utils/helpers/uiScaler";
 import Icon from "react-native-vector-icons/Ionicons";
+import { useTranslation } from "react-i18next";
 
 interface SportPreference {
   name: string;
@@ -20,17 +21,15 @@ const SportsSkillsPage: React.FC = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
-
+  const { t } = useTranslation();
   
   const [selectedSports, setSelectedSports] = useState<SportPreference[]>(user.profile.sportsOfPreference || []);
-
   
   useEffect(() => {
     if (user?.profile?.sportsOfPreference) {
       setSelectedSports(user.profile.sportsOfPreference);
     }
   }, [user]);
-
 
   const updateSportsOfPreferenceAPI = async (sports: SportPreference[]) => {
     const axiosInstance = getAxiosInstance();
@@ -41,7 +40,6 @@ const SportsSkillsPage: React.FC = () => {
       );
       dispatch(setUser({ ...user, profile: { ...user.profile, sportsOfPreference: sports } }));
 
-
       setSelectedSports(sports);
       
     } catch (error) {
@@ -49,7 +47,6 @@ const SportsSkillsPage: React.FC = () => {
       throw error;
     }
   };
-
 
   const handleSaveChanges = async () => {
     try {
@@ -67,12 +64,12 @@ const SportsSkillsPage: React.FC = () => {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Icon name="chevron-back" size={24} color={themeColors.text.dark} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Edit Profile</Text>
+        <Text style={styles.headerTitle}>{t('edit_profile_sports_skills.edit_profile')}</Text>
       </View>
 
       {/* Title Section */}
       <View style={styles.titleContainer}>
-        <Text style={styles.sectionTitle}>Add your Favourite Sports</Text>
+        <Text style={styles.sectionTitle}>{t('edit_profile_sports_skills.add_your_favourite_sports')}</Text>
       </View>
 
       {/* Pass selectedSports to RegisterProfileSports */}
@@ -82,7 +79,7 @@ const SportsSkillsPage: React.FC = () => {
 
       {/* Save Changes Button */}
       <View style={styles.buttonContainer}>
-        <ConfirmButton text="Save Changes" onPress={handleSaveChanges} icon={null} iconPlacement={null} />
+        <ConfirmButton text={t('edit_profile_sports_skills.save_changes')} onPress={handleSaveChanges} icon={null} iconPlacement={null} />
       </View>
     </View>
   );
