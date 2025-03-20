@@ -285,5 +285,29 @@
     "no_description": "Aucune description fournie pour cet événement",
     "failed_to_fetch_event": "Échec de la récupération de l'événement",
     "copied": "Copié"
+  },
+  "post_creation_component": {
+    "post_about_this_event": "Postez à propos de cet événement",
+    "create_post": "Créer un message",
+    "whats_on_your_mind": "Qu'avez-vous en tête?",
+    "attach_image": "Joindre une image",
+    "take_photo": "Prendre une photo",
+    "post": "Poster"
+  },
+  "post_component": {
+    "likes": "J'aimes",
+    "comments": "Commentaires",
+    "just_now": "à l'instant",
+    "minute_ago": "il y a une minute",
+    "minutes_ago": "il y a {{count}} minutes",
+    "hour_ago": "il y a une heure",
+    "hours_ago": "il y a {{count}} heures",
+    "day_ago": "il y a un jour",
+    "days_ago": "il y a {{count}} jours"
+  },
+  "event_posts_tab": {
+    "failed_to_fetch_posts": "Échec de la récupération des messages",
+    "be_the_first_to_post": "Soyez le premier à poster!",
+    "reached_the_end": "Vous avez atteint la fin"
   }
 }

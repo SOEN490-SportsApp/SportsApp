@@ -5,6 +5,9 @@ import moment from 'moment';
 import { router } from 'expo-router';
 import { Post } from '@/types/post';
 import { mhs, mvs } from '@/utils/helpers/uiScaler';
+import { useTranslation } from 'react-i18next';
+import 'moment/locale/fr';
+import 'moment/locale/en-ca';
 
 type PostComponentProps = {
   post: Post;
@@ -15,7 +18,21 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, userProfile }) => {
   const [liked, setLiked] = useState<boolean>(false);
   const [likeCount, setLikeCount] = useState<number>(post.likes);
 
-  const timeAgo = moment(post.creationDate).fromNow();
+  const { t, i18n } = useTranslation();
+  moment.locale(i18n.language === 'fr' ? 'fr' : 'en-ca');
+
+  const getTimeAgoTranslation = (time: moment.Moment) => {
+    const diffMinutes = moment().diff(time, 'minutes');
+    const diffHours = moment().diff(time, 'hours');
+    const diffDays = moment().diff(time, 'days');
+  
+    if (diffMinutes < 1) return t('post_component.just_now');
+    if (diffMinutes < 60) return t('post_component.minutes_ago', { count: diffMinutes });
+    if (diffHours < 24) return t('post_component.hours_ago', { count: diffHours });
+    return t('post_component.days_ago', { count: diffDays });
+  };
+  
+  const timeAgo = getTimeAgoTranslation(moment(post.creationDate));  
 
   const handleLike = () => {
     setLiked((prev) => !prev);
@@ -62,12 +79,12 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, userProfile }) => {
         <View style={styles.actionsContainer}>
           <TouchableOpacity onPress={handleLike} style={styles.actionButton}>
             <Ionicons name={liked ? 'heart' : 'heart-outline'} size={24} color={liked ? 'red' : '#555'} />
-            <Text style={styles.actionText}>{likeCount} Likes</Text>
+            <Text style={styles.actionText}>{likeCount} {t('post_component.likes')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.actionButton}>
             <Ionicons name="chatbubble-outline" size={24} color="#555" />
-            <Text style={styles.actionText}>{post.comments.length} Comments</Text>
+            <Text style={styles.actionText}>{post.comments.length} {t('post_component.comments')}</Text>
           </TouchableOpacity>
         </View>
       </View>

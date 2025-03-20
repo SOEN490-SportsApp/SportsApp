@@ -285,5 +285,29 @@
     "no_description": "No description provided for this event",
     "failed_to_fetch_event": "Failed to fetch event details",
     "copied": "Copied"
+  },
+  "post_creation_component": {
+    "post_about_this_event": "Post about this event!",
+    "create_post": "Create Post",
+    "whats_on_your_mind": "What's on your mind?",
+    "attach_image": "Attach Image",
+    "take_photo": "Take Photo",
+    "post": "Post"
+  },
+  "post_component": {
+    "likes": "Likes",
+    "comments": "Comments",
+    "just_now": "just now",
+    "minute_ago": "a minute ago",
+    "minutes_ago": "{{count}} minutes ago",
+    "hour_ago": "an hour ago",
+    "hours_ago": "{{count}} hours ago",
+    "day_ago": "a day ago",
+    "days_ago": "{{count}} days ago"
+  },
+  "event_posts_tab": {
+    "failed_to_fetch_posts": "Failed to fetch posts.",
+    "be_the_first_to_post": "Be the first one to post!",
+    "reached_the_end": "You've reached the end!"
   }
 }
