@@ -6,6 +6,7 @@ import { fetchPosts } from '@/utils/api/postApiClient';
 import { Post } from '@/types/post';
 import { getProfile } from '@/utils/api/profileApiClient';
 import { mhs, mvs } from '@/utils/helpers/uiScaler';
+import { useTranslation } from 'react-i18next';
 
 const EventPostsTab = ({ eventId, isUserParticipant }: { eventId: string, isUserParticipant: boolean }) => {
     const [posts, setPosts] = useState<Post[]>([]);
@@ -14,6 +15,7 @@ const EventPostsTab = ({ eventId, isUserParticipant }: { eventId: string, isUser
     const [error, setError] = useState<string | null>(null);
     const [page, setPage] = useState<number>(0);
     const [hasMore, setHasMore] = useState<boolean>(true);
+    const { t } = useTranslation();
 
     const loadPosts = async () => {
         try {
@@ -37,7 +39,7 @@ const EventPostsTab = ({ eventId, isUserParticipant }: { eventId: string, isUser
                 setHasMore(false);
             }
         } catch (err) {
-            setError('Failed to fetch posts.');
+            setError(t('event_posts_tab.failed_to_fetch_posts'));
             console.error(err);
         } finally {
             setLoading(false);
@@ -98,7 +100,7 @@ const EventPostsTab = ({ eventId, isUserParticipant }: { eventId: string, isUser
                 <View style={{ height: 16 }} />
     
                 {posts.length === 0 ? (
-                    <Text style={styles.noPostsText}>Be the first one to post!</Text>
+                    <Text style={styles.noPostsText}>{t('event_posts_tab.be_the_first_to_post')}</Text>
                 ) : (
                     posts.map((post) => (
                         <PostComponent key={post.id} post={post} userProfile={userProfiles[post.createdBy]} />
@@ -106,7 +108,7 @@ const EventPostsTab = ({ eventId, isUserParticipant }: { eventId: string, isUser
                 )}
     
                 {loading && <ActivityIndicator size="small" color="#0000ff" />}
-                {posts.length > 0 && !hasMore && <Text style={styles.noMorePostsText}>You have reached the end!</Text>}
+                {posts.length > 0 && !hasMore && <Text style={styles.noMorePostsText}>{t('event_posts_tab.reached_the_end')}</Text>}
             </ScrollView>
         </SafeAreaView>
     );
