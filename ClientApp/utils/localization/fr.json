@@ -269,7 +269,7 @@
     "description": "Description",
     "participants": "Participants",
     "no_participants_yet": "Pas encore de participants. Soyez le premier à rejoindre!",
-    "you": "Vous",
+    "you": "Moi",
     "join": "Rejoindre",
     "joined": "Rejoint",
     "beginner": "Débutant",
@@ -279,6 +279,11 @@
     "location_copied": "Emplacement copié",
     "event_not_found": "Événement non trouvé",
     "public": "Public",
-    "private": "Privé"
+    "private": "Privé",
+    "posts": "Messages",
+    "details": "Détails",
+    "no_description": "Aucune description fournie pour cet événement",
+    "failed_to_fetch_event": "Échec de la récupération de l'événement",
+    "copied": "Copié"
   }
 }

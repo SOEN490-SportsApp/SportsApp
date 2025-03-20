@@ -279,6 +279,11 @@
     "location_copied": "Location copied to clipboard",
     "event_not_found": "Event not found",
     "public": "Public",
-    "private": "Private"
+    "private": "Private",
+    "posts": "Posts",
+    "details": "Details",
+    "no_description": "No description provided for this event",
+    "failed_to_fetch_event": "Failed to fetch event details",
+    "copied": "Copied"
   }
 }
