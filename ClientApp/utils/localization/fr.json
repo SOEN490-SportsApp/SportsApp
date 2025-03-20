@@ -264,5 +264,21 @@
     "advanced": "Avancé",
     "remove": "Supprimer",
     "select": "Sélectionner"
+  },
+  "event_page": {
+    "description": "Description",
+    "participants": "Participants",
+    "no_participants_yet": "Pas encore de participants. Soyez le premier à rejoindre!",
+    "you": "Vous",
+    "join": "Rejoindre",
+    "joined": "Rejoint",
+    "beginner": "Débutant",
+    "intermediate": "Intermédiaire",
+    "advanced": "Avancé",
+    "failed_to_join": "Échec de la connexion",
+    "location_copied": "Emplacement copié",
+    "event_not_found": "Événement non trouvé",
+    "public": "Public",
+    "private": "Privé"
   }
 }
