@@ -10,7 +10,9 @@ import app.sportahub.notificationservice.service.firebase.FirebaseMessagingServi
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -60,8 +62,10 @@ public class NotificationServiceImpl implements NotificationService {
     public Page<NotificationResponse> getNotificationsByUserId(String userId, Pageable pageable) {
         log.info("NotificationServiceImpl::getNotificationsByUserId: Retrieving notifications for user: {}", userId);
 
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "updatedAt"));
+
         Page<NotificationResponse> notifications = notificationRepository
-                .findByUserId(userId, pageable)
+                .findByUserId(userId, sortedPageable)
                 .map(notificationMapper::toResponseDto);
 
         log.info("NotificationServiceImpl::getNotificationsByUserId: Retrieved {} notifications for user: {}",
