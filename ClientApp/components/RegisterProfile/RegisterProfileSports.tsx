@@ -6,6 +6,7 @@ import { vs, hs } from "@/utils/helpers/uiScaler";
 import themeColors from "@/utils/constants/colors";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser, selectUser } from "@/state/user/userSlice";
+import { useTranslation } from "react-i18next";
 
 interface SportPreference {
   name: string;
@@ -25,6 +26,9 @@ const RegisterProfileSports: React.FC<sportSelection> = ({ selectedSports = [], 
   const [modalVisible, setModalVisible] = useState(false);
   const [currentSport, setCurrentSport] = useState<{ id: number; name: string } | null>(null);
   const [ranking, setRanking] = useState<string>("");
+
+  const { t } = useTranslation();
+
   useEffect(() => {
     if (user?.profile?.sportsOfPreference) {
       setSelectedIcons(user.profile.sportsOfPreference.map(sport => {
@@ -133,7 +137,7 @@ const selectedIconRankings = (name: string): string => {
           <View style={styles.modalView}>
             <View style={styles.modalSection}>
               <Text style={styles.modalMessage}>
-                Select your skill level in {currentSport?.name}
+                {t('edit_profile_register_profile_sports.select_your_skill_level_in')} {currentSport?.name}
               </Text>
               <View style={styles.skillSelectionSection}>
                 <TouchableOpacity
@@ -152,7 +156,7 @@ const selectedIconRankings = (name: string): string => {
                         : styles.normalOptionText
                     }
                   >
-                    Beginner
+                    {t('edit_profile_register_profile_sports.beginner')}
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -171,7 +175,7 @@ const selectedIconRankings = (name: string): string => {
                         : styles.normalOptionText
                     }
                   >
-                    Intermediate
+                    {t('edit_profile_register_profile_sports.intermediate')}
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -190,7 +194,7 @@ const selectedIconRankings = (name: string): string => {
                         : styles.normalOptionText
                     }
                   >
-                    Advanced
+                    {t('edit_profile_register_profile_sports.advanced')}
                   </Text>
                 </TouchableOpacity>
                 </View>
@@ -205,7 +209,7 @@ const selectedIconRankings = (name: string): string => {
                   ]}
                 >
                 
-                  <Text style={{ color: themeColors.text.grey }}>Remove</Text>
+                  <Text style={{ color: themeColors.text.grey }}>{t('edit_profile_register_profile_sports.remove')}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                 testID="confirm-sport"
@@ -216,7 +220,7 @@ const selectedIconRankings = (name: string): string => {
                     styles.selectSkillsSectionButton
                   ]}
                 >
-                  <Text style={{ color: themeColors.text.light }}>Select</Text>
+                  <Text style={{ color: themeColors.text.light }}>{t('edit_profile_register_profile_sports.select')}</Text>
                 </TouchableOpacity>
               </View>
             </View>
