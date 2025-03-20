@@ -1,6 +1,7 @@
 package app.sportahub.userservice.service.user;
 
 import app.sportahub.userservice.client.KeycloakApiClient;
+import app.sportahub.userservice.config.kafka.KafkaProducerConfig;
 import app.sportahub.userservice.dto.request.user.friend.FriendRequestRequest;
 import app.sportahub.userservice.dto.request.user.friend.UpdateFriendRequestRequest;
 import app.sportahub.userservice.dto.response.user.UserProfileResponse;
@@ -49,6 +50,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,6 +58,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -77,6 +80,7 @@ public class UserServiceImpl implements UserService {
     private final FriendRepository friendRepository;
     private final FriendRequestRepository friendRequestRepository;
     private final PublicProfileMapper publicProfileMapper;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @Override
     public UserResponse createUser(UserRequest userRequest) {
@@ -254,6 +258,18 @@ public class UserServiceImpl implements UserService {
         User savedReceiverUser = userRepository.save(userReceiver);
         log.info("UserServiceImpl::sendFriendRequest: User with id: {} received a new friend request",
                 savedReceiverUser.getId());
+
+        Map<String, Object> notificationPayload = Map.of(
+                "userId", userReceiver.getId(),
+                "title", "New Friend Request",
+                "body", userSender.getUsername() + " has sent you a friend request.",
+                "clickAction", "/friends",
+                "icon", "https://example.com/friend-request-icon.png",
+                "data", Map.of("senderId", userSender.getId(), "receiverId", userReceiver.getId())
+        );
+
+        kafkaTemplate.send("friend-requests", notificationPayload);
+        log.info("UserServiceImpl::sendFriendRequest: Notification sent to Kafka for user {}", userReceiver.getId());
 
         return new FriendRequestResponse("Friend request sent successfully.",
                 savedSenderFriendRequest.getId(),
