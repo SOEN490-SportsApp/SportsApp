@@ -9,6 +9,7 @@ import { hs, vs, mhs } from "@/utils/helpers/uiScaler";
 import supportedSports from "@/utils/constants/supportedSports";
 import TinyCustomDateTimePicker from "../Helper Components/TinyCustomDateTimePicker";
 import { editEvent } from "@/services/eventService";
+import { useTranslation } from "react-i18next";
 
 interface EditEventModalProps {
   visible: boolean;
@@ -109,6 +110,8 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
   const [selectedSport, setSelectedSport] = useState<string>("");
   const [selectedSkillLevels, setSelectedSkillLevels] = useState<string[]>([]);
 
+  const { t } = useTranslation();
+
   useEffect(() => {
     if (eventDetails?.eventType) {
       setValue("eventType", eventDetails.eventType);
@@ -186,7 +189,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
 
       if (eventDate && cutOffDate) {
         if (cutOffDate > eventDate) {
-          Alert.alert("Ooops..", "Cutoff date cannot be after the event date.");
+          Alert.alert(t('edit_event_modal.oops'), t('edit_event_modal.cutoff_event_date_error'));
           return;
         }
 
@@ -196,13 +199,13 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
           cutOffTime &&
           cutOffTime > eventStartTime
         ) {
-          Alert.alert("Oops..", "Event cutoff time cannot be after the event start time on the same day.");
+          Alert.alert(t('edit_event_modal.oops'), t('edit_event_modal.cutoff_event_time_error'));
           return;
         }
       }
 
       if (description.length === 0) {
-        Alert.alert("Oops..", "Please enter a description for the event.");
+        Alert.alert(t('edit_event_modal.oops'), t('edit_event_modal.enter_description_error'));
         return;
       }
 
@@ -245,14 +248,14 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
       if (selectedSkillLevels.length > 0) {
         updatedEventData.requiredSkillLevel = selectedSkillLevels;
       } else {
-        alert("Please select at least one skill level.");
+        alert(t('edit_event_modal.skill_level_error'));
         return;
       }  
       await editEvent(eventId, updatedEventData);
-      Alert.alert("Success", "Event updated successfully!");
+      Alert.alert(t('edit_event_modal.success'), t('edit_event_modal.event_updated'));
       onClose();
     } catch (error) {
-      Alert.alert("Error", "Failed to update event. Please try again.");
+      Alert.alert(t('edit_event_modal.cutoff_event_time_error'), t('edit_event_modal.failed_to_update_event'));
       if (error instanceof Error) {
         console.error("Error updating event:", (error as any).response?.data || error.message);
       } else {
@@ -346,7 +349,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
           keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
         >
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Editing event ...</Text>
+            <Text style={styles.modalTitle}>{t('edit_event_modal.editing_event')}</Text>
             {loading ? (
               <ActivityIndicator size="large" color="#007BFF" />
             ) : (
@@ -355,14 +358,14 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
                   <>
                     {/* event name */}
                     <View style={styles.rowView}>
-                        <Text style={styles.bold}>Name:</Text>
+                        <Text style={styles.bold}>{t('edit_event_modal.name')}</Text>
                       <Controller
                         control={control}
                         name="eventName"
                         rules={{
                           maxLength: {
                             value: 20,
-                            message: "Event name cannot exceed 20 characters.",
+                            message: t('edit_event_modal.event_name_cannot_exceed_20'),
                           },
                         }}
                         render={({ field: { onChange, onBlur, value } }) => (
@@ -409,12 +412,12 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
                     {/* sport type */}
                     <View style={styles.spaceView}>
                       <View style={styles.sportTypeContainer}>
-                        <Text style={styles.bold}>Sport Type:</Text>
+                        <Text style={styles.bold}>{t('edit_event_modal.sport_type')}</Text>
                         <TouchableOpacity
                           style={styles.sportDropdown}
                           onPress={() => setSportTypeModalVisible(true)}
                         >
-                          <Text style={{ fontSize: mhs(13) }}>{selectedSport || "Select a Sport"}</Text>
+                          <Text style={{ fontSize: mhs(13) }}>{selectedSport || t('edit_event_modal.select_sport')}</Text>
                         </TouchableOpacity>
                         {renderSportTypeModal()}
                       </View>
@@ -423,7 +426,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
                     <View style={styles.spaceView}>
                       <View style={styles.rowView}>
                         <View style={styles.maxParticipantsContainer}>
-                          <Text style={styles.bold}>Max Participants:</Text>
+                          <Text style={styles.bold}>{t('edit_event_modal.max_participants')}</Text>
                           <Controller
                             control={control}
                             name="maxParticipants"
@@ -443,7 +446,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
                     {/* skill level */}
                     <View style={styles.spaceView}>
                       <View style={styles.rowView}>
-                        <Text style={styles.bold}>Skill Level:</Text>
+                        <Text style={styles.bold}>{t('edit_event_modal.skill_level')}</Text>
                         <View style={styles.skillLevelGroup}>
                           {["Beginner", "Intermediate", "Advanced"].map((level) => (
                             <TouchableOpacity
@@ -461,7 +464,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
                                   selectedSkillLevels.includes(level.toUpperCase()) && styles.skillLevelTextSelected,
                                 ]}
                               >
-                                {level}
+                                {t(`edit_event_modal.${level.toLowerCase()}`)}
                               </Text>
                             </TouchableOpacity>
                           ))}
@@ -473,35 +476,35 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
                     {/* date and time */}
                     <View style={styles.spaceView}>
                       <View style={styles.rowView}>
-                        <Text style={styles.bold}>Date:</Text>
+                        <Text style={styles.bold}>{t('edit_event_modal.date')}</Text>
                         <View style={styles.dateView}>
                           <TinyCustomDateTimePicker
                             value={eventDate}
                             mode="date"
                             onChange={(newDate) => setEventDate(newDate)}
-                            label="Select Event Date"
+                            label={t('edit_event_modal.select_event_date')}
                           />
                         </View>
                       </View>
                     </View>
                     <View style={styles.spaceView}>
                       <View style={styles.rowViewRegister}>
-                        <Text style={styles.bold}>From:</Text>
+                        <Text style={styles.bold}>{t('edit_event_modal.from')}</Text>
                         <View style={styles.timeView}>
                           <TinyCustomDateTimePicker
                             value={eventStartTime}
                             mode="time"
                             onChange={(newTime) => setEventStartTime(newTime)}
-                            label="Select Start Time"
+                            label={t('edit_event_modal.select_start_time')}
                           />
                         </View>
-                        <Text style={styles.bold}>To:</Text>
+                        <Text style={styles.bold}>{t('edit_event_modal.to')}</Text>
                         <View style={styles.timeView}>
                           <TinyCustomDateTimePicker
                             value={eventEndTime}
                             mode="time"
                             onChange={(newTime) => setEventEndTime(newTime)}
-                            label="Select End Time"
+                            label={t('edit_event_modal.select_end_time')}
                           />
                         </View>
                       </View>
@@ -509,30 +512,30 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
                     {/* cut off time */}
                     <View style={styles.spaceView}>
                       <View style={styles.rowViewRegister}>
-                        <Text style={styles.bold}>Register by:</Text>
+                        <Text style={styles.bold}>{t('edit_event_modal.register_by')}</Text>
                         <TinyCustomDateTimePicker
                           value={cutOffDate}
                           mode="date"
                           onChange={(newDate) => setCutOffDate(newDate)}
-                          label="Select Cut-off Date"
+                          label={t('edit_event_modal.select_cut_off_date')}
                         />
                         <TinyCustomDateTimePicker
                           value={cutOffTime}
                           mode="time"
                           onChange={(newTime) => setCutOffTime(newTime)}
-                          label="Select Cut-off Time"
+                          label={t('edit_event_modal.select_cut_off_time')}
                         />
                       </View>
                     </View>
                     {/* description */}
                     <View style={styles.spaceView}>
-                      <Text style={styles.bold}>Description:</Text>
+                      <Text style={styles.bold}>{t('edit_event_modal.description')}</Text>
                       <Controller
                         control={control}
                         name="description"
                         render={({ field: { onChange, onBlur, value } }) => (
                           <TextInput
-                            placeholder="Enter event description..."
+                            placeholder={t('edit_event_modal.enter_event_description')}
                             placeholderTextColor="black"
                             style={styles.descriptionInput}
                             onBlur={onBlur}
@@ -550,19 +553,19 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ visible, onClose }) => 
                     </View>
                   </>
                 ) : (
-                  <Text style={styles.errorText}>Failed to load event details.</Text>
+                  <Text style={styles.errorText}>{t('edit_event_modal.failed_to_load_details')}</Text>
                 )}
               </ScrollView>
             )}
             <View style={styles.rowViewButtons}>
               <TouchableOpacity style={styles.closeButton} onPress={handleCancel}>
-                <Text style={styles.closeButtonText}>Cancel</Text>
+                <Text style={styles.closeButtonText}>{t('edit_event_modal.cancel')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.submitButton}
                 onPress={handleSubmit(handleUpdateEvent)}
               >
-                <Text style={styles.submitButtonText}>Save</Text>
+                <Text style={styles.submitButtonText}>{t('edit_event_modal.save')}</Text>
               </TouchableOpacity>
             </View>
           </View>
