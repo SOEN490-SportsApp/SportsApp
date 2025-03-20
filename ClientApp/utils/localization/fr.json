@@ -324,5 +324,11 @@
     "edit_event": "Modifier l'événement",
     "delete_event": "Supprimer l'événement",
     "leave_event": "Quitter l'événement"
+  },
+  "qr": {
+    "share_your": "Partagez votre",
+    "profile": "profil",
+    "event": "événement",
+    "with_friends": "avec des amis"
   }
 }
