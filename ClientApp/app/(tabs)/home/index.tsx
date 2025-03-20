@@ -2,7 +2,7 @@ import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import { View, StyleSheet, SafeAreaView, StatusBar, Alert, Animated } from "react-native";
 import TopBar from "@/components/Home Page/TopBar";
-import Feed from "@/components/Home Page/Feed";
+import HomePageFeed from "@/components/Home Page/HomePageFeed";
 import MyCalendar from "@/components/Calendar/MyCalendar";
 import { getAllEvents } from "@/services/eventService";
 import { Event } from "@/types/event";
@@ -50,7 +50,7 @@ const HomePage = () => {
       {/* Feed */}
       <View style={styles.content}>
         <MyCalendar userId={user.id as string} isVisible={isCalendarVisible}/>
-        <Feed />
+        <HomePageFeed />
       </View>
     </SafeAreaView>
   );

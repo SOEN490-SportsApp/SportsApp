@@ -20,6 +20,8 @@ import FavoriteSportsBadges from "@/components/FavoriteSportsBadges";
 import FriendsList from "@/components/Profile/FriendsList";
 import MyCalendar from "@/components/Calendar/MyCalendar";
 import ProfileSection from "@/components/Profile/ProfileSection";
+import ProfilePageActivityFeed from "@/components/Profile/ProfilePageActivityFeed";
+import ProfilePageCreatedFeed from "@/components/Profile/ProfilePageCreatedFeed";
 import { useTranslation } from 'react-i18next';
 
 const screenHeight = Dimensions.get("window").height;
@@ -40,17 +42,8 @@ const getSkillColor = (ranking: string) => {
 };
 
 const ActivityTab = () => {
-  const user = useSelector((state: { user: any }) => state.user);
   return (
-    <View className="p-4">
-      <View>
-        <EventList
-          fetchEventsFunction={(page, size) =>
-            getEventsJoined(user.id, page, size)
-          }
-        />
-      </View>
-    </View>
+    <ProfilePageActivityFeed />
   );
 };
 
@@ -66,18 +59,9 @@ const FriendsTab = () => {
 
 // About tab content with user data
 const MyEvents = () => {
-  const user = useSelector((state: { user: any }) => state.user);
 
   return (
-    <View className="p-4 bg-white">
-      <View>
-        <EventList
-          fetchEventsFunction={(page, size) =>
-            getEventsCreated(user.id, page, size)
-          }
-        />
-      </View>
-    </View>
+    <ProfilePageCreatedFeed />
   );
 };
 

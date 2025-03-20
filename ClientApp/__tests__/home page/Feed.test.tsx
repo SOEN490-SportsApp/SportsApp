@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react-native';
-import Feed from '../../components/Home Page/Feed';
+import Feed from '../../components/Home Page/HomePageFeed';
 import EventsList from '../../components/Event/EventsListHomePage';
 
 jest.mock('../../components/Event/EventsListHomePage', () => jest.fn());
