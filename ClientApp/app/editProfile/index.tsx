@@ -18,6 +18,7 @@ import { useUpdateUserToStore } from "@/state/user/actions";
 import { Picker } from "@react-native-picker/picker";
 import { Platform } from "react-native";
 import { ActionSheetIOS } from "react-native";
+import { useTranslation } from 'react-i18next';
 
 interface EditProfilePageFormData {
   firstName: string;
@@ -32,6 +33,7 @@ const EditProfilePage: React.FC = () => {
   const router = useRouter();
   const updateUserToStore = useUpdateUserToStore();
   const user = useSelector((state: { user: any }) => state.user);
+  const { t } = useTranslation();
 
   const { control, handleSubmit } = useForm<EditProfilePageFormData>({
     defaultValues: {
@@ -67,11 +69,11 @@ const EditProfilePage: React.FC = () => {
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.push("/(tabs)/profile")}>
-            <Text style={styles.cancelButton}>Cancel</Text>
+            <Text style={styles.cancelButton}>{t('edit_profile_page.cancel')}</Text>
           </TouchableOpacity>
-          <Text style={styles.title}>Edit Profile</Text>
+          <Text style={styles.title}>{t('edit_profile_page.edit_profile')}</Text>
           <TouchableOpacity onPress={handleSubmit(onSubmit)}>
-            <Text style={styles.doneButton}>Done</Text>
+            <Text style={styles.doneButton}>{t('edit_profile_page.done')}</Text>
           </TouchableOpacity>
         </View>
 
@@ -82,14 +84,14 @@ const EditProfilePage: React.FC = () => {
               style={styles.profileImage}
               source={{ uri: "https://via.placeholder.com/100" }}
             />
-            <Text style={styles.changePhotoText}>Change Profile Photo</Text>
+            <Text style={styles.changePhotoText}>{t('edit_profile_page.change_profile_photo')}</Text>
           </TouchableOpacity>
         </View>
 
         {/* Public Information Section */}
         <View style={styles.inputSection}>
           <View style={styles.inputRow}>
-            <Text style={styles.label}>First Name</Text>
+            <Text style={styles.label}>{t('edit_profile_page.first_name')}</Text>
             <Controller
               control={control}
               name="firstName"
@@ -105,7 +107,7 @@ const EditProfilePage: React.FC = () => {
           </View>
 
           <View style={styles.inputRow}>
-            <Text style={styles.label}>Last Name</Text>
+            <Text style={styles.label}>{t('edit_profile_page.last_name')}</Text>
             <Controller
               control={control}
               name="lastName"
@@ -125,16 +127,16 @@ const EditProfilePage: React.FC = () => {
 
           >
 
-            <Text style={styles.skillButtonText}>Sports and Skills</Text>
+            <Text style={styles.skillButtonText}>{t('edit_profile_page.sports_and_skills')}</Text>
           </TouchableOpacity>
         </View>
 
         {/* Private Information Section */}
         <View style={styles.privateInfoSection}>
-          <Text style={styles.privateInfoTitle}>Private Information</Text>
+          <Text style={styles.privateInfoTitle}>{t('edit_profile_page.private_information')}</Text>
 
           <View style={styles.inputRow}>
-            <Text style={styles.label}>Email</Text>
+            <Text style={styles.label}>{t('edit_profile_page.email')}</Text>
             <Controller
               control={control}
               name="email"
@@ -150,7 +152,7 @@ const EditProfilePage: React.FC = () => {
           </View>
 
           <View style={styles.inputRow}>
-            <Text style={styles.label}>Phone</Text>
+            <Text style={styles.label}>{t('edit_profile_page.phone')}</Text>
             <Controller
               control={control}
               name="phoneNumber"
@@ -165,7 +167,7 @@ const EditProfilePage: React.FC = () => {
             />
           </View>
           <View style={styles.inputRow}>
-          <Text style={styles.label}>Gender</Text>
+          <Text style={styles.label}>{t('edit_profile_page.gender')}</Text>
           <Controller
             control={control}
             name="gender"
@@ -187,7 +189,7 @@ const EditProfilePage: React.FC = () => {
             );
           }}
         >
-          <Text style={styles.iosPickerText}>{value || "Select Gender"}</Text>
+          <Text style={styles.iosPickerText}>{value || t('edit_profile_page.select_gender')}</Text>
         </TouchableOpacity>
       ) : (
         <View style={styles.pickerContainer}>
@@ -196,10 +198,10 @@ const EditProfilePage: React.FC = () => {
             onValueChange={(itemValue) => onChange(itemValue)}
             style={styles.picker}
           >
-            <Picker.Item label="Select Gender" value="" />
-            <Picker.Item label="Male" value="Male" />
-            <Picker.Item label="Female" value="Female" />
-            <Picker.Item label="Other" value="Other" />
+            <Picker.Item label={t('edit_profile_page.select_gender')} value="" />
+            <Picker.Item label={t('edit_profile_page.male')} value="Male" />
+            <Picker.Item label={t('edit_profile_page.female')} value="Female" />
+            <Picker.Item label={t('edit_profile_page.other')} value="Other" />
           </Picker>
         </View>
           )
@@ -207,7 +209,7 @@ const EditProfilePage: React.FC = () => {
       />
        </View>
           <View style={styles.inputRow}>
-            <Text style={styles.label}>Date of Birth</Text>
+            <Text style={styles.label}>{t('edit_profile_page.date_of_birth')}</Text>
             <Controller
               control={control}
               name="dateOfBirth"
