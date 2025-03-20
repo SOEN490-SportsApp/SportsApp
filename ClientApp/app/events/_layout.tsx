@@ -11,6 +11,7 @@ import { mvs } from "@/utils/helpers/uiScaler";
 import { useSelector } from "react-redux";
 import { selectUser } from "@/state/user/userSlice";
 import EditEventModal from "@/components/Event/EditEventModal";
+import { useTranslation } from "react-i18next";
 
 export default function EventDetailsLayout() {
   const { eventId } = useLocalSearchParams<{ eventId: string }>();
@@ -20,6 +21,7 @@ export default function EventDetailsLayout() {
   const [isParticipant, setIsParticipant] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [eventData, setEventData] = useState(null);
+  const { t } = useTranslation();
   
   const user = useSelector(selectUser); 
   const userId = user.id; 
@@ -40,7 +42,7 @@ export default function EventDetailsLayout() {
         setIsParticipant(hasJoined);
 
       } catch (error) {
-        console.error("Error fetching event details:", error);
+        console.error(t('event_details_layout.error_fetching_details'), error);
       }
     };
     
@@ -77,20 +79,20 @@ export default function EventDetailsLayout() {
     }
 
     Alert.alert(
-      "Confirm Delete",
-      "Are you sure you want to delete this event?",
+      t('event_details_layout.confirm_delete_1'),
+      t('event_details_layout.confirm_delete_2'),
       [
-        { text: "Cancel", style: "cancel" },
+        { text: t('event_details_layout.cancel'), style: "cancel" },
         {
-          text: "Delete",
+          text: t('event_details_layout.delete'),
           style: "destructive",
           onPress: async () => {
             try {
               await deleteEvent(eventId);
-              Alert.alert("Success", "Event has been deleted.");
+              Alert.alert(t('event_details_layout.success_1'), t('event_details_layout.success_2'));
               router.replace("/(tabs)/home");
             } catch (error) {
-              Alert.alert("Error", "Unable to delete event. Please try again.");
+              Alert.alert(t('event_details_layout.error'), t('event_details_layout.error_deleting_event'));
             }
           },
         },
@@ -127,14 +129,14 @@ export default function EventDetailsLayout() {
     </TouchableOpacity>
   } 
 >
-  <Menu.Item onPress={() => handleOptionPress("invite")} title="Invite Friend" titleStyle={{ color: "black" }} />
+  <Menu.Item onPress={() => handleOptionPress("invite")} title={t('event_details_layout.invite_friend')} titleStyle={{ color: "black" }} />
   {!isCreator && isParticipant && (
-    <Menu.Item onPress={() => handleOptionPress("leave")} title="Leave Event" titleStyle={{ color: "black" }} />
+    <Menu.Item onPress={() => handleOptionPress("leave")} title={t('event_details_layout.leave_event')} titleStyle={{ color: "black" }} />
         )}
   {isCreator && (
     <React.Fragment>
-      <Menu.Item onPress={() => handleOptionPress("edit")} title="Edit Event" />
-      <Menu.Item onPress={() => handleOptionPress("delete")} title="Delete Event" titleStyle={{ color: "red" }} />
+      <Menu.Item onPress={() => handleOptionPress("edit")} title={t('event_details_layout.edit_event')} />
+      <Menu.Item onPress={() => handleOptionPress("delete")} title={t('event_details_layout.delete_event')} titleStyle={{ color: "red" }} />
     </React.Fragment>
   )}
       </Menu>
