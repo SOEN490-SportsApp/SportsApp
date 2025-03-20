@@ -189,7 +189,16 @@
     "to": "to"
   },
   "search_page": {
-    "search": "Search..."
+    "search": "Search...",
+    "connect_with_others": "Connect with others and plan events!",
+    "no_users_fonud": "No users found",
+    "navigate": "Navigate",
+    "users": "Users",
+    "events": "Events",
+    "details": "Details",
+    "unknown_location": "Unknown Location",
+    "public": "Public",
+    "private": "Private"
   },
   "home_notifications_page": {
     "friend_requests": "Friend Requests",

@@ -189,7 +189,16 @@
     "to": "à"
   },
   "search_page": {
-    "search": "Rechercher..."
+    "search": "Rechercher...",
+    "connect_with_others": "Connectez-vous avec d'autres et planifiez des événements!",
+    "no_users_fonud": "Aucun utilisateur trouvé",
+    "navigate": "Naviguer",
+    "users": "Utilisateurs",
+    "events": "Événements",
+    "details": "Détails",
+    "unknown_location": "Emplacement inconnu",
+    "public": "Public",
+    "private": "Privé"
   },
   "home_notifications_page": {
     "friend_requests": "Demandes d'ami",
