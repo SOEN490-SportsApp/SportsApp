@@ -17,10 +17,20 @@ import Octicons from '@expo/vector-icons/Octicons';
 import * as Clipboard from 'expo-clipboard';
 import EventPostsTab from "@/components/Event/EventPostsTab";
 import ClosedButtonEventPage from "@/components/Helper Components/ClosedButtonEventPage";
+import { useTranslation } from "react-i18next";
+import i18n from "i18next";
+import { format } from 'date-fns';
+import { fr, enUS } from 'date-fns/locale';
+
+export const formatDate = (date: string, locale: string) => {
+  const parsedDate = new Date(date);
+  return format(parsedDate, 'EEE dd MMM yyyy', { locale: locale === 'fr' ? fr : enUS });
+};
 
 const EventDetails = ({ event, handleJoinEvent }: { event: Event; handleJoinEvent: () => void }) => {
   const router = useRouter();
   const user = useSelector((state: { user: any }) => state.user);
+  const { t } = useTranslation();
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -98,6 +108,7 @@ const EventPage: React.FC = () => {
   const { eventId } = useLocalSearchParams<{ eventId: string }>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchEventDetails = async () => {
@@ -204,7 +215,7 @@ const EventPage: React.FC = () => {
               </Pressable>
             </Text>
             <Text style={styles.detailText}>
-              📅 {new Date(event.date).toDateString()} •
+              📅 {formatDate(event.date, i18n.language)} •
               ⏰ {`${event.startTime.slice(0, -3)} - ${event.endTime.slice(0, -3)}`}
             </Text>
             
@@ -214,7 +225,7 @@ const EventPage: React.FC = () => {
                 size={20}
                 color="#94504b"
               />
-              {event.sportType} • {event.eventType}
+              {event.sportType} • {t(`event_page.${event.eventType.toLowerCase()}`)}
             </Text>
             <View style={styles.joinButtonView}>
               <View style={styles.skillTags}>
@@ -225,14 +236,14 @@ const EventPage: React.FC = () => {
               <View style={styles.joinButtonContainer}>
               {!isUserParticipant ? (
                   adjustedTimeDifference > 0 ? (
-                    <ConfirmButtonEventPage text="Join" onPress={handleJoinEvent} icon={undefined} iconPlacement={null} />
+                    <ConfirmButtonEventPage text={t('event_page.join')} onPress={handleJoinEvent} icon={undefined} iconPlacement={null} />
                   ) : (
                     <ClosedButtonEventPage text="Closed" />
                   )
                 ) : (
                   <View style={styles.joinedTextContainer}>
                     {/* <MaterialCommunityIcons name="check-circle" size={20} color={themeColors.primary} /> */}
-                    <Text style={styles.joinedText}>Joined</Text>
+                    <Text style={styles.joinedText}>{t('event_page.joined')}</Text>
                   </View>
                 )}
 
