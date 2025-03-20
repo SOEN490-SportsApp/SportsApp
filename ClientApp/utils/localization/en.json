@@ -256,5 +256,13 @@
     "edit_profile": "Edit Profile",
     "add_your_favourite_sports": "Add your favourite sports",
     "save_changes": "Save Changes"
+  },
+  "edit_profile_register_profile_sports": {
+    "select_your_skill_level_in": "Select your skill level in",
+    "beginner": "Beginner",
+    "intermediate": "Intermediate",
+    "advanced": "Advanced",
+    "remove": "Remove",
+    "select": "Select"
   }
 }
