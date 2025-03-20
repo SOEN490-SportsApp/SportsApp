@@ -79,7 +79,7 @@ const settingsPage: React.FC = () => {
             color="black"
             style={styles.icon}
           />
-          <Text style={styles.text}>Submit Feedback</Text>
+          <Text style={styles.text}>{t('settings_page.submit_feedback')}</Text>
         </TouchableOpacity>
         {/* Help */}
         <TouchableOpacity style={styles.option} onPress={() => router.push('/(tabs)/profile/(settings)/helpPage')}>
