@@ -20,4 +20,16 @@ public class OrchestrationServiceConsumerImpl implements OrchestrationServiceCon
         log.info("Received event update notification: {}", request);
         notificationService.processNotification(request);
     }
+
+    @KafkaListener(topics = "friend-requests", groupId = "notification-service", containerFactory = "kafkaListenerContainerFactory")
+    public void consumeFriendRequestNotification(NotificationRequest request) {
+        log.info("Received friend request notification: {}", request);
+        notificationService.processNotification(request);
+    }
+
+    @KafkaListener(topics = "user-mentions", groupId = "notification-service", containerFactory = "kafkaListenerContainerFactory")
+    public void consumeUserMentionNotification(NotificationRequest request) {
+        log.info("Received user mention notification: {}", request);
+        notificationService.processNotification(request);
+    }
 }
