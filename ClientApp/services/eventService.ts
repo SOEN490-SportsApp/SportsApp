@@ -32,13 +32,21 @@ export const getAllEvents = async () => {
   }
 };
 
-export const getAllRelevantEvents = async (longitude:number, latitude:number, radius = 15, radiusExpansion: boolean, paginate: boolean, page = 0 , size = 10) => {
+export const getAllRelevantEvents = async (
+  location: LocationState,
+  radius = 15, 
+  radiusExpansion: 
+  boolean, 
+  paginate: boolean, 
+  page = 0 , 
+  size = 10
+) => {
   try {
     const axiosInstance = getAxiosInstance();
     const response = await axiosInstance.get(API_ENDPOINTS.GET_RELEVANT_EVENTS_FOR_CALENDAR, {
       params: {
-        longitude: longitude,
-        latitude: latitude,
+        longitude: location.longitude,
+        latitude: location.latitude,
         radius: radius,
         radiusExpansion: radiusExpansion,
         paginate: paginate,
@@ -46,15 +54,29 @@ export const getAllRelevantEvents = async (longitude:number, latitude:number, ra
         size: size
       }
     });
-    if (paginate) {
-      return response.data.content
+    // Ensure response.data.content exists and is an array
+    if (Array.isArray(response.data?.content)) {
+      const updatedContent = response.data.content.map((event: Event) => ({
+        ...event,
+        far: calculateDistanceBetweenEventAndUserLocation(event, location),
+      }));
+
+      return {
+        data: {
+          ...response.data,
+          content: updatedContent,
+        },
+      };    
     }
-    return response.data;
+    return {
+       data: response.data 
+    };
   } catch (error) {
-    console.error("Error fetching events:", error);
+    console.error("Error fetching homepage events:", error);
     throw error;
   }
 };
+
 export const getEventDetails = async (eventId: string) => {
   try {
     const axiosInstance = getAxiosInstance();
@@ -117,15 +139,16 @@ export const getEventsJoined = async (
         far: calculateDistanceBetweenEventAndUserLocation(event, location),
       }));
 
-      // console.log("Updated content with distances:", updatedContent);
-      const finalResponseSentToHook = {
-        ...response,
-        content: updatedContent,
-      }
-
-      return finalResponseSentToHook;
+      return {
+        data: {
+          ...response.data,
+          content: updatedContent,
+        },
+      };    
     }
-    return response.data;
+    return {
+       data: response.data 
+    };
   } catch (error) {
     console.error("Error fetching joined events:", error);
     throw error;
@@ -134,6 +157,7 @@ export const getEventsJoined = async (
 
 //API_ENDPOINTS.GET_ALL_EVENTS_CREATED_BY
 export const getEventsCreated = async (
+  location: LocationState,
   userId: string,
   page: number = 0,
   size: number = 5
@@ -146,7 +170,23 @@ export const getEventsCreated = async (
     );
     const url = `${endpoint}?page=${page}&size=${size}`;
     const response = await axiosInstance.get(url);
-    return response;
+    // Ensure response.data.content exists and is an array
+    if (Array.isArray(response.data?.content)) {
+      const updatedContent = response.data.content.map((event: Event) => ({
+        ...event,
+        far: calculateDistanceBetweenEventAndUserLocation(event, location),
+      }));
+
+      return {
+        data: {
+          ...response.data,
+          content: updatedContent,
+        },
+      };    
+    }
+    return {
+       data: response.data 
+    };
   } catch (error) {
     console.error("Error fetching created events:", error);
     throw error;

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
-import EventsList from '../Event/EventsListHomePage';
+import EventsList from '@/components/Event/EventList';
 import { useDispatch, useSelector } from 'react-redux';
 import { calculateDistanceBetweenEventAndUserLocation, requestAndStoreLocation } from '@/services/locationService';
 import EventListSkeleton from '../Event/EventListSkeleton';
@@ -15,38 +15,26 @@ const HomePageFeed = () => {
   const [isLocationFetching, setIsLocationFetching] = useState(true);
   
   const Location = useSelector((state: { location: any }) => state.location);
-  const [events, setEvents] = useState<Event[]>([]);
 
-  const getEventsWithDistances = async () => {
-    try {
-      const eventsData = await getAllRelevantEvents(Location.longtitude, Location.latitude, 25, true, false, 0, 10);
-      const measuredEvents = eventsData.map((event:Event) => {
-        return {
-          ...event,
-          far: calculateDistanceBetweenEventAndUserLocation(event, Location)
-        }})
-      setEvents(measuredEvents);
-    } catch (error) {
-      Alert.alert("Error", "Failed to fetch events. Please try again later.");
-    } finally {
-    }
-  };
-
+  // ⏳ Fetch user location on mount
   useEffect(() => {
     const fetchLocation = async () => {
       setIsLocationFetching(true);
       await requestAndStoreLocation(dispatch, user.profile.postalCode);
-      setTimeout(() => setIsLocationFetching(false), 700);
+      setTimeout(() => setIsLocationFetching(false), 700); // slight delay for smoother UX
     };
     fetchLocation();
   }, [user.id]);
-  
+
   return (
-    <View testID = 'feed-container' style={styles.container}>
-      {isLocationFetching ? (
-        <EventListSkeleton />
-      ) : (
-        <EventsList />
+    <View testID="feed-container" style={styles.container}>
+      {!isLocationFetching && (
+        <EventsList
+          forProfile = {false}
+          fetchEventsFunction={(page, size) =>
+            getAllRelevantEvents(Location, 15, true, true, page, size)
+          }
+        />
       )}
     </View>
   );
@@ -58,5 +46,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#ffffff',
-  }
+    padding: 10,
+  },
 });
