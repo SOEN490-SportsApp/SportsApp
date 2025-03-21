@@ -19,9 +19,9 @@ public interface UserRepository extends MongoRepository<User, String>, Searching
 
     @Aggregation(pipeline = {
             "{ $match: { _id: { $ne: ?0 }, 'profile.postalCode': ?1, 'profile.sportsOfPreference.name': { $in: ?2 }, 'profile.gender': ?3 } }",
-            "{ $addFields: { mutualFriendsCount: { $size: { $setIntersection: [ '$friendList.userId', ?4 ] } } } }",
-            "{ $addFields: { mutualEventsCount: { $size: { $setIntersection: [ '$eventIds', ?5 ] } } } }",
-            "{ $addFields: { skillMatchScore: { $size: { $setIntersection: [ '$profile.sportsOfPreference.ranking', ?6 ] } } } }",
+            "{ $addFields: { mutualFriendsCount: { $size: { $setIntersection: [ { $ifNull: ['$friendList.userId', []] }, ?4 ] } } } }",
+            "{ $addFields: { mutualEventsCount: { $size: { $setIntersection: [ { $ifNull: ['$eventIds', []] }, ?5 ] } } } }",
+            "{ $addFields: { skillMatchScore: { $size: { $setIntersection: [ { $ifNull: ['$profile.sportsOfPreference.ranking', []] }, ?6 ] } } } }",
             "{ $sort: { mutualFriendsCount: -1, mutualEventsCount: -1, skillMatchScore: -1 } }",
             "{ $limit: 10 }"
     })
