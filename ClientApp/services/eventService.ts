@@ -2,7 +2,10 @@ import { FilterState } from "@/components/Helper Components/FilterSection/Filter
 import { getAxiosInstance } from "@/services/axiosInstance";
 import { API_ENDPOINTS } from "@/utils/api/endpoints";
 import { accessibilityProps } from "react-native-paper/lib/typescript/components/MaterialCommunityIcon";
-
+import { useSelector } from "react-redux";
+import { calculateDistanceBetweenEventAndUserLocation } from "./locationService";
+import { Event } from "@/types/event";
+import { LocationState } from "@/state/location/locationSlice";
 //API_ENDPOINTS.CREATE_EVENT
 export const createEvent = async (eventData: any) => {
   try {
@@ -93,6 +96,7 @@ export const leaveEvent = async (eventId: string, userId: string) => {
 
 // API function that fetches paginated events
 export const getEventsJoined = async (
+  location: LocationState,
   userId: string,
   page: number = 0,
   size: number = 5
@@ -105,7 +109,23 @@ export const getEventsJoined = async (
     );
     const url = `${endpoint}?page=${page}&size=${size}`;
     const response = await axiosInstance.get(url);
-    return response;
+
+    // Ensure response.data.content exists and is an array
+    if (Array.isArray(response.data?.content)) {
+      const updatedContent = response.data.content.map((event: Event) => ({
+        ...event,
+        far: calculateDistanceBetweenEventAndUserLocation(event, location),
+      }));
+
+      // console.log("Updated content with distances:", updatedContent);
+      const finalResponseSentToHook = {
+        ...response,
+        content: updatedContent,
+      }
+
+      return finalResponseSentToHook;
+    }
+    return response.data;
   } catch (error) {
     console.error("Error fetching joined events:", error);
     throw error;
