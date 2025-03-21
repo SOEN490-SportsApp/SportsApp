@@ -24,6 +24,7 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -64,29 +65,22 @@ public class UserServiceConsumerImpl{
     public void listenForJoinedEventsByUserRequestEvent(
             @Payload JoinedEventsByUserRequestEvent requestEvent,
             @Header(KafkaHeaders.CORRELATION_ID) byte[] correlationId){
-        String userId = requestEvent.getEmail();
 
+        log.info("UserServiceConsumerImpl::listenForJoinedEventsByUserRequestEvent: received request for event ids for user with id: {}", requestEvent.getUserId());
+
+        String userId = requestEvent.getUserId();
         BaseEvent fetchBaseEvent = new BaseEvent(
                 UUID.randomUUID().toString(),
-                "response",
+                "request",
                 "orchestration-service",
                 Instant.now(),
                 requestEvent.getBaseEvent().getCorrelationId()
         );
 
-        JoinedEventsByUserFetchEvent fetchEvent = new JoinedEventsByUserFetchEvent(fetchBaseEvent, userId);
-
-        // Send the fetch event and wait for the response
-//        ProducerRecord<String, Object> record = new ProducerRecord<>(
-//                JoinedEventsByUserEvent.FETCH_TOPIC,
-//                fetchEvent
-//        );
-//        record.headers().add(new RecordHeader(KafkaHeaders.REPLY_TOPIC, JoinedEventsByUserEvent.FETCHED_TOPIC.getBytes()));
-//        record.headers().add(new RecordHeader(KafkaHeaders.CORRELATION_ID, fetchEvent.getBaseEvent().getCorrelationId().getBytes()));
-
-        JoinedEventsByUserFetchedEvent fetchedEvent = null;
         try{
             replyingKafkaTemplate.start();
+
+            JoinedEventsByUserFetchEvent fetchEvent = new JoinedEventsByUserFetchEvent(fetchBaseEvent, userId);
             ProducerRecord<String, Object> record = new ProducerRecord<>(
                     JoinedEventsByUserEvent.FETCH_TOPIC,
                     fetchEvent
@@ -96,29 +90,23 @@ public class UserServiceConsumerImpl{
 
             RequestReplyFuture<String, Object, Object> future =
                     replyingKafkaTemplate.sendAndReceive(record);
-            log.info("UserServiceConsumerImpl::listenForJoinedEventsByUserRequestEvent: fetch topic");
+            log.info("UserServiceConsumerImpl::listenForJoinedEventsByUserRequestEvent: sent fetch request for event ids for user with id: {}", fetchEvent.getUserId());
 
             SendResult<String, Object> sendResult = future.getSendFuture().get();
             sendResult.getProducerRecord().headers().forEach(header -> System.out.println(header.key() + ":" + header.value().toString()));
 
-            ConsumerRecord<String, Object> response = future.get(90, TimeUnit.SECONDS);
-            log.info("UserServiceConsumerImpl::listenForJoinedEventsByUserRequestEvent: fetched topic");
+            ConsumerRecord<String, Object> response = future.get(5, TimeUnit.SECONDS);
+            log.info("UserServiceConsumerImpl::listenForJoinedEventsByUserRequestEvent: received reply for event ids for user with id: {}", fetchEvent.getUserId());
 
-            fetchedEvent = (JoinedEventsByUserFetchedEvent) response.value();
-
-        } catch (InterruptedException e) {
-            log.error(e.getMessage());
-        } catch (ExecutionException e) {
-            log.error(e.getMessage());
-        } catch (TimeoutException e) {
-            log.error(e.getMessage());
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        } finally {
-            replyingKafkaTemplate.stop();
-        }
-
-        if(fetchedEvent != null){
+            if (response.value() instanceof JoinedEventsByUserFetchedEvent fetchedEvent
+                    &&
+                    Objects.equals(fetchedEvent.getBaseEvent().getCorrelationId(), fetchEvent.getBaseEvent().getCorrelationId()))
+            {
+                log.info("UserServiceConsumerImpl::listenForJoinedEventsByUserRequestEvent: received response for event ids for user with id: {}", requestEvent.getUserId());
+            }
+            else{
+                throw new RuntimeException("Invalid response received");
+            }
 
             BaseEvent fetchedBaseEvent = new BaseEvent(
                     UUID.randomUUID().toString(),
@@ -131,9 +119,20 @@ public class UserServiceConsumerImpl{
 
             ProducerRecord<String, Object> responseRecord = new ProducerRecord<>(JoinedEventsByUserEvent.RESPONSE_TOPIC, responseEvent);
             responseRecord.headers().add(new RecordHeader(KafkaHeaders.CORRELATION_ID, correlationId));
-            kafkaTemplate.send(responseRecord);
 
-            log.info("UserServiceConsumerImpl::listenForJoinedEventsByUserRequestEvent: response topic sent");
+            kafkaTemplate.send(responseRecord);
+            log.info("UserServiceConsumerImpl::listenForJoinedEventsByUserRequestEvent: sent response to user-service for user with id : {}", userId);
+
+        } catch (InterruptedException e) {
+            log.error(e.getMessage());
+        } catch (ExecutionException e) {
+            log.error(e.getMessage());
+        } catch (TimeoutException e) {
+            log.error(e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        } finally {
+            replyingKafkaTemplate.stop();
         }
     }
 }
