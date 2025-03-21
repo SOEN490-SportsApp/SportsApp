@@ -19,7 +19,7 @@ interface EventCardProps {
   isForProfile?: boolean;
 }
 
-export const  stringToDate = (dateString: string) => {
+export const stringToDate = (dateString: string) => {
   const [year, month, day] = dateString.split('-');
   return new Date(+year, +month - 1, +day);
 }
@@ -55,42 +55,50 @@ const EventCard: React.FC<EventCardProps> = ({
     "Ping-Pong": "table-tennis",
   };
 
-const currentTime = new Date();
-const cutoffTime = new Date(event.cutOffTime);
-let hoursLeft = 0;
-let minutesLeft = 0;
+  const getTimeLeftColor = (daysLeft: number) => {
+    if (daysLeft >= 1) return "#0C9E04"; // Green
+    else return "#FF0000"; // Red (hours or minutes left)
+  };
 
-  // Ensure both currentTime and cutoffTime are valid
+  const currentTime = new Date();
+  const cutoffTime = new Date(event.cutOffTime);
+
   let timeLeftShown = "";
   let eventStarted = false;
   let canJoin = true;
+  let daysLeft = 0;
 
-if (!isNaN(cutoffTime.getTime())) {
-  const timeLeft = cutoffTime.getTime() - currentTime.getTime();
-  if (timeLeft > 1) {
-    // Calculate remaining time in minutes, hours, and days
-    minutesLeft = Math.floor(timeLeft / (1000 * 60));
-    hoursLeft = Math.floor(timeLeft / (1000 * 60 * 60));
-    const daysLeft = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-    const weeksLeft = Math.floor(daysLeft / 7);
+  if (!isNaN(cutoffTime.getTime())) {
+    const timeDifference = cutoffTime.getTime() - currentTime.getTime();
+    const adjustedTimeDifference = timeDifference - cutoffTime.getTimezoneOffset() * 60 * 1000; // Convert offset to milliseconds
 
-    if (minutesLeft < 60) {
-      timeLeftShown = `${minutesLeft} minute${minutesLeft > 1 ? "s" : ""}`;
-    } else if (hoursLeft < 24) {
-      timeLeftShown = `${hoursLeft} hour${hoursLeft > 1 ? "s" : ""}`;
-    } else if (daysLeft < 7) {
-      timeLeftShown = `${daysLeft} day${daysLeft > 1 ? "s" : ""}`;
+    if (adjustedTimeDifference > 0) {
+      const minutesLeft = Math.floor(adjustedTimeDifference / (1000 * 60));
+      const hoursLeft = Math.floor(minutesLeft / 60);
+      daysLeft = Math.floor(hoursLeft / 24);
+      const weeksLeft = Math.floor(daysLeft / 7);
+
+      if (minutesLeft < 60) {
+        timeLeftShown = `${minutesLeft} minute${minutesLeft !== 1 ? "s" : ""} left to join`;
+      } else if (hoursLeft < 24) {
+        timeLeftShown = `${hoursLeft} hour${hoursLeft !== 1 ? "s" : ""} left to join`;
+      } else if (daysLeft < 7) {
+        timeLeftShown = `${daysLeft} day${daysLeft !== 1 ? "s" : ""} left to join`;
+      } else {
+        timeLeftShown = `${weeksLeft} week${weeksLeft !== 1 ? "s" : ""} left to join`;
+      }
     } else {
-      timeLeftShown = `${weeksLeft} week${weeksLeft > 1 ? "s" : ""}`;
+      eventStarted = true;
+      canJoin = false;
+      timeLeftShown = "Registration closed";
     }
   } else {
     eventStarted = true;
     canJoin = false;
+    timeLeftShown = "Invalid cutoff time";
   }
-} else {
-  eventStarted = true;
-  canJoin = false;
-}
+
+  const timeLeftColor = getTimeLeftColor(daysLeft);
 
   // Dynamic styling for the card
   const dynamicCardStyle = {
@@ -103,28 +111,28 @@ if (!isNaN(cutoffTime.getTime())) {
     color: canJoin ? "#dc3545" : "#000000", // Red text for expired, black for active
   };
 
-return (
-  <TouchableOpacity testID = 'event-card' style={[styles.card, dynamicCardStyle]} onPress={() => onPress(event.id)}>
-    <Text style={styles.eventName}>{event.eventName}</Text> 
-    {showDetailPreview && 
-    <Text style={styles.eventDetails}>
-      {/*TODO - Add distance calculation after backend does it*/}
-      {showSportType ? `${event.sportType} - X km away` : `X km away`}
-      </Text>}
-    
-    {showSportType && 
-    <View style={styles.sportIconContainer}>
-      <MaterialCommunityIcons
-        name={sportIcons[event.sportType] || 'help-circle-outline'} // Fallback icon
-        size={40}
-        color="#94504b"
-      /> 
-    </View>}
-    
-    {showDate && 
-    <Text style={styles.date}>
-      📅 {new Date(stringToDate(event.date)).toDateString()}
-    </Text>}
+  return (
+    <TouchableOpacity testID='event-card' style={[styles.card, dynamicCardStyle]} onPress={() => onPress(event.id)}>
+      <Text style={styles.eventName}>{event.eventName}</Text>
+      {showDetailPreview &&
+        <Text style={styles.eventDetails}>
+          {/*TODO - Add distance calculation after backend does it*/}
+          {showSportType ? `${event.sportType} - X km away` : `X km away`}
+        </Text>}
+
+      {showSportType &&
+        <View style={styles.sportIconContainer}>
+          <MaterialCommunityIcons
+            name={sportIcons[event.sportType] || 'help-circle-outline'} // Fallback icon
+            size={40}
+            color="#94504b"
+          />
+        </View>}
+
+      {showDate &&
+        <Text style={styles.date}>
+          📅 {new Date(event.date).toDateString()}
+        </Text>}
 
       {showLocation && (
         <Text style={styles.location}>
@@ -155,7 +163,9 @@ return (
       )}
 
       {showTimeLeft && (
-        <Text style={styles.timeLeft}>{timeLeftShown} left to join</Text>
+        <Text style={[styles.timeLeft, { color: timeLeftColor }]}>
+          {timeLeftShown}
+        </Text>
       )}
     </TouchableOpacity>
   );
@@ -224,6 +234,5 @@ const styles = StyleSheet.create({
   timeLeft: {
     marginTop: 10,
     fontSize: 14,
-    color: "#0C9E04",
   },
 });

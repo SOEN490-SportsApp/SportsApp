@@ -90,6 +90,7 @@
     "react-native-google-places-autocomplete": "^2.5.7",
     "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-maps": "1.18.0",
+    "react-native-mime-types": "^2.5.0",
     "react-native-modal-datetime-picker": "^18.0.0",
     "react-native-pager-view": "6.5.1",
     "react-native-paper": "^5.13.1",
