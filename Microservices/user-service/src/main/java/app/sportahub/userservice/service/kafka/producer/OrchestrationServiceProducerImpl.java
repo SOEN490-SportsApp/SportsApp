@@ -57,9 +57,11 @@ public class OrchestrationServiceProducerImpl implements OrchestrationServicePro
                 UUID.randomUUID().toString()
         );
 
-        JoinedEventsByUserRequestEvent requestEvent = new JoinedEventsByUserRequestEvent(baseEvent, userId);
-
         try{
+            replyingKafkaTemplate.start();
+
+            JoinedEventsByUserRequestEvent requestEvent = new JoinedEventsByUserRequestEvent(baseEvent, userId);
+
             ProducerRecord<String, Object> record = new ProducerRecord<>(
                     JoinedEventsByUserEvent.REQUEST_TOPIC,
                     requestEvent
@@ -67,18 +69,18 @@ public class OrchestrationServiceProducerImpl implements OrchestrationServicePro
             record.headers().add(KafkaHeaders.REPLY_TOPIC, JoinedEventsByUserEvent.RESPONSE_TOPIC.getBytes());
 
             RequestReplyFuture<String, Object, Object> future = replyingKafkaTemplate.sendAndReceive(record);
-            log.info("OrchestrationServiceProducerImpl::getEventsJoinedByUser: request topic");
+            log.info("OrchestrationServiceProducerImpl::getEventsJoinedByUser: sent request for event ids for user with id: {}", requestEvent.getUserId());
 
             SendResult<String, Object> sendResult = future.getSendFuture().get();
             sendResult.getProducerRecord().headers().forEach(header -> System.out.println(header.key() + ":" + header.value().toString()));
 
-            ConsumerRecord<String, Object> response = future.get(90, TimeUnit.SECONDS);
-            log.info("UserServiceConsumerImpl::listenForJoinedEventsByUserRequestEvent: fetched topic");
+            ConsumerRecord<String, Object> response = future.get(5, TimeUnit.SECONDS);
 
-            if (response.value() instanceof JoinedEventsByUserResponseEvent responseEvent) {
-                System.out.println(responseEvent.getEventIds());
-                log.info("eventIds: {}", responseEvent.getEventIds());
-
+            if (response.value() instanceof JoinedEventsByUserResponseEvent responseEvent
+                    &&
+                    Objects.equals(responseEvent.getBaseEvent().getCorrelationId(), requestEvent.getBaseEvent().getCorrelationId())
+            ) {
+                log.info("UserServiceConsumerImpl::listenForJoinedEventsByUserRequestEvent: received response for event ids for user with id: {}", requestEvent.getUserId());
                 return responseEvent.getEventIds();
             }
 
@@ -95,25 +97,5 @@ public class OrchestrationServiceProducerImpl implements OrchestrationServicePro
         }
 
         return Collections.<String> emptyList();
-//        ProducerRecord<String, Object> record =
-//                new ProducerRecord<>(REQUEST_TOPIC, requestEvent);
-//
-//        RequestReplyFuture<String, Object, Object> future = replyingKafkaTemplate.sendAndReceive(record);
-//
-//        // Wait for response (set timeout as needed)
-//        ConsumerRecord<String, Object> response = future.get(5, TimeUnit.SECONDS);
-//
-//        try {
-//            RequestReplyFuture<String, Object, Object> future =
-//                    replyingKafkaTemplate.sendAndReceive(record);
-//
-//            JoinedEventsByUserResponseEvent responseEvent = future.get().value();
-//
-//            log.info("OrchestrationServiceProducerImpl::getEventsJoinedByUser:  topic");
-//            return responseEvent.getEventIds();
-//        } catch (Exception e) {
-//            log.error("Failed to get response from orchestration-service", e);
-//            return Collections.emptyList();
-//        }
     }
 }
