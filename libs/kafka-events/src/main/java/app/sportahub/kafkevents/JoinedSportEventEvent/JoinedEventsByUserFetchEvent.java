@@ -1,21 +1,21 @@
-package app.sportahub.kafkevents.forgotPassword;
+package app.sportahub.kafkevents.JoinedSportEventEvent;
 
 import app.sportahub.kafkevents.BaseEvent;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ForgotPasswordRequestedEvent {
+public class JoinedEventsByUserFetchEvent {
     private final BaseEvent baseEvent;
-    private final String email;
+    private final String userId;
 
     @JsonCreator
-    public ForgotPasswordRequestedEvent(
+    public JoinedEventsByUserFetchEvent(
             @JsonProperty("baseEvent") BaseEvent baseEvent,
-            @JsonProperty("email") String email)
+            @JsonProperty("userId") String userId)
     {
         this.baseEvent = baseEvent;
-        this.email = email;
+        this.userId = userId;
     }
-    public String getEmail() {return this.email;}
+    public String getEmail() {return this.userId;}
     public BaseEvent getBaseEvent() {return this.baseEvent;}
 }
