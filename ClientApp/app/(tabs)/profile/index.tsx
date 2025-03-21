@@ -92,7 +92,7 @@ const ProfilePage: React.FC = () => {
   const scenes = {
     activity: <ActivityTab />,
     friends: <FriendsTab />,
-    MyEvents: <MyEvents />,
+    // MyEvents: <MyEvents />,
   };
 
   return (
