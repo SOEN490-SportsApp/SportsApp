@@ -113,6 +113,22 @@ const EventPage: React.FC = () => {
   }, [eventId]);
 
   const handleJoinEvent = async () => {
+    const currentTime = new Date();
+    const cutoffTime = new Date(event!.cutOffTime);
+  
+    if (!isNaN(cutoffTime.getTime())) {
+      const timeDifference = cutoffTime.getTime() - currentTime.getTime();
+      const adjustedTimeDifference = timeDifference - cutoffTime.getTimezoneOffset() * 60 * 1000; // Convert offset to milliseconds
+  
+      if (adjustedTimeDifference <= 0) {
+        alert("Registration time has been closed for this event.");
+        return; 
+      }
+    } else {
+      alert("Invalid cutoff time for registration.");
+      return; 
+    }
+  
     try {
       await joinEvent(eventId!, user.id);
       setEvent((prevEvent) => {
