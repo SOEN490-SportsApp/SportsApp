@@ -106,10 +106,6 @@ public class EventServiceImpl implements EventService {
             events = eventRepository.findByLocationCoordinatesNear(point, distance, pageable);
         }
 
-        if(events.isEmpty()){
-            throw new EventsNotFoundException();
-        }
-
         return ResponseEntity.ok(paginate ? events.map(eventMapper::eventToEventResponse):
                 events.getContent().stream().map(eventMapper::eventToEventResponse).toList());
     }
