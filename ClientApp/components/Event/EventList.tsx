@@ -7,10 +7,10 @@ import { useSelector } from 'react-redux';
 import usePagination from '@/app/hooks/usePagination';
 
 interface userEventsListProps {
-  fetchEventsFunction: (page: number, size: number) => Promise<{ data: { content: Event[]; totalElements: number; totalPages: number; pageable: { pageNumber: number; pageSize: number } } }>;
+  forProfile: boolean, fetchEventsFunction: (page: number, size: number) => Promise<{ data: { content: Event[]; totalElements: number; totalPages: number; pageable: { pageNumber: number; pageSize: number } } }>;
 }
 
-const EventsList: React.FC<userEventsListProps> = ({ fetchEventsFunction }) => {
+const EventsList: React.FC<userEventsListProps> = ({ forProfile, fetchEventsFunction }) => {
   const user = useSelector((state: { user: any }) => state.user);
 
   const {
@@ -55,7 +55,7 @@ const EventsList: React.FC<userEventsListProps> = ({ fetchEventsFunction }) => {
           data={events.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <EventCard event={item} onPress={handleEventPress} isForProfile={true} />
+            <EventCard event={item} onPress={handleEventPress} isForProfile={forProfile} />
           )}
           refreshControl={
             <RefreshControl

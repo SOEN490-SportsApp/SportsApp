@@ -36,4 +36,5 @@ export interface Event {
     }[]; 
     isPrivate: boolean; 
     whitelistedUsers?: string[];
+    far: number;
   };
