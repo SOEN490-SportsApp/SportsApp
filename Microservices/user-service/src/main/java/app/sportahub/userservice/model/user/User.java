@@ -40,4 +40,7 @@ public class User extends BaseEntity {
 
     @Builder.Default
     private List<Friend> friendList = new ArrayList<>();
+
+    @Builder.Default
+    private List<String> recommendedFriends = new ArrayList<>();
 }
