@@ -38,7 +38,7 @@ const FilterModal: React.FC<FilterModalInterface> = ({
     ...supportedSports,
   ];
 
-  const skillLevels = ["Beginner", "Intermediate", "Advanced"];
+  const skillLevels = ["beginner", "intermediate", "advanced"];
   const { t } = useTranslation();
 
   return (
@@ -146,22 +146,21 @@ const FilterModal: React.FC<FilterModalInterface> = ({
                 gap: 2,
               }}
             >
-              {skillLevels &&
-                skillLevels.map((item: any, index) => (
-                  <View key={index}>
-                    <FilterButtonBadge
-                      sport={item}
-                      isSelected={filterState.skillLevel === item}
-                      onPress={() =>
-                        setFilterState((prev) => ({
-                          ...prev,
-                          skillLevel: item,
-                        }))
-                      }
-                      icon={undefined}
-                    />
-                  </View>
-                ))}
+              {skillLevels.map((level, index) => (
+                <View key={index}>
+                  <FilterButtonBadge
+                    sport={t(`filter_modal.${level}`)}
+                    isSelected={filterState.skillLevel.toLowerCase() === level}
+                    onPress={() =>
+                      setFilterState((prev) => ({
+                        ...prev,
+                        skillLevel: level.charAt(0).toUpperCase() + level.slice(1) as FilterState['skillLevel']
+                      }))
+                    }
+                    icon={undefined}
+                  />
+                </View>
+              ))}
             </View>
           </View>
           <View
@@ -212,7 +211,7 @@ const FilterModal: React.FC<FilterModalInterface> = ({
         </View>
         <ConfirmButton
           icon={null}
-          text="Apply Filters"
+          text={t('filter_modal.apply_filters')}
           iconPlacement={null}
           onPress={handleFilterToggle}
         />

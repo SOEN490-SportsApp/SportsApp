@@ -190,7 +190,11 @@
     "clear_filters": "effacer les filtres",
     "skill_level": "Calibre",
     "select_date_range": "Sélectionner la plage de dates",
-    "to": "à"
+    "to": "à",
+    "beginner": "Débutant(e)",
+    "intermediate": "Intermédiaire",
+    "advanced": "Avancé(e)",
+    "apply_filters": "Appliquer les filtres"
   },
   "search_page": {
     "search": "Rechercher...",

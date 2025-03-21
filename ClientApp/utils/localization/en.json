@@ -190,7 +190,11 @@
     "clear_filters": "clear filters",
     "skill_level": "Skill Level",
     "select_date_range": "Select Date Range",
-    "to": "to"
+    "to": "to",
+    "beginner": "Beginner",
+    "intermediate": "Intermediate",
+    "advanced": "Advanced",
+    "apply_filters": "Apply Filters"
   },
   "search_page": {
     "search": "Search...",
