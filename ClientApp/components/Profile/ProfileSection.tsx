@@ -67,13 +67,23 @@ const ProfileSection: React.FC<ProfileRequest> = ({
       >
         <View className="items-center flex flex-row gap-4">
           <View style={styles.container}>
-            <Text
-              testID="firstName"
-              style={{ fontSize: 26, fontWeight: "700", marginBottom: vs(4) }}
+            <View
+              style={{
+                display:'flex',
+                flexDirection:'row',
+                gap:vs(8),
+                width:'86%',
+                alignItems:'baseline'
+              }}
             >
-              {user?.profile.firstName} {user?.profile.lastName}
-            </Text>
-
+              <Text
+                testID="firstName"
+                style={{ fontSize: 26, fontWeight: 700, marginBottom: vs(4) }}
+              >
+                {user?.profile.firstName} {user?.profile.lastName}
+              </Text>
+              <Text style={{fontSize:18, color:themeColors.border.dark}}>@{user?.username}</Text>
+            </View>
             <View style={styles.headerContainer}>
               {!isUserProfile ? (
                 <>

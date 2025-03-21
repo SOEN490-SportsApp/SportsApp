@@ -115,33 +115,6 @@ export default function UserProfilesLayout() {
                 screenOptions={{
                     headerShown: true,
                     title: "",
-                    headerRight: () => (
-                        <Menu
-                            style={{
-                                backgroundColor: themeColors.background.lightGrey,
-                                position: "absolute",
-                                top: 50,
-                                right: 10,
-                                left: "auto",
-                            }}
-                            visible={menuVisible}
-                            onDismiss={closeMenu}
-                            anchor={
-                                <TouchableOpacity onPress={openMenu}>
-                                    <MaterialCommunityIcons name="dots-vertical" size={24} />
-                                </TouchableOpacity>
-                            }>
-                            {!isFriends && !isRequestSent && (
-                        <Menu.Item onPress={() => handleOptionPress("add")} title="Add Friend" />
-                            )}
-
-                            {isFriends && (
-                        <Menu.Item onPress={() => handleOptionPress("remove")} title="Remove Friend" />
-                            )}
-
-                        <Menu.Item onPress={() => handleOptionPress("message")} title="Send a Message" />
-                        </Menu>
-                    ),
                     headerLeft: () => (
                         <TouchableOpacity
                           onPress={() => router.back()}
