@@ -11,6 +11,14 @@ import { mvs } from "@/utils/helpers/uiScaler";
 import { useSelector } from "react-redux";
 import { selectUser } from "@/state/user/userSlice";
 import EditEventModal from "@/components/Event/EditEventModal";
+import { Event } from "@/types/event";
+import { Participant } from "@/types/event";
+import { createContext } from "react";
+
+export const EventContext = createContext<{
+  eventData: Event | null;
+  setEventData: React.Dispatch<React.SetStateAction<Event | null>>;
+} | null>(null);
 
 export default function EventDetailsLayout() {
   const { eventId } = useLocalSearchParams<{ eventId: string }>();
@@ -19,8 +27,7 @@ export default function EventDetailsLayout() {
   const [isCreator, setIsCreator] = useState(false);
   const [isParticipant, setIsParticipant] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
-  const [eventData, setEventData] = useState(null);
-  
+  const [eventData, setEventData] = useState<Event | null>(null);
   const user = useSelector(selectUser); 
   const userId = user.id; 
 
@@ -47,6 +54,11 @@ export default function EventDetailsLayout() {
     fetchEventDetails();
   }, [eventId, userId]);  
 
+  useEffect(() => {
+ 
+  }, [eventData]);
+  
+  
   const openMenu = () => setMenuVisible(true);
   const closeMenu = () => setMenuVisible(false);
 
@@ -71,33 +83,44 @@ export default function EventDetailsLayout() {
   };
   
   const handleLeaveEvent = async () => {
-    if (!eventId || !userId) {
+    if (!eventId || !user.id) {
       Alert.alert("Error", "Event ID or User ID is missing.");
       return;
     }
   
-    Alert.alert(
-      "Confirm Leave",
-      "Are you sure you want to leave this event?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Leave",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              const response = await leaveEvent(eventId, userId);
-              Alert.alert("Success", "You have left the event.");
-              setIsParticipant(false); 
-            } catch (error: any) {
-              Alert.alert("Error", "Unable to leave event. Please check the request format.");
-            }
-          },
-        },
-      ]
-    );
-  };
+    Alert.alert("Confirm Leave", "Are you sure you want to leave this event?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Leave",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            const updatedEvent = await getEventDetails(eventId);
+            if (!updatedEvent) return;
   
+            const filteredParticipants = updatedEvent.participants.filter(
+              (p: Participant) => p.userId !== user.id
+            );
+            setEventData({
+              ...updatedEvent,
+              participants: filteredParticipants,
+            });
+  
+            setIsParticipant(false); 
+  
+            await leaveEvent(eventId, user.id); 
+  
+            const refetched = await getEventDetails(eventId);
+            setEventData(refetched); 
+  
+            Alert.alert("Success", "You have left the event.");
+          } catch (error) {
+            Alert.alert("Error", "Unable to leave event. Please try again.");
+          }
+        },
+      },
+    ]);
+  };
   
   const handleDeleteEvent = async (eventId: string | undefined) => {
     if (!eventId) {
@@ -128,6 +151,7 @@ export default function EventDetailsLayout() {
   };
 
   return (
+    <EventContext.Provider value={{ eventData, setEventData }}>
     <Provider>
       <Stack
         screenOptions={{
@@ -178,6 +202,7 @@ export default function EventDetailsLayout() {
       />
       <EditEventModal visible={editModalVisible} onClose={() => setEditModalVisible(false)} eventId={eventId} />
     </Provider>
+    </EventContext.Provider>
   );
 }
 
