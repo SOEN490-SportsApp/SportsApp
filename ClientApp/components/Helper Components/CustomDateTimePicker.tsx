@@ -3,6 +3,8 @@ import { View, Text, TouchableOpacity, Modal, StyleSheet } from "react-native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import themeColors from "@/utils/constants/colors";
 import { useTranslation } from 'react-i18next';
+import moment from 'moment';
+import 'moment/locale/fr';
 
 interface CustomDateTimePickerProps {
   value: Date | null;
@@ -18,7 +20,11 @@ const CustomDateTimePicker: React.FC<CustomDateTimePickerProps> = ({
   label,
 }) => {
   const [isPickerVisible, setPickerVisible] = useState(false);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+
+  const locale = i18n.language === 'fr' ? 'fr' : 'en';
+  moment.locale(locale);
+
   const currentMode = mode === "date" ? t('custom_date_time_picker.date') : t('custom_date_time_picker.time');
 
   const showPicker = () => setPickerVisible(true);
@@ -35,7 +41,7 @@ const CustomDateTimePicker: React.FC<CustomDateTimePickerProps> = ({
         <Text style={styles.inputText}>
           {value
             ? currentMode === t('custom_date_time_picker.date')
-              ? value.toDateString()
+              ? moment(value).format('ddd D MMM YYYY')
               : value.toLocaleTimeString([], {
                   hour: "2-digit",
                   minute: "2-digit",
