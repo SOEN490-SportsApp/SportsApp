@@ -85,12 +85,12 @@ const ProfilePage: React.FC = () => {
   const routes = [
     { key: "activity", title: "Activity", testID: "Activity" },
     { key: "friends", title: "Friends", testID: "Friends" },
-    // { key: "MyEvents", title: "My Events", testID: "MyEvents" },
+    { key: "MyEvents", title: "My Events", testID: "MyEvents" },
   ];
   const scenes = {
     activity: <ActivityTab />,
     friends: <FriendsTab />,
-    // MyEvents: <MyEvents />,
+    MyEvents: <MyEvents />,
   };
 
   return (

@@ -13,6 +13,7 @@ const ProfilePageActivityFeed = () => {
   return (
     <View testID = 'feed-container' style={styles.container}>
         <EventList
+          forProfile = {true}
           fetchEventsFunction={(page, size) =>
             getEventsJoined(Location, user.id, page, size)}
       />
