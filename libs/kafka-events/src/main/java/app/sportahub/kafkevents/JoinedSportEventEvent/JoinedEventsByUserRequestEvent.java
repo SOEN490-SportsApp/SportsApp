@@ -16,6 +16,6 @@ public class JoinedEventsByUserRequestEvent {
         this.baseEvent = baseEvent;
         this.userId = userId;
     }
-    public String getEmail() {return this.userId;}
+    public String getUserId() {return this.userId;}
     public BaseEvent getBaseEvent() {return this.baseEvent;}
 }
