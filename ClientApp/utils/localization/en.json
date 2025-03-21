@@ -113,8 +113,8 @@
     "general_information": "General Information",
     "event_name": "Event Name",
     "event_name_placeholder": "Enter event name",
-    "public": "public",
-    "private": "private",
+    "public": "Public",
+    "private": "Private",
     "event_type": "Event Type",
     "sport_type": "Sport Type",
     "select_sport": "Select a Sport",
@@ -141,7 +141,10 @@
     "register_by": "Register by",
     "at": "at",
     "no_dresciption": "No description provided",
-    "create_event_button": "Create Event"
+    "create_event_button": "Create Event",
+    "beginner": "Beginner",
+    "intermediate": "Intermediate",
+    "advanced": "Advanced"
   },
   "custom_date_time_picker": {
     "date": "date",

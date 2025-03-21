@@ -113,15 +113,15 @@
     "general_information": "Informations générales",
     "event_name": "Nom de l'événement",
     "event_name_placeholder": "Entrez le nom de l'événement",
-    "public": "public",
-    "private": "private",
+    "public": "Public",
+    "private": "Privé",
     "event_type": "Type d'événement",
     "sport_type": "Type de sport",
     "select_sport": "Sélectionnez",
     "max_participants": "Nb. de joeurs",
     "at_least_2": "Au moins 2 participants",
     "enter_max": "Entrez max",
-    "required_skill_level": "Niveau de compétence requis",
+    "required_skill_level": "calibre requis",
     "description": "Description",
     "description_placeholder": "Entrez la description",
     "date_time": "Date et heure",
@@ -133,7 +133,7 @@
     "next_button": "Suivant",
     "event_summary": "Résumé de l'événement",
     "participants": "Participants",
-    "skill_level": "Niv.",
+    "skill_level": "Calibre",
     "time_location": "Heure et lieu",
     "from": "De",
     "to": "à",
@@ -141,7 +141,10 @@
     "register_by": "Inscrivez av.",
     "at": "à",
     "no_dresciption": "Aucune description fournie",
-    "create_event_button": "Créer un événement"
+    "create_event_button": "Créer un événement",
+    "beginner": "Débutant(e)",
+    "intermediate": "Intermédiaire",
+    "advanced": "Avancé(e)"
   },
   "custom_date_time_picker": {
     "date": "la date",
@@ -185,7 +188,7 @@
   "filter_modal": {
     "sport_type": "Type de sport",
     "clear_filters": "effacer les filtres",
-    "skill_level": "Niveau de compétence",
+    "skill_level": "Calibre",
     "select_date_range": "Sélectionner la plage de dates",
     "to": "à"
   },
@@ -218,9 +221,9 @@
     "week": "semaine"
   },
   "skill_tag": {
-    "beginner": "Débutant",
+    "beginner": "Débutant(e)",
     "intermediate": "Intermédiaire",
-    "advanced": "Avancé"
+    "advanced": "Avancé(e)"
   },
   "tab_layout": {
     "home": "Accueil",
@@ -259,9 +262,9 @@
   },
   "edit_profile_register_profile_sports": {
     "select_your_skill_level_in": "Sélectionnez votre niveau de compétence en",
-    "beginner": "Débutant",
+    "beginner": "Débutant(e)",
     "intermediate": "Intermédiaire",
-    "advanced": "Avancé",
+    "advanced": "Avancé(e)",
     "remove": "Supprimer",
     "select": "Sélectionner"
   },
@@ -272,9 +275,9 @@
     "you": "Moi",
     "join": "Rejoindre",
     "joined": "Rejoint",
-    "beginner": "Débutant",
+    "beginner": "Débutant(e)",
     "intermediate": "Intermédiaire",
-    "advanced": "Avancé",
+    "advanced": "Avancé(e)",
     "failed_to_join": "Échec de la connexion",
     "location_copied": "Emplacement copié",
     "event_not_found": "Événement non trouvé",
@@ -336,10 +339,10 @@
     "name": "Nom:",
     "sport_type": "Type de sport:",
     "max_participants": "Nb. de joeurs:",
-    "skill_level": "Niv.:",
-    "beginner": "Débutant",
+    "skill_level": "Calibre:",
+    "beginner": "Débutant(e)",
     "intermediate": "Intermédiaire",
-    "advanced": "Avancé",
+    "advanced": "Avancé(e)",
     "date": "Date:",
     "from": "De:",
     "to": "à:",

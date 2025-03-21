@@ -29,6 +29,7 @@ import CustomDateTimePicker from "@/components/Helper Components/CustomDateTimeP
 import { Ionicons } from "@expo/vector-icons";
 import MapView, { Marker } from 'react-native-maps';
 import { useTranslation } from 'react-i18next';
+import i18n from "@/utils/localization/i18n";
 
 const Create = () => {
   const {
@@ -408,7 +409,7 @@ const Create = () => {
 
                 <Text style={styles.inputLabel}>{t('create.event_type')}</Text>
                 <View style={styles.segmentedControl}>
-                  {[t('create.public'), t('create.private')].map((type) => (
+                  {['public', 'private'].map((type) => (
                     <TouchableOpacity
                       key={type}
                       onPress={() => setValue("eventType", type)}
@@ -425,7 +426,7 @@ const Create = () => {
                             styles.segmentButtonTextSelected,
                         ]}
                       >
-                        {type.charAt(0).toUpperCase() + type.slice(1)}
+                        {t(`create.${type}`)}
                       </Text>
                     </TouchableOpacity>
                   ))}
@@ -504,28 +505,26 @@ const Create = () => {
 
                 <Text style={styles.inputLabel}>{t('create.required_skill_level')}</Text>
                 <View style={styles.skillLevelGroup}>
-                  {["Beginner", "Intermediate", "Advanced"].map((level) => (
+                {['beginner', 'intermediate', 'advanced'].map((level) => (
                     <TouchableOpacity
                       key={level}
                       testID={`skill-level-${level}`}
                       style={[
                         styles.skillLevelOption,
-                        requiredSkillLevel.includes(level) &&
-                          styles.skillLevelSelected,
+                        requiredSkillLevel.includes(level) && styles.skillLevelSelected,
                       ]}
                       onPress={() => toggleSkillLevel(level)}
                     >
                       <Text
                         style={[
                           styles.skillLevelText,
-                          requiredSkillLevel.includes(level) &&
-                            styles.skillLevelTextSelected,
+                          requiredSkillLevel.includes(level) && styles.skillLevelTextSelected,
                         ]}
                       >
-                        {level}
+                        {t(`create.${level}`)}
                       </Text>
                     </TouchableOpacity>
-                  ))}
+                ))}
                 </View>
 
                 <Text style={styles.inputLabel}>{t('create.description')}</Text>
@@ -789,16 +788,26 @@ const Create = () => {
                   />
                   <SummaryItem
                     label={`${t('create.skill_level')}:`}
-                    value={requiredSkillLevel.join(", ") || "None"}
+                    value={
+                      requiredSkillLevel
+                        .map((level) => t(`create.${level.toLowerCase()}`))
+                        .join(", ") || t('create.not_selected')
+                    }
                     icon="ribbon-outline"
                   />
+
                 </View>
 
                 <View style={styles.card}>
                   <Text style={styles.sectionTitle}>{t('create.time_location')}</Text>
                   <SummaryItem
                     label=""
-                    value={eventDate?.toDateString()}
+                    value={eventDate?.toLocaleDateString(i18n.language === 'fr' ? 'fr-FR' : 'en-US', {
+                      weekday: 'short',
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric'
+                    })}
                     icon="calendar"
                   />
                   <SummaryItem
@@ -822,7 +831,12 @@ const Create = () => {
                     label=""
                     value={
                       startTime && endTime
-                        ? `${t('create.register_by')} ${cutOffDate?.toDateString()} ${t('create.at')} ${cutOffTime?.toLocaleTimeString(
+                        ? `${t('create.register_by')} ${cutOffDate?.toLocaleDateString(i18n.language === 'fr' ? 'fr-FR' : 'en-US', {
+                            weekday: 'short',
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric'
+                          })} ${t('create.at')} ${cutOffTime?.toLocaleTimeString(
                             [],
                             {
                               hour: "2-digit",
@@ -1016,14 +1030,14 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   summaryLabel: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "bold",
     color: themeColors.text.dark,
     marginLeft: 8,
     flexWrap: "nowrap",
   },
   summaryValue: {
-    fontSize: 16,
+    fontSize: 15,
     color: themeColors.text.dark,
     marginLeft: 4,
     flex: 1,

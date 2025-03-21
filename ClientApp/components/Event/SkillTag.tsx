@@ -46,6 +46,5 @@ const styles = StyleSheet.create({
   tagText: {
     fontSize: 12,
     fontWeight: 'bold',
-    textTransform: 'capitalize',
   },
 });
