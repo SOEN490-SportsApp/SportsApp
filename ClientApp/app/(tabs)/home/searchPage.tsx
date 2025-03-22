@@ -74,8 +74,8 @@ export default function searchPage() {
       if (activeIndex === 0) {
         await fetchUserResults(searchText);
       } else {        
-        response = await handleEventListData(0,10);
-        setEvents(Array.isArray(response) ? response : []);       
+        response = await handleEventListData(0,10, setEvents);
+        // setEvents(Array.isArray(response) ? response : []);       
       }
     } catch (err) {
       console.error("Error fetching events:", err);
@@ -83,13 +83,6 @@ export default function searchPage() {
       setLoading(false);
     }
   }, [searchText, filter]);
-
-  // useEffect(() => {
-  //   const fetchAndSetEvents = async () => {
-  //     await fetchEvents();
-  //   };
-  //   fetchAndSetEvents();
-  // }, [fetchEvents]);
 
   useEffect(() => {
     if (activeIndex === 1) {
@@ -120,12 +113,18 @@ export default function searchPage() {
     }
   }, [location]);
 
-  const handleEventListData = async (page: number, size: number) => {
+  const handleEventListData = async (page: number, size: number, updateState?: (events: Event[]) => void) => {
     let response;
     if (filter || searchText) {
       response = await searchEventsWithFilter(searchText, filterState, LocationOfUser, page, size);
     } else {
-      response = await getAllRelevantEvents(LocationOfUser, 15, false, true);
+      response = await getAllRelevantEvents(LocationOfUser, 15, false, true, page, size);
+    }
+  
+    const eventArray = response?.data?.content || [];
+  
+    if (updateState) {
+      updateState(eventArray); // e.g., setEvents
     }
     return response;
   };
