@@ -29,5 +29,7 @@ public record ProfileRequest(@Nullable
                              List<SportLevelRequest> sportsOfPreference,
 
                              @Nullable
-                             String ranking) {
+                             String ranking,
+                             @Nullable
+                             String profilePicture) {
 }

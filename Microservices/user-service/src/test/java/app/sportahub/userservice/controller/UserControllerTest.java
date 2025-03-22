@@ -35,6 +35,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -102,8 +103,8 @@ public class UserControllerTest {
     @SneakyThrows
     @Test
     public void updateUserProfileSuccessfully() {
-        ProfileRequest profileRequest = new ProfileRequest("John", "Doe", null, "Male", "12345", "555-1234", null, "Amateur");
-        ProfileResponse expectedResponse = new ProfileResponse("John", "Doe", null, "Male", "12345", "555-1234", null, "Amateur");
+        ProfileRequest profileRequest = new ProfileRequest("John", "Doe", null, "Male", "12345", "555-1234", null, "Amateur","https://i1.sndcdn.com/artworks-000360728946-bilq7t-t500x500.jpg");
+        ProfileResponse expectedResponse = new ProfileResponse("John", "Doe", null, "Male", "12345", "555-1234", null, "Amateur","https://i1.sndcdn.com/artworks-000360728946-bilq7t-t500x500.jpg");
         when(userService.updateUserProfile("1", profileRequest)).thenReturn(expectedResponse);
 
         mockMvc.perform(put("/user/1/profile")
@@ -116,8 +117,8 @@ public class UserControllerTest {
     @SneakyThrows
     @Test
     public void shouldPatchProfileSuccessfully() {
-        ProfileRequest profileRequest = new ProfileRequest("John", "Doe", null, "Male", "12345", "555-1234", null, "Amateur");
-        ProfileResponse expectedResponse = new ProfileResponse("John", "Doe", null, "Male", "12345", "555-1234", null, "Amateur");
+        ProfileRequest profileRequest = new ProfileRequest("John", "Doe", null, "Male", "12345", "555-1234", null, "Amateur",null);
+        ProfileResponse expectedResponse = new ProfileResponse("John", "Doe", null, "Male", "12345", "555-1234", null, "Amateur",null);
         when(userService.patchUserProfile("1", profileRequest)).thenReturn(expectedResponse);
 
         mockMvc.perform(patch("/user/1/profile")
@@ -131,7 +132,7 @@ public class UserControllerTest {
     @SneakyThrows
     @Test
     public void patchProfileUserNotFound() {
-        ProfileRequest profileRequest = new ProfileRequest("John", "Doe", null, "Male", "12345", "555-1234", null, "Amateur");
+        ProfileRequest profileRequest = new ProfileRequest("John", "Doe", null, "Male", "12345", "555-1234", null, "Amateur",null);
         doThrow(new UserDoesNotExistException("User does not exist"))
                 .when(userService).patchUserProfile("999", profileRequest);
 
@@ -170,7 +171,7 @@ public class UserControllerTest {
     @SneakyThrows
     @Test
     public void getUserBadgeSuccessfully() {
-        BadgeResponse badge = new BadgeResponse( "Name", "Team PLayer", "url");
+        BadgeResponse badge = new BadgeResponse("Name", "Team PLayer", "url");
         Integer badgeCount = 1;
         List<BadgeWithCountResponse> badgeResponses = new ArrayList<>();
         badgeResponses.add(new BadgeWithCountResponse(badge, badgeCount));
@@ -184,14 +185,17 @@ public class UserControllerTest {
     @SneakyThrows
     @Test
     public void sendFriendRequestSuccessfully() {
-        FriendRequestResponse friendRequestResponse = new FriendRequestResponse("Friend request sent", "req123");
+        FriendRequestResponse friendRequestResponse = new FriendRequestResponse("Friend request sent",
+                "req123", LocalDateTime.now(), LocalDateTime.now(), "https://example.com/profile.jpg");
         when(userService.sendFriendRequest("1", new FriendRequestRequest("2"))).thenReturn(friendRequestResponse);
 
         mockMvc.perform(post("/user/1/friends/requests")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new FriendRequestRequest("2"))))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Friend request sent"));
+                .andExpect(jsonPath("$.message").value("Friend request sent"))
+                .andExpect(jsonPath("$.createdAt").exists())  // Ensure createdAt exists
+                .andExpect(jsonPath("$.profilePictureURL").value("https://example.com/profile.jpg"));
     }
 
     @SneakyThrows
@@ -200,8 +204,9 @@ public class UserControllerTest {
         List<FriendRequestStatusEnum> friendRequestStatusEnums = new ArrayList<>();
         friendRequestStatusEnums.add(FriendRequestStatusEnum.SENT);
 
-        List<ViewFriendRequestsResponse> friendRequestResponse= new ArrayList<>();
-        friendRequestResponse.add(new ViewFriendRequestsResponse("username1", "1", FriendRequestStatusEnum.SENT, "1"));
+        List<ViewFriendRequestsResponse> friendRequestResponse = new ArrayList<>();
+        friendRequestResponse.add(new ViewFriendRequestsResponse("username1", "1",
+                FriendRequestStatusEnum.SENT, "1", LocalDateTime.now(), "https://example.com/profile.jpg"));
 
         when(userService.getFriendRequests("1", friendRequestStatusEnums)).thenReturn(friendRequestResponse);
 
@@ -211,7 +216,10 @@ public class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].friendRequestUsername").value("username1"))
-                .andExpect(jsonPath("$[0].status").value("SENT"));
+                .andExpect(jsonPath("$[0].status").value("SENT"))
+                .andExpect(jsonPath("$[0].createdAt").exists())  // Ensure createdAt exists
+                .andExpect(jsonPath("$[0].profilePictureURL").value("https://example.com/profile.jpg"));
+        ;
     }
 
     @SneakyThrows
@@ -232,9 +240,9 @@ public class UserControllerTest {
     @SneakyThrows
     @Test
     public void shouldUpdateFriendRequestSuccessfully() {
-        UpdateFriendRequestRequest request = new UpdateFriendRequestRequest("1",  UpdateFriendRequestActionEnum.ACCEPT);
+        UpdateFriendRequestRequest request = new UpdateFriendRequestRequest("1", UpdateFriendRequestActionEnum.ACCEPT);
         UpdateFriendRequestResponse response = new UpdateFriendRequestResponse("Request updated successfully");
-        UpdateFriendRequestRequest  updateFriendRequestRequest = new UpdateFriendRequestRequest("1",  UpdateFriendRequestActionEnum.ACCEPT);
+        UpdateFriendRequestRequest updateFriendRequestRequest = new UpdateFriendRequestRequest("1", UpdateFriendRequestActionEnum.ACCEPT);
         when(userService.updateFriendRequest("1", "1", updateFriendRequestRequest)).thenReturn(response);
 
         mockMvc.perform(put("/user/1/friend-requests/1")
@@ -247,7 +255,7 @@ public class UserControllerTest {
     @SneakyThrows
     @Test
     public void searchUsersSuccessfully() {
-        ProfileResponse profileResponse = new ProfileResponse("John", "Doe", null, "Male", "12345", "555-1234", null, "Amateur");
+        ProfileResponse profileResponse = new ProfileResponse("John", "Doe", null, "Male", "12345", "555-1234", null, "Amateur","https://i1.sndcdn.com/artworks-000360728946-bilq7t-t500x500.jpg");
 
         List<UserProfileResponse> userProfiles = List.of(new UserProfileResponse("123abc", profileResponse));
         Page<UserProfileResponse> page = new PageImpl<>(userProfiles);
