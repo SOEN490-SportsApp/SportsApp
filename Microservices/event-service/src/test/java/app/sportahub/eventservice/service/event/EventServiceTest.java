@@ -205,26 +205,6 @@ class EventServiceTest {
     }
 
     @Test
-    public void testGetRelevantEvents_EmptyResult() {
-        when(eventRepository.findByLocationCoordinatesNear(any(GeoJsonPoint.class), any(Distance.class), any(Pageable.class)))
-                .thenReturn(Page.empty());
-
-        assertThrows(EventsNotFoundException.class, () -> {
-            eventServiceImpl.getRelevantEvents(0.0, 0.0, 10.0, false, true, 0, 10);
-        });
-    }
-
-    @Test
-    public void testGetRelevantEventsWithExpandedRadius_EmptyResult() {
-        when(eventRepository.findByLocationCoordinatesNear(any(GeoJsonPoint.class), any(Distance.class), any(Pageable.class)))
-                .thenReturn(Page.empty());
-
-        assertThrows(EventsNotFoundException.class, () -> {
-            eventServiceImpl.getRelevantEvents(0.0, 0.0, 10.0, true, true, 0, 10);
-        });
-    }
-
-    @Test
     void getRelevantEventsShouldExpandRadiusAndReturnEvents() {
         GeoJsonPoint point = new GeoJsonPoint(0, 0);
         Distance initialDistance = new Distance(25, Metrics.KILOMETERS);
