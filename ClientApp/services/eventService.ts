@@ -35,8 +35,7 @@ export const getAllEvents = async () => {
 export const getAllRelevantEvents = async (
   location: LocationState,
   radius = 15, 
-  radiusExpansion: 
-  boolean, 
+  radiusExpansion: boolean, 
   paginate: boolean, 
   page = 0 , 
   size = 10
@@ -72,7 +71,7 @@ export const getAllRelevantEvents = async (
        data: response.data 
     };
   } catch (error) {
-    console.error("Error fetching homepage events:", error);
+    console.error("Error fetching all relevant events:", error);
     throw error;
   }
 };
@@ -195,40 +194,67 @@ export const getEventsCreated = async (
 
 export const searchEventsWithFilter = async (
   searchText: string,
-  params: FilterState
-) => {
-
+  params: FilterState,
+  location: LocationState,
+  page: number = 0,
+  size: number = 10
+): Promise<{
+  data: {
+    content: Event[];
+    totalElements: number;
+    totalPages: number;
+    pageable: {
+      pageNumber: number;
+      pageSize: number;
+    };
+  };
+}> => {
   try {
     const axiosInstance = getAxiosInstance();
     const endpoint = API_ENDPOINTS.SEARCH_EVENTS;
-    const queryParams: Record<string, string> = {};
+
+    const queryParams: Record<string, string | number> = {
+      page,
+      size,
+    };
 
     if (searchText) {
       queryParams.eventName = searchText;
     }
+
     if (params.skillLevel !== "All") {
       queryParams.requiredSkillLevel = params.skillLevel.toUpperCase();
     }
 
-    if(params.minDate !== params.maxDate){
+    if (params.minDate !== params.maxDate) {
       queryParams.date = addAdjustedDate(params);
     }
-    
+
     if (params.filterType !== "All") {
       queryParams.sportType = params.filterType;
     }
 
-    if (Object.keys(queryParams).length > 0) {
-      const response = axiosInstance.get(endpoint, {
-        params: queryParams,
-      });
-      if (response) {
-        return (await response).data.content;
-      }
-    }
-    return [];
+    const response = await axiosInstance.get(endpoint, {
+      params: queryParams,
+    });
+
+    const originalData = response.data;
+
+    const updatedContent = Array.isArray(originalData.content)
+      ? originalData.content.map((event: Event) => ({
+          ...event,
+          far: calculateDistanceBetweenEventAndUserLocation(event, location),
+        }))
+      : [];
+
+    return {
+      data: {
+        ...originalData,
+        content: updatedContent,
+      },
+    };
   } catch (error) {
-    console.error("Error fetching parametered events:", error);
+    console.error("Error in searchEventsWithFilter:", error);
     throw error;
   }
 };
