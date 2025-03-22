@@ -20,6 +20,7 @@ import {
   getOtherUserProfile,
   getSentFriendRequests,
   sendFriendRequest,
+  removeFriendRequest,
 } from "@/utils/api/profileApiClient";
 import { calculateAge } from "@/utils/helpers/ageOfUser";
 import { getEventsByUserId } from "@/utils/api/profileApiClient";
@@ -55,7 +56,6 @@ const ActivityTab = ({ userId }: { userId: string }) => {
       const eventData: Event[] = response.content;
       setEvents(eventData || []);
     } catch (error) {
-      console.error("Error fetching events:", error);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -152,7 +152,7 @@ const ProfilePage: React.FC = () => {
         setUser(userData);
         await fetchUserFriends();
       } catch (error) {
-        console.error("Error fetching user data:", error);
+    
       } finally {
         setLoading(false);
       }
@@ -163,15 +163,56 @@ const ProfilePage: React.FC = () => {
   const handleFriendRequest = async () => {
     try {
       if (friendStatus !== "UNKNOWN") return;
+  
       const response = await sendFriendRequest(visitingUser.id, id);
-      response
-        ? setFriendStatus("PENDING")
-        : Alert.alert("Error", "Failed to send friend request");
+  
+      if (response) {
+        setFriendStatus("PENDING");
+        await fetchUserFriends(); 
+      } else {
+        Alert.alert("Error", "Failed to send friend request");
+      }
     } catch (err: any) {
-      console.log(err, " occured sending friend request");
     }
   };
-
+    
+  const handleRemoveFriend = async () => {
+    Alert.alert(
+      "Remove Friend",
+      "Are you sure you want to remove this friend?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Yes",
+          onPress: async () => {
+            try {
+              const matchedFriend = friendList.find(
+                (friend: Friend) => friend.friendUserId === id
+              );
+  
+              const realFriendId = matchedFriend?.FriendId;
+  
+              if (!realFriendId) {
+                Alert.alert("Error", "Could not find friendId to remove.");
+                return;
+              }
+  
+              const success = await removeFriendRequest(visitingUser.id, realFriendId);
+  
+              if (success) {
+                setFriendStatus("UNKNOWN");
+                Alert.alert("Success", "Friend removed successfully.");
+                await fetchUserFriends(); 
+              }
+            } catch (error) {
+              Alert.alert("Error", "Failed to remove friend.");
+            }
+          },
+        },
+      ]
+    );
+  };
+    
   const fetchUserFriends = async () => {
     if (!id) return;
     try {
@@ -191,7 +232,7 @@ const ProfilePage: React.FC = () => {
         setFriendStatus("ACCEPTED");
       }
     } catch (error: any) {
-      console.log(error, " occured fetching friends");
+      
     }
   };
 
@@ -224,7 +265,13 @@ const ProfilePage: React.FC = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-white pt-6">
-      <ProfileSection user={user} friendStatus={friendStatus} handleFriendRequest={handleFriendRequest} isUserProfile={false} />
+      <ProfileSection
+  user={user}
+  friendStatus={friendStatus}
+  handleFriendRequest={handleFriendRequest}
+  handleRemoveFriend={handleRemoveFriend}
+  isUserProfile={false}
+/>
       <CustomTabMenu routes={routes} scenes={scenes} backgroundColor={"#fff"} />
     </SafeAreaView>
   );

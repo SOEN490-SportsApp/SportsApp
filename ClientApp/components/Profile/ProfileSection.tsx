@@ -16,6 +16,7 @@ interface ProfileRequest {
   user: any | null;
   friendStatus: string | null;
   handleFriendRequest: () => void | Promise<void> | null;
+  handleRemoveFriend?: () => void | Promise<void>;
   isUserProfile: boolean;
 }
 
@@ -23,6 +24,7 @@ const ProfileSection: React.FC<ProfileRequest> = ({
   user,
   friendStatus,
   handleFriendRequest,
+  handleRemoveFriend,
   isUserProfile,
 }) => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -54,7 +56,6 @@ const ProfileSection: React.FC<ProfileRequest> = ({
       />
 
       <View
-        className=""
         style={{
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
@@ -66,62 +67,59 @@ const ProfileSection: React.FC<ProfileRequest> = ({
       >
         <View className="items-center flex flex-row gap-4">
           <View style={styles.container}>
-            <View
-              style={{
-                display:'flex',
-                flexDirection:'row',
-                gap:vs(8),
-                width:'86%',
-                alignItems:'baseline'
-              }}
+            <Text
+              testID="firstName"
+              style={{ fontSize: 26, fontWeight: "700", marginBottom: vs(4) }}
             >
-              <Text
-                testID="firstName"
-                style={{ fontSize: 26, fontWeight: 700, marginBottom: vs(4) }}
-              >
-                {user?.profile.firstName} {user?.profile.lastName}
-              </Text>
-              <Text style={{fontSize:18, color:themeColors.border.dark}}>@{user?.username}</Text>
-            </View>
+              {user?.profile.firstName} {user?.profile.lastName}
+            </Text>
+
             <View style={styles.headerContainer}>
               {!isUserProfile ? (
                 <>
-                  <TouchableOpacity
-                    style={[
-                      styles.button,
-                      {
-                        backgroundColor:
-                          friendStatus === "UNKNOWN" ? "#0C9E04" : "#fff",
-                        borderColor:
-                          friendStatus !== "UNKNOWN" ? "#0C9E04" : "#fff",
-                      },
-                    ]}
-                    onPress={handleFriendRequest}
-                  >
-                    <Text
-                      className="font-bold"
-                      style={{
-                        color: friendStatus === "UNKNOWN" ? "#fff" : "#0C9E04",
-                      }}
+                  {friendStatus === "ACCEPTED" ? (
+                    <TouchableOpacity
+                      style={[styles.button, { backgroundColor: "#fff", borderColor: "#0C9E04" }]}
+                      onPress={handleRemoveFriend}
                     >
-                      {friendStatus === "ACCEPTED"
-                        ? "Friends"
-                        : friendStatus === "PENDING"
-                          ? "Pending"
-                          : "Add"}
-                    </Text>
-                    <MaterialCommunityIcons
-                      name={
-                        friendStatus === "ACCEPTED"
-                          ? "check"
-                          : friendStatus === "PENDING"
+                      <Text style={{ color: "#0C9E04", fontWeight: "bold" }}>Unfriend</Text>
+                      <MaterialCommunityIcons name="account-remove" size={22} color="#0C9E04" />
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity
+                      style={[
+                        styles.button,
+                        {
+                          backgroundColor:
+                            friendStatus === "UNKNOWN" ? "#0C9E04" : "#fff",
+                          borderColor:
+                            friendStatus !== "UNKNOWN" ? "#0C9E04" : "#fff",
+                        },
+                      ]}
+                      onPress={handleFriendRequest}
+                      disabled={friendStatus !== "UNKNOWN"}
+                    >
+                      <Text
+                        className="font-bold"
+                        style={{
+                          color: friendStatus === "UNKNOWN" ? "#fff" : "#0C9E04",
+                        }}
+                      >
+                        {friendStatus === "PENDING" ? "Pending" : "Add"}
+                      </Text>
+                      <MaterialCommunityIcons
+                        name={
+                          friendStatus === "PENDING"
                             ? "account-clock"
                             : "account-plus"
-                      }
-                      size={22}
-                      color={friendStatus === "UNKNOWN" ? "#fff" : "#0C9E04"}
-                    />
-                  </TouchableOpacity>
+                        }
+                        size={22}
+                        color={friendStatus === "UNKNOWN" ? "#fff" : "#0C9E04"}
+                      />
+                    </TouchableOpacity>
+                  )}
+
+                  {/* Message button */}
                   <TouchableOpacity
                     style={[
                       styles.button,
@@ -140,7 +138,11 @@ const ProfileSection: React.FC<ProfileRequest> = ({
                       Message
                     </Text>
                     <MaterialCommunityIcons
-                      name={friendStatus === "UNKOWN" ? "chat-outline" : "chat"}
+                      name={
+                        friendStatus === "UNKNOWN"
+                          ? "chat-outline"
+                          : "chat"
+                      }
                       size={22}
                       color={friendStatus === "UNKNOWN" ? "#0C9E04" : "#fff"}
                     />
@@ -171,7 +173,7 @@ const styles = StyleSheet.create({
     width: "91.6667%",
   },
   button: {
-    marginTop:vs(8),
+    marginTop: vs(8),
     padding: 5,
     borderRadius: 5,
     width: "48%",

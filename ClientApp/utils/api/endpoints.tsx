@@ -23,6 +23,7 @@ export const API_ENDPOINTS = {
 
 
   SEND_FRIEND_REQUEST: 'user-service/user/{userId}/friends/requests',
+  REMOVE_FRIEND_REQUEST: 'user-service/user/{userId}/friends',
   RETRIEVE_USER_FRIEND_REQUESTS: 'user-service/user/{userId}/friend-requests',
   GET_ALL_FRIENDS: 'user-service/user/{userId}/friends',
   RESPOND_TO_FRIEND_REQUEST: 'user-service/user/{userId}/friend-requests/{requestId}',
