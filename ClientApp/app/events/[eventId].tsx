@@ -16,6 +16,7 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Octicons from '@expo/vector-icons/Octicons';
 import * as Clipboard from 'expo-clipboard';
 import EventPostsTab from "@/components/Event/EventPostsTab";
+import ClosedButtonEventPage from "@/components/Helper Components/ClosedButtonEventPage";
 
 const EventDetails = ({ event, handleJoinEvent }: { event: Event; handleJoinEvent: () => void }) => {
   const router = useRouter();
@@ -76,12 +77,12 @@ const EventDetails = ({ event, handleJoinEvent }: { event: Event; handleJoinEven
           )}
         </ScrollView>
       </View>
-      
+
       {/* Event Location Map */}
       {event.locationResponse?.coordinates?.coordinates?.[1] && event.locationResponse?.coordinates?.coordinates?.[0] && (
         <View style={styles.section}>
-          <EventLocationMap 
-            latitude={event.locationResponse.coordinates.coordinates[1]} 
+          <EventLocationMap
+            latitude={event.locationResponse.coordinates.coordinates[1]}
             longitude={event.locationResponse.coordinates.coordinates[0]}
             showFullScreenButton={false}
           />
@@ -132,9 +133,9 @@ const EventPage: React.FC = () => {
 
   const handleCopyLocation = () => {
     const locationText = `${event?.locationResponse?.streetNumber} ${event?.locationResponse?.streetName}, ${event?.locationResponse?.city}, ${event?.locationResponse?.province} ${event?.locationResponse?.postalCode}`;
-  
+
     Clipboard.setStringAsync(locationText);
-  
+
     if (Platform.OS === 'android') {
       ToastAndroid.show("Location copied to clipboard!", ToastAndroid.SHORT);
     } else {
@@ -170,15 +171,20 @@ const EventPage: React.FC = () => {
     (participant) => participant.userId === user.id
   );
 
+  const currentTime = new Date();
+  const cutoffTime = new Date(event!.cutOffTime);
+  const timeDifference = cutoffTime.getTime() - currentTime.getTime();
+  const adjustedTimeDifference = timeDifference - cutoffTime.getTimezoneOffset() * 60 * 1000; // Convert offset to milliseconds
+
   let sportIcon = sportIconMap[event.sportType];
 
   const routes = [
     { key: "eventPosts", title: "Posts", testID: "eventPosts" },
     { key: "eventDetails", title: "Details", testID: "eventDetails" },
   ];
-  
+
   const scenes = {
-    eventPosts: [<EventPostsTab eventId={eventId} key={eventId} isUserParticipant={isUserParticipant}/>],
+    eventPosts: [<EventPostsTab eventId={eventId} key={eventId} isUserParticipant={isUserParticipant} />],
     eventDetails: <EventDetails event={event} handleJoinEvent={handleJoinEvent} />,
   };
 
@@ -201,7 +207,7 @@ const EventPage: React.FC = () => {
               📅 {new Date(event.date).toDateString()} •
               ⏰ {`${event.startTime.slice(0, -3)} - ${event.endTime.slice(0, -3)}`}
             </Text>
-            
+
             <Text style={styles.detailText}>
               <MaterialCommunityIcons
                 name={event.sportType ? sportIcon as any : "help-circle-outline"}
@@ -218,13 +224,18 @@ const EventPage: React.FC = () => {
               </View>
               <View style={styles.joinButtonContainer}>
                 {!isUserParticipant ? (
-                  <ConfirmButtonEventPage text="Join" onPress={handleJoinEvent} icon={undefined} iconPlacement={null} />
+                  adjustedTimeDifference > 0 ? (
+                    <ConfirmButtonEventPage text="Join" onPress={handleJoinEvent} icon={undefined} iconPlacement={null} />
+                  ) : (
+                    <ClosedButtonEventPage text="Closed" />
+                  )
                 ) : (
                   <View style={styles.joinedTextContainer}>
                     {/* <MaterialCommunityIcons name="check-circle" size={20} color={themeColors.primary} /> */}
                     <Text style={styles.joinedText}>Joined</Text>
                   </View>
                 )}
+
               </View>
             </View>
           </View>
