@@ -16,6 +16,11 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Octicons from '@expo/vector-icons/Octicons';
 import * as Clipboard from 'expo-clipboard';
 import EventPostsTab from "@/components/Event/EventPostsTab";
+import { EventContext } from "@/app/events/_layout";
+import { useContext } from 'react';
+import { Participant } from '@/types/event';
+
+
 
 const EventDetails = ({ event, handleJoinEvent }: { event: Event; handleJoinEvent: () => void }) => {
   const router = useRouter();
@@ -43,8 +48,7 @@ const EventDetails = ({ event, handleJoinEvent }: { event: Event; handleJoinEven
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.participantsScrollContainer}>
           {event.participants.filter((p) => p.attendStatus === "JOINED" || p.attendStatus === "CONFIRMED").length >
             0 ? (
-            event.participants
-              .filter((p) => p.attendStatus === "JOINED" || p.attendStatus === "CONFIRMED")
+              event.participants.filter((p: Participant) => p.attendStatus === "JOINED" || p.attendStatus === "CONFIRMED")
               .map((participant) => (
                 <Pressable
                   key={participant.userId}
@@ -93,16 +97,23 @@ const EventDetails = ({ event, handleJoinEvent }: { event: Event; handleJoinEven
 
 const EventPage: React.FC = () => {
   const user = useSelector((state: { user: any }) => state.user);
-  const [event, setEvent] = useState<Event | null>(null);
   const { eventId } = useLocalSearchParams<{ eventId: string }>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // Get context inside the component
+  const eventContext = useContext(EventContext);
+  if (!eventContext) {
+    return <Text>Error loading event context</Text>;
+  }
+
+  const { eventData, setEventData } = eventContext;
+  const event = eventData; 
   useEffect(() => {
     const fetchEventDetails = async () => {
       try {
-        const eventData = await getEventById(eventId!);
-        setEvent(eventData);
+        const data = await getEventById(eventId!);
+        setEventData(data); 
       } catch (err) {
         setError("Failed to fetch event details.");
       } finally {
@@ -115,7 +126,7 @@ const EventPage: React.FC = () => {
   const handleJoinEvent = async () => {
     try {
       await joinEvent(eventId!, user.id);
-      setEvent((prevEvent) => {
+      setEventData((prevEvent) => {
         if (!prevEvent) return prevEvent;
         return {
           ...prevEvent,
@@ -161,10 +172,11 @@ const EventPage: React.FC = () => {
   if (!event) {
     return (
       <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>Event not found.</Text>
+        <Text style={styles.errorText}>Loading event data...</Text>
       </View>
     );
   }
+  
 
   const isUserParticipant = event.participants.some(
     (participant) => participant.userId === user.id
@@ -217,16 +229,21 @@ const EventPage: React.FC = () => {
                 ))}
               </View>
               <View style={styles.joinButtonContainer}>
-                {!isUserParticipant ? (
-                  <ConfirmButtonEventPage text="Join" onPress={handleJoinEvent} icon={undefined} iconPlacement={null} />
-                ) : (
-                  <View style={styles.joinedTextContainer}>
-                    {/* <MaterialCommunityIcons name="check-circle" size={20} color={themeColors.primary} /> */}
-                    <Text style={styles.joinedText}>Joined</Text>
-                  </View>
-                )}
-              </View>
-            </View>
+  {!isUserParticipant ? (
+    <ConfirmButtonEventPage 
+      text="Join" 
+      onPress={handleJoinEvent} 
+      icon={undefined} 
+      iconPlacement={null} 
+    />
+  ) : (
+    <View style={styles.joinedTextContainer}>
+      <Text style={styles.joinedText}>Joined</Text> 
+    </View>
+  )}
+</View>
+
+        </View>
           </View>
         </View>
       </View>

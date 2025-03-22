@@ -51,6 +51,21 @@ export const deleteEvent = async (eventId: string) => {
     throw error;
   }
 };
+export const leaveEvent = async (eventId: string, userId: string) => {
+  try {
+    const axiosInstance = getAxiosInstance();
+    const endpoint = `${API_ENDPOINTS.LEAVE_EVENT.replace("{id}", eventId)}?userId=${userId}`;
+    const response = await axiosInstance.post(endpoint); 
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      console.error("Error leaving event:", error.response.status, error.response.data);
+    } else {
+      console.error("Unexpected error:", error.message);
+    }
+    throw error;
+  }
+};
 
 // API function that fetches paginated events
 export const getEventsJoined = async (
