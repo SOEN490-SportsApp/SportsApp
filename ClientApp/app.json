@@ -1,3 +1,4 @@
+
 {
   "expo": {
     "name": "ClientApp",
@@ -15,11 +16,18 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.nchelico.ClientApp",
-      "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false,
-        "LSApplicationQueriesSchemes": [
-          "myapp"
-        ]
+     "infoPlist": {
+      "ITSAppUsesNonExemptEncryption": false,
+      "NSCameraUsageDescription": "This app needs access to your camera to take photos.",
+      "NSMicrophoneUsageDescription": "This app needs access to your microphone for video recording.",
+      "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to upload images.",
+      "NSPhotoLibraryAddUsageDescription": "This app needs permission to save photos to your gallery.",
+      "LSApplicationQueriesSchemes": [
+        "myapp"
+      ]
+      },
+      "config": {
+        "googleMapsApiKey":  "process.env.GOOGLE_MAPS_API_KEY"
       }
     },
     "android": {
@@ -32,7 +40,12 @@
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION"
       ],
-      "package": "com.sporta.clientApp"
+      "package": "com.sporta.clientApp",
+      "config" : {
+        "googleMaps": {
+          "apiKey": "process.env.GOOGLE_MAPS_API_KEY"
+        }
+      }
     },
     "web": {
       "bundler": "metro",
@@ -69,9 +82,7 @@
       }
     },
     "owner": "sportaapp",
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
+   "runtimeVersion": "1.0.0",
     "updates": {
       "url": "https://u.expo.dev/0a493fac-f7b6-4eee-a154-9cc7280a3dad"
     }

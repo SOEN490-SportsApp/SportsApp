@@ -21,7 +21,7 @@ const LoginPage: React.FC = () => {
   const updateUserToStore = useUpdateUserToStore();
   const { control, handleSubmit, formState: { errors } } = useForm<LoginPageFormData>();
   const [showPassword, setShowPassword] = useState(false);
-
+  
   const onSubmit = async (data: LoginPageFormData) => {
     try {
         const res = await loginUser(data.identifier, data.password);
