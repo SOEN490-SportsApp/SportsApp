@@ -52,7 +52,7 @@ const EventsList: React.FC<userEventsListProps> = ({ forProfile, fetchEventsFunc
         </View>
       ) : (
         <FlatList
-          data={events.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())}
+          data={events}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <EventCard event={item} onPress={handleEventPress} isForProfile={forProfile} />
