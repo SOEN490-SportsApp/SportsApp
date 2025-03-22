@@ -30,6 +30,7 @@ import FilterModal, {
   FilterState,
 } from "@/components/Helper Components/FilterSection/FilterModal";
 import { set } from "react-hook-form";
+import { useTranslation } from 'react-i18next';
 
 export default function searchPage() {
   const router = useRouter();
@@ -55,6 +56,7 @@ export default function searchPage() {
   const [isVisible, setIsVisible] = useState(false);
   const [filter, setFilter] = useState(false);
   const [filterState, setFilterState] = useState(initialState);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchInitialEvents = async () => {
@@ -162,10 +164,10 @@ export default function searchPage() {
           <FlatList
             data={userResults}
             renderItem={({ item }) => <FriendCard user={item} />}
-            ListEmptyComponent={<CenterMessage message={"No users found"} />}
+            ListEmptyComponent={<CenterMessage message={t('search_page.no_users_found')} />}
           />
         ) : (
-          <CenterMessage message={"Connect with others and plan events!"} />
+          <CenterMessage message={t('search_page.connect_with_others')} />
         )}
       </View>
     );
@@ -368,16 +370,17 @@ export default function searchPage() {
     onPress: () => void;
   }) => {
     const router = useRouter();
+    const { t } = useTranslation();
 
     return (
       <TouchableOpacity style={styles.eventCard} onPress={onPress}>
         <View style={styles.eventInfo}>
           <Text style={styles.eventName}>{event.eventName}</Text>
           <Text style={styles.eventType}>
-            {event.sportType} • {event.eventType}
+            {event.sportType} • {t(`search_page.${event.eventType.toLowerCase()}`)}
           </Text>
           <Text style={styles.eventLocation}>
-            📍 {event.locationResponse.city || "Unknown Location"}
+            📍 {event.locationResponse.city || t('search_page.unknown_location')}
           </Text>
 
           <View style={styles.buttonContainer}>
@@ -385,7 +388,7 @@ export default function searchPage() {
               style={styles.detailsButton}
               onPress={() => router.push(`/events/${event.id}`)}
             >
-              <Text style={styles.buttonText2}>Details</Text>
+              <Text style={styles.buttonText2}>{t('search_page.details')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -402,7 +405,7 @@ export default function searchPage() {
                 }
               }}
             >
-              <Text style={styles.buttonText}>Navigate</Text>
+              <Text style={styles.buttonText}>{t('search_page.navigate')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -411,8 +414,8 @@ export default function searchPage() {
   };
 
   const routes = [
-    { key: "users", title: "Users", testID: "Users" },
-    { key: "events", title: "Events", testID: "Events" },
+    { key: "users", title: t('search_page.users'), testID: "Users" },
+    { key: "events", title: t('search_page.events'), testID: "Events" },
   ];
 
   const scenes = {
@@ -438,7 +441,7 @@ export default function searchPage() {
         </TouchableOpacity>
         <TextInput
           style={[styles.searchInput]}
-          placeholder="Search..."
+          placeholder={t("search_page.search")}
           value={searchText}
           onChangeText={(text) => handleChangeText(text)}
           placeholderTextColor="#999"
@@ -638,7 +641,7 @@ const styles = StyleSheet.create({
   },
   centerButton: {
     position: "absolute",
-    top: Platform.OS === "ios" ? vs(400) : vs(380),
+    top: Platform.OS === "ios" ? vs(400) : vs(420),
     right: 20,
     backgroundColor: themeColors.primary,
     paddingVertical: 10,

@@ -10,6 +10,7 @@ import { hs, vs, mvs, mhs } from "@/utils/helpers/uiScaler";
 import { loginUser } from "@/services/authService";
 import { useUpdateUserToStore } from '@/state/user/actions';
 import { getUserById } from "@/state/user/api";
+import { useTranslation } from 'react-i18next';
 
 interface LoginPageFormData {
   identifier: string;
@@ -21,7 +22,8 @@ const LoginPage: React.FC = () => {
   const updateUserToStore = useUpdateUserToStore();
   const { control, handleSubmit, formState: { errors } } = useForm<LoginPageFormData>();
   const [showPassword, setShowPassword] = useState(false);
-  
+  const { t } = useTranslation();
+
   const onSubmit = async (data: LoginPageFormData) => {
     try {
         const res = await loginUser(data.identifier, data.password);
@@ -37,10 +39,10 @@ const LoginPage: React.FC = () => {
         console.log(error);
 
         // Check for specific error message from the backend
-        if (error.message === "The email or password you entered is incorrect. Please try again.") {
-            Alert.alert('Login Failed', error.message);
+        if (error.message === t('login.invalid_credentials')) {
+            Alert.alert(t('login.login_failed'), error.message);
         } else {
-            Alert.alert('Error', 'An unexpected error occurred. Please try again.');
+            Alert.alert(t('login.error_1'), t('login.error_2'));
         }
     }
 };
@@ -53,85 +55,85 @@ const LoginPage: React.FC = () => {
               source={require("@/assets/images/sporta_logo.png")}
               style={styles.logo}
             />
-            <Text style={styles.slogan}>Connect, Compete, Conquer</Text>
+            <Text style={styles.slogan}>{t('login.slogan')}</Text>
             <Text style={styles.joinText}>
-              Join <Text style={styles.sportaText}>Sporta</Text>
+            {t('login.join')} <Text style={styles.sportaText}>Sporta</Text>
             </Text>
           </View>
 
-          <View>
-            <View style={styles.inputContainer}>
-              <MaterialCommunityIcons name="email" size={mvs(20)} color="#aaa" />
-              <Controller
-                control={control}
-                name="identifier"
-                rules={{
-                  required: "Email or username is required",
-                }}
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Email/username"
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                  />
-                )}
-              />
-            </View>
-            {errors.identifier && (
-              <Text style={styles.errorText}>{errors.identifier.message}</Text>
-            )}
+        <View>
+          <View style={styles.inputContainer}>
+            <MaterialCommunityIcons name="email" size={mvs(20)} color="#aaa" />
+            <Controller
+              control={control}
+              name="identifier"
+              rules={{
+                required: t('login.email_username_required'),
+              }}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  style={styles.input}
+                  placeholder={t('login.email_placeholder')}
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
+              )}
+            />
+          </View>
+          {errors.identifier && (
+            <Text style={styles.errorText}>{errors.identifier.message}</Text>
+          )}
 
             <View style={styles.spacing} />
 
-            <View style={styles.inputContainer}>
-              <MaterialCommunityIcons name="lock" size={mvs(20)} color="#aaa" />
-              <Controller
-                control={control}
-                name="password"
-                rules={{
-                  required: "Password is required",
-                  minLength: { value: 6, message: "Minimum 6 characters" },
-                }}
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <View style={styles.passwordContainer}>
-                    <TextInput
-                      style={styles.input}
-                      placeholder="Password"
-                      onBlur={onBlur}
-                      onChangeText={onChange}
-                      value={value}
-                      secureTextEntry={!showPassword}
+          <View style={styles.inputContainer}>
+            <MaterialCommunityIcons name="lock" size={mvs(20)} color="#aaa" />
+            <Controller
+              control={control}
+              name="password"
+              rules={{
+                required: t('login.password_required'),
+                minLength: { value: 6, message: t('login.minimum_characters') },
+              }}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View style={styles.passwordContainer}>
+                  <TextInput
+                    style={styles.input}
+                    placeholder={t('login.password_placeholder')}
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                    secureTextEntry={!showPassword}
+                  />
+                  <TouchableOpacity
+                    onPress={() => setShowPassword((prev) => !prev)}
+                    style={styles.eyeIcon}
+                  >
+                    <MaterialCommunityIcons
+                      name={showPassword ? "eye" : "eye-off"}
+                      size={mvs(20)}
+                      color="#aaa"
                     />
-                    <TouchableOpacity
-                      onPress={() => setShowPassword((prev) => !prev)}
-                      style={styles.eyeIcon}
-                    >
-                      <MaterialCommunityIcons
-                        name={showPassword ? "eye" : "eye-off"}
-                        size={mvs(20)}
-                        color="#aaa"
-                      />
-                    </TouchableOpacity>
-                  </View>
-                )}
-              />
-            </View>
-            {errors.password && (<Text style={styles.errorText}>{errors.password.message}</Text>)}
+                  </TouchableOpacity>
+                </View>
+              )}
+            />
+          </View>
+          {errors.password && (<Text style={styles.errorText}>{errors.password.message}</Text>)}
 
-            <TouchableOpacity onPress={() => router.push('/auth/resetPassword')}>
-              <Text style={styles.forgotPasswordText} testID="forgot-password">
-                Forgot your password?
-              </Text>
-            </TouchableOpacity>
-            <View style={{ height: vs(64) }} />
+          <TouchableOpacity onPress={() => router.push('/auth/resetPassword')}>
+            <Text style={styles.forgotPasswordText} testID="forgot-password">
+              {t('login.forgot_password')}
+            </Text>
+          </TouchableOpacity>
+          <View style={{ height: vs(64) }} />
 
             <ConfirmButton
               icon={<MaterialCommunityIcons name="login" size={mvs(24)} color="#fff" />}
-              text="Login"
+              text={t('login.title')}
               onPress={handleSubmit(onSubmit)}
               iconPlacement={IconPlacement.left}
             />
@@ -143,8 +145,8 @@ const LoginPage: React.FC = () => {
             onPress={() => router.replace("/auth/registerAccount")}
           >
             <Text style={styles.registerText}>
-              Is this your first time?{" "}
-              <Text style={styles.registerNowText}>Register Now</Text>
+              {t('login.first_time_1')}{" "}
+              <Text style={styles.registerNowText}>{t('login.first_time_2')}</Text>
             </Text>
           </TouchableOpacity>
         </View>

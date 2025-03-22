@@ -23,6 +23,7 @@ import { useSelector } from 'react-redux';
 import { UserState } from '@/types';
 import { mhs, mvs } from '@/utils/helpers/uiScaler';
 import { Camera } from "expo-camera";
+import { useTranslation } from 'react-i18next';
 
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -38,6 +39,7 @@ const PostCreationComponent: React.FC<PostCreationProps> = ({ eventId, onNewPost
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const { t } = useTranslation();
 
   const pickImage = async (source: 'gallery' | 'camera') => {
     let result;
@@ -147,7 +149,7 @@ const PostCreationComponent: React.FC<PostCreationProps> = ({ eventId, onNewPost
           source={require("@/assets/images/avatar-placeholder.png")}
           style={styles.avatar}
         />
-        <Text style={styles.placeholderText}>Post about this event!</Text>
+        <Text style={styles.placeholderText}>{t('post_creation_component.post_about_this_event')}</Text>
         <TouchableOpacity onPress={() => setIsModalVisible(true)} style={styles.attachmentButton}>
           <Ionicons name="attach" size={24} color="#555" />
         </TouchableOpacity>
@@ -169,7 +171,7 @@ const PostCreationComponent: React.FC<PostCreationProps> = ({ eventId, onNewPost
           >
             <View style={[styles.modalContent, { height: keyboardHeight == 0 ? SCREEN_HEIGHT * 0.90 : SCREEN_HEIGHT - keyboardHeight }]}>
               <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>Create Post</Text>
+                <Text style={styles.modalTitle}>{t('post_creation_component.create_post')}</Text>
                 <TouchableOpacity onPress={resetModal}>
                   <Ionicons name="close" size={24} color="#555" />
                 </TouchableOpacity>
@@ -193,7 +195,7 @@ const PostCreationComponent: React.FC<PostCreationProps> = ({ eventId, onNewPost
                 {/* Text Input with Fixed Height */}
                 <TextInput
                   style={styles.modalInput}
-                  placeholder="What's on your mind?"
+                  placeholder={t('post_creation_component.whats_on_your_mind')}
                   placeholderTextColor="#888"
                   value={comment}
                   onChangeText={setComment}
@@ -240,7 +242,7 @@ const PostCreationComponent: React.FC<PostCreationProps> = ({ eventId, onNewPost
                     onPress={() => pickImage('gallery')}
                   >
                     <Ionicons name="image" size={24} color="#555" />
-                    <Text style={styles.imageButtonText}>Attach Image</Text>
+                    <Text style={styles.imageButtonText}>{t('post_creation_component.attach_image')}</Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity
@@ -248,14 +250,14 @@ const PostCreationComponent: React.FC<PostCreationProps> = ({ eventId, onNewPost
                     onPress={() => pickImage('camera')}
                   >
                     <Ionicons name="camera" size={24} color="#555" />
-                    <Text style={styles.imageButtonText}>Take Photo</Text>
+                    <Text style={styles.imageButtonText}>{t('post_creation_component.take_photo')}</Text>
                   </TouchableOpacity>
                 </View>
               </ScrollView>
 
               {/* Post Button */}
               <TouchableOpacity onPress={handlePost} style={styles.modalPostButton}>
-                <Text style={styles.modalPostButtonText}>Post</Text>
+                <Text style={styles.modalPostButtonText}>{t('post_creation_component.post')}</Text>
               </TouchableOpacity>
             </View>
           </KeyboardAvoidingView>

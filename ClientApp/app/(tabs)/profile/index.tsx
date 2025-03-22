@@ -20,6 +20,7 @@ import FavoriteSportsBadges from "@/components/FavoriteSportsBadges";
 import FriendsList from "@/components/Profile/FriendsList";
 import MyCalendar from "@/components/Calendar/MyCalendar";
 import ProfileSection from "@/components/Profile/ProfileSection";
+import { useTranslation } from 'react-i18next';
 
 const screenHeight = Dimensions.get("window").height;
 const maxHeight = screenHeight * 0.5;
@@ -84,6 +85,7 @@ const ProfilePage: React.FC = () => {
   const router = useRouter();
   const user = useSelector((state: { user: any }) => state.user);
   const [loading, setLoading] = useState<boolean>(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     setLoading(false);
@@ -99,9 +101,9 @@ const ProfilePage: React.FC = () => {
 
   // CustomTabMenu links
   const routes = [
-    { key: "activity", title: "Activity", testID: "Activity" },
-    { key: "friends", title: "Friends", testID: "Friends" },
-    { key: "MyEvents", title: "My Events", testID: "MyEvents" },
+    { key: "activity", title: t('profile_page.activity'), testID: "Activity" },
+    { key: "friends", title: t('profile_page.friends'), testID: "Friends" },
+    { key: "MyEvents", title: t('profile_page.my_events'), testID: "MyEvents" },
   ];
   const scenes = {
     activity: <ActivityTab />,
@@ -118,7 +120,7 @@ const ProfilePage: React.FC = () => {
           className="absolute left-4"
         >
           <Text className="text-base font-bold" style={{ color: "#007AFF" }}>
-            Edit
+            {t('profile_page.edit')}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity

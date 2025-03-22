@@ -3,6 +3,9 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Event } from "@/types/event";
 import SkillTag from "./SkillTag";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useTranslation } from 'react-i18next';
+import { format } from 'date-fns';
+import { fr, enUS } from 'date-fns/locale';
 
 // all the show props are optional and default to true to modularize the component
 interface EventCardProps {
@@ -23,6 +26,11 @@ export const  stringToDate = (dateString: string) => {
   const [year, month, day] = dateString.split('-');
   return new Date(+year, +month - 1, +day);
 }
+
+export const formatDate = (date: Date, locale: string) => {
+  return format(date, 'EEE MMM dd yyyy', { locale: locale === 'fr' ? fr : enUS });
+};
+
 const EventCard: React.FC<EventCardProps> = ({
   event,
   onPress,
@@ -60,6 +68,9 @@ const cutoffTime = new Date(event.cutOffTime);
 let hoursLeft = 0;
 let minutesLeft = 0;
 
+const { t, i18n } = useTranslation();
+const locale = i18n.language === 'fr' ? 'fr' : 'en';
+
   // Ensure both currentTime and cutoffTime are valid
   let timeLeftShown = "";
   let eventStarted = false;
@@ -77,11 +88,11 @@ if (!isNaN(cutoffTime.getTime())) {
     if (minutesLeft < 60) {
       timeLeftShown = `${minutesLeft} minute${minutesLeft > 1 ? "s" : ""}`;
     } else if (hoursLeft < 24) {
-      timeLeftShown = `${hoursLeft} hour${hoursLeft > 1 ? "s" : ""}`;
+      timeLeftShown = `${hoursLeft} ${t('event_card.hour')}${hoursLeft > 1 ? "s" : ""}`;
     } else if (daysLeft < 7) {
-      timeLeftShown = `${daysLeft} day${daysLeft > 1 ? "s" : ""}`;
+      timeLeftShown = `${daysLeft} ${t('event_card.day')}${daysLeft > 1 ? "s" : ""}`;
     } else {
-      timeLeftShown = `${weeksLeft} week${weeksLeft > 1 ? "s" : ""}`;
+      timeLeftShown = `${weeksLeft} ${t('event_card.week')}${weeksLeft > 1 ? "s" : ""}`;
     }
   } else {
     eventStarted = true;
@@ -109,7 +120,7 @@ return (
     {showDetailPreview && 
     <Text style={styles.eventDetails}>
       {/*TODO - Add distance calculation after backend does it*/}
-      {showSportType ? `${event.sportType} - X km away` : `X km away`}
+      {showSportType ? `${event.sportType} - X ${t('event_card.km_away')}` : `X ${t('event_card.km_away')}`}
       </Text>}
     
     {showSportType && 
@@ -123,7 +134,7 @@ return (
     
     {showDate && 
     <Text style={styles.date}>
-      📅 {new Date(stringToDate(event.date)).toDateString()}
+      📅 {formatDate(stringToDate(event.date), locale)}
     </Text>}
 
       {showLocation && (
@@ -155,7 +166,7 @@ return (
       )}
 
       {showTimeLeft && (
-        <Text style={styles.timeLeft}>{timeLeftShown} left to join</Text>
+        <Text style={styles.timeLeft}>{timeLeftShown} {t('event_card.left_to_join')}</Text>
       )}
     </TouchableOpacity>
   );

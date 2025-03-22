@@ -16,25 +16,35 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Octicons from '@expo/vector-icons/Octicons';
 import * as Clipboard from 'expo-clipboard';
 import EventPostsTab from "@/components/Event/EventPostsTab";
+import { useTranslation } from "react-i18next";
+import i18n from "i18next";
+import { format } from 'date-fns';
+import { fr, enUS } from 'date-fns/locale';
+
+export const formatDate = (date: string, locale: string) => {
+  const parsedDate = new Date(date);
+  return format(parsedDate, 'EEE dd MMM yyyy', { locale: locale === 'fr' ? fr : enUS });
+};
 
 const EventDetails = ({ event, handleJoinEvent }: { event: Event; handleJoinEvent: () => void }) => {
   const router = useRouter();
   const user = useSelector((state: { user: any }) => state.user);
+  const { t } = useTranslation();
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* Description */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Description</Text>
+        <Text style={styles.sectionTitle}>{t('event_page.description')}</Text>
         <Text style={styles.sectionText}>
-          {event.description || "No description provided for this event."}
+          {event.description || t('event_page.no_description')}
         </Text>
       </View>
 
       {/* Participants */}
       <View style={styles.section}>
         <View style={styles.participantsHeader}>
-          <Text style={styles.sectionTitle}>Participants</Text>
+          <Text style={styles.sectionTitle}>{t('event_page.participants')}</Text>
           <Text style={styles.participantsCount}>
             {event.participants.filter((p) => p.attendStatus === "JOINED" || p.attendStatus === "CONFIRMED").length}/
             {event.maxParticipants}
@@ -64,14 +74,14 @@ const EventDetails = ({ event, handleJoinEvent }: { event: Event; handleJoinEven
                       testID="participant-avatar"
                     />
                     {participant.userId === user.id && (
-                      <Text style={styles.currentUserText}>You</Text>
+                      <Text style={styles.currentUserText}>{t('event_page.you')}</Text>
                     )}
                   </View>
                 </Pressable>
               ))
           ) : (
             <Text style={styles.noParticipantsText}>
-              No participants yet. Be the first to join!
+              {t('event_page.no_participants_yet')}
             </Text>
           )}
         </ScrollView>
@@ -97,6 +107,7 @@ const EventPage: React.FC = () => {
   const { eventId } = useLocalSearchParams<{ eventId: string }>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchEventDetails = async () => {
@@ -104,7 +115,7 @@ const EventPage: React.FC = () => {
         const eventData = await getEventById(eventId!);
         setEvent(eventData);
       } catch (err) {
-        setError("Failed to fetch event details.");
+        setError(t('event_page.failed_to_fetch_event'));
       } finally {
         setLoading(false);
       }
@@ -126,7 +137,7 @@ const EventPage: React.FC = () => {
         };
       });
     } catch (err) {
-      setError("Failed to join the event.");
+      setError(t('event_page.failed_to_join'));
     }
   };
 
@@ -136,9 +147,9 @@ const EventPage: React.FC = () => {
     Clipboard.setStringAsync(locationText);
   
     if (Platform.OS === 'android') {
-      ToastAndroid.show("Location copied to clipboard!", ToastAndroid.SHORT);
+      ToastAndroid.show(t('event_page.location_copied'), ToastAndroid.SHORT);
     } else {
-      Alert.alert("Copied!", "Location has been copied to clipboard.");
+      Alert.alert(t('event_page.copied'), t('event_page.location_copied'));
     }
   };
 
@@ -161,7 +172,7 @@ const EventPage: React.FC = () => {
   if (!event) {
     return (
       <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>Event not found.</Text>
+        <Text style={styles.errorText}>{t('event_page.event_not_found')}</Text>
       </View>
     );
   }
@@ -173,8 +184,8 @@ const EventPage: React.FC = () => {
   let sportIcon = sportIconMap[event.sportType];
 
   const routes = [
-    { key: "eventPosts", title: "Posts", testID: "eventPosts" },
-    { key: "eventDetails", title: "Details", testID: "eventDetails" },
+    { key: "eventPosts", title: t('event_page.posts'), testID: "eventPosts" },
+    { key: "eventDetails", title: t('event_page.details'), testID: "eventDetails" },
   ];
   
   const scenes = {
@@ -198,7 +209,7 @@ const EventPage: React.FC = () => {
               </Pressable>
             </Text>
             <Text style={styles.detailText}>
-              📅 {new Date(event.date).toDateString()} •
+              📅 {formatDate(event.date, i18n.language)} •
               ⏰ {`${event.startTime.slice(0, -3)} - ${event.endTime.slice(0, -3)}`}
             </Text>
             
@@ -208,7 +219,7 @@ const EventPage: React.FC = () => {
                 size={20}
                 color="#94504b"
               />
-              {event.sportType} • {event.eventType}
+              {event.sportType} • {t(`event_page.${event.eventType.toLowerCase()}`)}
             </Text>
             <View style={styles.joinButtonView}>
               <View style={styles.skillTags}>
@@ -218,11 +229,11 @@ const EventPage: React.FC = () => {
               </View>
               <View style={styles.joinButtonContainer}>
                 {!isUserParticipant ? (
-                  <ConfirmButtonEventPage text="Join" onPress={handleJoinEvent} icon={undefined} iconPlacement={null} />
+                  <ConfirmButtonEventPage text={t('event_page.join')} onPress={handleJoinEvent} icon={undefined} iconPlacement={null} />
                 ) : (
                   <View style={styles.joinedTextContainer}>
                     {/* <MaterialCommunityIcons name="check-circle" size={20} color={themeColors.primary} /> */}
-                    <Text style={styles.joinedText}>Joined</Text>
+                    <Text style={styles.joinedText}>{t('event_page.joined')}</Text>
                   </View>
                 )}
               </View>
@@ -374,7 +385,7 @@ const styles = StyleSheet.create({
   joinedText: {
     color: themeColors.primary,
     fontWeight: "bold",
-    fontSize: mvs(16),
+    fontSize: mvs(12),
   },
   participantsScrollContainer: {
     flexDirection: "row",

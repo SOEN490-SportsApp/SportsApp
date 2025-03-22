@@ -9,6 +9,8 @@ import { registerUser } from "@/services/authService";
 import ConfirmButton from "@/components/Helper Components/ConfirmButton";
 import Checkbox from 'expo-checkbox';
 import themeColors from "@/utils/constants/colors";
+import { useUpdateUserToStore } from "@/state/user/actions";
+import { useTranslation } from 'react-i18next';
 
 interface RegisterAccountPageFormData {
   username: string;
@@ -24,25 +26,26 @@ const RegisterAccountPage: React.FC = () => {
   const { control, handleSubmit, formState: { errors }, watch, setValue } = useForm<RegisterAccountPageFormData>();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const { t } = useTranslation();
 
   const onSubmit = async (data: RegisterAccountPageFormData) => {
-    if (data.password !== data.confirmPassword) return Alert.alert("Oh oh!", "Passwords do not match.");
-    if (!data.agreeToTerms) return Alert.alert("", "You must agree to the terms to continue.");
+    if (data.password !== data.confirmPassword) return Alert.alert(t('register.password_mismatch_1'), t('register.password_mismatch_2'));
+    if (!data.agreeToTerms) return Alert.alert("", t('register.must_agree_terms'));
     try{
       const response = await registerUser(data.email, data.username, data.password);
       setUserID(response.data.id);
-      Alert.alert('Account Created', `Check your email at ${data.email} to verify your account.`)
+      Alert.alert(t('register.account_created'), `${t('register.check_email_1')} ${data.email} ${t('register.check_email_2')}`)
       router.push('/auth/login');
     } catch (error: any){
-      Alert.alert("Error", "Failed to create account.");
-      console.error(`Failed to create account: ${error}. ${error.message}`);
+      Alert.alert(t('register.error'), t('register.fail_create_account'));
+      console.error(`${t('register.fail_create_account')}: ${error}. ${error.message}`);
     }
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.mainContent}>
-        <Text style={styles.title}>Create an Account</Text>
+        <Text style={styles.title}>{t('register.title')}</Text>
 
         <View style={{height: mvs(80)}} />
 
@@ -52,11 +55,11 @@ const RegisterAccountPage: React.FC = () => {
           <Controller
             control={control}
             name="username"
-            rules={{ required: "Username is required" }}
+            rules={{ required: t('register.username_required') }}
             render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
                 style={styles.input}
-                placeholder="Username"
+                placeholder={t('register.username_placeholder')}
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}
@@ -75,13 +78,13 @@ const RegisterAccountPage: React.FC = () => {
             control={control}
             name="email"
             rules={{
-              required: "Email is required",
+              required: t('register.email_required'),
               pattern: { value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/, message: "Invalid email" }
             }}
             render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
                 style={styles.input}
-                placeholder="Email"
+                placeholder={t('register.email_placeholder')}
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}
@@ -101,12 +104,12 @@ const RegisterAccountPage: React.FC = () => {
           <Controller
             control={control}
             name="password"
-            rules={{ required: "Password is required", minLength: { value: 6, message: "Minimum 6 characters" } }}
+            rules={{ required: t('register.password_required'), minLength: { value: 6, message: t('register.minimum_characters') } }}
             render={({ field: { onChange, onBlur, value } }) => (
               <View style={styles.passwordContainer}>
                 <TextInput
                   style={styles.input}
-                  placeholder="Password"
+                  placeholder={t('register.password_placeholder')}
                   onBlur={onBlur}
                   onChangeText={onChange}
                   value={value}
@@ -136,12 +139,12 @@ const RegisterAccountPage: React.FC = () => {
           <Controller
             control={control}
             name="confirmPassword"
-            rules={{ required: "Please confirm your password" }}
+            rules={{ required: t('register.confirm_email_required') }}
             render={({ field: { onChange, onBlur, value } }) => (
               <View style={styles.passwordContainer}>
                 <TextInput
                   style={styles.input}
-                  placeholder="Confirm Password"
+                  placeholder={t('register.confirm_password_placeholder')}
                   onBlur={onBlur}
                   onChangeText={onChange}
                   value={value}
@@ -176,8 +179,8 @@ const RegisterAccountPage: React.FC = () => {
           />
           {/* TODO: Are we going to have terms? If so we need to write them up. */}
           <Text style={styles.termsText}>
-            By continuing you accept our{" "}
-            <Text style={styles.linkText}>Privacy Policy</Text> and <Text style={styles.linkText}>Terms of Use</Text>
+            {t('register.by_continuing_1')}{" "}
+            <Text style={styles.linkText}>{t('register.by_continuing_2')}</Text> {t('register.by_continuing_3')} <Text style={styles.linkText}>{t('register.by_continuing_4')}</Text>
           </Text>
         </View>
 
@@ -186,18 +189,19 @@ const RegisterAccountPage: React.FC = () => {
         {/* Confirm Button */}
         <ConfirmButton
           icon={<MaterialCommunityIcons name="login" size={25} color="#fff" />}
-          text="Sign Up"
+          text={t('register.register_button')}
           onPress={handleSubmit(onSubmit)}
           iconPlacement={IconPlacement.left}
         />
+     
       </View>
 
       {/* Back to Login */}
       <View style={styles.loginContainer}>
         <TouchableOpacity onPress={() => router.replace("/auth/login")} testID="account-already-created">
           <Text style={styles.loginText}>
-            Already have an account?{" "}
-            <Text style={styles.loginNowText}>Login</Text>
+            {t('register.already_have_account')}{" "}
+            <Text style={styles.loginNowText}>{t('register.login')}</Text>
           </Text>
         </TouchableOpacity>
       </View>
