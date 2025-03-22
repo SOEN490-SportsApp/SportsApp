@@ -19,7 +19,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import FriendCard from "@/components/Helper Components/FriendCard";
 import { Profile } from "@/types";
 import MapView, { Marker } from "react-native-maps";
-import { getAllEvents, searchEventsWithFilter } from "@/services/eventService";
+import { getAllEvents, getAllRelevantEvents, searchEventsWithFilter } from "@/services/eventService";
 import { Event } from "@/types/event";
 import * as Location from "expo-location";
 import { Linking } from "react-native";
@@ -55,6 +55,7 @@ export default function searchPage() {
   const [isVisible, setIsVisible] = useState(false);
   const [filter, setFilter] = useState(false);
   const [filterState, setFilterState] = useState(initialState);
+  const LocationOfUser = useSelector((state: { location: any }) => state.location);
 
   useEffect(() => {
     const fetchInitialEvents = async () => {
@@ -71,7 +72,7 @@ export default function searchPage() {
       if (activeIndex === 0) {
         await fetchUserResults(searchText);
       } else {        
-        response = await handleEventListData();
+        response = await handleEventListData(0,10);
         setEvents(Array.isArray(response) ? response : []);       
       }
     } catch (err) {
@@ -81,13 +82,18 @@ export default function searchPage() {
     }
   }, [searchText, filter]);
 
-  useEffect(() => {
-    const fetchAndSetEvents = async () => {
-      await fetchEvents();
-    };
-    fetchAndSetEvents();
-  }, [fetchEvents]);
+  // useEffect(() => {
+  //   const fetchAndSetEvents = async () => {
+  //     await fetchEvents();
+  //   };
+  //   fetchAndSetEvents();
+  // }, [fetchEvents]);
 
+  useEffect(() => {
+    if (activeIndex === 1) {
+      fetchEvents();
+    }
+  }, [fetchEvents, activeIndex]);
   
   const handleFilterToggle = async () => {
     setFilter(true);
@@ -112,13 +118,13 @@ export default function searchPage() {
     }
   }, [location]);
 
-  const handleEventListData = async () => {
+  const handleEventListData = async (page: number, size: number) => {
     let response;
     if (filter || searchText) {
-      response = await searchEventsWithFilter(searchText, filterState);
+      response = await searchEventsWithFilter(searchText, filterState, LocationOfUser, page, size);
     } else {
-      response = await getAllEvents();
-    } 
+      response = await getAllRelevantEvents(LocationOfUser, 15, false, true);
+    }
     return response;
   };
 
@@ -338,16 +344,8 @@ export default function searchPage() {
         ) : (
           <View style={styles.eventListSection}>
             <EventList
-              fetchEventsFunction={() =>
-                handleEventListData().then((data) => ({
-                  data: {
-                    content: data,
-                    totalElements: data.length,
-                    totalPages: 1,
-                    pageable: { pageNumber: 0, pageSize: data.length },
-                  },
-                }))
-              }
+              forProfile={true}
+              fetchEventsFunction={handleEventListData}
             />
           </View>
         )}

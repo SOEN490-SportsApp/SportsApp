@@ -12,7 +12,7 @@ interface ApiResponse<T> {
 }
 
 // Define generic pagination hook
-const usePagination = <T,>(
+const usePagination = <T extends { id: string }>(
   apiFunction: (page: number, pageSize: number) => Promise<{ data: ApiResponse<T> }>, dependency: any
 ) => {
   const [initialLoader, setInitialLoader] = useState<boolean>(true);
@@ -30,7 +30,13 @@ const usePagination = <T,>(
       const result = response.data;
 
       if (result.content && result.content.length > 0) {
-        setData((prevData) => (page === 0 ? result.content : [...prevData, ...result.content]));
+        setData((prevData) => {
+          if (page === 0) return result.content;
+        
+          const existingIds = new Set(prevData.map((item) => item.id));
+          const newItems = result.content.filter((item) => !existingIds.has(item.id));
+          return [...prevData, ...newItems];
+        });
         setTotalElements(result.totalElements);
         setPageNo(result.pageable.pageNumber);
         setTotalPages(result.totalPages);

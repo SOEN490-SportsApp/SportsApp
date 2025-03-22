@@ -17,6 +17,7 @@ interface EventCardProps {
   showSportType?: boolean;
   showTimeLeft?: boolean;
   isForProfile?: boolean;
+  isForVisitedProfile?: boolean,
 }
 
 export const  stringToDate = (dateString: string) => {
@@ -35,6 +36,7 @@ const EventCard: React.FC<EventCardProps> = ({
   showLocation = isForProfile ? false : true,
   showTimeLeft = isForProfile ? false : true,
   showSportType = true,
+  isForVisitedProfile = false,
 }) => {
   // Sport Icon Mapping (type-safe)
   const sportIcons: {
@@ -106,10 +108,15 @@ if (!isNaN(cutoffTime.getTime())) {
 return (
   <TouchableOpacity testID = 'event-card' style={[styles.card, dynamicCardStyle]} onPress={() => onPress(event.id)}>
     <Text style={styles.eventName}>{event.eventName}</Text> 
-    {showDetailPreview && 
-    <Text style={styles.eventDetails}>
-      {showSportType ? `${event.sportType} - ${event.far} km away` : `${event.far} km away`}
-      </Text>}
+    {showDetailPreview && (
+      <Text style={styles.eventDetails}>
+        {isForVisitedProfile
+          ? `${event.sportType}`
+          : showSportType
+            ? `${event.sportType} - ${event.far} km away`
+            : `${event.far} km away`}
+      </Text>
+    )}
     
     {showSportType && 
     <View style={styles.sportIconContainer}>
