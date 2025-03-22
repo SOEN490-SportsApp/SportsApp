@@ -113,3 +113,19 @@ export async function respondToFriendRequest(userId: string, senderId: string, r
         throw error.response?.data || error;
     }
 }
+
+export async function removeFriendRequest(userId: string, friendId: string) {
+    const axiosInstance = getAxiosInstance();
+    const url = API_ENDPOINTS.REMOVE_FRIEND_REQUEST.replace("{userId}", userId);
+    try {
+      const response = await axiosInstance.delete(url, {
+        params: { friendId }, 
+      });
+  
+      return response.status === 204;
+    } catch (error: any) {
+      console.error("Error removing friend:", error);
+      throw error.response?.data || error;
+    }
+  }
+  
