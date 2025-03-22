@@ -82,6 +82,7 @@ const ActivityTab = ({ userId }: { userId: string }) => {
             <EventCard
               event={item}
               isForProfile={true}
+              isForVisitedProfile={true}
               onPress={() => {
                 router.push(`/events/${item.id}`);
               }}

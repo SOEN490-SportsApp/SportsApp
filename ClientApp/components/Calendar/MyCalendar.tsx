@@ -54,8 +54,12 @@ const MyCalendar: React.FC<EventList> = ({ userId, isVisible }) => {
     useCallback(() => {
       setSelectedDate("");
       const fetchEvents = async () => {
-        const response = await getAllRelevantEvents(Location.longitude, Location.latitude, 25, false, false);
-        events.current = response;
+        try{
+          const response = await getAllRelevantEvents(Location, 15, false, false);
+          events.current = response.data;
+        } catch {
+          console.log("Error fetching events from calendar");
+        }
         const eventDates = events.current.map((event) => event.date);
         const updatedMarkedDates = eventDates.reduce(
           (acc: any, date: string) => {

@@ -16,7 +16,6 @@ const HomePageFeed = () => {
   
   const Location = useSelector((state: { location: any }) => state.location);
 
-  // ⏳ Fetch user location on mount
   useEffect(() => {
     const fetchLocation = async () => {
       setIsLocationFetching(true);
@@ -28,14 +27,16 @@ const HomePageFeed = () => {
 
   return (
     <View testID="feed-container" style={styles.container}>
-      {!isLocationFetching && (
-        <EventsList
-          forProfile = {false}
-          fetchEventsFunction={(page, size) =>
-            getAllRelevantEvents(Location, 15, true, true, page, size)
-          }
-        />
-      )}
+      {isLocationFetching ? (
+      <EventListSkeleton />
+      ) : (
+      <EventsList
+        forProfile={false}
+        fetchEventsFunction={(page, size) =>
+          getAllRelevantEvents(Location, 15, true, true, page, size)
+        }
+      />
+    )}
     </View>
   );
 };
