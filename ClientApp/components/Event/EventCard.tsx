@@ -90,18 +90,18 @@ const locale = i18n.language === 'fr' ? 'fr' : 'en';
       const weeksLeft = Math.floor(daysLeft / 7);
 
       if (minutesLeft < 60) {
-        timeLeftShown = `${minutesLeft} minute${minutesLeft !== 1 ? "s" : ""} left to join`;
+        timeLeftShown = `${minutesLeft} minute${minutesLeft !== 1 ? "s" : ""} ${t('event_card.left_to_join')}`;
       } else if (hoursLeft < 24) {
-        timeLeftShown = `${hoursLeft} ${t('event_card.hour')}${hoursLeft !== 1 ? "s" : ""} left to join`;
+        timeLeftShown = `${hoursLeft} ${t('event_card.hour')}${hoursLeft !== 1 ? "s" : ""} ${t('event_card.left_to_join')}`;
       } else if (daysLeft < 7) {
-        timeLeftShown = `${daysLeft} ${t('event_card.day')}${daysLeft !== 1 ? "s" : ""} left to join`;
+        timeLeftShown = `${daysLeft} ${t('event_card.day')}${daysLeft !== 1 ? "s" : ""} ${t('event_card.left_to_join')}`;
       } else {
-        timeLeftShown = `${weeksLeft} week${weeksLeft !== 1 ? "s" : ""} left to join`;
+        timeLeftShown = `${weeksLeft} ${t('event_card.week')}${weeksLeft !== 1 ? "s" : ""} ${t('event_card.left_to_join')}`;
       }
     } else {
       eventStarted = true;
       canJoin = false;
-      timeLeftShown = "Registration closed";
+      timeLeftShown = t('event_card.registration_closed');
     }
   } else {
     eventStarted = true;
@@ -142,30 +142,8 @@ const locale = i18n.language === 'fr' ? 'fr' : 'en';
 
       {showDate &&
         <Text style={styles.date}>
-          📅 {new Date(event.date).toDateString()}
+          📅 {formatDate(new Date(event.date), i18n.language)}
         </Text>}
-return (
-  <TouchableOpacity testID = 'event-card' style={[styles.card, dynamicCardStyle]} onPress={() => onPress(event.id)}>
-    <Text style={styles.eventName}>{event.eventName}</Text> 
-    {showDetailPreview && 
-    <Text style={styles.eventDetails}>
-      {/*TODO - Add distance calculation after backend does it*/}
-      {showSportType ? `${event.sportType} - X ${t('event_card.km_away')}` : `X ${t('event_card.km_away')}`}
-      </Text>}
-    
-    {showSportType && 
-    <View style={styles.sportIconContainer}>
-      <MaterialCommunityIcons
-        name={sportIcons[event.sportType] || 'help-circle-outline'} // Fallback icon
-        size={40}
-        color="#94504b"
-      /> 
-    </View>}
-    
-    {showDate && 
-    <Text style={styles.date}>
-      📅 {formatDate(stringToDate(event.date), locale)}
-    </Text>}
 
       {showLocation && (
         <Text style={styles.location}>

@@ -222,7 +222,8 @@
     "left_to_join": "restant pour rejoindre",
     "hour": "heure",
     "day": "jour",
-    "week": "semaine"
+    "week": "semaine",
+    "registration_closed": "Inscription fermée"
   },
   "skill_tag": {
     "beginner": "Débutant(e)",
