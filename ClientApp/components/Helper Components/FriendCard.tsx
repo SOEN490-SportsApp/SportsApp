@@ -1,27 +1,38 @@
 import { TouchableOpacity, View, Text, StyleSheet, Image } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Profile } from "@/types";
 import themeColors from "@/utils/constants/colors";
 import { useState } from "react";
 import { hs, mhs, mvs, vs } from "@/utils/helpers/uiScaler";
 import { useRouter } from "expo-router";
+import { sendFriendRequest } from "@/utils/api/profileApiClient";
+import { useSelector } from "react-redux";
 
 interface FriendCardProp {
   user: any;
 }
 
-function generateRandomFriendsInCommon() {
-  return Math.floor(Math.random() * 50);
-}
-
 const FriendCard: React.FC<FriendCardProp> = ({ user }) => {
   const router = useRouter();
-  const [requestSent, setRequestSent] = useState(false);
+  const currentUser = useSelector((state: { user: any }) => state.user);
+  const [requestSent, setRequestSent] = useState(user.friendRequestStatus === "SENT");
+
+  if (!user || !user.profileResponse) return null;
+
   const userId = user.userId;
+
+  const handleSendRequest = async () => {
+    try {
+      await sendFriendRequest(currentUser.id, userId);
+      setRequestSent(true);
+    } catch (error) {
+      console.log("Error sending friend request:", error);
+    }
+  };
+
   return (
     <TouchableOpacity
       style={styles.cardHolder}
-      onPress={() => router.push({pathname: `/userProfiles/[id]`, params: {id: userId}})}
+      onPress={() => router.push({ pathname: `/userProfiles/[id]`, params: { id: userId } })}
     >
       <View style={styles.pictureSection}>
         <Image
@@ -31,36 +42,23 @@ const FriendCard: React.FC<FriendCardProp> = ({ user }) => {
         />
       </View>
       <View style={styles.infoSection}>
-        <View>
-          <Text style={styles.userInfo}>
-            {user.profileResponse.firstName + " " + user.profileResponse.lastName}{" "}
-          </Text>
-        </View>
-
-        <View>
-          <Text style={styles.subUserInfo}>
-            {generateRandomFriendsInCommon()} - friends in common
-          </Text>
-        </View>
+        <Text style={styles.userInfo}>
+          {user.profileResponse.firstName + " " + user.profileResponse.lastName}
+        </Text>
+        <Text style={styles.subUserInfo}>
+          {Math.floor(Math.random() * 50)} - friends in common
+        </Text>
       </View>
       <View style={styles.addFriendSection}>
         <TouchableOpacity
-          style={{ marginRight: 8 }}
-          onPress={() => setRequestSent(!requestSent)}
+          onPress={handleSendRequest}
+          disabled={requestSent}
         >
-          {requestSent === false ? (
-            <MaterialCommunityIcons
-              name="account-plus"
-              size={26}
-              color="#aaa"
-            />
-          ) : (
-            <MaterialCommunityIcons
-              name="account-clock-outline"
-              size={26}
-              color="#aaa"
-            />
-          )}
+          <MaterialCommunityIcons
+            name={requestSent ? "account-clock-outline" : "account-plus"}
+            size={26}
+            color="#aaa"
+          />
         </TouchableOpacity>
       </View>
     </TouchableOpacity>
@@ -114,22 +112,10 @@ const styles = StyleSheet.create({
     color: themeColors.text.lightGrey,
   },
   addFriendSection: {
-    flex: 3,
+    flex: 1,
     justifyContent: "center",
-    alignItems: "flex-end",
+    alignItems: "center",
     marginRight: vs(8),
-  },
-  tagContainer: {
-    paddingHorizontal: hs(10),
-    paddingVertical: vs(5),
-    borderRadius: 15,
-    marginRight: vs(5),
-    marginBottom: hs(5),
-  },
-  tagText: {
-    fontSize: 12,
-    fontWeight: "bold",
-    textTransform: "capitalize",
   },
   participantAvatar: {
     width: mhs(45),
