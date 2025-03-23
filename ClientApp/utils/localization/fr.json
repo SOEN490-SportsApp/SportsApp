@@ -292,7 +292,8 @@
     "details": "Détails",
     "no_description": "Aucune description fournie pour cet événement",
     "failed_to_fetch_event": "Échec de la récupération de l'événement",
-    "copied": "Copié"
+    "copied": "Copié",
+    "closed": "Fermé"
   },
   "post_creation_component": {
     "post_about_this_event": "Postez à propos de cet événement",

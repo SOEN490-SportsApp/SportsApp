@@ -292,7 +292,8 @@
     "details": "Details",
     "no_description": "No description provided for this event",
     "failed_to_fetch_event": "Failed to fetch event details",
-    "copied": "Copied"
+    "copied": "Copied",
+    "closed": "Closed"
   },
   "post_creation_component": {
     "post_about_this_event": "Post about this event!",
