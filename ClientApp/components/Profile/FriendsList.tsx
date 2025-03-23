@@ -1,36 +1,44 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { View, FlatList, ActivityIndicator, Text, StyleSheet } from "react-native";
 import FriendCard from "./FriendCardProfilePage";
 import { getFriendsOfUser, getUserProfile} from "@/services/userService";
+import { useFocusEffect } from "expo-router";
 
 const FriendsList = ({ userId }: { userId: string }) => {
   const [friends, setFriends] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchFriends = async () => {
-      setLoading(true);
+  const fetchFriends = async () => {
+    setLoading(true);
+    try {
       const friendList = await getFriendsOfUser(userId);
-      // Fetch profiles for each friend
       const friendsWithProfiles = await Promise.all(
-        friendList.map(async (friend:any) => {
+        friendList.map(async (friend: any) => {
           const profile = await getUserProfile(friend.friendUserId);
           return { ...friend, profile };
         })
       );
       setFriends(friendsWithProfiles);
+    } catch (error) {
+      console.error("Failed to fetch friends:", error);
+      setFriends([]);
+    } finally {
       setLoading(false);
-    };
-
-    fetchFriends();
-  }, [userId]);
+    }
+  };
+  
+  useFocusEffect(
+    useCallback(() => {
+      fetchFriends();
+    }, [userId])
+  );
 
   if (loading) {
     return <ActivityIndicator style={styles.loader} size="large" color="#0000ff" />;
   }
 
   if (friends.length === 0) {
-    return <Text style={styles.noFriends}>No friends found.</Text>;
+    return <Text style={styles.noFriends}>Start Making Friends.</Text>;
   }
 
   return (
