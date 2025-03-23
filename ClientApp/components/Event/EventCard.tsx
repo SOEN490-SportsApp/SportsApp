@@ -129,7 +129,6 @@ const locale = i18n.language === 'fr' ? 'fr' : 'en';
       <Text style={styles.eventName}>{event.eventName}</Text>
       {showDetailPreview &&(
           <Text style={styles.eventDetails}>
-          {/*TODO - Add distance calculation after backend does it*/}
             {isForVisitedProfile
           ? `${event.sportType}`
           : showSportType
