@@ -70,8 +70,14 @@ export const getAllRelevantEvents = async (
     return {
        data: response.data 
     };
-  } catch (error) {
-    console.error("Error fetching all relevant events:", error);
+  } catch (error: any) {
+    if (error?.response?.status === 404) {
+      return {
+        data: {
+          content: [],
+        },
+      };
+    }
     throw error;
   }
 };
