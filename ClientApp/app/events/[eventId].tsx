@@ -238,7 +238,7 @@ const EventPage: React.FC = () => {
                   adjustedTimeDifference > 0 ? (
                     <ConfirmButtonEventPage text={t('event_page.join')} onPress={handleJoinEvent} icon={undefined} iconPlacement={null} />
                   ) : (
-                    <ClosedButtonEventPage text="Closed" />
+                    <ClosedButtonEventPage text={t('event_page.closed')} />
                   )
                 ) : (
                   <View style={styles.joinedTextContainer}>
