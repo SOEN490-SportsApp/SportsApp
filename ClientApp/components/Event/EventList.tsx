@@ -48,7 +48,8 @@ const EventsList: React.FC<userEventsListProps> = ({ forProfile, fetchEventsFunc
     <View style={styles.container}>
       {events.length === 0 ? (
         <View style = {styles.noActivityContainer}>
-          <Text style={styles.noActivityText}>You Don't Have Any Events Yet!</Text>
+          <Text style={styles.noActivityText}>Wow! Couldn't find events within 100 km</Text>
+          <Text style={styles.noActivityText}>Be The First To Create Events In Your Area</Text>
         </View>
       ) : (
         <FlatList
