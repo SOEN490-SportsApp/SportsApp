@@ -246,21 +246,20 @@ const EventPage: React.FC = () => {
                 ))}
               </View>
               <View style={styles.joinButtonContainer}>
-  {!isUserParticipant ? (
-    <ConfirmButtonEventPage 
-      text="Join" 
-      onPress={handleJoinEvent} 
-      icon={undefined} 
-      iconPlacement={null} 
-    />
-  ) : (
-    <View style={styles.joinedTextContainer}>
-      <Text style={styles.joinedText}>Joined</Text> 
-    </View>
-  )}
-</View>
-
-        </View>
+              {!isUserParticipant ? (
+                  adjustedTimeDifference > 0 ? (
+                    <ConfirmButtonEventPage text="Join" onPress={handleJoinEvent} icon={undefined} iconPlacement={null} />
+                  ) : (
+                    <ClosedButtonEventPage text="Closed" />
+                  )
+                ) : (
+                  <View style={styles.joinedTextContainer}>
+                    {/* <MaterialCommunityIcons name="check-circle" size={20} color={themeColors.primary} /> */}
+                    <Text style={styles.joinedText}>Joined</Text>
+                  </View>
+                )}
+              </View>
+            </View>
           </View>
         </View>
       </View>
