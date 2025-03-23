@@ -16,6 +16,7 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Octicons from '@expo/vector-icons/Octicons';
 import * as Clipboard from 'expo-clipboard';
 import EventPostsTab from "@/components/Event/EventPostsTab";
+import ClosedButtonEventPage from "@/components/Helper Components/ClosedButtonEventPage";
 
 const EventDetails = ({ event, handleJoinEvent }: { event: Event; handleJoinEvent: () => void }) => {
   const router = useRouter();
@@ -113,22 +114,6 @@ const EventPage: React.FC = () => {
   }, [eventId]);
 
   const handleJoinEvent = async () => {
-    const currentTime = new Date();
-    const cutoffTime = new Date(event!.cutOffTime);
-  
-    if (!isNaN(cutoffTime.getTime())) {
-      const timeDifference = cutoffTime.getTime() - currentTime.getTime();
-      const adjustedTimeDifference = timeDifference - cutoffTime.getTimezoneOffset() * 60 * 1000; // Convert offset to milliseconds
-  
-      if (adjustedTimeDifference <= 0) {
-        alert("Registration time has been closed for this event.");
-        return; 
-      }
-    } else {
-      alert("Invalid cutoff time for registration.");
-      return; 
-    }
-  
     try {
       await joinEvent(eventId!, user.id);
       setEvent((prevEvent) => {
@@ -186,6 +171,11 @@ const EventPage: React.FC = () => {
     (participant) => participant.userId === user.id
   );
 
+  const currentTime = new Date();
+  const cutoffTime = new Date(event!.cutOffTime);
+  const timeDifference = cutoffTime.getTime() - currentTime.getTime();
+  const adjustedTimeDifference = timeDifference - cutoffTime.getTimezoneOffset() * 60 * 1000; // Convert offset to milliseconds
+
   let sportIcon = sportIconMap[event.sportType];
 
   const routes = [
@@ -233,14 +223,19 @@ const EventPage: React.FC = () => {
                 ))}
               </View>
               <View style={styles.joinButtonContainer}>
-                {!isUserParticipant ? (
-                  <ConfirmButtonEventPage text="Join" onPress={handleJoinEvent} icon={undefined} iconPlacement={null} />
+              {!isUserParticipant ? (
+                  adjustedTimeDifference > 0 ? (
+                    <ConfirmButtonEventPage text="Join" onPress={handleJoinEvent} icon={undefined} iconPlacement={null} />
+                  ) : (
+                    <ClosedButtonEventPage text="Closed" />
+                  )
                 ) : (
                   <View style={styles.joinedTextContainer}>
                     {/* <MaterialCommunityIcons name="check-circle" size={20} color={themeColors.primary} /> */}
                     <Text style={styles.joinedText}>Joined</Text>
                   </View>
                 )}
+
               </View>
             </View>
           </View>
