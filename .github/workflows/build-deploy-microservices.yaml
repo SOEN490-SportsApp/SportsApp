@@ -94,6 +94,9 @@ jobs:
 
       - name: Build with Gradle
         working-directory: Microservices/${{ matrix.service }}
+        env:
+          GITHUB_USERNAME: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew clean build
 
       - name: Determine JAR File Name
