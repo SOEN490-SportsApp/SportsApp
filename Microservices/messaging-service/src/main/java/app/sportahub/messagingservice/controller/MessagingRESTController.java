@@ -1,7 +1,5 @@
 package app.sportahub.messagingservice.controller;
 
-import app.sportahub.messagingservice.dto.request.MessageRequest;
-import app.sportahub.messagingservice.dto.request.MessageRequest;
 import app.sportahub.messagingservice.dto.request.chatroom.ChatroomRequest;
 import app.sportahub.messagingservice.dto.response.chatroom.ChatroomResponse;
 import app.sportahub.messagingservice.dto.response.message.MessageResponse;
@@ -10,9 +8,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import io.swagger.v3.oas.annotations.Operation;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
@@ -24,6 +19,15 @@ import java.util.List;
 public class MessagingRESTController {
 
     private final MessagingService messagingService;
+
+    @GetMapping("/chatroom/{chatroomId}")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Retrieve a chatroom",
+    description = "Retrieve a chatroom based on the passed chatroomId")
+    public ChatroomResponse getChatroom(@PathVariable String chatroomId) {
+        return messagingService.getChatroom(chatroomId);
+    }
+
 
     @GetMapping("/chatrooms/messages/{chatroomId}")
     @ResponseStatus(HttpStatus.OK)
