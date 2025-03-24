@@ -62,6 +62,7 @@
     "@react-navigation/native": "^7.0.14",
     "@react-navigation/native-stack": "^7.2.0",
     "@reduxjs/toolkit": "^2.4.0",
+    "@stomp/stompjs": "^7.0.1",
     "@testing-library/react": "^16.0.1",
     "date-fns": "^2.30.0",
     "eas-cli": "^15.0.12",
@@ -122,6 +123,8 @@
     "react-native-vector-icons": "^10.2.0",
     "react-native-web": "~0.19.10",
     "react-redux": "^9.1.2",
+    "react-stomp": "^5.1.0",
+    "sockjs-client": "^1.6.1",
     "tailwindcss": "^3.4.14",
     "use-debounce": "^10.0.4",
     "expo-file-system": "~18.0.12"

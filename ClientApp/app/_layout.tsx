@@ -3,6 +3,7 @@ import { Provider } from 'react-redux';
 import { store } from '@/state/store';
 import "../global.css";
 import { setupAxiosInstance } from '@/services/axiosInstance';
+import { setupLocalAxiosInstance } from "@/services/axiosLocalInstance";
 import { NotificationProvider } from "@/context/NotificationContext";
 import * as Notifications from "expo-notifications"
 import 'react-native-get-random-values';
@@ -21,6 +22,7 @@ export default function RootLayout() {
     // Inject Redux dispatch into Axios
     const { dispatch } = store;
     setupAxiosInstance(dispatch);
+    setupLocalAxiosInstance(dispatch);
 
     return (
         <Provider store={store}>
