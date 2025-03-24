@@ -1,4 +1,4 @@
-package app.sportahub.userservice.controller;
+package app.sportahub.userservice.controller.user;
 
 import app.sportahub.userservice.config.auth.TestSecurityConfig;
 import app.sportahub.userservice.controller.user.UserController;
