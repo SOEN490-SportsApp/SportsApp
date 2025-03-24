@@ -20,4 +20,6 @@ public interface MessagingService {
     ChatroomResponse getOrCreateChatroom(String senderId, Set<String> members, boolean createNewIfNotExists);
 
     ChatroomResponse createChatroom(ChatroomRequest chatroomRequest);
+
+    ChatroomResponse getChatroom(String chatroomId);
 }

@@ -114,4 +114,10 @@ public class MessagingServiceImpl  implements MessagingService {
         Chatroom savedChatroom = chatroomRepository.save(chatroom);
         return chatroomMapper.chatroomToChatroomResponse(savedChatroom);
     }
+
+    @Override
+    public ChatroomResponse getChatroom(String chatroomId) {
+        Chatroom chatroom = chatroomRepository.findByChatroomId(chatroomId);
+        return chatroomMapper.chatroomToChatroomResponse(chatroom);
+    }
 }
