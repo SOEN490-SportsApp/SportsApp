@@ -123,6 +123,11 @@ env:
       secretKeyRef:
         name: shared-secrets
         key: logstash-port
+  - name: KAFKA_BOOTSTRAP_SERVERS
+    valueFrom:
+      secretKeyRef:
+        name: shared-secrets
+        key: kafka-bootstrap-servers
 
 livenessProbe:
   enabled: true

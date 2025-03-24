@@ -108,6 +108,11 @@ env:
       secretKeyRef:
         name: shared-secrets
         key: keycloak-realm
+  - name: KAFKA_BOOTSTRAP_SERVERS
+    valueFrom:
+      secretKeyRef:
+        name: shared-secrets
+        key: kafka-bootstrap-servers
 
 livenessProbe:
   enabled: true
