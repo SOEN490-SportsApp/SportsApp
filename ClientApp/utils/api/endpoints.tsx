@@ -41,4 +41,5 @@ export const API_ENDPOINTS = {
   GET_FILE: "storage-service/objects/{objectPath}",
 
   GET_CHATROOMS: 'messaging-service/messaging/chatrooms/{userId}',
+  GET_MESSAGES: 'messaging/chatrooms/messages/{chatroomId}',
 };
