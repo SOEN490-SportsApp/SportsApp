@@ -13,18 +13,26 @@ interface message {
   senderId: string;
   receiverIds: string[];
   content: string;
-  createdAt: string;
+  createdAt: Number | Date;
   attachments: string[];
 }
 
 interface chatroomProps {
   chatroomId: string;
-  createdAt: string,
-  createdBy: string,
-  members: string[],
-  messages: message[],
-  isEvent: boolean,
-  unread: boolean,
+  createdAt: Number | Date;
+  createdBy: string;
+  members: string[];
+  messages: message[];
+  isEvent: boolean;
+  unread: boolean;
+}
+
+interface messageRequest {
+  chatroomId: string;
+  senderId: string;
+  receiverIds: string[];
+  content: string;
+  attachments: string[];
 }
 
 const ChatScreen = () => {
@@ -35,7 +43,7 @@ const ChatScreen = () => {
   const user = useSelector((state: {user: any}) => state.user);
   const [connected, setConnected] = useState(false);
   const clientRef = useRef<Client | null>(null);
-  const [chatroom, setChatroom] = useState<chatroomProps[]>([]);
+  const [chatroom, setChatroom] = useState<chatroomProps>();
 
   useEffect(() => {
     const response = async () => {
@@ -63,8 +71,6 @@ const ChatScreen = () => {
         connectHeaders: {
           Authorization: "Bearer " + finalToken,
         },
-        //forceBinaryWSFrames: true,
-        //appendMissingNULLonIncoming: true,
 
         onWebSocketError: (error: any) => console.error("Websocket error:", error),
         onConnect: () => {
@@ -72,7 +78,19 @@ const ChatScreen = () => {
 
           client.subscribe(`/topic/chatroom/${id}`, (message: any) => {
             console.log(JSON.parse(message.body));
-            setMessages((prev: any) => [...prev, message.body]);
+                setMessages((prev: IMessage[]) => [
+                  ...prev,
+                  {
+                    _id: JSON.parse(message.body).messageId,
+                    text: JSON.parse(message.body).content,
+                    createdAt: new Date(JSON.parse(message.body).createdAt),
+                    user: {
+                      _id: JSON.parse(message.body).senderId,
+                      name: 'Sender Name', // Replace with actual sender name if available
+                      avatar: 'https://example.com/sender-avatar.png', // Replace with actual avatar URL if available
+                    },
+                  },
+                ]);
           },
               {
                 "Authorization": "Bearer " + finalToken,
@@ -87,17 +105,33 @@ const ChatScreen = () => {
       client.activate();
       clientRef.current = client;
 
-      const fetchChatroom = async () => {
-        try {
-          const messagesData = await getMessages(id.toString())
-          const chatroomData = await getChatroom(id.toString())
-          setChatroom(chatroomData);
-          setMessages(messagesData);
-        } catch (error) {
-          console.error("Failed to fetch messages", error);
-          throw error;
-        }
+    const fetchChatroom = async () => {
+      try {
+        const messagesData = await getMessages(id.toString());
+        console.log("messageData: ", messagesData);
+
+        // Ensure messagesData is mapped to IMessage structure
+        const formattedMessages = messagesData.map((message: any) => ({
+          _id: message.messageId,
+          text: message.content,
+          createdAt: new Date(message.createdAt),
+          user: {
+            _id: message.senderId,
+            name: message.senderName || "Unknown", // Replace with sender's name if available
+            avatar: message.senderAvatar || "https://example.com/default-avatar.png", // Replace with avatar URL if available
+          },
+        }));
+
+        const chatroomData = await getChatroom(id.toString());
+        console.log("chatroomData: ", chatroomData);
+
+        setChatroom(chatroomData);
+        setMessages(formattedMessages);
+      } catch (error) {
+        console.error("Failed to fetch messages", error);
+        throw error;
       }
+    };
       fetchChatroom();
 
     return () => {
@@ -106,33 +140,47 @@ const ChatScreen = () => {
   }, [finalToken]);
 
   const onSend = useCallback((newMessages: IMessage[] = []) => {
+    let attachments: string[] = [];
+    console.log("newMessages: ", newMessages);
+    console.log("chatroom: ", chatroom);
 
-    console.log(finalToken);
     if (!Array.isArray(newMessages)) return;
     try {
-      const message = newMessages[0];
-
-
-
+      const newMessage = newMessages[0];
+      if (newMessage.audio != undefined) {
+        attachments.push(newMessage.audio)
+      }
+      if (newMessage.video != undefined) {
+        attachments.push(newMessage.video)
+      }
+      if (chatroom != undefined) {
+        const newMessageRequest: messageRequest = {
+          chatroomId: chatroom.chatroomId,
+          attachments: attachments,
+          content: newMessage.text,
+          receiverIds: chatroom.members,
+          senderId: user.id,
+        }
+        console.log("newMessageRequest: ",newMessageRequest);
         // @ts-ignore
-      clientRef.current.publish({
-        destination: "/app/message",
+        clientRef.current.publish({
+          destination: "/app/message",
           headers: {Authorization: "Bearer " + finalToken},
-        body: JSON.stringify(message),
-      })
-    } catch (error) {
+          body: JSON.stringify(newMessageRequest),
+        })
+      }
+      } catch (error) {
       console.error("Failed to publish messages", error);
     }
 
-    //setMessages(previousMessages => GiftedChat.append(previousMessages, newMessages));
-  }, [finalToken]);
+  }, [finalToken, chatroom]);
 
   return (
     
         <GiftedChat
           messages={messages}
           onSend={messages => onSend(messages)}
-          user={{ _id: 1 }}
+          user={{ _id: user.id }}
         />
   );
 };

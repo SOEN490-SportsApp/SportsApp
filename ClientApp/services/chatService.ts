@@ -2,12 +2,12 @@ import { getAxiosInstance } from '@/services/axiosInstance';
 import { getAxiosLocalInstance } from '@/services/axiosLocalInstance';
 import { API_ENDPOINTS } from '@/utils/api/endpoints';
 import {store} from "@/state/store";
-// API_ENDPOINTS.GET_CHATROOMS
 
+// API_ENDPOINTS.GET_CHATROOM
 export const getChatroom = async (chatroomId: string) => {
   try {
-    const axiosInstance = await getAxiosInstance();
-    const response = await axiosInstance.get(`/chatroom/${chatroomId}`);
+    const axiosLocalInstance = getAxiosLocalInstance();
+    const response = await axiosLocalInstance.get(API_ENDPOINTS.GET_CHATROOM.replace("{chatroomId}", chatroomId));
     return response.data;
   } catch (error) {
     console.error("Error fetching chatroom:", error);
@@ -15,10 +15,11 @@ export const getChatroom = async (chatroomId: string) => {
   }
 };
 
+// API_ENDPOINTS.GET_CHATROOMS
 export const getChatrooms = async (userId: string) => {
 
   try {
-    const axiosLocalInstance = await getAxiosLocalInstance();
+    const axiosLocalInstance = getAxiosLocalInstance();
     const response = await axiosLocalInstance.get(
         API_ENDPOINTS.GET_CHATROOMS.replace("{userId}", userId));
     return response.data;
@@ -32,7 +33,7 @@ export const getChatrooms = async (userId: string) => {
 export const getMessages = async (chatroomId: string) => {
 
   try {
-    const axiosLocalInstance = await getAxiosLocalInstance();
+    const axiosLocalInstance = getAxiosLocalInstance();
     const response = await axiosLocalInstance.get(
         API_ENDPOINTS.GET_MESSAGES.replace("{chatroomId}", chatroomId));
     return response.data;
