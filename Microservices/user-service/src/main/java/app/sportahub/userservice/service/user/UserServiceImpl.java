@@ -168,6 +168,22 @@ public class UserServiceImpl implements UserService {
                 .giverId(giverId)
                 .build();
         profile.getBadges().add(newBadge);
+
+        Map<String, Object> notificationPayload = Map.of(
+                "userId", userId,
+                "title", "🎖️ You Received a New Badge!",
+                "body", "You’ve just received a new badge from user " + giverId,
+                "clickAction", "/profile/badges", // frontend
+                "icon", "https://example.com/badge-icon.png",
+                "data", Map.of(
+                        "badgeId", badgeId,
+                        "giverId", giverId
+                )
+        );
+
+        kafkaTemplate.send("badge-assignments", notificationPayload);
+        log.info("assignBadge: Sent notification to user {} for badge {}", userId, badgeId);
+
         return userMapper.userToUserResponse(userRepository.save(user));
     }
 
