@@ -26,6 +26,8 @@ public class Chatroom {
     @MongoId(FieldType.OBJECT_ID)
     private String chatroomId;
 
+    private String chatroomName;
+
     @NotNull
     private Timestamp createdAt;
 

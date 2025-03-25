@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.simp.SimpMessageType;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -50,20 +49,19 @@ public class SecurityConfig {
                  authenticateAndAuthorize(auth.get(), context.getMessage());
 
         messages
-                .simpTypeMatchers(SimpMessageType.CONNECT, SimpMessageType.DISCONNECT).permitAll()
-                .anyMessage().access(tokenAuthorizationManager);
+                .simpTypeMatchers(SimpMessageType.CONNECT, SimpMessageType.DISCONNECT,
+                        SimpMessageType.UNSUBSCRIBE).permitAll()
+                .simpTypeMatchers(SimpMessageType.SUBSCRIBE).access(tokenAuthorizationManager)
+                .simpDestMatchers("/app/message").access(tokenAuthorizationManager)
+                .anyMessage().denyAll();
 
         return messages.build();
     }
 
     private AuthorizationDecision authenticateAndAuthorize(Authentication auth, Message<?> message) {
-        String authHeader = null;
-        try {
+            @SuppressWarnings("Unchecked")
             Map<String, List<String>> nativeHeaders = (Map<String, List<String>>) message.getHeaders().get("nativeHeaders");
-            authHeader = nativeHeaders != null ? nativeHeaders.get("Authorization").stream().findFirst().orElse(null) : null;
-        } catch (Exception e) {
-
-        }
+            String authHeader = nativeHeaders != null ? nativeHeaders.get("Authorization").stream().findFirst().orElse(null) : null;
 
         try {
             if (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken)) {

@@ -1,6 +1,6 @@
 package app.sportahub.messagingservice.controller;
 
-import app.sportahub.messagingservice.dto.request.MessageRequest;
+import app.sportahub.messagingservice.dto.request.message.MessageRequest;
 import app.sportahub.messagingservice.service.MessagingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -19,6 +19,7 @@ public class MessagingWebSocketController {
 
     @MessageMapping("/message")
     public void processMessage(@Payload MessageRequest messageRequest) {
+        System.out.println("Message received: " + messageRequest);
         messagingService.processMessage(messageRequest);
     }
 }
