@@ -381,5 +381,9 @@
     "be_the_first_to_create": "Be The First To Create Events In Your Area",
     "loading_more": "Loading more...",
     "all_done": "All done!"
+  },
+  "my_calendar": {
+    "events_for": "Events for",
+    "no_events": "No events for this day."
   }
 }
