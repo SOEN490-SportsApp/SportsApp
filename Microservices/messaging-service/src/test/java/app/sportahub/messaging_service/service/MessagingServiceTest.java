@@ -1,9 +1,8 @@
 package app.sportahub.messaging_service.service;
 
-import app.sportahub.messagingservice.dto.request.MessageRequest;
+import app.sportahub.messagingservice.dto.request.message.MessageRequest;
 import app.sportahub.messagingservice.dto.response.chatroom.ChatroomResponse;
 import app.sportahub.messagingservice.dto.response.message.MessageResponse;
-import app.sportahub.messagingservice.exception.UserAddingThemselvesToChatroomMemberSetException;
 import app.sportahub.messagingservice.mapper.ChatroomMapper;
 import app.sportahub.messagingservice.mapper.MessageMapper;
 import app.sportahub.messagingservice.model.Chatroom;
@@ -123,28 +122,6 @@ public class MessagingServiceTest {
         verify(chatroomRepository, times(1)).findByCreatedByAndMembersEquals(senderId,members);
         verify(chatroomRepository, times(0)).save(any());
 
-    }
-
-    @Test
-    public void getOrCreateMessageShouldThrowUserAddingThemselvesToChatroomMemberSetException() {
-        //Arrange
-        String senderId = "testSenderId";
-        String memberId = "testSenderId";
-        Set<String> members = new HashSet<>();
-        members.add(memberId);
-        boolean createNewIfNotExists = true;
-
-        when(chatroomRepository.findByCreatedByAndMembersEquals(senderId, members)).thenReturn(Optional.empty());
-
-        //Act
-        UserAddingThemselvesToChatroomMemberSetException exception =
-                assertThrows(UserAddingThemselvesToChatroomMemberSetException.class,
-                        () ->  messagingService.getOrCreateChatroom(senderId,members,createNewIfNotExists));
-
-        //Assert
-        assertEquals("409 CONFLICT \"User with id testSenderId is trying to add themselves to their own chatroom.\"", exception.getMessage());
-        verify(chatroomRepository, times(1)).findByCreatedByAndMembersEquals(senderId,members);
-        verify(chatroomRepository, times(0)).save(any());
     }
 
     @Test

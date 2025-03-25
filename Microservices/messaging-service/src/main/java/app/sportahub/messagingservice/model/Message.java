@@ -30,6 +30,8 @@ public class Message {
     @NotNull
     private String senderId;
 
+    private String senderName;
+
     @NotEmpty
     @Size(min = 1, max = 255)
     private Set<String> receiverIds;

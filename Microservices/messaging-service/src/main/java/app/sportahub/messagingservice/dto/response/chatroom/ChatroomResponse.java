@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record ChatroomResponse(String chatroomId, Timestamp createdAt, String createdBy,
+public record ChatroomResponse(String chatroomId, String chatroomName, Timestamp createdAt, String createdBy,
                                Set<String> members, List<Message> messages, Boolean isEvent,
                                Boolean unread) {
 }
