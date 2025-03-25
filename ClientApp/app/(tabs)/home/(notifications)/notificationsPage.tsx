@@ -74,7 +74,7 @@ const NotificationsScreen: React.FC = () => {
                             style={{ flex: 1 }}
                             ListEmptyComponent={
                                 <View style={{ alignItems: "center", padding: 20 }}>
-                                    <Text style={{ fontSize: 16, color: "gray" }}>{t('home_notifications_page.now_friends_requests')}</Text>
+                                    <Text style={{ fontSize: 16, color: "gray" }}>{t('home_notifications_page.no_friend_requests')}</Text>
                                     <Text style={{ fontSize: 14, color: "gray", marginTop: 5 }}>{t('home_notifications_page.check_later')}</Text>
                                 </View>
                             }
