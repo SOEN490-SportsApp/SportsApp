@@ -39,4 +39,9 @@ export interface Event {
   isPrivate: boolean;
   whitelistedUsers?: string[];
   far: number;
+  cancellation?: {
+    cancelledAt: string;
+    cancelledBy: string;
+    reason: string;
+  };
 }

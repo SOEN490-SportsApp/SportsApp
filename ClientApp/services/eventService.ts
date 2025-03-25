@@ -311,3 +311,18 @@ export const getEventById = async (eventId: string) => {
     throw error;
   }
 }
+export const cancelEvent = async (eventId: string, reason: string) => {
+  try {
+    const axiosInstance = getAxiosInstance();
+    const response = await axiosInstance.patch(
+      API_ENDPOINTS.CANCEL_EVENT_BY_ID.replace("{id}", eventId),
+      {
+        reason: reason, 
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error cancelling event:", error);
+    throw error;
+  }
+};

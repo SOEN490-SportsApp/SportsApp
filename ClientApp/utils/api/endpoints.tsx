@@ -22,6 +22,7 @@ export const API_ENDPOINTS = {
   SEARCH_EVENTS:"event-service/event/search",
   LEAVE_EVENT: "event-service/event/{id}/leave",
   EDIT_EVENT_BY_ID: 'event-service/event/{id}',
+  CANCEL_EVENT_BY_ID: "event-service/event/{id}/cancel",
 
 
   SEND_FRIEND_REQUEST: 'user-service/user/{userId}/friends/requests',
