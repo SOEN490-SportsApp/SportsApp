@@ -374,5 +374,12 @@
     "select_cutoff_time": "Select Cut-off Time",
     "enter_event_description": "Enter event description...",
     "failed_to_load_details": "Failed to load event details."
+  },
+  "event_list": {
+    "loading_events": "Loading events...",
+    "wow_couldnt_find": "Wow! Couldn't find events within 100 km",
+    "be_the_first_to_create": "Be The First To Create Events In Your Area",
+    "loading_more": "Loading more...",
+    "all_done": "All done!"
   }
 }

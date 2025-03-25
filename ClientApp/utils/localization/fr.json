@@ -374,5 +374,12 @@
     "select_cutoff_time": "Sélectionnez l'heure limite d'inscription",
     "enter_event_description": "Entrez la description de l'événement",
     "failed_to_load_details": "Échec du chargement des détails de l'événement"
+  },
+  "event_list": {
+    "loading_events": "Chargement des événements ...",
+    "wow_couldnt_find": "Wow, nous n'avons pas pu trouver d'événements",
+    "be_the_first_to_create": "Soyez le premier à créer un!",
+    "loading_more": "Chargement de plus d'événements ...",
+    "all_done": "Tout est fait!"
   }
 }
