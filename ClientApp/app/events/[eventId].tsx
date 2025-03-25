@@ -226,7 +226,6 @@ const EventPage: React.FC = () => {
   {event.cancellation && " (Cancelled)"}
 </Text>
 </View>
-
     <View style={styles.details}>
             <Text style={styles.detailText}>
               <FontAwesome6 name="map-pin" size={16} color="black" />{" "}

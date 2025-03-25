@@ -134,8 +134,8 @@ const locale = i18n.language === 'fr' ? 'fr' : 'en';
 >
   {event.eventName}
   {event.cancellation && " (Cancelled)"}
-</Text>
- {showDetailPreview &&(
+    </Text>
+    {showDetailPreview &&(
           <Text style={styles.eventDetails}>
             {isForVisitedProfile
           ? `${event.sportType}`
@@ -144,7 +144,6 @@ const locale = i18n.language === 'fr' ? 'fr' : 'en';
             : `${event.far} ${t('event_card.km_away')}`}
         </Text>
     )}
-
       {showSportType &&
         <View style={styles.sportIconContainer}>
           <MaterialCommunityIcons
