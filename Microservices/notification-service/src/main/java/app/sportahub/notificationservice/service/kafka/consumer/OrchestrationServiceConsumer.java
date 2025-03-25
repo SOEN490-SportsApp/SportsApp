@@ -5,4 +5,10 @@ import app.sportahub.notificationservice.dto.request.notification.NotificationRe
 public interface OrchestrationServiceConsumer {
 
     void consumeEventNotification(NotificationRequest request);
+
+    void consumeFriendRequestNotification(NotificationRequest request);
+
+    void consumeUserMentionNotification(NotificationRequest request);
+
+    void consumeBadgeAssignmentNotification(NotificationRequest request);
 }
