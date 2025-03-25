@@ -22,7 +22,7 @@ import ConfirmButton from "@/components/Helper Components/ConfirmButton";
 import themeColors from "@/utils/constants/colors";
 import { hs, vs, mhs } from "@/utils/helpers/uiScaler";
 import { createEvent } from "@/services/eventService";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import supportedSports from "@/utils/constants/supportedSports";
 import GooglePlacesInput from "@/components/Helper Components/GooglePlacesInput";
 import CustomDateTimePicker from "@/components/Helper Components/CustomDateTimePicker";
@@ -49,6 +49,7 @@ const Create = () => {
   });
   const router = useRouter();
   const [isSportTypeModalVisible, setSportTypeModalVisible] = useState(false);
+  const dispatch = useDispatch();
   const [eventDate, setEventDate] = useState<Date | null>(null);
   const [isSuccessModalVisible, setSuccessModalVisible] = useState(false);
   const [cutOffDate, setCutOffDate] = useState<Date | null>(null);
@@ -172,7 +173,9 @@ const Create = () => {
         ),
       };
 
-      await createEvent(eventRequest);
+      const createdEvent = await createEvent(eventRequest);
+
+      dispatch({ type: 'ADD_NEW_EVENT', payload: createdEvent });
 
       reset({
         eventName: "",
