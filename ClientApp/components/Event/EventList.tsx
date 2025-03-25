@@ -5,6 +5,7 @@ import { Event } from '@/types/event';
 import { router, useFocusEffect } from 'expo-router';
 import { useSelector } from 'react-redux';
 import usePagination from '@/app/hooks/usePagination';
+import { useTranslation } from 'react-i18next';
 
 interface userEventsListProps {
   forProfile: boolean, 
@@ -13,6 +14,7 @@ interface userEventsListProps {
 
 const EventsList: React.FC<userEventsListProps> = ({ forProfile, fetchEventsFunction }) => {
   const user = useSelector((state: { user: any }) => state.user);
+  const { t } = useTranslation();
 
   const {
     data: events,
@@ -40,7 +42,7 @@ const EventsList: React.FC<userEventsListProps> = ({ forProfile, fetchEventsFunc
     return (
       <View style={styles.loaderContainer}>
         <ActivityIndicator size="large" color="#0000ff" />
-        <Text>Loading events...</Text>
+        <Text>{t('event_list.loading_event')}</Text>
       </View>
     );
   }
@@ -49,8 +51,8 @@ const EventsList: React.FC<userEventsListProps> = ({ forProfile, fetchEventsFunc
     <View style={styles.container}>
       {events.length === 0 ? (
         <View style = {styles.noActivityContainer}>
-          <Text style={styles.noActivityText}>Wow! Couldn't find events within 100 km</Text>
-          <Text style={styles.noActivityText}>Be The First To Create Events In Your Area</Text>
+          <Text style={styles.noActivityText}>{t('event_list.wow_couldnt_find')}</Text>
+          <Text style={styles.noActivityText}>{t('event_list.be_the_first_to_create')}</Text>
         </View>
       ) : (
         <FlatList
@@ -74,11 +76,11 @@ const EventsList: React.FC<userEventsListProps> = ({ forProfile, fetchEventsFunc
           ListFooterComponent={() =>
             pageNo + 1 < totalPages ? (
               <View style={styles.endMessageContainer}>
-                <Text style={styles.endMessageText}>Loading more...</Text>
+                <Text style={styles.endMessageText}>{t('event_list.loading_more')}</Text>
               </View>
             ) : (
               <View style={styles.endMessageContainer}>
-                <Text style={styles.endMessageText}>All Done!</Text>
+                <Text style={styles.endMessageText}>{t('event_list.all_done')}</Text>
               </View>
             )
           }
