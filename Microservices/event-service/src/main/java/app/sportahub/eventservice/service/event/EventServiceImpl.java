@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -47,6 +48,7 @@ import app.sportahub.eventservice.repository.event.EventRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
+import org.springframework.kafka.core.KafkaTemplate;
 
 
 @Slf4j
@@ -56,6 +58,7 @@ public class EventServiceImpl implements EventService {
 
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     /**
      * Returns a specific event with an id matching the provided id.
@@ -457,6 +460,9 @@ public class EventServiceImpl implements EventService {
         Event savedEvent = eventRepository.save(event);
         log.info("EventServiceImpl::cancelEvent: Event with id:{} was cancelled by user:{}", eventId,
                 authentication.getName());
+
+        sendEventCancellationNotifications(savedEvent);
+
         return eventMapper.eventToEventResponse(savedEvent);
     }
 
@@ -643,16 +649,16 @@ public class EventServiceImpl implements EventService {
 
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new EventDoesNotExistException(id));
-        
+
         List<String> whitelistUserList = event.getWhitelistedUsers();
 
         for(String userId: userIds) {
             if(!whitelistUserList.contains(userId)){
-                userIdsToAdd.add(userId); 
+                userIdsToAdd.add(userId);
             }
         }
         whitelistUserList.addAll(userIdsToAdd);
-  
+
 
         if(whitelistUserList.size() > event.getMaxParticipants()){
             throw new EventFullException(id, userIdsToAdd.toString());
@@ -663,4 +669,33 @@ public class EventServiceImpl implements EventService {
         log.info("EventServiceImpl::whitelistUsers: Users with ids: {} were added to the whitelist for event with id: {}", userIds, id);
         return eventMapper.eventToEventResponse(savedEvent);
     }
+
+    private void sendEventCancellationNotifications(Event event) {
+        List<Participant> participants = event.getParticipants();
+        if (participants == null || participants.isEmpty()) {
+            log.info("No participants registered for event: {}", event.getId());
+            return;
+        }
+
+        for (Participant participant : participants) {
+            String userId = participant.getUserId(); // adjust if needed
+
+            Map<String, Object> notificationPayload = Map.of(
+                    "userId", userId,
+                    "title", "Event Cancelled",
+                    "body", "The event '" + event.getEventName() + "' has been cancelled.",
+                    "clickAction", "/events/" + event.getId(),
+                    "icon", "https://example.com/event-cancel-icon.png",
+                    "data", Map.of(
+                            "eventId", event.getId(),
+                            "reason", event.getCancellation().getReason(),
+                            "cancelledBy", event.getCancellation().getCancelledBy()
+                    )
+            );
+
+            kafkaTemplate.send("event-updates", notificationPayload);
+            log.info("Notification sent to user {} for event {}", userId, event.getId());
+        }
+    }
+
 }
