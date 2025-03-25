@@ -1,0 +1,58 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/soen490-sportsapp/sportsapp-orchestration-service
+  pullPolicy: Always
+  tag: "latest"
+
+imagePullSecrets:
+  - name: ghcr-access-secret
+nameOverride: "orchestration-service"
+
+serviceAccount:
+  create: true
+  automount: true
+  name: "orchestration-service"
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: false
+
+resources:
+   limits:
+     cpu: 1000m
+     memory: 1Gi
+   requests:
+     cpu: 500m
+     memory: 500Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+
+volumes: []
+volumeMounts: []
+
+env:
+  - name: KAFKA_BOOTSTRAP_SERVERS
+    valueFrom:
+      secretKeyRef:
+        name: shared-secrets
+        key: kafka-bootstrap-servers
+
+livenessProbe:
+  enabled: true
+  path: /api/orchestration-service/actuator/health
+  initialDelaySeconds: 30
+  periodSeconds: 10
+
+readinessProbe:
+  enabled: true
+  path: /api/orchestration-service/actuator/health
+  initialDelaySeconds: 15
+  periodSeconds: 5
