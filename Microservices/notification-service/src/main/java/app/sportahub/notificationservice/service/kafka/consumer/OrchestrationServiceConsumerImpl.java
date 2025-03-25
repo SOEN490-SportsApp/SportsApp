@@ -22,6 +22,7 @@ public class OrchestrationServiceConsumerImpl implements OrchestrationServiceCon
     }
 
     @KafkaListener(topics = "friend-requests", groupId = "notification-service", containerFactory = "kafkaListenerContainerFactory")
+    @Override
     public void consumeFriendRequestNotification(NotificationRequest request) {
         log.info("Received friend request notification: {}", request);
         notificationService.processNotification(request);
@@ -32,4 +33,12 @@ public class OrchestrationServiceConsumerImpl implements OrchestrationServiceCon
         log.info("Received user mention notification: {}", request);
         notificationService.processNotification(request);
     }
+
+    @KafkaListener(topics = "badge-assignments", groupId = "notification-service", containerFactory = "kafkaListenerContainerFactory")
+    @Override
+    public void consumeBadgeAssignmentNotification(NotificationRequest request) {
+        log.info("Received badge assignment notification: {}", request);
+        notificationService.processNotification(request);
+    }
+
 }
