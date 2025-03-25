@@ -45,4 +45,11 @@ public class Routes {
                 .route(RequestPredicates.path("/api/storage-service/**"), HandlerFunctions.http("http://storage-service:8080"))
                 .build();
     }
+
+    @Bean
+    public RouterFunction<ServerResponse> notificationServiceRoute() {
+        return GatewayRouterFunctions.route("notification_service")
+                .route(RequestPredicates.path("/api/notification-service/**"), HandlerFunctions.http("http://notification-service:8080"))
+                .build();
+    }
 }
