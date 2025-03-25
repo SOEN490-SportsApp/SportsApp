@@ -199,7 +199,7 @@
   "search_page": {
     "search": "Rechercher...",
     "connect_with_others": "Connectez-vous avec d'autres et planifiez des événements!",
-    "no_users_fonud": "Aucun utilisateur trouvé",
+    "no_users_found": "Aucun utilisateur trouvé",
     "navigate": "Naviguer",
     "users": "Utilisateurs",
     "events": "Événements",
