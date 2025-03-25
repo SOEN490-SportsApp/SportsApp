@@ -381,5 +381,9 @@
     "be_the_first_to_create": "Soyez le premier à créer un!",
     "loading_more": "Chargement de plus d'événements ...",
     "all_done": "Tout est fait!"
+  },
+  "my_calendar": {
+    "events_for": "Événements pour",
+    "no_events": "Pas d'événements pour cette date" 
   }
 }

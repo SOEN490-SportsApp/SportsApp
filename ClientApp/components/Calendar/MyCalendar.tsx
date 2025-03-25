@@ -11,19 +11,22 @@ import {
   ScrollView,
   FlatList,
 } from "react-native";
-
 import { Calendar } from "react-native-calendars";
 import { Event } from "@/types/event";
 import { useFocusEffect, useRouter } from "expo-router";
 import CalendarEventCard from "./CalendarEventCard";
 import { mhs, mvs, vs } from "@/utils/helpers/uiScaler";
 import { useSelector } from "react-redux";
+import { useTranslation } from 'react-i18next';
+import { LocaleConfig } from 'react-native-calendars';
 
 interface EventList {
   userId: string;
   isVisible: boolean;
 }
 const MyCalendar: React.FC<EventList> = ({ userId, isVisible }) => {
+  const { t, i18n } = useTranslation();
+  const currentLanguage = i18n.language;
   const router = useRouter();
   const [modalVisible, setModalVisible] = useState(false);
   const events = useRef<Event[]>([]);
@@ -41,6 +44,21 @@ const MyCalendar: React.FC<EventList> = ({ userId, isVisible }) => {
   });
   const Location = useSelector((state: { location: any }) => state.location);
   const heightAnim = useRef(new Animated.Value(0)).current;
+
+  LocaleConfig.locales['fr'] = {
+    monthNames: [
+      'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+      'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
+    ],
+    monthNamesShort: ['Janv.', 'Févr.', 'Mars', 'Avril', 'Mai', 'Juin', 'Juil.', 'Août', 'Sept.', 'Oct.', 'Nov.', 'Déc.'],
+    dayNames: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
+    dayNamesShort: ['Dim.', 'Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.'],
+    today: "Aujourd'hui"
+  };
+
+  LocaleConfig.locales['en'] = LocaleConfig.locales[''];
+
+  LocaleConfig.defaultLocale = currentLanguage;
 
   useEffect(() => {
     Animated.timing(heightAnim, {
@@ -135,6 +153,7 @@ const MyCalendar: React.FC<EventList> = ({ userId, isVisible }) => {
           }
           markedDates={markedDates}
           onDayPress={onDayPress}
+          locale={currentLanguage}
         />
       )}
 
@@ -148,7 +167,7 @@ const MyCalendar: React.FC<EventList> = ({ userId, isVisible }) => {
           <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
             <View style={styles.modalContainer}>
               <View style={styles.modalContent}>
-                <Text style={styles.modalTitle}>Events for {selectedDate}</Text>
+                <Text style={styles.modalTitle}>{t('my_calendar.events_for')} {selectedDate}</Text>
                 {displayEvents && displayEvents.length > 0 ? (
                   <ScrollView style={{ width: "100%" }}>
                     {displayEvents.map((event, index) => (
@@ -161,7 +180,7 @@ const MyCalendar: React.FC<EventList> = ({ userId, isVisible }) => {
                     ))}
                   </ScrollView>
                 ) : (
-                  <Text>No events for this day.</Text>
+                  <Text>{t('my_calendar.no_events')}</Text>
                 )}
               </View>
             </View>
