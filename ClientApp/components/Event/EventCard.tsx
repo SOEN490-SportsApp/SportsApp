@@ -126,8 +126,16 @@ const locale = i18n.language === 'fr' ? 'fr' : 'en';
 
   return (
     <TouchableOpacity testID='event-card' style={[styles.card, dynamicCardStyle]} onPress={() => onPress(event.id)}>
-      <Text style={styles.eventName}>{event.eventName}</Text>
-      {showDetailPreview &&(
+      <Text
+  style={[
+    styles.eventName,
+    event.cancellation && { color: "red" }
+  ]}
+>
+  {event.eventName}
+  {event.cancellation && " (Cancelled)"}
+</Text>
+ {showDetailPreview &&(
           <Text style={styles.eventDetails}>
             {isForVisitedProfile
           ? `${event.sportType}`

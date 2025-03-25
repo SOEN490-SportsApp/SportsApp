@@ -4,7 +4,7 @@ import { router, Stack } from "expo-router";
 import { Menu, Provider } from "react-native-paper";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import themeColors from "@/utils/constants/colors";
-import { deleteEvent, getEventDetails, leaveEvent } from "@/services/eventService";
+import { deleteEvent, getEventDetails, leaveEvent, cancelEvent } from "@/services/eventService";
 import { useLocalSearchParams } from "expo-router";
 import QR from "@/components/QR/QR";
 import { mvs } from "@/utils/helpers/uiScaler";
@@ -79,6 +79,9 @@ export default function EventDetailsLayout() {
       case "delete":
         handleDeleteEvent(eventId);
         break;
+        case "cancel":
+      handleCancelEvent(eventId);
+       break;
       default:
         break;
     }
@@ -122,6 +125,42 @@ export default function EventDetailsLayout() {
         },
       },
     ]);
+  };
+
+  const handleCancelEvent = async (eventId: string | undefined) => {
+    if (!eventId) {
+      Alert.alert("Error", "Event ID is missing.");
+      return;
+    }
+  
+    Alert.prompt(
+      "Cancel Event",
+      "Please provide a reason for cancelling this event:",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Confirm",
+          onPress: async (reason) => {
+            if (!reason) {
+              Alert.alert("Error", "A reason is required to cancel the event.");
+              return;
+            }
+  
+            try {
+              await cancelEvent(eventId, reason);
+              Alert.alert("Success", "Event has been cancelled.");
+              router.replace("/(tabs)/home");
+            } catch (error) {
+              Alert.alert("Error", "Unable to cancel event.");
+            }
+          },
+        },
+      ],
+      "plain-text"
+    );
   };
   
   const handleDeleteEvent = async (eventId: string | undefined) => {
@@ -189,6 +228,7 @@ export default function EventDetailsLayout() {
   {isCreator && (
     <React.Fragment>
       <Menu.Item onPress={() => handleOptionPress("edit")} title={t('event_details_layout.edit_event')} />
+      <Menu.Item onPress={() => handleOptionPress("cancel")} title="Cancel Event" titleStyle={{ color: "orange" }} />
       <Menu.Item onPress={() => handleOptionPress("delete")} title={t('event_details_layout.delete_event')} titleStyle={{ color: "red" }} />
     </React.Fragment>
   )}

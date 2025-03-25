@@ -215,10 +215,19 @@ const EventPage: React.FC = () => {
     <SafeAreaView className="flex-1 bg-white pt-6">
       <View style={styles.header}>
         <View style={styles.headerTextContainer}>
-          <View style={styles.eventTitle}>
-            <Text style={styles.eventName}>{event.eventName}</Text>
-          </View>
-          <View style={styles.details}>
+        <View style={styles.eventTitle}>
+        <Text
+  style={[
+    styles.eventName,
+    event.cancellation && { color: "red" }, 
+  ]}
+>
+  {event.eventName}
+  {event.cancellation && " (Cancelled)"}
+</Text>
+</View>
+
+    <View style={styles.details}>
             <Text style={styles.detailText}>
               <FontAwesome6 name="map-pin" size={16} color="black" />{" "}
               {event.locationResponse?.streetNumber} {event.locationResponse?.streetName}, {event.locationResponse?.city}
