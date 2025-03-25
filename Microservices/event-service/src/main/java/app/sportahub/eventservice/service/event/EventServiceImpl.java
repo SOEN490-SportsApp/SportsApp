@@ -185,6 +185,8 @@ public class EventServiceImpl implements EventService {
         Event savedEvent = eventRepository.save(updatedEvent);
         log.info("EventServiceImpl::updateEvent: Event with id:{} was updated", savedEvent.getId());
 
+        notifyParticipantsAboutUpdate(savedEvent);
+
         return eventMapper.eventToEventResponse(savedEvent);
     }
 
@@ -207,6 +209,8 @@ public class EventServiceImpl implements EventService {
 
         Event savedEvent = eventRepository.save(event);
         log.info("EventServiceImpl::patchEvent: Event with id:{} was patched", savedEvent.getId());
+
+        notifyParticipantsAboutUpdate(savedEvent);
 
         return eventMapper.eventToEventResponse(savedEvent);
     }
@@ -314,6 +318,8 @@ public class EventServiceImpl implements EventService {
             throw new UserAlreadyParticipantException(id, userId);
         }
 
+        List<Participant> previousParticipants = new ArrayList<>(event.getParticipants());
+
         Participant participant = Participant.builder()
                 .withUserId(userId)
                 .withAttendStatus(ParticipantAttendStatus.JOINED)
@@ -323,6 +329,8 @@ public class EventServiceImpl implements EventService {
         event.getParticipants().add(participant);
         eventRepository.save(event);
         log.info("EventServiceImpl::joinEvent: User with id:{} joined event with id:{}", userId, id);
+
+        notifyExistingParticipantsOfNewJoiner(event, previousParticipants, userId);
         return new ParticipantResponse(participant.getUserId(), participant.getAttendStatus(),
                 participant.getJoinedOn());
     }
@@ -695,6 +703,59 @@ public class EventServiceImpl implements EventService {
 
             kafkaTemplate.send("event-updates", notificationPayload);
             log.info("Notification sent to user {} for event {}", userId, event.getId());
+        }
+    }
+
+    private void notifyParticipantsAboutUpdate(Event event) {
+        List<Participant> participants = event.getParticipants();
+
+        if (participants == null || participants.isEmpty()) {
+            log.info("No participants to notify for event: {}", event.getId());
+            return;
+        }
+
+        for (Participant participant : participants) {
+            String userId = participant.getUserId(); // adjust based on your model
+
+            Map<String, Object> notificationPayload = Map.of(
+                    "userId", userId,
+                    "title", "Event Updated",
+                    "body", "The event '" + event.getEventName() + "' has been updated.",
+                    "clickAction", "/events/" + event.getId(),
+                    "icon", "https://example.com/event-update-icon.png",
+                    "data", Map.of(
+                            "eventId", event.getId(),
+                            "updatedAt", event.getUpdatedAt().toString()
+                    )
+            );
+
+            kafkaTemplate.send("event-updates", notificationPayload);
+            log.info("Event update notification sent to user {} for event {}", userId, event.getId());
+        }
+    }
+
+    private void notifyExistingParticipantsOfNewJoiner(Event event, List<Participant> previousParticipants, String newUserId) {
+        if (previousParticipants == null || previousParticipants.isEmpty()) {
+            return;
+        }
+
+        for (Participant participant : previousParticipants) {
+            String receiverId = participant.getUserId();
+
+            Map<String, Object> payload = Map.of(
+                    "userId", receiverId,
+                    "title", "New Player Joined",
+                    "body", "A new player has joined the event '" + event.getEventName() + "'.",
+                    "clickAction", "/events/" + event.getId(),
+                    "icon", "https://example.com/user-join-icon.png",
+                    "data", Map.of(
+                            "eventId", event.getId(),
+                            "newUserId", newUserId
+                    )
+            );
+
+            kafkaTemplate.send("event-updates", payload);
+            log.info("Notification sent to {} about new participant {} for event {}", receiverId, newUserId, event.getId());
         }
     }
 
