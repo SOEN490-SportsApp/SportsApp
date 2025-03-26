@@ -115,7 +115,7 @@ public class UserController {
     @PreAuthorize("#userId == authentication.name || hasRole('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Send a friend request to a user",
-    description = "Allows a user to send a friend request to another user and returns the details of the friend request.")
+            description = "Allows a user to send a friend request to another user and returns the details of the friend request.")
     public FriendRequestResponse sendFriendRequest(@PathVariable String userId,
                                                    @Valid @RequestBody FriendRequestRequest friendRequestRequest) {
         return userService.sendFriendRequest(userId, friendRequestRequest);
@@ -125,7 +125,7 @@ public class UserController {
     @PreAuthorize("#userId == authentication.name || hasRole('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Accept or decline a friend request",
-    description = "Allows a user to accept or decline a friend request and returns a success message if successful.")
+            description = "Allows a user to accept or decline a friend request and returns a success message if successful.")
     public UpdateFriendRequestResponse updateFriendRequest(@PathVariable String userId, @PathVariable String requestId,
                                                            @Valid @RequestBody UpdateFriendRequestRequest updateFriendRequestRequest) {
         return userService.updateFriendRequest(userId, requestId, updateFriendRequestRequest);
@@ -135,16 +135,15 @@ public class UserController {
     @PreAuthorize("#userId == authentication.name || hasRole('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "view received friend requests",
-    description = "Retrieves user's friend requests stored in their friend list based on given type.")
+            description = "Retrieves user's friend requests stored in their friend list based on given type.")
     public List<ViewFriendRequestsResponse> getFriendRequests(@PathVariable String userId, @RequestParam List<FriendRequestStatusEnum> type) {
         return userService.getFriendRequests(userId, type);
     }
 
     @GetMapping("/{userId}/friends")
-    @PreAuthorize("#userId == authentication.name || hasRole('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "view accepted friends",
-    description = "Retrieves user's friend list")
+            description = "Retrieves user's friend list")
     public List<ViewFriendResponse> getFriends(@PathVariable String userId) {
         return userService.getFriends(userId);
     }
@@ -153,7 +152,7 @@ public class UserController {
     @PreAuthorize("#userId == authentication.name || hasRole('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "remove a friend",
-    description = "Remove a friend from the user's friendList.")
+            description = "Remove a friend from the user's friendList.")
     public void removeFriend(@PathVariable String userId, @RequestParam String friendId) {
         userService.deleteFriend(userId, friendId);
     }
