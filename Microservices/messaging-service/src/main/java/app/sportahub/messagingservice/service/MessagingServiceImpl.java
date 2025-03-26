@@ -4,6 +4,7 @@ import app.sportahub.messagingservice.dto.request.message.MessageRequest;
 import app.sportahub.messagingservice.dto.request.chatroom.ChatroomRequest;
 import app.sportahub.messagingservice.dto.response.chatroom.ChatroomResponse;
 import app.sportahub.messagingservice.dto.response.message.MessageResponse;
+import app.sportahub.messagingservice.exception.ChatroomAlreadyExistsException;
 import app.sportahub.messagingservice.exception.ChatroomDoesNotExistException;
 import app.sportahub.messagingservice.exception.MessageDoesNotExistException;
 import app.sportahub.messagingservice.mapper.ChatroomMapper;
@@ -55,50 +56,18 @@ public class MessagingServiceImpl  implements MessagingService {
                 .withCreatedAt(Timestamp.valueOf(LocalDateTime.now()))
                 .build();
         String chatroomId;
-        if (message.getChatroomId() == null) {
-            chatroomId = getOrCreateChatroom(message.getSenderId(), message.getReceiverIds(),
-                    true).chatroomId();
-            message.setChatroomId(chatroomId);
-        } else {
-            chatroomId = message.getChatroomId();
-        }
 
-        Message savedMessage = messageRepository.save(message);
+        chatroomId = message.getChatroomId();
+
         Chatroom chatroom = chatroomRepository.findByChatroomId(chatroomId).orElseThrow(() ->
                 new ChatroomDoesNotExistException(chatroomId));
+
+        Message savedMessage = messageRepository.save(message);
         List<Message> messages = chatroom.getMessages();
         messages.addFirst(savedMessage);
         chatroom.setMessages(messages);
         chatroomRepository.save(chatroom);
         messagingTemplate.convertAndSend("/topic/chatroom/" + chatroomId, savedMessage);
-    }
-
-    /**
-     * The helper method that processMessage uses to create a chatroom if the received message has no associated chatroomId
-     *
-     * @param senderId the unique identifier of the user who sent the message
-     * @param members a set containing the userIds of all members of the chatroom, including the sender.
-     * @param createNewIfNotExists a boolean to toggle whether this method should allow the creation of a new chatroom or not
-     * @return a {@link ChatroomResponse} object representing the chatroom that was found, or the new one created
-     */
-    @Override
-    public ChatroomResponse getOrCreateChatroom(String senderId, Set<String> members, boolean createNewIfNotExists) {
-        return chatroomMapper.chatroomToChatroomResponse((chatroomRepository.findByCreatedByAndMembersEquals(senderId, members)
-                .or(() -> {
-                    System.out.println("getOrCreateChatroom::Chatroom not found");
-                    if (createNewIfNotExists) {
-                        members.add(senderId);
-                        Chatroom chatroom = Chatroom.builder()
-                                .createdBy(senderId)
-                                .createdAt(Timestamp.valueOf(LocalDateTime.now()))
-                                .members(members)
-                                .build();
-
-                        Chatroom savedChatroom = chatroomRepository.save(chatroom);
-                        return Optional.of(savedChatroom);
-                    }
-                    return Optional.empty();
-                })).orElse(null));
     }
 
     /**
@@ -116,10 +85,7 @@ public class MessagingServiceImpl  implements MessagingService {
         List<Message> messages = chatroom.getMessages();
 
         return messages.stream()
-                .map(message -> new MessageResponse(message.getMessageId(), message.getChatroomId(),
-                        message.getSenderId(), message.getSenderName(), message.getReceiverIds(), message.getContent(),
-                        message.getCreatedAt(), message.getAttachments()))
-                .toList();
+                .map(messageMapper::MessageToMessageResponse).toList();
     }
 
     /**
@@ -136,9 +102,7 @@ public class MessagingServiceImpl  implements MessagingService {
         List<Chatroom> chatrooms = chatroomRepository.findAllByMembersContains(tempSet);
 
         return chatrooms.stream()
-                .map(chatroom -> new ChatroomResponse(chatroom.getChatroomId(), chatroom.getChatroomName(),
-                        chatroom.getCreatedAt(), chatroom.getCreatedBy(), chatroom.getMembers(), chatroom.getMessages(),
-                        chatroom.getIsEvent(), chatroom.getUnread()))
+                .map(chatroomMapper::chatroomToChatroomResponse)
                 .toList();
     }
 
@@ -148,16 +112,25 @@ public class MessagingServiceImpl  implements MessagingService {
      *
      * @param chatroomRequest the object containing all the data necessary to create the new chatroom.
      * @return a {@link ChatroomResponse} object representing the newly created chatroom object
+     * @throws ChatroomAlreadyExistsException if a chatroom with the same name, members, and creator already exists
      */
     @Override
     public ChatroomResponse createChatroom(ChatroomRequest chatroomRequest) {
-        Chatroom chatroom = chatroomMapper.chatroomRequestToChatroom(chatroomRequest);
-        chatroom.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
-        Set<String> members = chatroom.getMembers();
-        members.add(chatroomRequest.createdBy());
-        chatroom.setMembers(members);
+        Chatroom newChatroom = chatroomMapper.chatroomRequestToChatroom(chatroomRequest);
+        Optional<Chatroom> existingChatroom = chatroomRepository.findByCreatedByAndChatroomNameAndMembersEquals(
+                newChatroom.getCreatedBy(), newChatroom.getChatroomName(), newChatroom.getMembers()
+        );
 
-        Chatroom savedChatroom = chatroomRepository.save(chatroom);
+        if (existingChatroom.isPresent()) {
+            throw new ChatroomAlreadyExistsException(newChatroom.getCreatedBy(), newChatroom.getChatroomName());
+        }
+
+        newChatroom.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
+        Set<String> members = newChatroom.getMembers();
+        members.add(chatroomRequest.createdBy());
+        newChatroom.setMembers(members);
+
+        Chatroom savedChatroom = chatroomRepository.save(newChatroom);
         return chatroomMapper.chatroomToChatroomResponse(savedChatroom);
     }
 

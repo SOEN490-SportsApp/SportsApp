@@ -16,8 +16,6 @@ public interface MessagingService {
 
     List<ChatroomResponse> getChatrooms(String senderId);
 
-    ChatroomResponse getOrCreateChatroom(String senderId, Set<String> members, boolean createNewIfNotExists);
-
     ChatroomResponse createChatroom(ChatroomRequest chatroomRequest);
 
     ChatroomResponse getChatroom(String chatroomId);
