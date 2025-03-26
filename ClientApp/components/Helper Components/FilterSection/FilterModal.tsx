@@ -16,6 +16,7 @@ export interface FilterState {
   skillLevel: "All" | "Beginner" | "Intermediate" | "Advanced";
   minDate: Date;
   maxDate: Date;
+  filterDate: boolean;
 }
 
 interface FilterModalInterface {
@@ -190,7 +191,9 @@ const FilterModal: React.FC<FilterModalInterface> = ({
                 onChange={(selectedDate: Date) =>
                   setFilterState((prev) => ({
                     ...prev,
+                    filterDate: true,
                     minDate: selectedDate,
+                  
                   }))
                 }
               />
@@ -202,6 +205,7 @@ const FilterModal: React.FC<FilterModalInterface> = ({
                 onChange={(selectedDate: Date) =>
                   setFilterState((prev) => ({
                     ...prev,
+                    filterDate: true,
                     maxDate: selectedDate,
                   }))
                 }

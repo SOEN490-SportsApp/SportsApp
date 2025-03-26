@@ -4,8 +4,6 @@ import { View, StyleSheet, SafeAreaView, StatusBar, Alert, Animated } from "reac
 import TopBar from "@/components/Home Page/TopBar";
 import HomePageFeed from "@/components/Home Page/HomePageFeed";
 import MyCalendar from "@/components/Calendar/MyCalendar";
-import { getAllEvents } from "@/services/eventService";
-import { Event } from "@/types/event";
 import { useSelector } from "react-redux";
 
 const HomePage = () => {
