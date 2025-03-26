@@ -9,6 +9,8 @@ import {
   FlatList,
   ActivityIndicator,
   Animated,
+  TextInputEndEditingEventData,
+  NativeSyntheticEvent,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import themeColors from "@/utils/constants/colors";
@@ -39,6 +41,7 @@ export default function searchPage() {
     skillLevel: "All",
     minDate: new Date(),
     maxDate: new Date(),
+    filterDate: false
   };
   const [events, setEvents] = useState<Event[]>([]);
   const [searchText, setSearchText] = useState("");
@@ -47,6 +50,7 @@ export default function searchPage() {
   const [loading, setLoading] = useState(false);
   const [viewMode, setViewMode] = useState<"map" | "list">("list");
   const [activeIndex, setActiveIndex] = useState(0)
+  const [searchContent, setSearchContent] = useState<string>('')
   const location = useSelector(
     (state: { location: Location.LocationObjectCoords | null }) =>
       state.location
@@ -57,6 +61,7 @@ export default function searchPage() {
   const [filter, setFilter] = useState(false);
   const [filterState, setFilterState] = useState(initialState);
   const LocationOfUser = useSelector((state: { location: any }) => state.location);
+  const [refresh, setRefresh] = useState(false)
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -73,6 +78,7 @@ export default function searchPage() {
       let response;
       if (activeIndex === 0) {
         await fetchUserResults(searchText);
+        
       } else {        
         response = await handleEventListData(0,10, setEvents);
         // setEvents(Array.isArray(response) ? response : []);       
@@ -85,9 +91,10 @@ export default function searchPage() {
   }, [searchText, filter]);
 
   useEffect(() => {
-    if (activeIndex === 1) {
-      fetchEvents();
+    const fetchAndSetEvents = async () => {
+      await fetchEvents()
     }
+      fetchAndSetEvents()
   }, [fetchEvents, activeIndex]);
   
   const handleFilterToggle = async () => {
@@ -122,13 +129,14 @@ export default function searchPage() {
     }
   
     const eventArray = response?.data?.content || [];
-  
+
     if (updateState) {
-      updateState(eventArray); // e.g., setEvents
+      updateState(eventArray); 
     }
     return response;
   };
 
+  
   const fetchUserResults = async (searchText: string) => {
     setLoading(true);
     try {
@@ -421,8 +429,6 @@ export default function searchPage() {
     
   };
 
-  
-
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f5f5f5" }}>
       <Animated.View style={styles.header}>
@@ -441,11 +447,13 @@ export default function searchPage() {
           placeholder={t("search_page.search")}
           value={searchText}
           onChangeText={(text) => handleChangeText(text)}
+          // onEndEditing={handleSubmitEvents}
+          // onSubmitEditing={handleSubmitEvents}
           placeholderTextColor="#999"
           clearButtonMode="while-editing"
         />
-
-        <View style={{}}>
+         
+        <View style={{}}>    
           {activeIndex === 1 && (
             <TouchableOpacity
               style={{
@@ -538,7 +546,7 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    marginHorizontal: hs(10),
+    marginHorizontal: hs(15),
     height: vs(40),
     borderWidth: 1,
     borderColor: "#d3d3d3",

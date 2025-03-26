@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import { calculateDistanceBetweenEventAndUserLocation } from "./locationService";
 import { Event } from "@/types/event";
 import { LocationState } from "@/state/location/locationSlice";
+import { original } from "@reduxjs/toolkit";
 //API_ENDPOINTS.CREATE_EVENT
 export const createEvent = async (eventData: any) => {
   try {
@@ -227,12 +228,12 @@ export const searchEventsWithFilter = async (
     if (searchText) {
       queryParams.eventName = searchText;
     }
-
+  
     if (params.skillLevel !== "All") {
       queryParams.requiredSkillLevel = params.skillLevel.toUpperCase();
     }
 
-    if (params.minDate !== params.maxDate) {
+    if (params.filterDate) {
       queryParams.date = addAdjustedDate(params);
     }
 
@@ -240,12 +241,12 @@ export const searchEventsWithFilter = async (
       queryParams.sportType = params.filterType;
     }
 
+    
     const response = await axiosInstance.get(endpoint, {
       params: queryParams,
     });
 
-    const originalData = response.data;
-
+    const originalData = response.data
     const updatedContent = Array.isArray(originalData.content)
       ? originalData.content.map((event: Event) => ({
           ...event,
