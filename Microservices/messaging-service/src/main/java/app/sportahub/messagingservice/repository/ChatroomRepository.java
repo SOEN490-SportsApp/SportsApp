@@ -13,7 +13,8 @@ import java.util.Set;
 
 @Repository
 public interface ChatroomRepository extends MongoRepository<Chatroom, String> {
-    Optional<Chatroom> findByCreatedByAndMembersEquals(String senderId, Set<String> members);
+    Optional<Chatroom> findByCreatedByAndChatroomNameAndMembersEquals(String senderId,
+                                                                      String chatroomName, Set<String> members);
 
     List<Chatroom> findAllByMembersContains(@NotEmpty @Size(min = 1, max = 255) Set<String> members);
     Optional<Chatroom> findByChatroomId(String chatroomId);
