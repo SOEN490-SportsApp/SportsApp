@@ -7,6 +7,7 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record PostResponse(
         String eventId,
+        String id,
         String content,
         String createdBy,
         List<String> attachments,
