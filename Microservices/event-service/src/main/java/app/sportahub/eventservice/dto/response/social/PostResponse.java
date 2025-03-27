@@ -1,5 +1,6 @@
 package app.sportahub.eventservice.dto.response.social;
 
+import app.sportahub.eventservice.model.event.reactor.Reaction;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.List;
@@ -11,6 +12,6 @@ public record PostResponse(
         String content,
         String createdBy,
         List<String> attachments,
-        List<CommentResponse> comments
-) {
+        List<CommentResponse> comments,
+        List<Reaction> reactions) {
 }
