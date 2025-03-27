@@ -2,8 +2,10 @@ package app.sportahub.eventservice.controller.social;
 
 import app.sportahub.eventservice.dto.request.social.CommentRequest;
 import app.sportahub.eventservice.dto.request.social.PostRequest;
+import app.sportahub.eventservice.dto.response.ReactionResponse;
 import app.sportahub.eventservice.dto.response.social.CommentResponse;
 import app.sportahub.eventservice.dto.response.social.PostResponse;
+import app.sportahub.eventservice.model.event.reactor.ReactionType;
 import app.sportahub.eventservice.service.social.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -152,5 +154,14 @@ public class PostController {
             @RequestParam String commentId
             ) {
         return postService.deleteComment(eventId, postId, commentId);
+    }
+
+    @PostMapping("/{postId}/reaction")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "React to a post", description = "Enables a user to react to a post given the eventId and postId.")
+    public ReactionResponse reactToPost(@PathVariable String eventId,
+                                         @PathVariable String postId,
+                                         @RequestParam ReactionType reaction) {
+        return postService.reactToPost(eventId, postId, reaction);
     }
 }
