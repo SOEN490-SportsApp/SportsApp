@@ -2,9 +2,11 @@ package app.sportahub.eventservice.controller.social;
 
 import app.sportahub.eventservice.dto.request.social.CommentRequest;
 import app.sportahub.eventservice.dto.request.social.PostRequest;
+import app.sportahub.eventservice.dto.response.ReactionResponse;
 import app.sportahub.eventservice.dto.response.social.CommentResponse;
 import app.sportahub.eventservice.dto.response.social.PostResponse;
 import app.sportahub.eventservice.mapper.social.PostMapper;
+import app.sportahub.eventservice.model.event.reactor.ReactionType;
 import app.sportahub.eventservice.model.social.Post;
 import app.sportahub.eventservice.service.event.EventService;
 import app.sportahub.eventservice.service.social.PostService;
@@ -12,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -21,6 +24,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -46,6 +50,7 @@ public class PostControllerTest {
     @Mock
     private Post post;
 
+    private ReactionResponse reactionResponse;
     private final String eventId = "event1";
     private final String postId = "post1";
     private final String commentId = "comment1";
@@ -79,7 +84,7 @@ public class PostControllerTest {
     @Test
     @WithMockUser
     void getPost_ShouldReturnPostResponse() {
-        PostResponse expectedResponse = new PostResponse(postId, "content", null, null, null);
+        PostResponse expectedResponse = new PostResponse(postId, null, "content", null, null, null, null);
 
         when(postService.getPost(eventId, postId)).thenReturn(expectedResponse);
 
@@ -92,7 +97,7 @@ public class PostControllerTest {
     @Test
     @WithMockUser
     void deletePost_ShouldReturnPostResponse() {
-        PostResponse expectedResponse = new PostResponse(postId, "content", null, null, null);
+        PostResponse expectedResponse = new PostResponse(postId,  null,"content", null, null, null, null);
 
         when(postService.deletePost(eventId, postId)).thenReturn(expectedResponse);
 //        when(eventService.isParticipant(eventId, username)).thenReturn(true);
@@ -106,7 +111,7 @@ public class PostControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     void deletePost_AsAdmin_ShouldSucceed() {
-        PostResponse expectedResponse = new PostResponse(postId, "content", null, null, null);
+        PostResponse expectedResponse = new PostResponse(postId, null, "content", null, null, null, null);
 
         when(postService.deletePost(eventId, postId)).thenReturn(expectedResponse);
 
@@ -120,7 +125,7 @@ public class PostControllerTest {
     @WithMockUser
     void createComment_ShouldReturnCommentResponse() {
         CommentRequest request = new CommentRequest("Test comment", username);
-        CommentResponse expectedResponse = new CommentResponse(commentId, "Test comment", username, null);
+        CommentResponse expectedResponse = new CommentResponse(commentId, null,"Test comment", username, null);
 
         when(postService.createComment(eventId, postId, request)).thenReturn(expectedResponse);
 
@@ -133,7 +138,7 @@ public class PostControllerTest {
     @Test
     @WithMockUser
     void deleteComment_ShouldReturnCommentResponse() {
-        CommentResponse expectedResponse = new CommentResponse(commentId, "Test comment", username, null);
+        CommentResponse expectedResponse = new CommentResponse(commentId, null,"Test comment", username, null);
 
         when(postService.deleteComment(eventId, postId, commentId)).thenReturn(expectedResponse);
 
@@ -141,5 +146,16 @@ public class PostControllerTest {
 
         verify(postService).deleteComment(eventId, postId, commentId);
         assertThat(result).isEqualTo(expectedResponse);
+    }
+
+    @Test
+    public void testReactToEvent() {
+        Mockito.when(postService.reactToPost(Mockito.eq("testId"), Mockito.eq("postId"), Mockito.eq(ReactionType.LIKE)))
+                .thenReturn(reactionResponse);
+
+        ReactionResponse response = postController.reactToPost("testId", "postId", ReactionType.LIKE);
+
+        assertEquals(reactionResponse, response);
+        Mockito.verify(postService).reactToPost(Mockito.eq("testId"), Mockito.eq("postId"), Mockito.eq(ReactionType.LIKE));
     }
 }
