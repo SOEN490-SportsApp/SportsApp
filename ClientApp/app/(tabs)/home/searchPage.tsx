@@ -59,6 +59,7 @@ export default function searchPage() {
   const [filterState, setFilterState] = useState(initialState);
   const LocationOfUser = useSelector((state: { location: any }) => state.location);
   const { t } = useTranslation();
+  const userProfile = useSelector((state: { user: { profile: Profile } }) => state.user.profile);
 
   useEffect(() => {
     const fetchInitialEvents = async () => {
@@ -108,17 +109,55 @@ export default function searchPage() {
   };
 
   useEffect(() => {
-    if (!location) {
-      const getLocation = async () => {
+    const getLocation = async () => {
+      try {
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status === "granted") {
           const location = await Location.getCurrentPositionAsync({});
           setUserLocation(location.coords);
+        } else if (userProfile?.postalCode) {
+          const coords = await getCoordsFromPostalCode(userProfile.postalCode);
+          if (coords) {
+            setUserLocation({
+              latitude: coords.latitude,
+              longitude: coords.longitude,
+              altitude: 0,
+              accuracy: 0,
+              altitudeAccuracy: null,
+              heading: null,
+              speed: null,
+            });
+          }
         }
-      };
+      } catch (error) {
+        console.error("Location error:", error);
+      }
+    };
+  
+    if (!location) {
       getLocation();
     }
   }, [location]);
+  
+  const getCoordsFromPostalCode = async (postalCode: string) => {
+    try {
+      const apiKey = "YOUR_GOOGLE_GEOCODING_API_KEY";
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${postalCode}&region=ca&key=${apiKey}`
+      );
+      const data = await response.json();
+      if (data.status === "OK") {
+        const { lat, lng } = data.results[0].geometry.location;
+        return { latitude: lat, longitude: lng };
+      } else {
+        console.warn("Geocoding failed:", data.status);
+        return null;
+      }
+    } catch (error) {
+      console.error("Error fetching geocoding:", error);
+      return null;
+    }
+  };  
 
   const handleEventListData = async (page: number, size: number, updateState?: (events: Event[]) => void): Promise<{ data: { content: Event[]; totalElements: number; totalPages: number; pageable: { pageNumber: number; pageSize: number; } } }> => {
       let response;
