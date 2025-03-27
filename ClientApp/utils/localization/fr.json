@@ -258,7 +258,10 @@
     "male": "Homme",
     "female": "Femme",
     "other": "Autre",
-    "date_of_birth": "Date de naissance"
+    "date_of_birth": "Date de naissance",
+    "postal_code": "Code postal",
+    "error": "Erreur",
+    "unexpected_error": "Une erreur inattendue s'est produite. Veuillez réessayer."
   },
   "edit_profile_sports_skills": {
     "edit_profile": "Modifier le profil",
