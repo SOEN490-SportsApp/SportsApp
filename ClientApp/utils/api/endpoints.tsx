@@ -36,5 +36,5 @@ export const API_ENDPOINTS = {
   CREATE_POST: "event-service/event/{eventId}/social/post",
 
   UPLOAD_FILE: "storage-service/objects/upload",
-  GET_FILE: "storage-service/objects/{objectPath}",
+  GET_FILE: "storage-service/objects/file{objectPath}",
 };
