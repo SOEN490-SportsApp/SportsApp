@@ -64,7 +64,9 @@ public interface EventService {
                                      String createdBy,
                                      Boolean isPrivate,
                                      List<SkillLevelEnum> requiredSkillLevel,
-                                     Pageable pageable);
+                                     Pageable pageable,
+                                     double longitude,
+                                     double latitude);
 
 
     ReactionResponse reactToEvent(String id, ReactionType reaction);

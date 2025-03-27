@@ -305,11 +305,14 @@ public class EventControllerTest {
         // Mock the service method
         when(eventService.searchEvents(
                 anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
-                anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), any(), any(), any()
+                anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), any(), any(), any(), any(Double.class),
+                any(Double.class)
         )).thenReturn(mockPage);
 
         // Act
         Page<EventResponse> result = eventController.searchEvents(
+                -74,
+                40,
                 "Soccer Match", // eventName
                 "Friendly", // eventType
                 "Soccer", // sportType
@@ -354,8 +357,10 @@ public class EventControllerTest {
 
         // Verify interactions
         verify(eventService).searchEvents(
-                "Soccer Match", "Friendly", "Soccer", "Central Park", "New York", "NY", "USA", "10001",
-                "2023-10-15", "14:00", "16:00", "120", "20", "user123", false, List.of(SkillLevelEnum.INTERMEDIATE), pageable
+                "Soccer Match", "Friendly", "Soccer", "Central Park",
+                "New York", "NY", "USA", "10001", "2023-10-15",
+                "14:00", "16:00", "120", "20", "user123",
+                false, List.of(SkillLevelEnum.INTERMEDIATE), pageable, -74, 40
         );
     }
 

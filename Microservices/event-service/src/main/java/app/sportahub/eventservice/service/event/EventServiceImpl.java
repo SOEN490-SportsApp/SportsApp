@@ -7,6 +7,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import app.sportahub.eventservice.exception.event.*;
 import org.springframework.data.domain.Page;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.Metrics;
+import org.springframework.data.mongodb.core.geo.GeoJson;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 
 import org.springframework.http.ResponseEntity;
@@ -147,6 +149,10 @@ public class EventServiceImpl implements EventService {
                 .withParticipants(participants)
                 .withReactions(new ArrayList<>())
                 .build();
+
+        if (event.getLocation().getCoordinates() == null) {
+            throw new InvalidEventCoordinatesReceivedException();
+        }
 
         Event savedEvent = eventRepository.save(event);
         log.info("EventServiceImpl::createEvent: Event with id: {} was successfully created", savedEvent.getId());
@@ -493,7 +499,9 @@ public class EventServiceImpl implements EventService {
                                             String createdBy,
                                             Boolean isPrivate,
                                             List<SkillLevelEnum> requiredSkillLevel,
-                                            Pageable pageable) {
+                                            Pageable pageable,
+                                            double longitude,
+                                            double latitude) {
         if (eventName == null &&
             eventType == null &&
             sportType == null &&
@@ -512,14 +520,55 @@ public class EventServiceImpl implements EventService {
             requiredSkillLevel == null) {
             throw new NoSearchCriteriaProvidedException();
         }
+        int defaultRadius = 25;
+        GeoJsonPoint point = new GeoJsonPoint(longitude, latitude);
+
         log.info("UserServiceImpl::searchUsers: User created a search query");
 
         Page<Event> events = eventRepository.searchEvents(eventName, eventType, sportType, locationName, city, province, country, postalCode, date, startTime, endTime, duration, maxParticipants, createdBy, isPrivate, requiredSkillLevel, pageable);
+        int finalDefaultRadius = defaultRadius;
+        List<Event> filteredEvents = events.stream().filter(event -> {
+            if(event.getLocation() != null && event.getLocation().getCoordinates() != null) {
+                double eventDistance = haversineDistance(point, event.getLocation().getCoordinates());
+                return !(eventDistance > finalDefaultRadius);
+            }
+            return false;
+        }).toList();
 
-        List<EventResponse> eventResponses = events.stream()
+        while(filteredEvents.isEmpty() && defaultRadius < 100) {
+            defaultRadius = defaultRadius * 2;
+            int finalDefaultRadius1 = defaultRadius * 2;
+            filteredEvents = events.stream().filter(event -> {
+                if(event.getLocation()!= null && event.getLocation().getCoordinates() != null) {
+                    double eventDistance = haversineDistance(point, event.getLocation().getCoordinates());
+                    return !(eventDistance > finalDefaultRadius1);
+                }
+                return false;
+            }).toList();
+        }
+        Page<Event> pagedFilteredEvents = new PageImpl<>(filteredEvents);
+
+        List<EventResponse> eventResponses = filteredEvents.stream()
                 .map(eventMapper::eventToEventResponse).toList();
 
-        return new PageImpl<>(eventResponses, events.getPageable(), events.getTotalElements());
+        return new PageImpl<>(eventResponses, pagedFilteredEvents.getPageable(), pagedFilteredEvents.getTotalElements());
+    }
+
+    private double haversineDistance(GeoJsonPoint originPoint, GeoJsonPoint eventPoint) {
+        final double EARTH_RADIUS = 6371;
+
+        double dlon = Math.toRadians(originPoint.getX() - eventPoint.getX());
+        double dlat = Math.toRadians(originPoint.getY() - eventPoint.getY());
+
+        double originLatitude = Math.toRadians(originPoint.getY());
+        double eventLatitude = Math.toRadians(eventPoint.getY());
+
+        double a = Math.pow(Math.sin(dlat / 2), 2)
+                + Math.pow(Math.sin(dlon / 2), 2)
+                * Math.cos(originLatitude)
+                * Math.cos(eventLatitude);
+
+        return EARTH_RADIUS * 2 * Math.asin(Math.sqrt(a));
     }
 
     /**

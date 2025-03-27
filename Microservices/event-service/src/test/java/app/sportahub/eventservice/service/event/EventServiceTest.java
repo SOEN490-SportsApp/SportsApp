@@ -2,6 +2,7 @@ package app.sportahub.eventservice.service.event;
 
 import app.sportahub.eventservice.dto.request.event.EventCancellationRequest;
 import app.sportahub.eventservice.dto.request.event.EventRequest;
+import app.sportahub.eventservice.dto.request.event.LocationRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.dto.response.ParticipantResponse;
 import app.sportahub.eventservice.dto.response.ReactionResponse;
@@ -11,6 +12,7 @@ import app.sportahub.eventservice.enums.SortDirection;
 import app.sportahub.eventservice.exception.event.*;
 import app.sportahub.eventservice.mapper.event.EventMapper;
 import app.sportahub.eventservice.model.event.Event;
+import app.sportahub.eventservice.model.event.Location;
 import app.sportahub.eventservice.model.event.participant.Participant;
 import app.sportahub.eventservice.model.event.participant.ParticipantAttendStatus;
 import app.sportahub.eventservice.repository.event.EventRepository;
@@ -68,6 +70,24 @@ class EventServiceTest {
     @BeforeEach
     void setUp() {
         cancelRequest = new EventCancellationRequest("Weather conditions");
+
+        LocationRequest locationRequest = new LocationRequest(
+                "Parc Lafontaine",
+                "3819",
+                "Av. Calixa-Lavallée",
+                "Montréal",
+                "Québec",
+                "Canada",
+                "H2H 1P4",
+                null,
+                null,
+                new GeoJsonPoint(45.52757745329691, -73.57033414232836)
+        );
+
+        Location location = new Location(locationRequest.name(), locationRequest.streetNumber(),
+                locationRequest.streetName(), locationRequest.city(), locationRequest.province(),
+                locationRequest.country(), locationRequest.postalCode(), locationRequest.addressLine2(),
+                locationRequest.phoneNumber(), locationRequest.coordinates());
         participant = Participant.builder()
                 .withUserId("user123")
                 .withAttendStatus(ParticipantAttendStatus.JOINED)
@@ -77,6 +97,7 @@ class EventServiceTest {
         event = Event.builder()
                 .withId("1")
                 .withEventName("Basketball Game")
+                .withLocation(location)
                 .withMaxParticipants(10)
                 .withParticipants(Collections.singletonList(participant))
                 .withCreatedBy("creatorId")
@@ -114,7 +135,7 @@ class EventServiceTest {
                 "Basketball Practice",
                 "Public",
                 "Basketball",
-                null,
+                locationRequest,
                 LocalDateTime.now().toLocalDate(),
                 LocalDateTime.now().toLocalTime(),
                 LocalDateTime.now().toLocalTime().plusHours(2),
