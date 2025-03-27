@@ -18,9 +18,12 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.test.context.support.WithMockUser;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -60,7 +63,9 @@ public class PostControllerTest {
     void testCreatePostShouldReturnCreatedPost() {
         String eventId = "1";
 
-        when(postService.createPost(eq(eventId), any(PostRequest.class))).thenReturn(postMapper.postToPostResponse(post));
+        PostResponse returnedPost = postMapper.postToPostResponse(post);
+
+        when(postService.createPost(eq(eventId), any(PostRequest.class))).thenReturn(returnedPost);
 
         postController.createPost(eventId, postRequest);
 
@@ -69,17 +74,45 @@ public class PostControllerTest {
 
     @Test
     void testGetAllPostsOrderedByCreationDateInDescShouldReturnPostsPage() {
+        // Setup
         String eventId = "1";
-        Page<PostResponse> page = new PageImpl<>(List.of(postMapper.postToPostResponse(post)));
         int pageNumber = 0;
         int pageSize = 10;
 
-        when(postService.getAllPostsOrderedByCreationDateInDesc(eq(eventId), any(Pageable.class))).thenReturn(page);
+        PostResponse returnedPost = new PostResponse(
+                "event1",
+                "post1",
+                "Test content",
+                "user1",
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>()
+        );
 
-        Page<PostResponse> resultPage = postController.getAllPostsOrderedByCreationDateInDesc(eventId, pageNumber, pageSize);
+        Page<PostResponse> page = new PageImpl<>(
+                List.of(returnedPost),
+                PageRequest.of(pageNumber, pageSize),
+                1
+        );
 
-        verify(postService, times(1)).getAllPostsOrderedByCreationDateInDesc(eq(eventId), any(Pageable.class));
+        when(postService.getAllPostsOrderedByCreationDateInDesc(eq(eventId), any(Pageable.class)))
+                .thenReturn(page);
+
+        // Execute
+        Page<PostResponse> result = postController.getAllPostsOrderedByCreationDateInDesc(
+                eventId,
+                pageNumber,
+                pageSize
+        );
+
+        // Verify
+        verify(postService, times(1))
+                .getAllPostsOrderedByCreationDateInDesc(eq(eventId), any(Pageable.class));
+
+        assertThat(result).isNotNull();
+        assertThat(result.getContent().getFirst()).isEqualTo(returnedPost);
     }
+
 
     @Test
     @WithMockUser
@@ -100,7 +133,6 @@ public class PostControllerTest {
         PostResponse expectedResponse = new PostResponse(postId,  null,"content", null, null, null, null);
 
         when(postService.deletePost(eventId, postId)).thenReturn(expectedResponse);
-//        when(eventService.isParticipant(eventId, username)).thenReturn(true);
 
         PostResponse result = postController.deletePost(eventId, postId);
 
