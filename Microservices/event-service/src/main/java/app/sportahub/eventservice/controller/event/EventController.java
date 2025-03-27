@@ -158,6 +158,8 @@ public class EventController {
     @Operation(summary = "Search for events",
             description = "Allows the search of events based on various filters like name, sport type, event type, location, date, and more.")
     public Page<EventResponse> searchEvents(
+            @RequestParam(required = true) double longitude,
+            @RequestParam(required = true) double latitude,
             @RequestParam(required = false) String eventName,
             @RequestParam(required = false) String eventType,
             @RequestParam(required = false) String sportType,
@@ -177,7 +179,9 @@ public class EventController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return eventService.searchEvents(eventName, eventType, sportType, locationName, city, province, country, postalCode, date, startTime, endTime, duration, maxParticipants, createdBy, isPrivate, requiredSkillLevel, pageable);
+        return eventService.searchEvents(eventName, eventType, sportType, locationName, city, province, country,
+                postalCode, date, startTime, endTime, duration, maxParticipants, createdBy, isPrivate,
+                requiredSkillLevel, pageable, longitude, latitude);
     }
 
     @PostMapping("/{id}/reaction")

@@ -1,5 +1,6 @@
 package app.sportahub.eventservice.service.event;
 
+import app.sportahub.eventservice.dto.request.event.LocationRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.dto.response.LocationResponse;
 import app.sportahub.eventservice.enums.SkillLevelEnum;
@@ -21,6 +22,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -53,24 +55,37 @@ public class EventSearchTest {
     @Mock
     private SearchingEventRepositoryImpl searchingEventRepository;
 
+    private Location location;
+    private LocationRequest locationRequest;
+
     @BeforeEach
     void setUp() {
         eventService = new EventServiceImpl(eventRepository, eventMapper);
         searchingEventRepository = new SearchingEventRepositoryImpl(mongoTemplate);
+
+        locationRequest = new LocationRequest(
+                "Parc Lafontaine",
+                "3819",
+                "Av. Calixa-Lavallée",
+                "Montréal",
+                "Québec",
+                "Canada",
+                "H2H 1P4",
+                null,
+                null,
+                new GeoJsonPoint(45.52757745329691, -73.57033414232836)
+        );
+
+        location = new Location(locationRequest.name(), locationRequest.streetNumber(),
+                locationRequest.streetName(), locationRequest.city(), locationRequest.province(),
+                locationRequest.country(), locationRequest.postalCode(), locationRequest.addressLine2(),
+                locationRequest.phoneNumber(), locationRequest.coordinates());
     }
 
     @Test
     void testSearchEvents_WithAllCriteria() {
         // Arrange
         Pageable pageable = PageRequest.of(0, 10);
-
-        Location location = Location.builder()
-                .withName("Central Park")
-                .withCity("New York")
-                .withProvince("NY")
-                .withCountry("USA")
-                .withPostalCode("10001")
-                .build();
 
         Event event = Event.builder()
                 .withId("event123")
@@ -125,7 +140,11 @@ public class EventSearchTest {
         when(eventMapper.eventToEventResponse(event)).thenReturn(eventResponse);
 
         // Act
-        Page<EventResponse> result = eventService.searchEvents("Soccer Match", "Friendly", "Soccer", "Central Park", "New York", "NY", "USA", "10001", "2023-10-15", "14:00", "16:00", "120", "20", "user123", false, List.of(SkillLevelEnum.INTERMEDIATE), pageable);
+        Page<EventResponse> result = eventService.searchEvents("Soccer Match", "Friendly",
+                "Soccer", "Central Park", "New York", "NY", "USA",
+                "10001", "2023-10-15", "14:00", "16:00", "120",
+                "20", "user123", false, List.of(SkillLevelEnum.INTERMEDIATE), pageable,
+                45.52757745329691, -73.57033414232836);
 
         // Assert
         assertNotNull(result);
@@ -163,7 +182,10 @@ public class EventSearchTest {
 
         // Act & Assert
         Assertions.assertThrows(NoSearchCriteriaProvidedException.class, () -> {
-            eventService.searchEvents(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, pageable);
+            eventService.searchEvents(null, null, null, null, null,
+                    null, null, null, null, null, null, null,
+                    null, null, null, null, pageable, -74,
+                    40);
         });
 
         // Verify interactions
@@ -175,14 +197,6 @@ public class EventSearchTest {
     void testSearchEvents_WithPartialCriteria() {
         // Arrange
         Pageable pageable = PageRequest.of(0, 10);
-
-        Location location = Location.builder()
-                .withName("Central Park")
-                .withCity("New York")
-                .withProvince("NY")
-                .withCountry("USA")
-                .withPostalCode("10001")
-                .build();
 
         Event event = Event.builder()
                 .withEventName("Soccer Match")
@@ -197,7 +211,7 @@ public class EventSearchTest {
         when(eventRepository.searchEvents("Soccer Match", null, "Soccer", null, "New York", null, null, null, "2023-10-15", null, null, null, null, null, null, null, pageable))
                 .thenReturn(mockEventPage);
 
-        LocationResponse locationResponse = new LocationResponse("Central Park", "", "", "New York", "NY", "USA", "10001", "", "", null);
+        LocationResponse locationResponse = new LocationResponse("Central Park", "", "", "New York", "NY", "USA", "10001", "", "", location.getCoordinates());
 
         EventResponse eventResponse = new EventResponse(
                 "event123",
@@ -228,7 +242,11 @@ public class EventSearchTest {
         when(eventMapper.eventToEventResponse(event)).thenReturn(eventResponse);
 
         // Act
-        Page<EventResponse> result = eventService.searchEvents("Soccer Match", null, "Soccer", null, "New York", null, null, null, "2023-10-15", null, null, null, null, null, null, null, pageable);
+        Page<EventResponse> result = eventService.searchEvents("Soccer Match", null,
+                "Soccer", null, "New York", null, null, null,
+                "2023-10-15", null, null, null, null, null,
+                null, null, pageable, 45.52757745329691, -73.57033414232836);
+
 
         // Assert
         assertNotNull(result);
@@ -251,16 +269,19 @@ public class EventSearchTest {
         Event event = Event.builder()
                 .withId("event123")
                 .withEventName("Soccer Match")
+                .withLocation(location)
                 .withDate(LocalDate.of(2023, 10, 15))
                 .build();
 
         List<Event> events = Collections.singletonList(event);
         Page<Event> mockEventPage = new PageImpl<>(events, pageable, events.size());
 
+        LocationResponse locationResponse = new LocationResponse("Central Park", "", "", "New York", "NY", "USA", "10001", "", "", location.getCoordinates());
+
         when(eventRepository.searchEvents(
                 null, null, null, null, null, null, null, null,
                 "2023-10-15-2023-10-20", null, null, null, null, null, null, null, pageable
-        )).thenReturn(mockEventPage);
+       )).thenReturn(mockEventPage);
 
         EventResponse eventResponse = new EventResponse(
                 "event123",
@@ -268,7 +289,7 @@ public class EventSearchTest {
                 "Soccer Match",
                 null,
                 null,
-                null,
+                locationResponse,
                 LocalDate.of(2023, 10, 15),
                 null,
                 null,
@@ -291,8 +312,9 @@ public class EventSearchTest {
 
         // Act
         Page<EventResponse> result = eventService.searchEvents(
-                null, null, null, null, null, null, null, null,
-                "2023-10-15-2023-10-20", null, null, null, null, null, null, null, pageable
+                null, null, null, null, null, null, null,
+                null, "2023-10-15-2023-10-20", null, null, null,
+                null, null, null, null, pageable, 45.52757745329691, -73.57033414232836
         );
 
         // Assert
@@ -318,6 +340,7 @@ public class EventSearchTest {
         Event event = Event.builder()
                 .withId("event123")
                 .withEventName("Soccer Match")
+                .withLocation(location)
                 .withStartTime(LocalTime.of(14, 0))
                 .build();
 
@@ -329,13 +352,15 @@ public class EventSearchTest {
                 "14:00-16:00", null, null, null, null, null, null, pageable
         )).thenReturn(mockEventPage);
 
+        LocationResponse locationResponse = new LocationResponse("Central Park", "", "", "New York", "NY", "USA", "10001", "", "", location.getCoordinates());
+
         EventResponse eventResponse = new EventResponse(
                 "event123",
                 null,
                 "Soccer Match",
                 null,
                 null,
-                null,
+                locationResponse,
                 null,
                 LocalTime.of(14, 0),
                 null,
@@ -358,8 +383,9 @@ public class EventSearchTest {
 
         // Act
         Page<EventResponse> result = eventService.searchEvents(
-                null, null, null, null, null, null, null, null, null,
-                "14:00-16:00", null, null, null, null, null, null, pageable
+                null, null, null, null, null, null, null,
+                null, null, "14:00-16:00", null, null, null,
+                null, null, null, pageable, 45.52757745329691, -73.57033414232836
         );
 
         // Assert
@@ -385,6 +411,7 @@ public class EventSearchTest {
         Event event = Event.builder()
                 .withId("event123")
                 .withEventName("Soccer Match")
+                .withLocation(location)
                 .withMaxParticipants(15)
                 .build();
 
@@ -396,13 +423,15 @@ public class EventSearchTest {
                 "10-20", null, null, null, null, pageable
         )).thenReturn(mockEventPage);
 
+        LocationResponse locationResponse = new LocationResponse("Central Park", "", "", "New York", "NY", "USA", "10001", "", "", location.getCoordinates());
+
         EventResponse eventResponse = new EventResponse(
                 "event123",
                 null,
                 "Soccer Match",
                 null,
                 null,
-                null,
+                locationResponse,
                 null,
                 null,
                 null,
@@ -426,7 +455,7 @@ public class EventSearchTest {
         // Act
         Page<EventResponse> result = eventService.searchEvents(
                 null, null, null, null, null, null, null, null, null, null, null,
-                "10-20", null, null, null, null, pageable
+                "10-20", null, null, null, null, pageable, 45.52757745329691, -73.57033414232836
         );
 
         // Assert
