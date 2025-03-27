@@ -1,46 +1,77 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Image, StyleSheet, ActivityIndicator, TouchableWithoutFeedback, Text } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { mhs, mvs } from '@/utils/helpers/uiScaler';
 
 type ImageGridProps = {
     imageUris: string[];
     loading: boolean;
-    handlePostPress: () => void;
+    onImagePress: (index: number) => void;
+    failedImages?: boolean[];
 };
 
-const ImageGridComponent: React.FC<ImageGridProps> = ({ imageUris, loading, handlePostPress}) => {
+const ImageGridComponent: React.FC<ImageGridProps> = ({ imageUris, loading, onImagePress, failedImages = [] }) => {
+    const [localFailedImages, setLocalFailedImages] = useState<boolean[]>([]);
+
     if (loading) {
         return <ActivityIndicator size="small" color="#0000ff" />;
     }
+
+    const handleImageError = (index: number) => {
+        setLocalFailedImages(prev => {
+            const newFailed = [...prev];
+            newFailed[index] = true;
+            return newFailed;
+        });
+    };
+
+    const renderImageWithFallback = (uri: string, index: number) => {
+        const isFailed = failedImages[index] || localFailedImages[index];
+
+        if (isFailed) {
+            return (
+                <View style={styles.fallbackContainer}>
+                    <Ionicons name="image-outline" size={mhs(24)} color="#ccc" />
+                    <Text style={styles.fallbackText}>Failed to load</Text>
+                </View>
+            );
+        }
+
+        return (
+            <Image
+                source={{ uri }}
+                style={StyleSheet.absoluteFill}
+                resizeMode="cover"
+                onError={() => handleImageError(index)}
+            />
+        );
+    };
 
     const renderGrid = () => {
         const imageCount = imageUris.length;
 
         if (imageCount === 1) {
             return (
-                <Image
-                    source={{ uri: imageUris[0] }}
-                    style={styles.singleImage}
-                    resizeMode='cover'
-                />
+                <TouchableWithoutFeedback onPress={() => onImagePress(0)}>
+                    <View style={styles.singleImage}>
+                        {renderImageWithFallback(imageUris[0], 0)}
+                    </View>
+                </TouchableWithoutFeedback>
             );
         }
+
         if (imageCount === 2) {
             return (
                 <View style={styles.twoImageContainer}>
-                    <TouchableWithoutFeedback onPress={() => handlePostPress()}>
-                        <Image
-                            source={{ uri: imageUris[0] }}
-                            style={styles.twoImage}
-                            resizeMode="cover"
-                        />
+                    <TouchableWithoutFeedback onPress={() => onImagePress(0)}>
+                        <View style={styles.twoImage}>
+                            {renderImageWithFallback(imageUris[0], 0)}
+                        </View>
                     </TouchableWithoutFeedback>
-                    <TouchableWithoutFeedback onPress={() => handlePostPress()}>
-                        <Image
-                            source={{ uri: imageUris[1] }}
-                            style={styles.twoImage}
-                            resizeMode="cover"
-                        />
+                    <TouchableWithoutFeedback onPress={() => onImagePress(1)}>
+                        <View style={styles.twoImage}>
+                            {renderImageWithFallback(imageUris[1], 1)}
+                        </View>
                     </TouchableWithoutFeedback>
                 </View>
             );
@@ -49,27 +80,21 @@ const ImageGridComponent: React.FC<ImageGridProps> = ({ imageUris, loading, hand
         if (imageCount === 3) {
             return (
                 <View style={styles.threeImageContainer}>
-                    <TouchableWithoutFeedback onPress={() => handlePostPress()}>
-                        <Image
-                            source={{ uri: imageUris[0] }}
-                            style={styles.threeImageMain}
-                            resizeMode="cover"
-                        />
+                    <TouchableWithoutFeedback onPress={() => onImagePress(0)}>
+                        <View style={styles.threeImageMain}>
+                            {renderImageWithFallback(imageUris[0], 0)}
+                        </View>
                     </TouchableWithoutFeedback>
                     <View style={styles.threeImageRight}>
-                        <TouchableWithoutFeedback onPress={() => handlePostPress()}>
-                            <Image
-                                source={{ uri: imageUris[1] }}
-                                style={styles.threeImageSub}
-                                resizeMode="cover"
-                            />
+                        <TouchableWithoutFeedback onPress={() => onImagePress(1)}>
+                            <View style={styles.threeImageSub}>
+                                {renderImageWithFallback(imageUris[1], 1)}
+                            </View>
                         </TouchableWithoutFeedback>
-                        <TouchableWithoutFeedback onPress={() => handlePostPress()}>
-                            <Image
-                                source={{ uri: imageUris[2] }}
-                                style={styles.threeImageSub}
-                                resizeMode="cover"
-                            />
+                        <TouchableWithoutFeedback onPress={() => onImagePress(2)}>
+                            <View style={styles.threeImageSub}>
+                                {renderImageWithFallback(imageUris[2], 2)}
+                            </View>
                         </TouchableWithoutFeedback>
                     </View>
                 </View>
@@ -80,38 +105,25 @@ const ImageGridComponent: React.FC<ImageGridProps> = ({ imageUris, loading, hand
             const remainingCount = imageCount - 4;
             return (
                 <View style={styles.fourImageContainer}>
-                    <TouchableWithoutFeedback onPress={() => handlePostPress()}>
-                        <Image
-                            source={{ uri: imageUris[0] }}
-                            style={styles.fourImageMain}
-                            resizeMode="cover"
-                        />
+                    <TouchableWithoutFeedback onPress={() => onImagePress(0)}>
+                        <View style={styles.fourImageMain}>
+                            {renderImageWithFallback(imageUris[0], 0)}
+                        </View>
                     </TouchableWithoutFeedback>
                     <View style={styles.fourImageRight}>
-                        <TouchableWithoutFeedback onPress={() => handlePostPress()}>
-                            <Image
-                                source={{ uri: imageUris[1] }}
-                                style={styles.fourImageSub}
-                                resizeMode="cover"
-                            />
+                        <TouchableWithoutFeedback onPress={() => onImagePress(1)}>
+                            <View style={styles.fourImageSub}>
+                                {renderImageWithFallback(imageUris[1], 1)}
+                            </View>
                         </TouchableWithoutFeedback>
-                        <TouchableWithoutFeedback onPress={() => handlePostPress()}>
-                            <Image
-                                source={{ uri: imageUris[2] }}
-                                style={styles.fourImageSub}
-                                resizeMode="cover"
-                            />
+                        <TouchableWithoutFeedback onPress={() => onImagePress(2)}>
+                            <View style={styles.fourImageSub}>
+                                {renderImageWithFallback(imageUris[2], 2)}
+                            </View>
                         </TouchableWithoutFeedback>
-                        <TouchableWithoutFeedback onPress={() => handlePostPress()}>
+                        <TouchableWithoutFeedback onPress={() => onImagePress(3)}>
                             <View style={[styles.fourImageSub, { marginTop: mvs(2) }]}>
-                                <Image
-                                    source={{ uri: imageUris[3] }}
-                                    style={[
-                                        StyleSheet.absoluteFill,
-                                        remainingCount > 0 && styles.overlayImage
-                                    ]}
-                                    resizeMode="cover"
-                                />
+                                {renderImageWithFallback(imageUris[3], 3)}
                                 {remainingCount > 0 && (
                                     <View style={styles.remainingCountContainer}>
                                         <Text style={styles.remainingCountText}>+{remainingCount}</Text>
@@ -199,6 +211,18 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: mhs(24),
         fontWeight: 'bold',
+    },
+    fallbackContainer: {
+        ...StyleSheet.absoluteFillObject,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#f5f5f5',
+        borderRadius: mhs(8),
+    },
+    fallbackText: {
+        marginTop: mvs(8),
+        color: '#888',
+        fontSize: mhs(12),
     },
 });
 
