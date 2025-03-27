@@ -1,7 +1,12 @@
 package app.sportahub.eventservice.controller.social;
 
+import app.sportahub.eventservice.dto.request.social.CommentRequest;
 import app.sportahub.eventservice.dto.request.social.PostRequest;
+import app.sportahub.eventservice.dto.response.social.CommentResponse;
+import app.sportahub.eventservice.dto.response.social.PostResponse;
+import app.sportahub.eventservice.mapper.social.PostMapper;
 import app.sportahub.eventservice.model.social.Post;
+import app.sportahub.eventservice.service.event.EventService;
 import app.sportahub.eventservice.service.social.PostService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,9 +16,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import java.util.List;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -24,6 +31,12 @@ public class PostControllerTest {
     @Mock
     private PostService postService;
 
+    @Mock
+    private EventService eventService;
+
+    @Mock
+    private PostMapper postMapper;
+
     @InjectMocks
     private PostController postController;
 
@@ -33,10 +46,16 @@ public class PostControllerTest {
     @Mock
     private Post post;
 
+    private final String eventId = "event1";
+    private final String postId = "post1";
+    private final String commentId = "comment1";
+    private final String username = "testUser";
+
     @Test
     void testCreatePostShouldReturnCreatedPost() {
         String eventId = "1";
-        when(postService.createPost(eq(eventId), any(PostRequest.class))).thenReturn(post);
+
+        when(postService.createPost(eq(eventId), any(PostRequest.class))).thenReturn(postMapper.postToPostResponse(post));
 
         postController.createPost(eventId, postRequest);
 
@@ -46,14 +65,81 @@ public class PostControllerTest {
     @Test
     void testGetAllPostsOrderedByCreationDateInDescShouldReturnPostsPage() {
         String eventId = "1";
-        Page<Post> page = new PageImpl<>(List.of(post));
+        Page<PostResponse> page = new PageImpl<>(List.of(postMapper.postToPostResponse(post)));
         int pageNumber = 0;
         int pageSize = 10;
 
         when(postService.getAllPostsOrderedByCreationDateInDesc(eq(eventId), any(Pageable.class))).thenReturn(page);
 
-        Page<Post> resultPage = postController.getAllPostsOrderedByCreationDateInDesc(eventId, pageNumber, pageSize);
+        Page<PostResponse> resultPage = postController.getAllPostsOrderedByCreationDateInDesc(eventId, pageNumber, pageSize);
 
         verify(postService, times(1)).getAllPostsOrderedByCreationDateInDesc(eq(eventId), any(Pageable.class));
+    }
+
+    @Test
+    @WithMockUser
+    void getPost_ShouldReturnPostResponse() {
+        PostResponse expectedResponse = new PostResponse(postId, "content", null, null, null);
+
+        when(postService.getPost(eventId, postId)).thenReturn(expectedResponse);
+
+        PostResponse result = postController.getPost(eventId, postId);
+
+        verify(postService).getPost(eventId, postId);
+        assertThat(result).isEqualTo(expectedResponse);
+    }
+
+    @Test
+    @WithMockUser
+    void deletePost_ShouldReturnPostResponse() {
+        PostResponse expectedResponse = new PostResponse(postId, "content", null, null, null);
+
+        when(postService.deletePost(eventId, postId)).thenReturn(expectedResponse);
+//        when(eventService.isParticipant(eventId, username)).thenReturn(true);
+
+        PostResponse result = postController.deletePost(eventId, postId);
+
+        verify(postService).deletePost(eventId, postId);
+        assertThat(result).isEqualTo(expectedResponse);
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void deletePost_AsAdmin_ShouldSucceed() {
+        PostResponse expectedResponse = new PostResponse(postId, "content", null, null, null);
+
+        when(postService.deletePost(eventId, postId)).thenReturn(expectedResponse);
+
+        PostResponse result = postController.deletePost(eventId, postId);
+
+        verify(postService).deletePost(eventId, postId);
+        assertThat(result).isEqualTo(expectedResponse);
+    }
+
+    @Test
+    @WithMockUser
+    void createComment_ShouldReturnCommentResponse() {
+        CommentRequest request = new CommentRequest("Test comment", username);
+        CommentResponse expectedResponse = new CommentResponse(commentId, "Test comment", username, null);
+
+        when(postService.createComment(eventId, postId, request)).thenReturn(expectedResponse);
+
+        CommentResponse result = postController.createComment(eventId, postId, request);
+
+        verify(postService).createComment(eventId, postId, request);
+        assertThat(result).isEqualTo(expectedResponse);
+    }
+
+    @Test
+    @WithMockUser
+    void deleteComment_ShouldReturnCommentResponse() {
+        CommentResponse expectedResponse = new CommentResponse(commentId, "Test comment", username, null);
+
+        when(postService.deleteComment(eventId, postId, commentId)).thenReturn(expectedResponse);
+
+        CommentResponse result = postController.deleteComment(eventId, postId, commentId);
+
+        verify(postService).deleteComment(eventId, postId, commentId);
+        assertThat(result).isEqualTo(expectedResponse);
     }
 }
