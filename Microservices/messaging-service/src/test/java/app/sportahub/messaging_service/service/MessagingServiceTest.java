@@ -5,6 +5,7 @@ import app.sportahub.messagingservice.dto.request.message.MessageRequest;
 import app.sportahub.messagingservice.dto.response.chatroom.ChatroomResponse;
 import app.sportahub.messagingservice.dto.response.message.MessageResponse;
 import app.sportahub.messagingservice.exception.ChatroomAlreadyExistsException;
+import app.sportahub.messagingservice.exception.ChatroomCreatorTryingToRemoveThemselvesFromChatroomException;
 import app.sportahub.messagingservice.exception.ChatroomDoesNotExistException;
 import app.sportahub.messagingservice.exception.MessageDoesNotExistException;
 import app.sportahub.messagingservice.mapper.ChatroomMapper;
@@ -396,12 +397,9 @@ public class MessagingServiceTest {
     @Test
     public void addMembersShouldSucceed() {
         // Arrange
+        Set<String> existingMembers = new HashSet<>(chatroom.getMembers());
         List<String> newMembers = List.of("newMemberUserId1", "newMemberUserId2");
         when(chatroomRepository.findByChatroomId(anyString())).thenReturn(Optional.of(chatroom));
-        Chatroom modifiedChatroom = chatroom;
-        Set<String> existingMembers = chatroom.getMembers();
-        existingMembers.addAll(newMembers);
-        modifiedChatroom.setMembers(existingMembers);
         when(chatroomRepository.save(any(Chatroom.class))).thenReturn(chatroom);
 
         // Act
@@ -409,7 +407,8 @@ public class MessagingServiceTest {
 
         // Assert
         assertNotNull(chatroomResponse);
-        assertEquals(chatroomResponse.members(), modifiedChatroom.getMembers());
+        assertNotEquals(chatroomResponse.members(), existingMembers);
+        assertEquals(chatroomResponse.members(), chatroom.getMembers());
         verify(chatroomRepository, times(1)).findByChatroomId(anyString());
         verify(chatroomRepository, times(1)).save(any(Chatroom.class));
     }
@@ -430,20 +429,21 @@ public class MessagingServiceTest {
     @Test
     public void removeMembersShouldSucceed() {
         // Arrange
+        Set<String> existingMembers = new HashSet<>(chatroom.getMembers());
+        Set<String> modifiedMembers = new HashSet<>(chatroom.getMembers());
         List<String> membersToRemove = List.of("testReceiverId1", "testReceiverId2");
+        modifiedMembers.removeAll(membersToRemove);
         when(chatroomRepository.findByChatroomId(anyString())).thenReturn(Optional.of(chatroom));
-        Chatroom modifiedChatroom = chatroom;
-        Set<String> existingMembers = chatroom.getMembers();
-        existingMembers.removeAll(membersToRemove);
-        modifiedChatroom.setMembers(existingMembers);
         when(chatroomRepository.save(any(Chatroom.class))).thenReturn(chatroom);
+
 
         // Act
         ChatroomResponse chatroomResponse = messagingService.removeMembers(chatroom.getChatroomId(), membersToRemove);
 
         // Assert
         assertNotNull(chatroomResponse);
-        assertEquals(chatroomResponse.members(), modifiedChatroom.getMembers());
+        assertNotEquals(chatroomResponse.members(), existingMembers);
+        assertEquals(chatroomResponse.members(), modifiedMembers);
         verify(chatroomRepository, times(1)).findByChatroomId(anyString());
         verify(chatroomRepository, times(1)).save(any(Chatroom.class));
     }
@@ -459,6 +459,39 @@ public class MessagingServiceTest {
 
         // Assert
         verify(chatroomRepository, times(1)).findByChatroomId(anyString());
+    }
 
+    @Test
+    public void removeMemberShouldThrowChatroomCreatorTryingToRemoveThemselvesFromChatroomException() {
+        // Arrange
+        when(chatroomRepository.findByChatroomId(anyString())).thenReturn(Optional.of(chatroom));
+
+        // Act
+        assertThrows(ChatroomCreatorTryingToRemoveThemselvesFromChatroomException.class, () ->
+                messagingService.removeMembers(chatroom.getChatroomId(),
+                        List.of(chatroom.getCreatedBy(), "testReceiverId2")));
+
+        // Assert
+        verify(chatroomRepository, times(1)).findByChatroomId(anyString());
+    }
+
+    @Test
+    public void leaveChatroomShouldSucceed() {
+        // Arrange
+        Set<String> existingMembers = new HashSet<>(chatroom.getMembers());
+        Set<String> modifiedMembers = new HashSet<>(chatroom.getMembers());
+        modifiedMembers.remove("testReceiverId1");
+        when(chatroomRepository.findByChatroomId(anyString())).thenReturn(Optional.of(chatroom));
+        when(chatroomRepository.save(any(Chatroom.class))).thenReturn(chatroom);
+
+        // Act
+        ChatroomResponse chatroomResponse = messagingService.leaveChatroom(chatroom.getChatroomId(), "testReceiverId1");
+
+        //Assert
+        assertNotNull(chatroomResponse);
+        assertNotEquals(chatroomResponse.members(), existingMembers);
+        assertEquals(chatroomResponse.members(), modifiedMembers);
+        verify(chatroomRepository, times(1)).findByChatroomId(anyString());
+        verify(chatroomRepository, times(1)).save(any(Chatroom.class));
     }
 }
