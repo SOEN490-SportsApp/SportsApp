@@ -12,6 +12,8 @@ public interface ChatroomMapper {
     Chatroom chatroomRequestToChatroom(ChatroomRequest chatroomRequest);
 
     @Mapping(target = "chatroomId", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "messages", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void patchChatroomFromRequest(ChatroomRequest chatroomRequest, @MappingTarget Chatroom chatroom);
 }

@@ -9,6 +9,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import io.swagger.v3.oas.annotations.Operation;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
@@ -30,6 +32,7 @@ public class MessagingRESTController {
     }
 
     @PatchMapping("/chatroom/{chatroomId}")
+    @PreAuthorize("@messagingServiceImpl.isChatroomCreator(#chatroomId, authentication.name) || hasRole('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Partially update an existing chatroom",
     description = "Updates only the specified fields. Fields not included in the request body remain unchanged")
@@ -39,6 +42,7 @@ public class MessagingRESTController {
     }
 
     @DeleteMapping("/chatroom/{chatroomId}")
+    @PreAuthorize("@messagingServiceImpl.isChatroomCreator(#chatroomId, authentication.name) || hasRole('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Deletes a chatroom",
     description = "Deletes a chatroom from the database based on the provided chatroomId.")
@@ -47,6 +51,7 @@ public class MessagingRESTController {
     }
 
     @GetMapping("/chatrooms/{userId}")
+    @PreAuthorize("authentication.name == #userId || hasRole('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Retrieve a user's chatrooms",
             description = "Retrieves all the chatrooms for which the given user is a member.")
@@ -71,6 +76,7 @@ public class MessagingRESTController {
     }
 
     @PatchMapping("/chatroom/message/{messageId}")
+    @PreAuthorize("@messagingServiceImpl.isMessageCreator(#messageId, authentication.name || hasRole('ROLE_ADMIN'))")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Partially updates an existing message",
     description = "Updates only the specified fields. Fields not included in the request remain unchanged.")
@@ -80,6 +86,7 @@ public class MessagingRESTController {
     }
 
     @DeleteMapping("/chatroom/message/{messageId}")
+    @PreAuthorize("@messagingServiceImpl.isMessageCreator(#messageId, authentication.name || hasRole('ROLE_ADMIN'))")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Deletes a message",
     description = " Deletes a message from the database based on the provided messageId.")
@@ -88,6 +95,7 @@ public class MessagingRESTController {
     }
 
     @PostMapping("/chatroom/add-members/{chatroomId}")
+    @PreAuthorize("@messagingServiceImpl.isChatroomCreator(#chatroomId, authentication.name || hasRole('ROLE_ADMIN'))")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "adds new members to a chatroom",
     description = " Adds members to an existing chatroom based on the provided chatroomId and userIds")
@@ -96,10 +104,22 @@ public class MessagingRESTController {
     }
 
     @PostMapping("/chatroom/remove-members/{chatroomId}")
+    @PreAuthorize("@messagingServiceImpl.isChatroomCreator(#chatroomId, authentication.name || hasRole('ROLE_ADMIN'))")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "removes members from a chatroom",
-    description = "Removes members from an existing chatroom based on the provided chatroomId and userIds")
-    public ChatroomResponse removeMembers(@PathVariable("chatroomId") String chatroomId, @RequestBody List<String> userIds) {
+    @Operation(summary = "Allows the chatroom creator to remove members from the chatroom",
+    description = "Allows the chatroom creator to remove members from an existing chatroom based on the provided " +
+            "chatroomId and userIds")
+    public ChatroomResponse removeMembers(@PathVariable("chatroomId") String chatroomId,
+                                          @RequestBody List<String> userIds) {
         return messagingService.removeMembers(chatroomId, userIds);
+    }
+
+    @PostMapping("/chatroom/leave-chatroom/{chatroomId}/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Removes the user from the chatroom members set",
+    description = "Removes the user from the chatroom members set if they are not the creator of the chatroom.")
+    public ChatroomResponse leaveChatroom(@PathVariable("chatroomId") String chatroomId,
+                                          @PathVariable("userId") String userId) {
+        return messagingService.leaveChatroom(chatroomId, userId);
     }
 }

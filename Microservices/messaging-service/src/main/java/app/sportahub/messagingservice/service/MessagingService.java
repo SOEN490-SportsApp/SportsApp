@@ -6,7 +6,6 @@ import app.sportahub.messagingservice.dto.response.chatroom.ChatroomResponse;
 import app.sportahub.messagingservice.dto.response.message.MessageResponse;
 
 import java.util.List;
-import java.util.Set;
 
 public interface MessagingService {
 
@@ -31,4 +30,10 @@ public interface MessagingService {
     ChatroomResponse addMembers(String chatroomId, List<String> userIds);
 
     ChatroomResponse removeMembers(String chatroomId, List<String> userIds);
+
+    ChatroomResponse leaveChatroom(String chatroomId, String userId);
+
+    boolean isMessageCreator(String messageId, String userId);
+
+    boolean isChatroomCreator(String chatroomId, String userId);
 }

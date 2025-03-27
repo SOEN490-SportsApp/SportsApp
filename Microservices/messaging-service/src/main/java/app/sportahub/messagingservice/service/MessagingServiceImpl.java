@@ -4,9 +4,7 @@ import app.sportahub.messagingservice.dto.request.message.MessageRequest;
 import app.sportahub.messagingservice.dto.request.chatroom.ChatroomRequest;
 import app.sportahub.messagingservice.dto.response.chatroom.ChatroomResponse;
 import app.sportahub.messagingservice.dto.response.message.MessageResponse;
-import app.sportahub.messagingservice.exception.ChatroomAlreadyExistsException;
-import app.sportahub.messagingservice.exception.ChatroomDoesNotExistException;
-import app.sportahub.messagingservice.exception.MessageDoesNotExistException;
+import app.sportahub.messagingservice.exception.*;
 import app.sportahub.messagingservice.mapper.ChatroomMapper;
 import app.sportahub.messagingservice.mapper.MessageMapper;
 import app.sportahub.messagingservice.model.Chatroom;
@@ -41,10 +39,7 @@ public class MessagingServiceImpl  implements MessagingService {
 
     /**
      * This method is how the backend routes the messages it receives from the /app/message websocket endpoint
-     * to the appropriate queue, based off the chatroom id of the message.
-     * If a message is sent without a chatroomId, this method calls the getOrCreateChatroom method that will
-     * create a new chatroom and return its id, which processMessage will use to send the message to the appropriate
-     * topic following this format: 'topic/chatroom/{chatroomId}'.
+     * to the appropriate topic following this format: 'topic/chatroom/{chatroomId}, based off the chatroom id of the message.
      *
      * @param messageRequest the message that was received from a user through a websocket connection.
      * @throws ChatroomDoesNotExistException if no chatroom with the specified chatroom id is found
@@ -107,8 +102,7 @@ public class MessagingServiceImpl  implements MessagingService {
     }
 
     /**
-     * This method is a more straightforward way of creating a chatroom without the need to send a message through
-     * a websocket connection. It will instead be created from the data that is passed in the chatroomRequest
+     * This method will create a new chatroom based off the data that is passed in the chatroomRequest
      *
      * @param chatroomRequest the object containing all the data necessary to create the new chatroom.
      * @return a {@link ChatroomResponse} object representing the newly created chatroom object
@@ -275,13 +269,15 @@ public class MessagingServiceImpl  implements MessagingService {
     }
 
     /**
-     * This method removes the list of passed userIds from a chatroom based on the specified chatroomId.
-     * This method will convert the passed list into a set, removing duplicates and allowing for set operations
+     * This method allows the chatroom's creator to remove the list of passed userIds from a chatroom based on the
+     * specified chatroomId.
+     * This method will convert the passed list into a set, removing duplicates and allowing for set operations.
      *
      * @param chatroomId the unique identifier of the chatroom who's members you want to modify
-     * @param userIds the unique identifiers of the users you want to remove from the chatroom
+     * @param userIds    the unique identifiers of the users you want to remove from the chatroom
      * @return a {@link ChatroomResponse} object representing the newly modified chatroom object
      * @throws ChatroomDoesNotExistException if no chatroom is found with the specified chatroomId
+     * @throws ChatroomCreatorTryingToRemoveThemselvesFromChatroomException if the creator's userId is in userIds
      */
     @Override
     public ChatroomResponse removeMembers(String chatroomId, List<String> userIds) {
@@ -290,6 +286,10 @@ public class MessagingServiceImpl  implements MessagingService {
 
         Set<String> paramUserIdSet = new HashSet<>(userIds);
         Set<String> existingUserIdSet = chatroom.getMembers();
+
+        if (paramUserIdSet.contains(chatroom.getCreatedBy()))
+            throw new ChatroomCreatorTryingToRemoveThemselvesFromChatroomException(chatroomId, chatroom.getCreatedBy());
+
         existingUserIdSet.removeAll(paramUserIdSet);
         chatroom.setMembers(existingUserIdSet);
         Chatroom savedChatroom = chatroomRepository.save(chatroom);
@@ -297,5 +297,70 @@ public class MessagingServiceImpl  implements MessagingService {
                 savedChatroom.getChatroomId());
 
         return chatroomMapper.chatroomToChatroomResponse(savedChatroom);
+    }
+
+    /**
+     * This method allows a user who is member of a chatroom they did not create remove themselves from the chatroom.
+     *
+     * @param chatroomId the unique identifier of the chatroom
+     * @param userId the unique identifier of the user
+     * @return a {@link ChatroomResponse} object representing the newly modified chatroom object
+     * @throws ChatroomDoesNotExistException if no chatroom is found with the specified chatroomId
+     * @throws UserIsNotAChatroomMemberException if the provided userId is not in the chatroom's existing members set.
+     * @throws ChatroomCreatorTryingToRemoveThemselvesFromChatroomException if the provided userId is the chatroom's creator.
+     */
+    @Override
+    public ChatroomResponse leaveChatroom(String chatroomId, String userId) {
+        Chatroom chatroom = chatroomRepository.findByChatroomId(chatroomId)
+                .orElseThrow(() -> new ChatroomDoesNotExistException(chatroomId));
+
+        Set<String> existingUserIdSet = chatroom.getMembers();
+
+        System.out.println(existingUserIdSet);
+        if(!existingUserIdSet.contains(userId)) {
+            throw new UserIsNotAChatroomMemberException(chatroomId, userId);
+        }
+
+        if(userId.equals(chatroom.getCreatedBy())) {
+            throw new ChatroomCreatorTryingToRemoveThemselvesFromChatroomException(chatroomId, chatroom.getCreatedBy());
+        }
+        existingUserIdSet.remove(userId);
+        chatroom.setMembers(existingUserIdSet);
+        Chatroom savedChatroom = chatroomRepository.save(chatroom);
+        log.info("MessagingServiceImpl::leaveChatroom: Successfully removed the user with id: {} " +
+                "from the chatroom with id: {}.", userId, savedChatroom.getChatroomId());
+
+        return chatroomMapper.chatroomToChatroomResponse(savedChatroom);
+    }
+
+
+    /**
+     * Checks if the user with the specified userId is the creator of the chatroom with the specified id
+     *
+     * @param chatroomId the unique identifier of the chatroom
+     * @param userId the unique identifier of the user
+     * @return true if the user is the creator of the chatroom, false otherwise
+     * @throws ChatroomDoesNotExistException if no chatroom with the specified ID is found
+     */
+    @Override
+    public boolean isChatroomCreator(String chatroomId, String userId) {
+        return chatroomRepository.findByChatroomId(chatroomId)
+                .map(chatroom -> chatroom.getCreatedBy().equals(userId))
+                .orElseThrow(() -> new ChatroomDoesNotExistException(chatroomId));
+    }
+
+    /**
+     * Checks if the user with the specified userId is the creator of the message with the specified id
+     *
+     * @param messageId the unique identifier of the message
+     * @param userId the unique identifier of the user
+     * @return true if the user is the creator of the message, false otherwise
+     * @throws MessageDoesNotExistException if no message with the specified ID is found
+     */
+    @Override
+    public boolean isMessageCreator(String messageId, String userId) {
+        return messageRepository.findByMessageId(messageId)
+                .map(message -> message.getSenderId().equals(userId))
+                .orElseThrow(() -> new MessageDoesNotExistException(messageId));
     }
 }
