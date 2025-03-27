@@ -2,14 +2,15 @@ package app.sportahub.eventservice.service.social;
 
 import app.sportahub.eventservice.dto.request.social.CommentRequest;
 import app.sportahub.eventservice.dto.request.social.PostRequest;
+import app.sportahub.eventservice.dto.response.ReactionResponse;
 import app.sportahub.eventservice.dto.response.social.CommentResponse;
 import app.sportahub.eventservice.dto.response.social.PostResponse;
-import app.sportahub.eventservice.exception.event.CommentDoesNotExistException;
-import app.sportahub.eventservice.exception.event.EventDoesNotExistException;
-import app.sportahub.eventservice.exception.event.PostDoesNotExistException;
+import app.sportahub.eventservice.exception.event.*;
 import app.sportahub.eventservice.mapper.social.CommentMapper;
 import app.sportahub.eventservice.mapper.social.PostMapper;
 import app.sportahub.eventservice.model.event.Event;
+import app.sportahub.eventservice.model.event.reactor.Reaction;
+import app.sportahub.eventservice.model.event.reactor.ReactionType;
 import app.sportahub.eventservice.model.social.Comment;
 import app.sportahub.eventservice.model.social.Post;
 import app.sportahub.eventservice.repository.event.EventRepository;
@@ -27,6 +28,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -250,5 +252,59 @@ public class PostServiceImpl implements PostService {
         log.info("Deleted comment with Id: {} in post with Id: {}in event with Id: {}", commentId, postId, eventId);
 
         return commentMapper.commentToCommentResponse(commentToDelete, eventId, postId);
+    }
+
+    @Override
+    public ReactionResponse reactToPost(String eventId, String postId, ReactionType newReaction){
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userId = authentication.getName();
+
+        if(!(newReaction == ReactionType.NO_REACTION || newReaction == ReactionType.LIKE)){
+            throw new InvalidReactionException();
+        }
+
+        Event event = eventRepository.findEventById(eventId)
+                .orElseThrow(() -> new EventDoesNotExistException(eventId));
+
+        Post post = event.getPosts().stream()
+                .filter(p -> p.getId().equals(postId))
+                .findFirst()
+                .orElseThrow(() -> new PostDoesNotExistException(postId, eventId));
+
+        Optional<Reaction> reactorToEventOpt = post.getReactions()
+                .stream()
+                .filter(reaction -> reaction.getUserId().equals(userId))
+                .findFirst();
+
+        Reaction reaction = new Reaction();
+
+        if(reactorToEventOpt.isPresent()) {
+            Reaction reactorToEvent = reactorToEventOpt.get();
+
+            if (newReaction == ReactionType.NO_REACTION) {
+                reaction = Reaction.builder()
+                        .withUserId(userId)
+                        .withReactionType(ReactionType.NO_REACTION)
+                        .build();
+                post.getReactions().remove(reactorToEvent);
+            } else {
+                throw new ReactionAlreadySubmittedException("post", postId, userId);
+            }
+        } else {
+            if(newReaction == ReactionType.LIKE) {
+                reaction = Reaction.builder()
+                        .withUserId(userId)
+                        .withReactionType(ReactionType.LIKE)
+                        .build();
+                post.getReactions().add(reaction);
+            } else{
+                throw new ReactionAlreadySubmittedException("post", postId, userId);
+            }
+        }
+        postRepository.save(post);
+        eventRepository.save(event);
+        log.info("PostServiceImpl::reactToPost: Post with id: {} reaction: {}", eventId, newReaction);
+        return new ReactionResponse( reaction.getUserId(), reaction.getReactionType());
     }
 }
