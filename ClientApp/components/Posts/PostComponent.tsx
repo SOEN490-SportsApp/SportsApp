@@ -5,9 +5,6 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
-  FlatList,
-  ActivityIndicator,
-  TouchableWithoutFeedback
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import moment from 'moment';
@@ -19,6 +16,7 @@ import 'moment/locale/fr';
 import 'moment/locale/en-ca';
 import { fetchImage } from '@/utils/api/postApiClient';
 import ImageGridComponent from './ImageGridComponent';
+import ImageView from 'react-native-image-viewing';
 
 type PostComponentProps = {
   post: Post;
@@ -30,13 +28,17 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, userProfile }) => {
   const [likeCount, setLikeCount] = useState<number>(post.likes);
   const [imageUris, setImageUris] = useState<string[]>([]);
   const [loadingImages, setLoadingImages] = useState<boolean>(false);
+  const [visible, setVisible] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [failedImages, setFailedImages] = useState<boolean[]>([]);
+
 
   const { t, i18n } = useTranslation();
   moment.locale(i18n.language === 'fr' ? 'fr' : 'en-ca');
 
   useEffect(() => {
     const loadImages = async () => {
-      if (post.attachments.length > 0 && post.attachments[0] !== '') {
+      if (post.attachments.length > 0) {
         setLoadingImages(true);
         try {
           const uris = await Promise.all(
@@ -44,10 +46,11 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, userProfile }) => {
               return await fetchImage(attachment);
             })
           );
-          setImageUris(uris);
-          console.log(uris.length);
+          setImageUris(uris.filter(uri => uri !== null) as string[]);
+          setFailedImages(uris.map(uri => uri === null));
         } catch (error) {
           console.error("Error loading images:", error);
+          setFailedImages(new Array(post.attachments.length).fill(true));
         } finally {
           setLoadingImages(false);
         }
@@ -75,8 +78,6 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, userProfile }) => {
     setLikeCount((prev) => (liked ? prev - 1 : prev + 1));
   };
 
-  console.log(imageUris)
-
   const handlePostPress = () => {
     router.push({
       pathname: `/posts/[id]`,
@@ -88,6 +89,10 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, userProfile }) => {
       },
     });
   }
+  const handleImagePress = (index: number) => {
+    setCurrentImageIndex(index);
+    setVisible(true);
+  };
 
   return (
     <TouchableOpacity activeOpacity={0.8} onPress={() => handlePostPress()}>
@@ -112,7 +117,8 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, userProfile }) => {
           <ImageGridComponent
             imageUris={imageUris}
             loading={loadingImages}
-            handlePostPress={handlePostPress} />
+            onImagePress={handleImagePress}
+            failedImages={failedImages} />
         </View>
 
         {/* Like and Comment Buttons */}
@@ -127,6 +133,17 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, userProfile }) => {
             <Text style={styles.actionText}>{post.comments.length} {t('post_component.comments')}</Text>
           </TouchableOpacity>
         </View>
+        {/* Image Viewer */}
+        <ImageView
+          images={imageUris.map(uri => ({ uri }))}
+          imageIndex={currentImageIndex}
+          visible={visible}
+          onRequestClose={() => setVisible(false)}
+          presentationStyle="overFullScreen"
+          backgroundColor="rgba(0, 0, 0, 0.9)"
+          swipeToCloseEnabled
+          doubleTapToZoomEnabled
+        />
       </View>
     </TouchableOpacity>
   );
