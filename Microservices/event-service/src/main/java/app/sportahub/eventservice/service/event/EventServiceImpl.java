@@ -612,7 +612,7 @@ public class EventServiceImpl implements EventService {
                         .build();
                 event.getReactions().remove(reactorToEvent);
             } else {
-               throw new ReactionAlreadySubmittedException(eventId, userId);
+               throw new ReactionAlreadySubmittedException("event", eventId, userId);
             }
         } else {
             if(newReaction == ReactionType.LIKE) {
@@ -622,7 +622,7 @@ public class EventServiceImpl implements EventService {
                         .build();
                 event.getReactions().add(reaction);
             } else{
-                throw new ReactionAlreadySubmittedException(eventId, userId);
+                throw new ReactionAlreadySubmittedException("event", eventId, userId);
             }
         }
 
