@@ -1,13 +1,24 @@
-import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  ActivityIndicator,
+  TouchableWithoutFeedback
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import moment from 'moment'; 
+import moment from 'moment';
 import { router } from 'expo-router';
 import { Post } from '@/types/post';
 import { mhs, mvs } from '@/utils/helpers/uiScaler';
 import { useTranslation } from 'react-i18next';
 import 'moment/locale/fr';
 import 'moment/locale/en-ca';
+import { fetchImage } from '@/utils/api/postApiClient';
+import ImageGridComponent from './ImageGridComponent';
 
 type PostComponentProps = {
   post: Post;
@@ -17,35 +28,69 @@ type PostComponentProps = {
 const PostComponent: React.FC<PostComponentProps> = ({ post, userProfile }) => {
   const [liked, setLiked] = useState<boolean>(false);
   const [likeCount, setLikeCount] = useState<number>(post.likes);
+  const [imageUris, setImageUris] = useState<string[]>([]);
+  const [loadingImages, setLoadingImages] = useState<boolean>(false);
 
   const { t, i18n } = useTranslation();
   moment.locale(i18n.language === 'fr' ? 'fr' : 'en-ca');
+
+  useEffect(() => {
+    const loadImages = async () => {
+      if (post.attachments.length > 0 && post.attachments[0] !== '') {
+        setLoadingImages(true);
+        try {
+          const uris = await Promise.all(
+            post.attachments.map(async (attachment) => {
+              return await fetchImage(attachment);
+            })
+          );
+          setImageUris(uris);
+          console.log(uris.length);
+        } catch (error) {
+          console.error("Error loading images:", error);
+        } finally {
+          setLoadingImages(false);
+        }
+      }
+    };
+
+    loadImages();
+  }, [post.attachments]);
 
   const getTimeAgoTranslation = (time: moment.Moment) => {
     const diffMinutes = moment().diff(time, 'minutes');
     const diffHours = moment().diff(time, 'hours');
     const diffDays = moment().diff(time, 'days');
-  
+
     if (diffMinutes < 1) return t('post_component.just_now');
     if (diffMinutes < 60) return t('post_component.minutes_ago', { count: diffMinutes });
     if (diffHours < 24) return t('post_component.hours_ago', { count: diffHours });
     return t('post_component.days_ago', { count: diffDays });
   };
-  
-  const timeAgo = getTimeAgoTranslation(moment(post.creationDate));  
+
+  const timeAgo = getTimeAgoTranslation(moment(post.creationDate));
 
   const handleLike = () => {
     setLiked((prev) => !prev);
     setLikeCount((prev) => (liked ? prev - 1 : prev + 1));
   };
 
+  console.log(imageUris)
+
+  const handlePostPress = () => {
+    router.push({
+      pathname: `/posts/[id]`,
+      params: {
+        id: post.id,
+        post: JSON.stringify(post),
+        timeAgo: timeAgo,
+        userProfile: JSON.stringify(userProfile),
+      },
+    });
+  }
+
   return (
-    <TouchableOpacity activeOpacity={0.8} onPress={() => {
-      router.push({
-        pathname: `/posts/[id]`,
-        params: { id: post.id },
-      });
-    }}>
+    <TouchableOpacity activeOpacity={0.8} onPress={() => handlePostPress()}>
       <View style={styles.container}>
         {/* User Info Section */}
         <View style={styles.userInfoContainer}>
@@ -62,18 +107,13 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, userProfile }) => {
         {/* Post Content */}
         <Text style={styles.postContent}>{post.content}</Text>
 
-        {/* Post Images */}
-        {(post.attachments.length > 0 && post.attachments[0] != '') && (
-          <FlatList
-            data={post.attachments}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            keyExtractor={(item) => item}
-            renderItem={({ item }) => (
-              <Image source={{ uri: item }} style={styles.postImage} resizeMode="cover" />
-            )}
-          />
-        )}
+        {/* Image Grid */}
+        <View style={styles.postImagesContainer}>
+          <ImageGridComponent
+            imageUris={imageUris}
+            loading={loadingImages}
+            handlePostPress={handlePostPress} />
+        </View>
 
         {/* Like and Comment Buttons */}
         <View style={styles.actionsContainer}>
@@ -124,35 +164,31 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   timeAgo: {
-    fontSize: mhs(12), 
+    fontSize: mhs(12),
     color: '#888',
   },
   postContent: {
     fontSize: mhs(14),
     color: '#333',
-    marginBottom: mvs(8), 
+    marginBottom: mvs(8),
   },
-  postImage: {
-    width: mhs(200), 
-    height: mvs(150), 
-    borderRadius: mhs(8), 
-    marginRight: mhs(8), 
+  postImagesContainer: {
+    marginBottom: mvs(8),
   },
   actionsContainer: {
     flexDirection: 'row',
-    marginTop: mvs(12), 
+    marginTop: mvs(12),
   },
   actionButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginRight: mhs(16), 
+    marginRight: mhs(16),
   },
   actionText: {
-    marginLeft: mhs(6), 
+    marginLeft: mhs(6),
     fontSize: mhs(13),
     color: '#555',
   },
 });
-
 
 export default PostComponent;
