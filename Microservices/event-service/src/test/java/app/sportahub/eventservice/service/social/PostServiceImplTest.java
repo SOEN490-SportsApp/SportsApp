@@ -2,13 +2,18 @@ package app.sportahub.eventservice.service.social;
 
 import app.sportahub.eventservice.dto.request.social.CommentRequest;
 import app.sportahub.eventservice.dto.request.social.PostRequest;
+import app.sportahub.eventservice.dto.response.ReactionResponse;
 import app.sportahub.eventservice.dto.response.social.CommentResponse;
 import app.sportahub.eventservice.dto.response.social.PostResponse;
 import app.sportahub.eventservice.exception.event.EventDoesNotExistException;
+import app.sportahub.eventservice.exception.event.InvalidReactionException;
 import app.sportahub.eventservice.exception.event.PostDoesNotExistException;
+import app.sportahub.eventservice.exception.event.ReactionAlreadySubmittedException;
 import app.sportahub.eventservice.mapper.social.CommentMapper;
 import app.sportahub.eventservice.mapper.social.PostMapper;
 import app.sportahub.eventservice.model.event.Event;
+import app.sportahub.eventservice.model.event.reactor.Reaction;
+import app.sportahub.eventservice.model.event.reactor.ReactionType;
 import app.sportahub.eventservice.model.social.Comment;
 import app.sportahub.eventservice.model.social.Post;
 import app.sportahub.eventservice.repository.event.EventRepository;
@@ -35,6 +40,8 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -175,7 +182,7 @@ public class PostServiceImplTest {
     void getPost_ShouldReturnPost() {
         String eventId = "event1";
         String postId = "post1";
-        PostResponse expectedResponse = new PostResponse("post1", "content", null, null, null);
+        PostResponse expectedResponse = new PostResponse("post1", null, "content", null, null, null, null);
 
         when(eventRepository.findEventById(eventId)).thenReturn(Optional.of(event));
         when(postMapper.postToPostResponse(post)).thenReturn(expectedResponse);
@@ -203,7 +210,7 @@ public class PostServiceImplTest {
     void deletePost_ShouldRemovePost() {
         String eventId = "event1";
         String postId = "post1";
-        PostResponse expectedResponse = new PostResponse("post1", "content", null, null, null);
+        PostResponse expectedResponse = new PostResponse("post1", null, "content", null, null, null, null);
 
         when(eventRepository.findEventById(eventId)).thenReturn(Optional.of(event));
         when(postMapper.postToPostResponse(post)).thenReturn(expectedResponse);
@@ -223,7 +230,7 @@ public class PostServiceImplTest {
     void createComment_ShouldAddCommentToPost() {
         String eventId = "event1";
         String postId = "post1";
-        CommentResponse expectedResponse = new CommentResponse("comment1", "content", "user1", null);
+        CommentResponse expectedResponse = new CommentResponse("comment1", null, "content", "user1", null);
 
         Authentication auth = mock(Authentication.class);
         SecurityContext securityContext = mock(SecurityContext.class);
@@ -254,7 +261,7 @@ public class PostServiceImplTest {
         String eventId = "event1";
         String postId = "post1";
         String commentId = "comment1";
-        CommentResponse expectedResponse = new CommentResponse("comment1", "content", "user1", null);
+        CommentResponse expectedResponse = new CommentResponse("comment1", null, "content", "user1", null);
 
         when(eventRepository.findEventById(eventId)).thenReturn(Optional.of(event));
         when(commentMapper.commentToCommentResponse(comment, eventId, postId))
@@ -269,5 +276,123 @@ public class PostServiceImplTest {
 
         assertThat(result).isEqualTo(expectedResponse);
         assertThat(post.getComments()).doesNotContain(comment);
+    }
+
+    @Test
+    void reactToPost_AddLike_ShouldAddReaction() {
+        // Setup
+        String eventId = "event1";
+        String postId = "post1";
+        String userId = "user1";
+
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn(userId);
+        SecurityContextHolder.setContext(securityContext);
+
+        Event event = new Event();
+        Post post = new Post();
+        post.setId(postId);
+        post.setReactions(new ArrayList<>());
+        event.setPosts(new ArrayList<>(List.of(post)));
+
+        when(eventRepository.findEventById(eventId)).thenReturn(Optional.of(event));
+        when(postRepository.save(any(Post.class))).thenReturn(post);
+
+        // Execute
+        ReactionResponse response = postService.reactToPost(eventId, postId, ReactionType.LIKE);
+
+        // Verify
+        assertThat(response.userId()).isEqualTo(userId);
+        assertThat(response.reactionType()).isEqualTo(ReactionType.LIKE);
+        assertThat(post.getReactions()).hasSize(1);
+        verify(postRepository).save(post);
+        verify(eventRepository).save(event);
+    }
+
+    @Test
+    void reactToPost_RemoveReaction_ShouldRemoveReaction() {
+        // Setup
+        String eventId = "event1";
+        String postId = "post1";
+        String userId = "user1";
+
+        Event event = new Event();
+        Post post = new Post();
+        post.setId(postId);
+        Reaction existingReaction = new Reaction(userId, ReactionType.LIKE, LocalDateTime.now());
+        post.setReactions(new ArrayList<>(List.of(existingReaction)));
+        event.setPosts(new ArrayList<>(List.of(post)));
+
+        when(eventRepository.findEventById(eventId)).thenReturn(Optional.of(event));
+        when(postRepository.save(any(Post.class))).thenReturn(post);
+
+        // Execute
+        ReactionResponse response = postService.reactToPost(eventId, postId, ReactionType.NO_REACTION);
+
+        // Verify
+        assertThat(response.userId()).isEqualTo(userId);
+        assertThat(response.reactionType()).isEqualTo(ReactionType.NO_REACTION);
+        assertThat(post.getReactions()).isEmpty();
+        verify(postRepository).save(post);
+        verify(eventRepository).save(event);
+    }
+
+    @Test
+    void reactToPost_AlreadyLiked_ShouldThrowException() {
+        // Setup
+        String eventId = "event1";
+        String postId = "post1";
+        String userId = "user1";
+
+        Event event = new Event();
+        Post post = new Post();
+        post.setId(postId);
+        Reaction existingReaction = new Reaction(userId, ReactionType.LIKE, LocalDateTime.now());
+        post.setReactions(new ArrayList<>(List.of(existingReaction)));
+        event.setPosts(new ArrayList<>(List.of(post)));
+
+        when(eventRepository.findEventById(eventId)).thenReturn(Optional.of(event));
+
+        // Execute & Verify
+        assertThatThrownBy(() -> postService.reactToPost(eventId, postId, ReactionType.LIKE))
+                .isInstanceOf(ReactionAlreadySubmittedException.class)
+                .hasMessageContaining("post")
+                .hasMessageContaining(postId)
+                .hasMessageContaining(userId);
+    }
+
+    @Test
+    void reactToPost_InvalidReactionType_ShouldThrowException() {
+        // Execute & Verify
+        assertThatThrownBy(() -> postService.reactToPost("event1", "post1", null))
+                .isInstanceOf(InvalidReactionException.class);
+    }
+
+    @Test
+    void reactToPost_EventNotFound_ShouldThrowException() {
+
+        String eventId = "nonexistent";
+        when(eventRepository.findEventById(eventId)).thenReturn(Optional.empty());
+
+        // Execute & Verify
+        assertThatThrownBy(() -> postService.reactToPost(eventId, "post1", ReactionType.LIKE))
+                .isInstanceOf(EventDoesNotExistException.class)
+                .hasMessageContaining(eventId);
+    }
+
+    @Test
+    void reactToPost_PostNotFound_ShouldThrowException() {
+        String eventId = "event1";
+        Event event = new Event();
+        event.setPosts(new ArrayList<>()); // No posts
+
+        when(eventRepository.findEventById(eventId)).thenReturn(Optional.of(event));
+
+        // Execute & Verify
+        assertThatThrownBy(() -> postService.reactToPost(eventId, "nonexistent", ReactionType.LIKE))
+                .isInstanceOf(PostDoesNotExistException.class)
+                .hasMessageContaining("nonexistent");
     }
 }
