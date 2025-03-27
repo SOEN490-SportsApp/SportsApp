@@ -34,7 +34,7 @@ const EventDetails = ({ event, handleJoinEvent }: { event: Event; handleJoinEven
   const router = useRouter();
   const user = useSelector((state: { user: any }) => state.user);
   const { t } = useTranslation();
-  console.log(event.id);
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* Description */}
