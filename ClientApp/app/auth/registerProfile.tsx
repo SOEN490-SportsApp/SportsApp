@@ -51,8 +51,8 @@ const RegisterProfilePage: React.FC = () => {
       isValid
         ? setCurrentStep(2)
         : Alert.alert(
-            t('register_profile.error_occured'),
-            t('register_profile.error_message_step_1')
+            t('register_profile.error_occurred'),
+            t('register_profile.error_message_step1')
           );
     } 
     if (currentStep === 2) {
@@ -60,8 +60,8 @@ const RegisterProfilePage: React.FC = () => {
       isValid
         ? setCurrentStep(1)
         : Alert.alert(
-            t('register_profile.error_occured'),
-            t('register_profile.error_message_step_2')
+            t('register_profile.error_occurred'),
+            t('register_profile.error_message_step2')
           );
     }
   };
