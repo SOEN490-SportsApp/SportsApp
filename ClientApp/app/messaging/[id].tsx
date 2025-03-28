@@ -6,34 +6,8 @@ import {useSelector} from "react-redux";
 import {getMessages, getChatroom} from "@/services/chatService";
 import { Client } from "@stomp/stompjs";
 import { getAccessToken } from "@/services/tokenService"
+import {message, chatroomProps, messageRequest} from "@/types/messaging";
 
-interface message {
-  messageId: string;
-  chatroomId: string;
-  senderId: string;
-  receiverIds: string[];
-  content: string;
-  createdAt: Number | Date;
-  attachments: string[];
-}
-
-interface chatroomProps {
-  chatroomId: string;
-  createdAt: Number | Date;
-  createdBy: string;
-  members: string[];
-  messages: message[];
-  isEvent: boolean;
-  unread: boolean;
-}
-
-interface messageRequest {
-  chatroomId: string;
-  senderId: string;
-  receiverIds: string[];
-  content: string;
-  attachments: string[];
-}
 
 const ChatScreen = () => {
   const { id } = useLocalSearchParams();
@@ -65,7 +39,7 @@ const ChatScreen = () => {
     if (!finalToken) return;
 
       const client = new Client({
-        brokerURL: "ws://localhost:8080/api/messaging-service/ws",
+        brokerURL: "wss://api.sportahub.app/api/messaging-service/ws",
         heartbeatIncoming: 0,
         heartbeatOutgoing: 0,
         connectHeaders: {

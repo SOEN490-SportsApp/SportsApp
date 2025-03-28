@@ -1,6 +1,7 @@
 import { getAxiosInstance } from '@/services/axiosInstance';
 import { API_ENDPOINTS } from '@/utils/api/endpoints';
 import {store} from "@/state/store";
+import { message } from '@/types/messaging';
 
 // API_ENDPOINTS.GET_CHATROOM
 export const getChatroom = async (chatroomId: string) => {
@@ -42,3 +43,37 @@ export const getMessages = async (chatroomId: string) => {
   }
 };
 
+// API_ENDPOINTS.CREATE_CHATROOM
+export const createUserChatroom = async (createrId: string, nameOfChatRoom: string,  members: message [], messages: string[], isEvent: boolean, unread: boolean) => {
+  try {
+    const axiosLocalInstance = getAxiosInstance();
+    const response = await axiosLocalInstance.post(API_ENDPOINTS.CREATE_CHATROOM,
+      {
+        createdBy: createrId,
+        chatroomName: nameOfChatRoom,
+        members,
+        messages,
+        isEvent,
+        unread
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error creating chatroom:', error);
+    throw error;
+  }
+}
+
+
+
+// API_ENDPOINTS.DELETE_CHATROOM
+export const deleteChatroom = async (chatroomId: string) => {
+  try {
+    const axiosLocalInstance = getAxiosInstance();
+    const response = await axiosLocalInstance.delete(API_ENDPOINTS.DELETE_CHATROOM.replace("{chatroomId}", chatroomId));
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting chatroom:', error);
+    throw error;
+  }
+};

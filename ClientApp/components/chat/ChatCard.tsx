@@ -9,16 +9,26 @@ interface CardProps {
   userImg: any;
   messageTime: string;
   messageText: string;
+  onLongPress?: () => void;
+  
 }
 
-const ChatCard: React.FC<CardProps> = ({ chatId, userName, userImg, messageTime, messageText }) => {
+const ChatCard: React.FC<CardProps> = ({ 
+  chatId, 
+  userName, 
+  userImg, 
+  messageTime, 
+  messageText,
+  onLongPress
+}) => {
     const router = useRouter();
     
     return (
     <TouchableOpacity 
     style={styles.card}
     onPress={() => router.push(`/messaging/${chatId}`)}
->
+    onLongPress={onLongPress}
+    >
       <View style={styles.userInfo}>
         <View style={styles.userImgWrapper}>
           <Image source={userImg} style={styles.userImg} />
