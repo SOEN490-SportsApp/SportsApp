@@ -390,5 +390,8 @@
   "my_calendar": {
     "events_for": "Events for",
     "no_events": "No events for this day."
+  },
+  "friends_list": {
+    "start_making_friends": "Start making friends!"
   }
 }
