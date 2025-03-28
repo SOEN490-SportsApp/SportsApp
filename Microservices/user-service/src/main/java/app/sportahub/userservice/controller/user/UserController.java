@@ -179,6 +179,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/friend-recommendation")
+    @PreAuthorize("#userId == authentication.name || hasRole('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "get recommended friends",
             description = "Allows user to get a recommended list of users to add as friends.")
