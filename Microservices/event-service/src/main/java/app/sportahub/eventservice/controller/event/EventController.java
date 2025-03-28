@@ -1,22 +1,5 @@
 package app.sportahub.eventservice.controller.event;
 
-import app.sportahub.eventservice.dto.request.event.EventRequest;
-import app.sportahub.eventservice.dto.request.event.WhitelistRequest;
-import app.sportahub.eventservice.dto.request.event.EventCancellationRequest;
-import app.sportahub.eventservice.dto.response.EventResponse;
-import app.sportahub.eventservice.dto.response.ParticipantResponse;
-import app.sportahub.eventservice.enums.EventSortingField;
-import app.sportahub.eventservice.enums.SortDirection;
-import app.sportahub.eventservice.model.event.Location;
-import app.sportahub.eventservice.enums.SkillLevelEnum;
-import app.sportahub.eventservice.dto.response.ReactionResponse;
-import app.sportahub.eventservice.model.event.reactor.ReactionType;
-import app.sportahub.eventservice.service.event.EventService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -25,7 +8,34 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+import app.sportahub.eventservice.dto.request.event.WhitelistRequest;
+import app.sportahub.eventservice.dto.request.event.EventCancellationRequest;
+import app.sportahub.eventservice.dto.request.event.EventRequest;
+import app.sportahub.eventservice.dto.response.EventResponse;
+import app.sportahub.eventservice.dto.response.ParticipantResponse;
+import app.sportahub.eventservice.dto.response.ReactionResponse;
+import app.sportahub.eventservice.enums.EventSortingField;
+import app.sportahub.eventservice.enums.SkillLevelEnum;
+import app.sportahub.eventservice.enums.SortDirection;
+import app.sportahub.eventservice.model.event.reactor.ReactionType;
+import app.sportahub.eventservice.service.event.EventService;
+import app.sportahub.eventservice.service.recommendation.RecommendationService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 
 @RestController
@@ -35,6 +45,7 @@ import org.springframework.web.bind.annotation.*;
 public class EventController {
 
     private final EventService eventService;
+    private final RecommendationService recommendationService;
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -200,5 +211,21 @@ public class EventController {
     public EventResponse whitelistUsers(@PathVariable String id,
             @RequestBody WhitelistRequest whitelistRequest) {
         return eventService.whitelistUsers(id, whitelistRequest);
+    }
+
+
+    @GetMapping("/recommendation")
+    @PreAuthorize("authentication.name == #userId || hasRole('ROLE_ADMIN')")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Retrieve events by location",
+            description = "Fetches events based on the provided location.")
+    public Page<EventResponse> getEventRecommendations(
+            @RequestParam String userId,
+            @RequestParam double longitude,
+            @RequestParam double latitude,
+            @RequestParam(defaultValue = "30.0") double radius,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return recommendationService.getRecommendations(userId, longitude, latitude, radius,  page, size);
     }
 }

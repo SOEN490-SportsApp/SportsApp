@@ -1,6 +1,8 @@
 package app.sportahub.orchestrationservice.config;
 
 import app.sportahub.kafka.events.SportaKafkaEvents;
+import app.sportahub.kafka.events.user.UserEvent;
+import app.sportahub.kafka.events.JoinedSportEventEvent.JoinedEventsByUserEvent;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
