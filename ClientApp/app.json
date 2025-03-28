@@ -15,6 +15,7 @@
     },
     "ios": {
       "supportsTablet": true,
+      "googleServicesFile": "./GoogleService-Info.plist",
       "bundleIdentifier": "com.nchelico.ClientApp",
      "infoPlist": {
       "ITSAppUsesNonExemptEncryption": false,
@@ -40,6 +41,7 @@
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION"
       ],
+      "googleServicesFile": "./google-services.json",
       "package": "com.sporta.clientApp",
       "config" : {
         "googleMaps": {
@@ -67,6 +69,17 @@
         {
           "photosPermission": "Allow $(PRODUCT_NAME) to access your photos",
           "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera"
+        }
+      ],
+      "@react-native-firebase/app",
+      "@react-native-firebase/auth",
+      "@react-native-firebase/crashlytics",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
         }
       ]
     ],
