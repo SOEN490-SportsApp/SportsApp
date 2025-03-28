@@ -21,7 +21,6 @@ export const getAllChatrooms = async (userId: string) => {
   try {
     const axiosLocalInstance = getAxiosInstance();
     const response = await axiosLocalInstance.get(API_ENDPOINTS.GET_All_CHATROOMS.replace("{userId}", userId));
-    console.log("Chatrooms response:", response.data);
     return response.data;
   } catch (error) {
     console.error('Error fetching chatrooms:', error);

@@ -35,117 +35,117 @@ const ChatScreen = () => {
   }, []);
 
 
-  useEffect(() => {
-    if (!finalToken) return;
+  // useEffect(() => {
+  //   if (!finalToken) return;
 
-      const client = new Client({
-        brokerURL: "wss://api.sportahub.app/api/messaging-service/ws",
-        heartbeatIncoming: 0,
-        heartbeatOutgoing: 0,
-        connectHeaders: {
-          Authorization: "Bearer " + finalToken,
-        },
+  //     const client = new Client({
+  //       brokerURL: "wss://api.sportahub.app/api/messaging-service/ws",
+  //       heartbeatIncoming: 0,
+  //       heartbeatOutgoing: 0,
+  //       connectHeaders: {
+  //         Authorization: "Bearer " + finalToken,
+  //       },
 
-        onWebSocketError: (error: any) => console.error("Websocket error:", error),
-        onConnect: () => {
-          setConnected(true);
+  //       onWebSocketError: (error: any) => console.error("Websocket error:", error),
+  //       onConnect: () => {
+  //         setConnected(true);
 
-          client.subscribe(`/topic/chatroom/${id}`, (message: any) => {
-            console.log(JSON.parse(message.body));
-                setMessages((prev: IMessage[]) => [
-                  ...prev,
-                  {
-                    _id: JSON.parse(message.body).messageId,
-                    text: JSON.parse(message.body).content,
-                    createdAt: new Date(JSON.parse(message.body).createdAt),
-                    user: {
-                      _id: JSON.parse(message.body).senderId,
-                      name: 'Sender Name', // Replace with actual sender name if available
-                      avatar: 'https://example.com/sender-avatar.png', // Replace with actual avatar URL if available
-                    },
-                  },
-                ]);
-          },
-              {
-                "Authorization": "Bearer " + finalToken,
-              });
-        },
-        onDisconnect: () => setConnected(false),
-        debug: (msg: any) => console.log(msg),
-        onStompError: (frame: any) => console.error("Stomp error:", frame),
+  //         client.subscribe(`/topic/chatroom/${id}`, (message: any) => {
+  //           console.log(JSON.parse(message.body));
+  //               setMessages((prev: IMessage[]) => [
+  //                 ...prev,
+  //                 {
+  //                   _id: JSON.parse(message.body).messageId,
+  //                   text: JSON.parse(message.body).content,
+  //                   createdAt: new Date(JSON.parse(message.body).createdAt),
+  //                   user: {
+  //                     _id: JSON.parse(message.body).senderId,
+  //                     name: 'Sender Name', // Replace with actual sender name if available
+  //                     avatar: 'https://example.com/sender-avatar.png', // Replace with actual avatar URL if available
+  //                   },
+  //                 },
+  //               ]);
+  //         },
+  //             {
+  //               "Authorization": "Bearer " + finalToken,
+  //             });
+  //       },
+  //       onDisconnect: () => setConnected(false),
+  //       debug: (msg: any) => console.log(msg),
+  //       onStompError: (frame: any) => console.error("Stomp error:", frame),
 
-      });
+  //     });
 
-      client.activate();
-      clientRef.current = client;
+  //     client.activate();
+  //     clientRef.current = client;
 
-    const fetchChatroom = async () => {
-      try {
-        const messagesData = await getMessages(id.toString());
-        console.log("messageData: ", messagesData);
+  //   const fetchChatroom = async () => {
+  //     try {
+  //       const messagesData = await getMessages(id.toString());
+  //       console.log("messageData: ", messagesData);
 
-        // Ensure messagesData is mapped to IMessage structure
-        const formattedMessages = messagesData.map((message: any) => ({
-          _id: message.messageId,
-          text: message.content,
-          createdAt: new Date(message.createdAt),
-          user: {
-            _id: message.senderId,
-            name: message.senderName || "Unknown", // Replace with sender's name if available
-            avatar: message.senderAvatar || "https://example.com/default-avatar.png", // Replace with avatar URL if available
-          },
-        }));
+  //       // Ensure messagesData is mapped to IMessage structure
+  //       const formattedMessages = messagesData.map((message: any) => ({
+  //         _id: message.messageId,
+  //         text: message.content,
+  //         createdAt: new Date(message.createdAt),
+  //         user: {
+  //           _id: message.senderId,
+  //           name: message.senderName || "Unknown", // Replace with sender's name if available
+  //           avatar: message.senderAvatar || "https://example.com/default-avatar.png", // Replace with avatar URL if available
+  //         },
+  //       }));
 
-        const chatroomData = await getChatroom(id.toString());
-        console.log("chatroomData: ", chatroomData);
+  //       const chatroomData = await getChatroom(id.toString());
+  //       console.log("chatroomData: ", chatroomData);
 
-        setChatroom(chatroomData);
-        setMessages(formattedMessages);
-      } catch (error) {
-        console.error("Failed to fetch messages", error);
-        throw error;
-      }
-    };
-      fetchChatroom();
+  //       setChatroom(chatroomData);
+  //       setMessages(formattedMessages);
+  //     } catch (error) {
+  //       console.error("Failed to fetch messages", error);
+  //       throw error;
+  //     }
+  //   };
+  //     fetchChatroom();
 
-    return () => {
-        client.deactivate();
-    }
-  }, [finalToken]);
+  //   return () => {
+  //       client.deactivate();
+  //   }
+  // }, [finalToken]);
 
   const onSend = useCallback((newMessages: IMessage[] = []) => {
-    let attachments: string[] = [];
-    console.log("newMessages: ", newMessages);
-    console.log("chatroom: ", chatroom);
+    // let attachments: string[] = [];
+    // console.log("newMessages: ", newMessages);
+    // console.log("chatroom: ", chatroom);
 
-    if (!Array.isArray(newMessages)) return;
-    try {
-      const newMessage = newMessages[0];
-      if (newMessage.audio != undefined) {
-        attachments.push(newMessage.audio)
-      }
-      if (newMessage.video != undefined) {
-        attachments.push(newMessage.video)
-      }
-      if (chatroom != undefined) {
-        const newMessageRequest: messageRequest = {
-          chatroomId: chatroom.chatroomId,
-          attachments: attachments,
-          content: newMessage.text,
-          receiverIds: chatroom.members,
-          senderId: user.id,
-        }
-        console.log("newMessageRequest: ",newMessageRequest);
-        // @ts-ignore
-        clientRef.current.publish({
-          destination: "/app/message",
-          headers: {Authorization: "Bearer " + finalToken},
-          body: JSON.stringify(newMessageRequest),
-        })
-      }
-      } catch (error) {
-      console.error("Failed to publish messages", error);
-    }
+    // if (!Array.isArray(newMessages)) return;
+    // try {
+    //   const newMessage = newMessages[0];
+    //   if (newMessage.audio != undefined) {
+    //     attachments.push(newMessage.audio)
+    //   }
+    //   if (newMessage.video != undefined) {
+    //     attachments.push(newMessage.video)
+    //   }
+      // if (chatroom != undefined) {
+      //   const newMessageRequest: messageRequest = {
+      //     chatroomId: chatroom.chatroomId,
+      //     attachments: attachments,
+      //     content: newMessage.text,
+      //     receiverIds: chatroom.members,
+      //     senderId: user.id,
+      //   }
+      //   console.log("newMessageRequest: ",newMessageRequest);
+      //   // @ts-ignore
+      //   clientRef.current.publish({
+      //     destination: "/app/message",
+      //     headers: {Authorization: "Bearer " + finalToken},
+      //     body: JSON.stringify(newMessageRequest),
+      //   })
+      // }
+    //   } catch (error) {
+    //   console.error("Failed to publish messages", error);
+    // }
 
   }, [finalToken, chatroom]);
 
