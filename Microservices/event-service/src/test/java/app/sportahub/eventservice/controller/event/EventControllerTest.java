@@ -2,6 +2,7 @@ package app.sportahub.eventservice.controller.event;
 
 import app.sportahub.eventservice.dto.request.event.EventCancellationRequest;
 import app.sportahub.eventservice.dto.request.event.EventRequest;
+import app.sportahub.eventservice.dto.request.event.WhitelistRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.dto.response.LocationResponse;
 import app.sportahub.eventservice.dto.response.ParticipantResponse;
@@ -383,6 +384,19 @@ public class EventControllerTest {
 
         assertEquals(reactionResponse, response);
         Mockito.verify(eventService).reactToEvent(Mockito.eq("testId"), Mockito.eq(ReactionType.LIKE));
+    }
+
+    @Test
+    public void testWhitelistUsers() {
+        String eventId = "testId";
+        List<String> userIds = List.of("user1", "user2");
+        WhitelistRequest whitelistRequest = new WhitelistRequest(userIds);
+        when(eventService.whitelistUsers(eventId, whitelistRequest)).thenReturn(eventResponse);
+
+        EventResponse response = eventController.whitelistUsers(eventId, whitelistRequest);
+
+        assertEquals(eventResponse, response);
+        verify(eventService).whitelistUsers(eventId, whitelistRequest);
     }
 
 }
