@@ -396,5 +396,19 @@
   },
   "friend_card": {
     "friends_in_common": "friends in common"
+  },
+  "user_profiles_layout": {
+    "error": "Error",
+    "user_not_found": "User not found. Please log in.",
+    "success": "Success",
+    "friend_request_sent": "Friend request sent successfully!",
+    "failed_to_send_request": "Failed to send friend request.",
+    "remove_friend": "Remove Friend",
+    "remove_friend_confirmation": "Are you sure you want to remove this friend?",
+    "cancel": "Cancel",
+    "yes": "Yes",
+    "could_not_find_user": "Could not find user ID.",
+    "friend_removed": "Friend removed successfully!",
+    "failed_to_remove_friend": "Failed to remove friend."
   }
 }
