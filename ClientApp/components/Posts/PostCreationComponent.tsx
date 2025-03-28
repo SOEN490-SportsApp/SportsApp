@@ -82,7 +82,6 @@ const PostCreationComponent: React.FC<PostCreationProps> = ({ eventId, onNewPost
       const downloadPaths = await Promise.all(uploadPromises);
       await createPost(eventId, comment, downloadPaths);
       onNewPost();
-      console.log('Post created successfully');
       resetModal();
     } catch (error) {
       console.error('Failed to create post:', error);
