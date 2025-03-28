@@ -11,9 +11,13 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { hs, mhs, mvs, vs } from "@/utils/helpers/uiScaler";
 import FavoriteSportsBadges from "../FavoriteSportsBadges";
 import themeColors from "@/utils/constants/colors";
+import { createUserChatroom } from "@/services/chatService";
+import { useSelector } from "react-redux";
+import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 
 interface ProfileRequest {
+  visitedId: string;
   user: any | null;
   friendStatus: string | null;
   handleFriendRequest: () => void | Promise<void> | null;
@@ -22,13 +26,16 @@ interface ProfileRequest {
 }
 
 const ProfileSection: React.FC<ProfileRequest> = ({
+  visitedId,
   user,
   friendStatus,
   handleFriendRequest,
   handleRemoveFriend,
   isUserProfile,
 }) => {
+  const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
+  const loggedInUser = useSelector((state: { user: any }) => state.user);  
   const { t } = useTranslation();
 
   if (loading) {
@@ -46,6 +53,16 @@ const ProfileSection: React.FC<ProfileRequest> = ({
       </View>
     );
   }
+
+  const handlePressMessage = async () => {
+    // Handle press event
+    console.log("Message button pressed");
+    try{
+      const response = await createUserChatroom(loggedInUser.id, visitedId, user.username, [], false, false);          
+    }catch(e){
+      console.log("Error in handlePress", e);
+    }
+  };
 
   return (
     <>
@@ -132,15 +149,7 @@ const ProfileSection: React.FC<ProfileRequest> = ({
                   )}
 
                   {/* Message button */}
-                  <TouchableOpacity
-                    style={[
-                      styles.button,
-                      {
-                        backgroundColor:
-                          friendStatus === "UNKNOWN" ? "#fff" : "#0C9E04",
-                      },
-                    ]}
-                  >
+                  <TouchableOpacity style={[styles.button,{backgroundColor:friendStatus === "UNKNOWN" ? "#fff" : "#0C9E04",},]} onPress={handlePressMessage}>
                     <Text
                       className="font-bold"
                       style={{
@@ -149,6 +158,7 @@ const ProfileSection: React.FC<ProfileRequest> = ({
                     >
                       {t('profile_section.message')}
                     </Text>
+
                     <MaterialCommunityIcons
                       name={
                         friendStatus === "UNKNOWN"
