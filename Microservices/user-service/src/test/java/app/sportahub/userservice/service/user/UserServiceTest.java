@@ -1115,10 +1115,10 @@ public class UserServiceTest {
         User friend = new User();
         friend.setId("userId2");
 
-        Friend requesterFriend = new Friend(friend.getId(), FriendRequestStatusEnum.ACCEPTED,"");
+        Friend requesterFriend = new Friend(friend.getId(), FriendRequestStatusEnum.ACCEPTED,"http://example.com/placeholder.jpg");
         requesterFriend.setId("friend1Id");
 
-        Friend friendFriend = new Friend(requester.getId(), FriendRequestStatusEnum.ACCEPTED,"");
+        Friend friendFriend = new Friend(requester.getId(), FriendRequestStatusEnum.ACCEPTED,"http://example.com/placeholder.jpg");
 
         friendFriend.setId("friend2Id");
 
