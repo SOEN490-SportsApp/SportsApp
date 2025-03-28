@@ -6,6 +6,7 @@ import { hs, mhs, mvs, vs } from "@/utils/helpers/uiScaler";
 import { useRouter } from "expo-router";
 import { sendFriendRequest } from "@/utils/api/profileApiClient";
 import { useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 
 interface FriendCardProp {
   user: any;
@@ -15,6 +16,7 @@ const FriendCard: React.FC<FriendCardProp> = ({ user }) => {
   const router = useRouter();
   const currentUser = useSelector((state: { user: any }) => state.user);
   const [requestSent, setRequestSent] = useState(user.friendRequestStatus === "SENT");
+  const { t } = useTranslation("common");
 
   if (!user || !user.profileResponse) return null;
 
@@ -46,7 +48,7 @@ const FriendCard: React.FC<FriendCardProp> = ({ user }) => {
           {user.profileResponse.firstName + " " + user.profileResponse.lastName}
         </Text>
         <Text style={styles.subUserInfo}>
-          {Math.floor(Math.random() * 50)} - friends in common
+          {Math.floor(Math.random() * 50)} - {t('friend_card.friends_in_common')}
         </Text>
       </View>
       <View style={styles.addFriendSection}>

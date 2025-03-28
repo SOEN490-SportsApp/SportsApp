@@ -393,5 +393,8 @@
   },
   "friends_list": {
     "start_making_friends": "Start making friends!"
+  },
+  "friend_card": {
+    "friends_in_common": "friends in common"
   }
 }
