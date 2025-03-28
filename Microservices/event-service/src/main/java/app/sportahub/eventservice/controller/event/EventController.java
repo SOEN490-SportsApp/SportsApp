@@ -1,6 +1,7 @@
 package app.sportahub.eventservice.controller.event;
 
 import app.sportahub.eventservice.dto.request.event.EventRequest;
+import app.sportahub.eventservice.dto.request.event.WhitelistRequest;
 import app.sportahub.eventservice.dto.request.event.EventCancellationRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.dto.response.ParticipantResponse;
@@ -190,5 +191,14 @@ public class EventController {
     public ReactionResponse reactToEvent(@PathVariable String id,
             @RequestParam ReactionType reaction) {
         return eventService.reactToEvent(id, reaction);
+    }
+
+    @PatchMapping("/{id}/whitelist")
+    @PreAuthorize("@eventService.isCreator(#id, authentication.name) || hasRole('ROLE_ADMIN')")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Whitelist users", description = "Add users to the whitelist of an event.")
+    public EventResponse whitelistUsers(@PathVariable String id,
+            @RequestBody WhitelistRequest whitelistRequest) {
+        return eventService.whitelistUsers(id, whitelistRequest);
     }
 }
