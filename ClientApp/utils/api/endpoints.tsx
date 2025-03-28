@@ -43,4 +43,6 @@ export const API_ENDPOINTS = {
   GET_All_CHATROOMS: 'messaging-service/messaging/chatrooms/{userId}',
   GET_MESSAGES: 'messaging-service/messaging/chatrooms/messages/{chatroomId}',
   GET_CHATROOM: 'messaging-service/messaging/chatroom/{chatroomId}',
+  CREATE_CHATROOM: 'messaging-service/messaging/chatroom',
+  DELETE_CHATROOM: 'messaging-service/messaging/chatroom/{chatroomId}',
 };
