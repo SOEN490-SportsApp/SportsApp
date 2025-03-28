@@ -108,7 +108,7 @@ const locale = i18n.language === 'fr' ? 'fr' : 'en';
   } else {
     eventStarted = true;
     canJoin = false;
-    timeLeftShown = "Invalid cutoff time";
+    timeLeftShown = t('event_card.invalid_cutoff_time');
   }
 
   const timeLeftColor = getTimeLeftColor(daysLeft);
