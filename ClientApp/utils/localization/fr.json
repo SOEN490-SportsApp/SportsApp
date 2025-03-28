@@ -296,7 +296,9 @@
     "no_description": "Aucune description fournie pour cet événement",
     "failed_to_fetch_event": "Échec de la récupération de l'événement",
     "copied": "Copié",
-    "closed": "Fermé"
+    "closed": "Fermé",
+    "loading_event_data": "Chargement des données de l'événement ...",
+    "error_loading_event_context": "Erreur lors du chargement du contexte de l'événement"
   },
   "post_creation_component": {
     "post_about_this_event": "Postez à propos de cet événement",
