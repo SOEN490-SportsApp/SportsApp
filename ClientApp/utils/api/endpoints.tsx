@@ -40,7 +40,7 @@ export const API_ENDPOINTS = {
   UPLOAD_FILE: "storage-service/objects/upload",
   GET_FILE: "storage-service/objects/file{objectPath}",
 
-  GET_CHATROOMS: 'messaging-service/messaging/chatrooms/{userId}',
+  GET_All_CHATROOMS: 'messaging-service/messaging/chatrooms/{userId}',
   GET_MESSAGES: 'messaging-service/messaging/chatrooms/messages/{chatroomId}',
   GET_CHATROOM: 'messaging-service/messaging/chatroom/{chatroomId}',
 };

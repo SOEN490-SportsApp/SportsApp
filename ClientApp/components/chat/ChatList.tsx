@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import ChatCard from '@/components/chat/ChatCard';
 import {Alert, FlatList} from 'react-native';
 import {useSelector} from "react-redux";
-import {getChatrooms} from "@/services/chatService";
+import {getAllChatrooms} from "@/services/chatService";
 import {User} from "react-native-gifted-chat";
 
 interface CardProps {
@@ -21,7 +21,7 @@ const Chats: React.FC<CardProps> = () => {
 
         const fetchChatrooms = async (user: any) => {
             try {
-                const chatroomData = await getChatrooms(user.id);
+                const chatroomData = await getAllChatrooms(user.id);
                 setChatrooms(chatroomData);
 
             } catch (error) {
