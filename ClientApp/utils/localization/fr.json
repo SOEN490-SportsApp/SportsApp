@@ -223,7 +223,8 @@
     "hour": "heure",
     "day": "jour",
     "week": "semaine",
-    "registration_closed": "Inscription fermée"
+    "registration_closed": "Inscription fermée",
+    "invalid_cutoff_time": "L'heure limite d'inscription doit être avant l'heure de début"
   },
   "skill_tag": {
     "beginner": "Débutant(e)",
@@ -410,5 +411,35 @@
     "could_not_find_user": "Impossible de trouver l'utilisateur",
     "friend_removed": "Vous avez supprimé cet ami",
     "failed_to_remove_friend": "Échec de la suppression de l'ami"
+  },
+  "other_user_profile": {
+    "no_events_found": "Aucun événement trouvé",
+    "friend": "Ami",
+    "error": "Erreur",
+    "failed_to_send_request": "Échec de l'envoi de la demande",
+    "remove_friend": "Supprimer l'ami",
+    "remove_friend_confirmation": "Êtes-vous sûr de vouloir supprimer cet ami?",
+    "cancel": "Annuler",
+    "yes": "Oui",
+    "success": "Succès",
+    "friend_removed": "Vous avez supprimé cet ami",
+    "failed_to_remove_friend": "Échec de la suppression de l'ami",
+    "could_not_find_user": "Impossible de trouver l'utilisateur",
+    "failed_to_load_user_data": "Échec du chargement des données de l'utilisateur",
+    "activity": "Activité",
+    "friends": "Amis",
+    "about": "À propos"
+  },
+  "user_info_card": {
+    "username": "Nom d'utilisateur:",
+    "gender": "Sexe:",
+    "phone": "Numéro de téléphone:",
+    "favourite_sports": "Sports préférés:",
+    "not_provided": "Non fourni"
+  },
+  "profile_section": {
+    "failed_to_load_user_data": "Échec du chargement des données de l'utilisateur",
+    "unfriend": "Supprimer l'ami",
+    "message": "Message"
   }
 }

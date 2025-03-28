@@ -11,6 +11,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { hs, mhs, mvs, vs } from "@/utils/helpers/uiScaler";
 import FavoriteSportsBadges from "../FavoriteSportsBadges";
 import themeColors from "@/utils/constants/colors";
+import { useTranslation } from "react-i18next";
 
 interface ProfileRequest {
   user: any | null;
@@ -28,6 +29,7 @@ const ProfileSection: React.FC<ProfileRequest> = ({
   isUserProfile,
 }) => {
   const [loading, setLoading] = useState<boolean>(false);
+  const { t } = useTranslation();
 
   if (loading) {
     return (
@@ -40,7 +42,7 @@ const ProfileSection: React.FC<ProfileRequest> = ({
   if (!user) {
     return (
       <View className="flex-1 justify-center items-center">
-        <Text className="text-lg text-red-500">Failed to load user data</Text>
+        <Text className="text-lg text-red-500">{t('profile_section.failed_to_load_user_data')}</Text>
       </View>
     );
   }
@@ -92,7 +94,7 @@ const ProfileSection: React.FC<ProfileRequest> = ({
                       style={[styles.button, { backgroundColor: "#fff", borderColor: "#0C9E04" }]}
                       onPress={handleRemoveFriend}
                     >
-                      <Text style={{ color: "#0C9E04", fontWeight: "bold" }}>Unfriend</Text>
+                      <Text style={{ color: "#0C9E04", fontWeight: "bold" }}>{t('profile_section.unfriend')}</Text>
                       <MaterialCommunityIcons name="account-remove" size={22} color="#0C9E04" />
                     </TouchableOpacity>
                   ) : (
@@ -145,7 +147,7 @@ const ProfileSection: React.FC<ProfileRequest> = ({
                         color: friendStatus === "UNKNOWN" ? "#0C9E04" : "#fff",
                       }}
                     >
-                      Message
+                      {t('profile_section.message')}
                     </Text>
                     <MaterialCommunityIcons
                       name={

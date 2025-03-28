@@ -33,6 +33,7 @@ import { Friend } from "@/types";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { hs, vs } from "@/utils/helpers/uiScaler";
 import ProfileSection from "@/components/Profile/ProfileSection";
+import { useTranslation } from "react-i18next";
 
 const screenHeight = Dimensions.get("window").height;
 const maxHeight = screenHeight * 0.5;
@@ -48,6 +49,7 @@ const ActivityTab = ({ userId }: { userId: string }) => {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const { t } = useTranslation();
 
   const fetchEvents = async () => {
     try {
@@ -71,7 +73,7 @@ const ActivityTab = ({ userId }: { userId: string }) => {
       {loading ? (
         <ActivityIndicator size="large" color="#0C9E04" />
       ) : events.length === 0 ? (
-        <Text className="text-center text-gray-500">No events found</Text>
+        <Text className="text-center text-gray-500">{t('other_user_profile.no_events_found')}</Text>
       ) : (
         <FlatList
           data={(events ?? []).sort(
@@ -97,23 +99,26 @@ const ActivityTab = ({ userId }: { userId: string }) => {
   );
 };
 
-const FriendsTab = () => (
-  <View className="p-4 bg-white flex-1">
-    <ScrollView className="pt-3 space-y-4" style={{ maxHeight }}>
-      {Array.from({ length: 6 }).map((_, index) => (
-        <View
-          key={index}
-          className="mt-4 p-4 rounded-lg"
-          style={{ backgroundColor: "#0C9E04" }}
-        >
-          <Text className="text-xl font-bold text-black">
-            Friend {index + 1}
-          </Text>
-        </View>
-      ))}
-    </ScrollView>
-  </View>
-);
+const FriendsTab = () => {
+  const { t } = useTranslation();
+  return (
+    <View className="p-4 bg-white flex-1">
+      <ScrollView className="pt-3 space-y-4" style={{ maxHeight }}>
+        {Array.from({ length: 6 }).map((_, index) => (
+          <View
+            key={index}
+            className="mt-4 p-4 rounded-lg"
+            style={{ backgroundColor: "#0C9E04" }}
+          >
+            <Text className="text-xl font-bold text-black">
+            {t('other_user_profile.friend')} {index + 1}
+            </Text>
+          </View>
+        ))}
+      </ScrollView>
+    </View>
+  );
+};
 
 const AboutTab: React.FC<{ user: any }> = ({ user }) => {
   let age = "N/A";
@@ -145,6 +150,7 @@ const ProfilePage: React.FC = () => {
   const [friendList, setFriendList] = useState<any[]>([]);
   const [friendStatus, setFriendStatus] = useState<string>("UNKNOWN");
   const visitingUser = useSelector((state: { user: any }) => state.user);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -171,7 +177,7 @@ const ProfilePage: React.FC = () => {
         setFriendStatus("PENDING");
         await fetchUserFriends(); 
       } else {
-        Alert.alert("Error", "Failed to send friend request");
+        Alert.alert(t('other_user_profile.error'), t('other_user_profile.failed_to_send_request'));
       }
     } catch (err: any) {
     }
@@ -179,12 +185,12 @@ const ProfilePage: React.FC = () => {
     
   const handleRemoveFriend = async () => {
     Alert.alert(
-      "Remove Friend",
-      "Are you sure you want to remove this friend?",
+      t('other_user_profile.remove_friend'),
+      t('other_user_profile.remove_friend_confirmation'),
       [
-        { text: "Cancel", style: "cancel" },
+        { text: t('other_user_profile.cancel'), style: "cancel" },
         {
-          text: "Yes",
+          text: t('other_user_profile.yes'),
           onPress: async () => {
             try {
               const matchedFriend = friendList.find(
@@ -194,7 +200,7 @@ const ProfilePage: React.FC = () => {
               const realFriendId = matchedFriend?.FriendId;
   
               if (!realFriendId) {
-                Alert.alert("Error", "Could not find friendId to remove.");
+                Alert.alert(t('other_user_profile.error'), t('other_user_profile.could_not_find_user'));
                 return;
               }
   
@@ -202,11 +208,11 @@ const ProfilePage: React.FC = () => {
   
               if (success) {
                 setFriendStatus("UNKNOWN");
-                Alert.alert("Success", "Friend removed successfully.");
+                Alert.alert(t('other_user_profile.success'), t('other_user_profile.friend_removed'));
                 await fetchUserFriends(); 
               }
             } catch (error) {
-              Alert.alert("Error", "Failed to remove friend.");
+              Alert.alert(t('other_user_profile.error'), t('other_user_profile.failed_to_remove_friend'));
             }
           },
         },
@@ -248,15 +254,15 @@ const ProfilePage: React.FC = () => {
   if (!user) {
     return (
       <View className="flex-1 justify-center items-center">
-        <Text className="text-lg text-red-500">Failed to load user data</Text>
+        <Text className="text-lg text-red-500">{t('other_user_profile.failed_to_load_user_data')}</Text>
       </View>
     );
   }
 
   const routes = [
-    { key: "activity", title: "Activity", testID: "Activity" },
-    { key: "friends", title: "Friends", testID: "Friends" },
-    { key: "about", title: "About", testID: "About" },
+    { key: "activity", title: t('other_user_profile.activity'), testID: "Activity" },
+    { key: "friends", title: t('other_user_profile.friends'), testID: "Friends" },
+    { key: "about", title: t('other_user_profile.about'), testID: "About" },
   ];
   const scenes = {
     activity: <ActivityTab userId={id} />,
@@ -267,12 +273,12 @@ const ProfilePage: React.FC = () => {
   return (
     <SafeAreaView className="flex-1 bg-white pt-6">
       <ProfileSection
-  user={user}
-  friendStatus={friendStatus}
-  handleFriendRequest={handleFriendRequest}
-  handleRemoveFriend={handleRemoveFriend}
-  isUserProfile={false}
-/>
+        user={user}
+        friendStatus={friendStatus}
+        handleFriendRequest={handleFriendRequest}
+        handleRemoveFriend={handleRemoveFriend}
+        isUserProfile={false}
+      />
       <CustomTabMenu routes={routes} scenes={scenes} backgroundColor={"#fff"} />
     </SafeAreaView>
   );

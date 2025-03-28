@@ -223,7 +223,8 @@
     "hour": "hour",
     "day": "day",
     "week": "week",
-    "registration_closed": "Registration closed"
+    "registration_closed": "Registration closed",
+    "invalid_cutoff_time": "Invalid cutoff time"
   },
   "skill_tag": {
     "beginner": "Beginner",
@@ -410,5 +411,35 @@
     "could_not_find_user": "Could not find user ID.",
     "friend_removed": "Friend removed successfully!",
     "failed_to_remove_friend": "Failed to remove friend."
+  },
+  "other_user_profile": {
+    "no_events_found": "No events found.",
+    "friend": "Friend",
+    "error": "Error",
+    "failed_to_send_request": "Failed to send friend request.",
+    "remove_friend": "Remove Friend",
+    "remove_friend_confirmation": "Are you sure you want to remove this friend?",
+    "cancel": "Cancel",
+    "yes": "Yes",
+    "success": "Success",
+    "friend_removed": "Friend removed successfully!",
+    "failed_to_remove_friend": "Failed to remove friend.",
+    "could_not_find_user": "Could not find user ID.",
+    "failed_to_load_user_data": "Failed to load user data.",
+    "activity": "Activity",
+    "friends": "Friends",
+    "about": "About"
+  },
+  "user_info_card": {
+    "username": "Username:",
+    "gender": "Gender:",
+    "phone": "Phone:",
+    "favourite_sports": "Favourite Sports:",
+    "not_provided": "Not provided"
+  },
+  "profile_section": {
+    "failed_to_load_user_data": "Failed to load user data.",
+    "unfriend": "Unfriend",
+    "message": "Message"
   }
 }
