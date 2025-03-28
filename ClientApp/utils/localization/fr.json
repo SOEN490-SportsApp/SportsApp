@@ -396,5 +396,19 @@
   },
   "friend_card": {
     "friends_in_common": "amis en commun"
+  },
+  "user_profiles_layout": {
+    "error": "Erreur",
+    "user_not_found": "Utilisateur non trouvé",
+    "success": "Succès",
+    "friend_request_sent": "Demande d'ami envoyée",
+    "failed_to_send_request": "Échec de l'envoi de la demande",
+    "remove_friend": "Supprimer l'ami",
+    "remove_friend_confirmation": "Êtes-vous sûr de vouloir supprimer cet ami?",
+    "cancel": "Annuler",
+    "yes": "Oui",
+    "could_not_find_user": "Impossible de trouver l'utilisateur",
+    "friend_removed": "Vous avez supprimé cet ami",
+    "failed_to_remove_friend": "Échec de la suppression de l'ami"
   }
 }
