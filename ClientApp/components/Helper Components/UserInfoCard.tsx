@@ -2,6 +2,7 @@ import { Sport } from "@/types/sport";
 import React, { ReactNode } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import FavoriteSportsBadges from "../FavoriteSportsBadges";
+import { useTranslation } from "react-i18next";
 
 interface UserInfoCardProps {
   username: string;
@@ -18,23 +19,24 @@ const UserInfoCard: React.FC<UserInfoCardProps> = ({
   phoneNumber,
   sports,
 }) => {
+  const { t } = useTranslation();
   return (
     <View style={styles.card}>
       <View style={styles.infoContainer}>
         <Text style={styles.infoText}>
-          ✍️ Username: {username || "Not Provided"}
+          ✍️ {t('user_info_card.username')} {username || t('user_info_card.not_provided')}
         </Text>
         <Text style={styles.infoText}>
-          👤 Gender: {gender || "Not Provided"}
+          👤 {t('user_info_card.gender')} {gender || t('user_info_card.not_provided')}
         </Text>
         <Text style={styles.infoText}>📅 Age: {age}</Text>
         <Text style={styles.infoText}>
-          📞 Phone: {phoneNumber || "Not Provided"}
+          📞 {t('user_info_card.phone')} {phoneNumber || t('user_info_card.not_provided')}
         </Text>
       </View>
       {sports && (
         <View style={styles.childrenContainer}>
-          <Text style={styles.infoText}>Favourite sports: </Text>
+          <Text style={styles.infoText}>{t('user_info_card.favourite_sports')} </Text>
           <FavoriteSportsBadges sports={sports} />
         </View>
       )}
