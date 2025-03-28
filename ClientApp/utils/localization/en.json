@@ -296,7 +296,9 @@
     "no_description": "No description provided for this event",
     "failed_to_fetch_event": "Failed to fetch event details",
     "copied": "Copied",
-    "closed": "Closed"
+    "closed": "Closed",
+    "loading_event_data": "Loading event data...",
+    "error_loading_event_context": "Error loading event context"
   },
   "post_creation_component": {
     "post_about_this_event": "Post about this event!",

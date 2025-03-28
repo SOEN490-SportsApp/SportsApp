@@ -19,8 +19,6 @@ import EventPostsTab from "@/components/Event/EventPostsTab";
 import { EventContext } from "@/app/events/_layout";
 import { useContext } from 'react';
 import { Participant } from '@/types/event';
-
-
 import ClosedButtonEventPage from "@/components/Helper Components/ClosedButtonEventPage";
 import { useTranslation } from "react-i18next";
 import i18n, { t } from "i18next";
@@ -115,7 +113,7 @@ const EventPage: React.FC = () => {
   // Get context inside the component
   const eventContext = useContext(EventContext);
   if (!eventContext) {
-    return <Text>Error loading event context</Text>;
+    return <Text>{t('event_page.error_loading_event_context')}</Text>;
   }
 
   const { eventData, setEventData } = eventContext;
@@ -184,7 +182,7 @@ const EventPage: React.FC = () => {
     return (
       <View style={styles.errorContainer}>
         <Text style={styles.errorText}>{t('event_page.event_not_found')}</Text>
-        <Text style={styles.errorText}>Loading event data...</Text>
+        <Text style={styles.errorText}>{t('event_page.loading_event_data')}.</Text>
       </View>
     );
   }
@@ -197,7 +195,7 @@ const EventPage: React.FC = () => {
   const currentTime = new Date();
   const cutoffTime = new Date(event!.cutOffTime);
   const timeDifference = cutoffTime.getTime() - currentTime.getTime();
-  const adjustedTimeDifference = timeDifference - cutoffTime.getTimezoneOffset() * 60 * 1000; // Convert offset to milliseconds
+  const adjustedTimeDifference = timeDifference - cutoffTime.getTimezoneOffset() * 60 * 1000;
 
   let sportIcon = sportIconMap[event.sportType];
 
@@ -255,17 +253,18 @@ const EventPage: React.FC = () => {
               </View>
               <View style={styles.joinButtonContainer}>
               {!isUserParticipant ? (
-                  adjustedTimeDifference > 0 ? (
-                    <ConfirmButtonEventPage text="Join" onPress={handleJoinEvent} icon={undefined} iconPlacement={null} />
-                  ) : (
-                    <ClosedButtonEventPage text="Closed" />
-                  )
+                adjustedTimeDifference > 0 ? (
+                  event.eventType !== "private" ? (
+                    <ConfirmButtonEventPage text={t('event_page.join')} onPress={handleJoinEvent} icon={undefined} iconPlacement={null} />
+                  ) : null
                 ) : (
-                  <View style={styles.joinedTextContainer}>
-                    {/* <MaterialCommunityIcons name="check-circle" size={20} color={themeColors.primary} /> */}
-                    <Text style={styles.joinedText}>Joined</Text>
-                  </View>
-                )}
+                  <ClosedButtonEventPage text={t('event_page.closed')} />
+                )
+              ) : (
+                <View style={styles.joinedTextContainer}>
+                  <Text style={styles.joinedText}>{t('event_page.joined')}</Text>
+                </View>
+              )}
               </View>
             </View>
           </View>
