@@ -165,7 +165,6 @@ public class UserServiceConsumerImpl{
         record.headers().add(new RecordHeader(KafkaHeaders.REPLY_TOPIC, UserEvent.FETCHED_TOPIC.getBytes()));
         record.headers().add(new RecordHeader(KafkaHeaders.CORRELATION_ID, correlationId));
         
-        // RequestReplyFuture<String, Object, Object> future = replyingKafkaTemplate.sendAndReceive(record);
         replyingKafkaTemplate.send(record);
         log.info("EventServiceConsumer::listenForUserRequests: sent fetch request for user with id: {}", userId);
     }
@@ -194,85 +193,4 @@ public class UserServiceConsumerImpl{
         kafkaTemplate.send(responseRecord);
         log.info("EventServiceConsumer::listenForFetchedUsers: sent response to event-service for user with id: {}", fetchedEvent.getUser());
     }
-
-    // @SneakyThrows
-    // @KafkaListener(topics = {UserEvent.REQUEST_TOPIC, UserEvent.FETCHED_TOPIC}, groupId = "UserServiceKafkaConsumer")
-    // public void listenForUserEvents(
-    //     @Payload UserRequestEvent requestEvent,
-    //     @Header(KafkaHeaders.CORRELATION_ID) byte[] correlationId
-    // ) { 
-    //     log.info("EventServiceConsumerImpl::listenForUserEvents: received user event with id : {} ", requestEvent.getUserId());
-    
-    //     String userId = requestEvent.getUserId();
-    //     BaseEvent fetchBaseEvent = new BaseEvent(
-    //         UUID.randomUUID().toString(),
-    //         "request",
-    //         "orchestration-service",
-    //         Instant.now(),
-    //         requestEvent.getBaseEvent().getCorrelationId()
-    //     );
-
-    //     try {
-    //         UserFetchEvent fetchEvent = new UserFetchEvent(
-    //             fetchBaseEvent,
-    //             userId
-    //         );
-    //         ProducerRecord<String, Object> record = new ProducerRecord<>(
-    //             UserEvent.FETCH_TOPIC,
-    //             fetchEvent
-    //         );
-    //         record.headers().add(new RecordHeader(KafkaHeaders.REPLY_TOPIC, UserEvent.FETCHED_TOPIC.getBytes()));
-    //         record.headers().add(new RecordHeader(KafkaHeaders.CORRELATION_ID, correlationId));
-            
-    //         RequestReplyFuture<String, Object, Object> future = replyingKafkaTemplate.sendAndReceive(record);
-    //         log.info("EventServiceConsumer::listenForUserEvents: send fetch requeest for user with id: {}", userId);
-
-    //         SendResult<String, Object> sendResult = future.getSendFuture().get();
-    //         sendResult.getProducerRecord().headers().forEach(header -> System.out.println(header.key() + ":" + header.value().toString()));
-    //         log.info("EventServiceConsumer::listenForUserEvents: received reply 1 for user with id: {}: {}", userId, sendResult);
-            
-    //         ConsumerRecord<String, Object> response = future.get(100, TimeUnit.SECONDS);
-    //         log.info("EventServiceConsumer::listenForUserEvents: received reply for user with id: {}", userId);
-
-    //         log.info("EventServiceConsumer::listenForUserEvents: response value: {}", response.value());
-
-    //         if(response.value() instanceof UserFetchedEvent fetchedEvent
-    //         && Objects.equals(fetchedEvent.getBaseEvent().getCorrelationId(), fetchEvent.getBaseEvent().getCorrelationId())) {
-    //             log.info("EventServiceConsumer::listenForUserEvents: received user with id: {}", requestEvent.getUserId());
-
-    //         }
-    //         else{
-    //             throw new RuntimeException("Invalid response received");
-    //         } 
-
-    //         BaseEvent fetchedBaseEvent = new BaseEvent(
-    //             UUID.randomUUID().toString(),
-    //             "response",
-    //             "orchestration-service",
-    //             Instant.now(),
-    //             fetchedEvent.getBaseEvent().getCorrelationId()
-    //         );  
-
-    //         UserResponseEvent responseEvent = new UserResponseEvent(
-    //             fetchedBaseEvent,
-    //             fetchedEvent.getUser()
-    //         );
-
-
-    //         ProducerRecord<String, Object> responseRecord = new ProducerRecord<>(UserEvent.RESPONSE_TOPIC, responseEvent);
-    //         responseRecord.headers().add(new RecordHeader(KafkaHeaders.CORRELATION_ID, correlationId));
-
-    //         kafkaTemplate.send(responseRecord);
-    //         log.info("EventServiceConsumer::listenForUserEvents: sent response to event-service for user with id: {}", userId);
-            
-    //     } catch(InterruptedException e) {
-    //         log.error(e.getMessage());
-    //     } catch(ExecutionException e) {
-    //         log.error(e.getMessage());
-    //     } catch(TimeoutException e) {
-    //         log.error(e.getMessage());
-    //     } catch(Exception e) {
-    //         log.error(e.getMessage());
-    //     }
-    // }
 }
