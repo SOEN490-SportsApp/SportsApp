@@ -267,12 +267,13 @@ const ProfilePage: React.FC = () => {
   return (
     <SafeAreaView className="flex-1 bg-white pt-6">
       <ProfileSection
-  user={user}
-  friendStatus={friendStatus}
-  handleFriendRequest={handleFriendRequest}
-  handleRemoveFriend={handleRemoveFriend}
-  isUserProfile={false}
-/>
+        visitedId = {id}
+        user={user}
+        friendStatus={friendStatus}
+        handleFriendRequest={handleFriendRequest}
+        handleRemoveFriend={handleRemoveFriend}
+        isUserProfile={false}
+      />
       <CustomTabMenu routes={routes} scenes={scenes} backgroundColor={"#fff"} />
     </SafeAreaView>
   );

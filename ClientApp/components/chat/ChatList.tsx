@@ -1,19 +1,21 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import ChatCard from '@/components/chat/ChatCard';
 import {Alert, FlatList} from 'react-native';
 import {useSelector} from "react-redux";
 import {deleteChatroom, getAllChatrooms} from "@/services/chatService";
 import {User} from "react-native-gifted-chat";
+import { useFocusEffect } from '@react-navigation/native';
 
 interface CardProps {
     chatroomId: string;
     createdBy: string;
-    //userImg: any;
+    userImg: any;
     createdAt: string;
-    //content: string;
+    content: string;
+    chatroomName: string
 }
 
-const Chats: React.FC<CardProps> = () => {
+const Chats = () => {
     const [chatrooms, setChatrooms] = useState<CardProps[]>([]);
     const user = useSelector((state: {user: any}) => state.user);
 
@@ -39,19 +41,25 @@ const Chats: React.FC<CardProps> = () => {
         ]
         );
     };
-    useEffect(() => {
-        const fetchChatrooms = async (user: any) => {
-            try {
-                const chatroomData = await getAllChatrooms(user.id);
-                setChatrooms(chatroomData);
 
-            } catch (error) {
-                console.error("Failed to fetch chatrooms:", error);
-                throw error;
-            }
-        }
-        fetchChatrooms(user);
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            const fetchChatrooms = async (user: any) => {
+                try {
+                    const chatroomData = await getAllChatrooms(user.id);
+                    setChatrooms(chatroomData);
+                } catch (error) {
+                    console.error("Failed to fetch chatrooms:", error);
+                    throw error;
+                }
+            };
+            fetchChatrooms(user);
+
+            return () => {
+                setChatrooms([]); // Cleanup if needed
+            };
+        }, [user])
+    );
 
     return (
         <FlatList
@@ -62,7 +70,7 @@ const Chats: React.FC<CardProps> = () => {
                     userImg={require('@/assets/images/avatar-placeholder.png')}
                     messageText={"hello"}
                     messageTime={item.createdAt}
-                    userName={user.username}
+                    cardTitle={item.chatroomName}
                     chatId={item.chatroomId}
                     onLongPress={() => handleDelete(item.chatroomId)}
                 />
