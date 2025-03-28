@@ -1076,8 +1076,8 @@ public class UserServiceTest {
         friendUser2.setId("friend2Id");
 
         List<Friend> friendList = new ArrayList<>();
-        friendList.add(new Friend("friend1", FriendRequestStatusEnum.ACCEPTED,""));
-        friendList.add(new Friend("friend2", FriendRequestStatusEnum.ACCEPTED,""));
+        friendList.add(new Friend("friend1", FriendRequestStatusEnum.ACCEPTED, "http://example.com/placeholder.jpg"));
+        friendList.add(new Friend("friend2", FriendRequestStatusEnum.ACCEPTED, "http://example.com/placeholder.jpg"));
         user.setFriendList(friendList);
 
         lenient().when(userRepository.findUserById("userId")).thenReturn(Optional.of(user));
