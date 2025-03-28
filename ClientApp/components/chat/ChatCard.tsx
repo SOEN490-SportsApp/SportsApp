@@ -5,7 +5,7 @@ import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 
 interface CardProps {
   chatId: string;
-  userName: string;
+  cardTitle: string;
   userImg: any;
   messageTime: string;
   messageText: string;
@@ -15,7 +15,7 @@ interface CardProps {
 
 const ChatCard: React.FC<CardProps> = ({ 
   chatId, 
-  userName, 
+  cardTitle, 
   userImg, 
   messageTime, 
   messageText,
@@ -35,7 +35,7 @@ const ChatCard: React.FC<CardProps> = ({
         </View>
         <View style={styles.textSection}>
           <View style={styles.userInfoText}>
-            <Text style={styles.userName}>{userName}</Text>
+            <Text style={styles.userName}>{cardTitle}</Text>
             <Text style={styles.postTime}>{messageTime}</Text>
           </View>
           <Text style={styles.messageText}>{messageText}</Text>
