@@ -338,10 +338,26 @@ const Create = () => {
           return false;
         }
 
-        if (cutOffDate.getTime() >= eventDate.getTime()) {
+        const combinedCutOffDateTime = new Date(
+          cutOffDate.getFullYear(),
+          cutOffDate.getMonth(),
+          cutOffDate.getDate(),
+          cutOffTime.getHours(),
+          cutOffTime.getMinutes()
+        );
+        
+        const combinedStartDateTime = new Date(
+          eventDate.getFullYear(),
+          eventDate.getMonth(),
+          eventDate.getDate(),
+          startTime.getHours(),
+          startTime.getMinutes()
+        );
+        
+        if (combinedCutOffDateTime >= combinedStartDateTime) {
           Alert.alert(t('create.oops'), t('create.cutoff_before_start'));
           return false;
-        }
+        }        
         break;
 
       case 3:
