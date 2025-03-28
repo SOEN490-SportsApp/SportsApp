@@ -3,6 +3,7 @@ package app.sportahub.eventservice.service.event;
 import app.sportahub.eventservice.dto.request.event.EventCancellationRequest;
 import app.sportahub.eventservice.dto.request.event.EventRequest;
 import app.sportahub.eventservice.dto.request.event.LocationRequest;
+import app.sportahub.eventservice.dto.request.event.WhitelistRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.dto.response.ParticipantResponse;
 import app.sportahub.eventservice.dto.response.ReactionResponse;
@@ -104,6 +105,7 @@ class EventServiceTest {
                 .withIsPrivate(false)
                 .withCutOffTime(LocalDateTime.now().plusDays(1).toString())
                 .withState(EventState.ACTIVE)
+                .withWhitelistedUsers(new ArrayList<>(List.of("user1")))
                 .build();
 
         eventResponse = new EventResponse(
@@ -125,7 +127,7 @@ class EventServiceTest {
                 "14:00",
                 "Friendly game",
                 false,
-                null,
+                Collections.singletonList("user1"),
                 null,
                 new ArrayList<>(),
                 null
@@ -744,5 +746,78 @@ class EventServiceTest {
         );
 
         verify(eventRepository).findEventById("event123");
+    }
+
+    @Test
+    void whitelistUsers_ShouldAddUsersToWhitelist() {
+        List<String> userIds = List.of("user3", "user4");
+        WhitelistRequest whitelistRequest = new WhitelistRequest(userIds);
+        when(eventRepository.findById("event123")).thenReturn(Optional.of(event));
+        when(eventRepository.save(any(Event.class))).thenReturn(event);
+        when(eventMapper.eventToEventResponse(any(Event.class))).thenReturn(eventResponse);
+
+        EventResponse response = eventServiceImpl.whitelistUsers("event123", whitelistRequest);
+
+        assertNotNull(response);
+        assertEquals(eventResponse, response);
+        assertTrue(event.getWhitelistedUsers().containsAll(userIds));
+        verify(eventRepository, times(1)).findById("event123");
+        verify(eventRepository, times(1)).save(event);
+    }
+
+    @Test
+    void whitelistUsers_ShouldThrowNoUserIdsProvidedException_WhenUserIdsIsEmpty() {
+        // Arrange
+        List<String> userIds = Collections.emptyList();
+
+        // Act & Assert
+        assertThrows(NoUserIdsProvidedException.class, () -> eventServiceImpl.whitelistUsers("event123", new WhitelistRequest(userIds)));
+        verify(eventRepository, never()).findById(anyString());
+        verify(eventRepository, never()).save(any(Event.class));
+    }
+
+    @Test
+    void whitelistUsers_ShouldThrowEventDoesNotExistException_WhenEventNotFound() {
+        // Arrange
+        List<String> userIds = List.of("user3");
+        when(eventRepository.findById("event123")).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(EventDoesNotExistException.class, () -> eventServiceImpl.whitelistUsers("event123", new WhitelistRequest(userIds)));
+        verify(eventRepository, times(1)).findById("event123");
+        verify(eventRepository, never()).save(any(Event.class));
+    }
+
+    @Test
+    void whitelistUsers_ShouldNotAddDuplicateUsers() {
+        // Arrange
+        List<String> userIds = new ArrayList<>(List.of("user1", "user3"));
+        when(eventRepository.findById("event123")).thenReturn(Optional.of(event));
+        when(eventRepository.save(any(Event.class))).thenReturn(event);
+        when(eventMapper.eventToEventResponse(any(Event.class))).thenReturn(eventResponse);
+
+        // Act
+        EventResponse response = eventServiceImpl.whitelistUsers("event123", new WhitelistRequest(userIds));
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(eventResponse, response);
+        assertTrue(event.getWhitelistedUsers().contains("user3"));
+        assertEquals(1, Collections.frequency(event.getWhitelistedUsers(), "user1")); 
+
+        verify(eventRepository, times(1)).findById("event123");
+        verify(eventRepository, times(1)).save(event);
+    }
+
+    @Test
+    void whitelistUsers_ShouldThrowEventFullException_WhenWhitelistExceedsMaxParticipants() {
+        // Arrange
+        List<String> userIds = List.of("user2", "user3", "user4", "user5", "user6", "user7", "user8", "user9", "user10", "user11");
+        when(eventRepository.findById("event123")).thenReturn(Optional.of(event));
+
+        // Act & Assert
+        assertThrows(EventFullException.class, () -> eventServiceImpl.whitelistUsers("event123", new WhitelistRequest(userIds)));
+        verify(eventRepository, times(1)).findById("event123");
+        verify(eventRepository, never()).save(any(Event.class));
     }
 }
