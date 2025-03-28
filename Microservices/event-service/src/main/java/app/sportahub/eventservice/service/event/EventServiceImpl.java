@@ -28,6 +28,7 @@ import app.sportahub.eventservice.dto.request.event.EventCancellationRequest;
 import app.sportahub.eventservice.dto.request.event.EventRequest;
 import app.sportahub.eventservice.dto.request.event.ParticipantRequest;
 import app.sportahub.eventservice.dto.request.event.ReactionRequest;
+import app.sportahub.eventservice.dto.request.event.WhitelistRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.dto.response.ParticipantResponse;
 import app.sportahub.eventservice.dto.response.ReactionResponse;
@@ -628,5 +629,36 @@ public class EventServiceImpl implements EventService {
         eventRepository.save(event);
         log.info("EventServiceImpl::reactToEvent: Event with id: {} reaction: {}", eventId, newReaction);
         return new ReactionResponse( reaction.getUserId(), reaction.getReactionType());
+    }
+
+    @Override
+    public EventResponse whitelistUsers(String id, WhitelistRequest whitelistRequest) {
+        List<String> userIds = whitelistRequest.userIds();
+        List<String> userIdsToAdd = new ArrayList<>();
+        if(userIds.isEmpty()){
+            throw new NoUserIdsProvidedException();
+        }
+
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new EventDoesNotExistException(id));
+        
+        List<String> whitelistUserList = event.getWhitelistedUsers();
+
+        for(String userId: userIds) {
+            if(!whitelistUserList.contains(userId)){
+                userIdsToAdd.add(userId); 
+            }
+        }
+        whitelistUserList.addAll(userIdsToAdd);
+  
+
+        if(whitelistUserList.size() > event.getMaxParticipants()){
+            throw new EventFullException(id, userIdsToAdd.toString());
+        }
+
+        event.setWhitelistedUsers(whitelistUserList);
+        Event savedEvent = eventRepository.save(event);
+        log.info("EventServiceImpl::whitelistUsers: Users with ids: {} were added to the whitelist for event with id: {}", userIds, id);
+        return eventMapper.eventToEventResponse(savedEvent);
     }
 }

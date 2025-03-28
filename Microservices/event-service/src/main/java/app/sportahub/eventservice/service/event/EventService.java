@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 
 import app.sportahub.eventservice.dto.request.event.EventCancellationRequest;
 import app.sportahub.eventservice.dto.request.event.EventRequest;
+import app.sportahub.eventservice.dto.request.event.WhitelistRequest;
 import app.sportahub.eventservice.dto.response.EventResponse;
 import app.sportahub.eventservice.dto.response.ParticipantResponse;
 import app.sportahub.eventservice.dto.response.ReactionResponse;
@@ -70,4 +71,6 @@ public interface EventService {
 
 
     ReactionResponse reactToEvent(String id, ReactionType reaction);
+
+    EventResponse whitelistUsers(String id, WhitelistRequest whitelistRequest);
 }
