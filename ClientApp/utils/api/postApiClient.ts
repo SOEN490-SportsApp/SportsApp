@@ -64,22 +64,45 @@ export async function fetchPosts(eventId: string, page: number, size: number): P
     }
 }
 
-export async function fetchImage(filePath: string): Promise<string> {
-    const axiosInstance = getAxiosInstance();
-    try {
-      const response = await axiosInstance.get(
-        API_ENDPOINTS.GET_FILE.replace("{objectPath}", filePath),
-        {
-          responseType: 'blob'
-        }
-      );
-      return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result as string);
-        reader.readAsDataURL(response.data);
-      });
-    } catch (error) {
-      console.error("Error fetching image:", error);
-      throw error;
+const imageCache: Record<string, string> = {};
+
+export async function fetchImage(filePath: string, retries = 3): Promise<string> {
+    if (imageCache[filePath]) {
+        return imageCache[filePath];
     }
-  }
+
+    const axiosInstance = getAxiosInstance();
+    let lastError: any;
+
+    for (let i = 0; i < retries; i++) {
+        try {
+            const response = await axiosInstance.get(
+                API_ENDPOINTS.GET_FILE.replace("{objectPath}", filePath),
+                {
+                    responseType: 'blob',
+                    timeout: 10000
+                }
+            );
+
+            const result = await new Promise<string>((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result as string);
+                reader.onerror = (error) => reject(error);
+                reader.readAsDataURL(response.data);
+            });
+
+            imageCache[filePath] = result;
+            return result;
+
+        } catch (error) {
+            lastError = error;
+            console.warn(`Attempt ${i + 1} failed for image ${filePath}`);
+            if (i < retries - 1) {
+                await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+            }
+        }
+    }
+
+    console.error("Failed to fetch image after retries:", lastError);
+    throw lastError;
+}
