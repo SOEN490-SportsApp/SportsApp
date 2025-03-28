@@ -3,10 +3,12 @@ import { View, FlatList, ActivityIndicator, Text, StyleSheet } from "react-nativ
 import FriendCard from "./FriendCardProfilePage";
 import { getFriendsOfUser, getUserProfile} from "@/services/userService";
 import { useFocusEffect } from "expo-router";
+import { useTranslation } from "react-i18next";
 
 const FriendsList = ({ userId }: { userId: string }) => {
   const [friends, setFriends] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   const fetchFriends = async () => {
     setLoading(true);
@@ -38,7 +40,7 @@ const FriendsList = ({ userId }: { userId: string }) => {
   }
 
   if (friends.length === 0) {
-    return <Text style={styles.noFriends}>Start Making Friends.</Text>;
+    return <Text style={styles.noFriends}>{t('friends_list.start_making_friends')}</Text>;
   }
 
   return (
