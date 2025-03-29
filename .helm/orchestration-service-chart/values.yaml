@@ -39,6 +39,8 @@ volumes: []
 volumeMounts: []
 
 env:
+  - name: SERVER_SERVLET_CONTEXT_PATH
+    value: "/api/event-service"
   - name: KAFKA_BOOTSTRAP_SERVERS
     valueFrom:
       secretKeyRef:
