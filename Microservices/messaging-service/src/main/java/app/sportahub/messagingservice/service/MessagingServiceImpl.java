@@ -95,6 +95,18 @@ public class MessagingServiceImpl  implements MessagingService {
     public List<ChatroomResponse> getChatrooms(String userId) {
         List<Chatroom> chatrooms = chatroomRepository.findAllByMembers_UserId(userId);
 
+        chatrooms = chatrooms.stream().peek(chatroom -> {
+            if (chatroom.getMembers().size() == 2) {
+                Set<Member> memberSet;
+                memberSet = chatroom.getMembers().stream().peek(member -> {
+                    if (!member.getUserId().equals(userId)) {
+                        chatroom.setChatroomName(member.getUsername());
+                    }
+                }).collect(Collectors.toSet());
+                chatroom.setMembers(memberSet);
+            }
+        }).toList();
+
         return chatrooms.stream()
                 .map(chatroomMapper::chatroomToChatroomResponse)
                 .toList();
@@ -294,7 +306,7 @@ public class MessagingServiceImpl  implements MessagingService {
         Set<Member> paramMembers = new HashSet<>(members);
         Set<Member> existingMembers = chatroom.getMembers();
 
-        if (paramMembers.contains(chatroom.getCreatedBy()))
+        if (paramMembers.stream().anyMatch(m -> m.getUserId().equals(chatroom.getCreatedBy())))
             throw new ChatroomCreatorTryingToRemoveThemselvesFromChatroomException(chatroomId, chatroom.getCreatedBy());
 
         existingMembers.removeAll(paramMembers);
