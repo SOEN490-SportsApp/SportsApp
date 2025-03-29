@@ -1,12 +1,14 @@
 package app.sportahub.eventservice.model.social;
 
 import app.sportahub.eventservice.model.BaseEntity;
+import app.sportahub.eventservice.model.event.reactor.Reaction;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -34,4 +36,7 @@ public class Post extends BaseEntity {
     @DBRef(lazy = true)
     @Builder.Default
     private List<Comment> comments = Collections.emptyList();
+
+    @Builder.Default
+    private List<Reaction> reactions = new ArrayList<>();
 }

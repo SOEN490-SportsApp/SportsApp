@@ -609,20 +609,22 @@ public class EventServiceImpl implements EventService {
                 reaction = Reaction.builder()
                         .withUserId(userId)
                         .withReactionType(ReactionType.NO_REACTION)
+                        .withReactionDate(LocalDateTime.now())
                         .build();
                 event.getReactions().remove(reactorToEvent);
             } else {
-               throw new ReactionAlreadySubmittedException(eventId, userId);
+               throw new ReactionAlreadySubmittedException("event", eventId, userId);
             }
         } else {
             if(newReaction == ReactionType.LIKE) {
                 reaction = Reaction.builder()
                         .withUserId(userId)
                         .withReactionType(ReactionType.LIKE)
+                        .withReactionDate(LocalDateTime.now())
                         .build();
                 event.getReactions().add(reaction);
             } else{
-                throw new ReactionAlreadySubmittedException(eventId, userId);
+                throw new ReactionAlreadySubmittedException("event", eventId, userId);
             }
         }
 

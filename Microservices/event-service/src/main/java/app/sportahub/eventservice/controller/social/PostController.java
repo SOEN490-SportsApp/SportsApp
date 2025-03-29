@@ -1,7 +1,12 @@
 package app.sportahub.eventservice.controller.social;
 
+import app.sportahub.eventservice.dto.request.social.CommentRequest;
 import app.sportahub.eventservice.dto.request.social.PostRequest;
-import app.sportahub.eventservice.model.social.Post;
+import app.sportahub.eventservice.dto.response.ReactionResponse;
+import app.sportahub.eventservice.dto.response.social.CommentResponse;
+import app.sportahub.eventservice.dto.response.social.PostResponse;
+import app.sportahub.eventservice.model.event.reactor.ReactionType;
+import app.sportahub.eventservice.service.event.EventService;
 import app.sportahub.eventservice.service.social.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -9,6 +14,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 public class PostController {
 
     private final PostService postService;
+    private final EventService eventService;
 
     @PostMapping
     @PreAuthorize("@eventService.isParticipant(#eventId, authentication.name) || hasRole('ROLE_ADMIN')")
@@ -41,7 +48,7 @@ public class PostController {
             @ApiResponse(responseCode = "403", description = "Forbidden – User is not a participant or not authorized"),
             @ApiResponse(responseCode = "404", description = "Event or user not found")
     })
-    public Post createPost(@PathVariable String eventId, @RequestBody PostRequest postRequest) {
+    public PostResponse createPost(@PathVariable String eventId, @RequestBody PostRequest postRequest) {
         return postService.createPost(eventId, postRequest);
     }
 
@@ -61,11 +68,103 @@ public class PostController {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved the list of posts", content = @Content),
             @ApiResponse(responseCode = "404", description = "Event not found")
     })
-    public Page<Post> getAllPostsOrderedByCreationDateInDesc(
+    public Page<PostResponse> getAllPostsOrderedByCreationDateInDesc(
             @PathVariable String eventId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = Pageable.ofSize(size).withPage(page);
         return postService.getAllPostsOrderedByCreationDateInDesc(eventId, pageable);
+    }
+
+    @GetMapping("/{postId}/")
+    @Operation(
+            summary = "Get post in a specific event",
+            description = "Get post by providing eventId and postId.",
+            parameters = {
+                    @Parameter(name = "eventId", description = "Unique identifier of the event", required = true, example = "12345"),
+                    @Parameter(name = "postId", description = "Unique identifier of the post", required = true, example = "67890"),
+            }
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Post retrieved successfully", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Forbidden – User is not authorized"),
+            @ApiResponse(responseCode = "404", description = "Post not found")
+    })
+    public PostResponse getPost(
+            @PathVariable String eventId,
+            @PathVariable String postId
+    ) {
+        return postService.getPost(eventId, postId);
+    }
+
+    @DeleteMapping("/{postId}/")
+    @PreAuthorize("@postService.isPostCreator(#postId, authentication.name) || hasRole('ROLE_ADMIN')")
+    @Operation(
+            summary = "Deletes post in an event",
+            description = "Deletes post in an event by providing eventId and postId.",
+            parameters = {
+                    @Parameter(name = "eventId", description = "Unique identifier of the event", required = true, example = "12345"),
+                    @Parameter(name = "postId", description = "Unique identifier of the post", required = true, example = "67890"),
+            }
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Post deleted successfully", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Forbidden – User is not authorized"),
+            @ApiResponse(responseCode = "404", description = "Post not found")
+    })
+    public PostResponse deletePost(
+            @PathVariable String eventId,
+            @PathVariable String postId
+    ) {
+        return postService.deletePost(eventId, postId);
+    }
+
+    @PostMapping("/{postId}/comment")
+    @Operation(
+            summary = "Creates comment in a post",
+            description = "Adds comment to post by providing eventId, postId, userId, and content."
+    )
+    public CommentResponse createComment(
+            @PathVariable String eventId,
+            @PathVariable String postId,
+            @RequestBody @Valid CommentRequest commentRequest
+            ) {
+        return postService.createComment(eventId, postId, commentRequest);
+    }
+
+    @DeleteMapping("/{postId}/comment")
+    @PreAuthorize("@postService.isCommentCreator(#eventId, authentication.name) ||" +
+            " @postService.isPostCreator(#postId, authentication.name) ||" +
+            " @eventService.isCreator(#eventId, authentication.name) ||" +
+            " hasRole('ROLE_ADMIN')")
+    @Operation(
+            summary = "Deletes comment in a post",
+            description = "Deletes comment in a post by providing eventId, postId, and commentId.",
+            parameters = {
+                    @Parameter(name = "eventId", description = "Unique identifier of the event", required = true, example = "12345"),
+                    @Parameter(name = "postId", description = "Unique identifier of the post", required = true, example = "67890"),
+                    @Parameter(name = "commentId", description = "Unique identifier of the comment", required = true, example = "11121")
+            }
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Comment deleted successfully", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Forbidden – User is not authorized"),
+            @ApiResponse(responseCode = "404", description = "Post not found")
+    })
+    public CommentResponse deleteComment(
+            @PathVariable String eventId,
+            @PathVariable String postId,
+            @RequestParam String commentId
+            ) {
+        return postService.deleteComment(eventId, postId, commentId);
+    }
+
+    @PostMapping("/{postId}/reaction")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "React to a post", description = "Enables a user to react to a post given the eventId and postId.")
+    public ReactionResponse reactToPost(@PathVariable String eventId,
+                                         @PathVariable String postId,
+                                         @RequestParam ReactionType reaction) {
+        return postService.reactToPost(eventId, postId, reaction);
     }
 }
