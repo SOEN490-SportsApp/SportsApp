@@ -9,23 +9,16 @@ const helpPage: React.FC = () => {
   const { t } = useTranslation();
 
   const handleContactSupport = () => {
-    Linking.openURL('mailto:yousfino-8@hotmail.com');
+    Linking.openURL('mailto:sportahubapp@gmail.com?subject=Support Request&body=Hello, I need help with...');
   };
 
   const handlePrivacyPolicy = () => {
-
+    Linking.openURL('https://www.termsfeed.com/live/d818d293-3b1e-4b74-9ebd-d40a6852aa93');
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
 
-      {/* Contact Support */}
-      <TouchableOpacity style={styles.option} onPress={handleContactSupport}>
-        <Ionicons name="mail-outline" size={mvs(24)} color={themeColors.text.dark} style={styles.icon} />
-        <Text style={styles.text}>{t('help_page.contact_support')}</Text>
-      </TouchableOpacity>
-
-      {/* Privacy Policy */}
       <TouchableOpacity style={styles.option} onPress={handlePrivacyPolicy}>
         <Ionicons name="document-text-outline" size={mvs(24)} color={themeColors.text.dark} style={styles.icon} />
         <Text style={styles.text}>{t('help_page.privacy_policy')}</Text>

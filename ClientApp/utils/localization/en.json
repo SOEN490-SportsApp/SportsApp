@@ -50,7 +50,10 @@
     "email_required": "Email is required",
     "password_required": "Password is required",
     "confirm_password_required": "Please confirm your password",
-    "minimum_characters": "Minimum 6 characters"
+    "minimum_characters": "Minimum 6 characters",
+    "terms_of_use_title": "Terms of Use",
+    "close_terms": "Close",
+    "terms_text": "Terms of Use for Sporta\n\nLast updated: March 29, 2025\n\nWelcome to Sporta! By accessing or using our app, you agree to these Terms of Use. Please read them carefully.\n\n1. Acceptance of Terms\nBy using Sporta, you agree to follow these Terms of Use and our Privacy Policy. If you don’t agree with any part of them, please do not use the app.\n\n2. Eligibility\nYou must be at least 13 years old to use Sporta. If you’re under 18, you must have your parent or legal guardian’s permission.\n\n3. Your Account\nYou’re responsible for keeping your account and password secure. You’re also responsible for any activity that occurs under your account.\nIf you believe your account has been compromised, please contact us immediately.\n\n4. User Content\nYou’re responsible for any content (photos, text, videos, etc.) you share on Sporta. You must not post content that is:\n- Offensive, abusive, or discriminatory\n- Infringing on someone else’s rights\n- Illegal or promotes illegal activities\n- Spam or misleading\n\nWe may remove content or suspend accounts that violate these rules.\n\n5. Community Guidelines\nWe want Sporta to be a respectful and safe space. You agree to:\n- Treat others with respect\n- Report harmful or abusive behavior\n- Avoid impersonating others or spreading misinformation\n\nWe reserve the right to remove users who violate these community standards.\n\n6. Intellectual Property\nSporta and its content (logos, design, features) are owned by us. You may not copy, modify, or distribute any part of our platform without permission.\n\n7. Termination\nWe may suspend or terminate your access to Sporta if you violate these Terms or if we need to for legal, technical, or security reasons.\n\n8. Limitation of Liability\nSporta is provided “as is.” We don’t guarantee that it will be error-free or always available. We are not responsible for any losses or damages caused by using the app.\n\n9. Changes to These Terms\nWe may update these Terms from time to time. If we make changes, we’ll notify you through the app or by other means. Continued use of the app means you accept the new terms.\n\n10. Contact Us\nIf you have questions about these Terms, you can contact us:\nEmail: sportahubapp@gmail.com\nInstagram: https://www.instagram.com/sportasapp/"
   },
   "reset_password": {
     "join": "Join",
@@ -199,7 +202,7 @@
   "search_page": {
     "search": "Search...",
     "connect_with_others": "Connect with others and plan events!",
-    "no_users_fonud": "No users found",
+    "no_users_found": "No users found",
     "navigate": "Navigate",
     "users": "Users",
     "events": "Events",
@@ -223,7 +226,8 @@
     "hour": "hour",
     "day": "day",
     "week": "week",
-    "registration_closed": "Registration closed"
+    "registration_closed": "Registration closed",
+    "invalid_cutoff_time": "Invalid cutoff time"
   },
   "skill_tag": {
     "beginner": "Beginner",
@@ -258,7 +262,10 @@
     "male": "Male",
     "female": "Female",
     "other": "Other",
-    "date_of_birth": "Date of Birth"
+    "date_of_birth": "Date of Birth",
+    "postal_code": "Postal Code",
+    "error": "Error",
+    "unexpected_error": "An error occurred while updating your profile."
   },
   "edit_profile_sports_skills": {
     "edit_profile": "Edit Profile",
@@ -293,7 +300,9 @@
     "no_description": "No description provided for this event",
     "failed_to_fetch_event": "Failed to fetch event details",
     "copied": "Copied",
-    "closed": "Closed"
+    "closed": "Closed",
+    "loading_event_data": "Loading event data...",
+    "error_loading_event_context": "Error loading event context"
   },
   "post_creation_component": {
     "post_about_this_event": "Post about this event!",
@@ -332,7 +341,20 @@
     "invite_friend": "Invite Friend",
     "edit_event": "Edit Event",
     "delete_event": "Delete Event",
-    "leave_event": "Leave Event"
+    "leave_event": "Leave Event",
+    "event_id_user_id_missing": "Event ID or User ID is missing.",
+    "confirm_leave_1": "Confirm Leave",
+    "confirm_leave_2": "Are you sure you want to leave this event?",
+    "leave": "Leave",
+    "success_leave": "You have successfully left the event.",
+    "error_leave": "Unable to leave event. Please try again.",
+    "event_id_missing": "Event ID is missing.",
+    "cancel_event": "Cancel Event",
+    "provide_reason": "Please provide a reason for cancellation.",
+    "confirm": "Confirm",
+    "reason_required_to_cancel": "Reason is required to cancel the event.",
+    "event_cancelled": "Event has been cancelled.",
+    "error_cancel_event": "Unable to cancel event. Please try again."
   },
   "qr": {
     "share_your": "Share your",
@@ -374,5 +396,66 @@
     "select_cutoff_time": "Select Cut-off Time",
     "enter_event_description": "Enter event description...",
     "failed_to_load_details": "Failed to load event details."
+  },
+  "event_list": {
+    "loading_events": "Loading events...",
+    "wow_couldnt_find": "Wow! Couldn't find events within 100 km",
+    "be_the_first_to_create": "Be The First To Create Events In Your Area",
+    "loading_more": "Loading more...",
+    "all_done": "All done!"
+  },
+  "my_calendar": {
+    "events_for": "Events for",
+    "no_events": "No events for this day."
+  },
+  "friends_list": {
+    "start_making_friends": "Start making friends!"
+  },
+  "friend_card": {
+    "friends_in_common": "friends in common"
+  },
+  "user_profiles_layout": {
+    "error": "Error",
+    "user_not_found": "User not found. Please log in.",
+    "success": "Success",
+    "friend_request_sent": "Friend request sent successfully!",
+    "failed_to_send_request": "Failed to send friend request.",
+    "remove_friend": "Remove Friend",
+    "remove_friend_confirmation": "Are you sure you want to remove this friend?",
+    "cancel": "Cancel",
+    "yes": "Yes",
+    "could_not_find_user": "Could not find user ID.",
+    "friend_removed": "Friend removed successfully!",
+    "failed_to_remove_friend": "Failed to remove friend."
+  },
+  "other_user_profile": {
+    "no_events_found": "No events found.",
+    "friend": "Friend",
+    "error": "Error",
+    "failed_to_send_request": "Failed to send friend request.",
+    "remove_friend": "Remove Friend",
+    "remove_friend_confirmation": "Are you sure you want to remove this friend?",
+    "cancel": "Cancel",
+    "yes": "Yes",
+    "success": "Success",
+    "friend_removed": "Friend removed successfully!",
+    "failed_to_remove_friend": "Failed to remove friend.",
+    "could_not_find_user": "Could not find user ID.",
+    "failed_to_load_user_data": "Failed to load user data.",
+    "activity": "Activity",
+    "friends": "Friends",
+    "about": "About"
+  },
+  "user_info_card": {
+    "username": "Username:",
+    "gender": "Gender:",
+    "phone": "Phone:",
+    "favourite_sports": "Favourite Sports:",
+    "not_provided": "Not provided"
+  },
+  "profile_section": {
+    "failed_to_load_user_data": "Failed to load user data.",
+    "unfriend": "Unfriend",
+    "message": "Message"
   }
 }

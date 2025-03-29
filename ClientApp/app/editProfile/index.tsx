@@ -27,6 +27,7 @@ interface EditProfilePageFormData {
   email: string;
   gender: string;
   dateOfBirth: string;
+  postalCode: string;
 }
 
 const EditProfilePage: React.FC = () => {
@@ -43,6 +44,7 @@ const EditProfilePage: React.FC = () => {
       email: user.email,
       gender: user.profile.gender,
       dateOfBirth: user.profile.dateOfBirth,
+      postalCode: user.profile.postalCode,
     },
   });
 
@@ -58,8 +60,8 @@ const EditProfilePage: React.FC = () => {
     } catch (error: any) {
      // console.error("Error occurred while updating profile:", error);
       const errorMessage =
-        error?.message || "An error occurred while updating your profile.";
-      Alert.alert("Error", errorMessage);
+        error?.message || t('edit_profile_page.unexpected_error');
+      Alert.alert(t('edit_profile_page.error'), errorMessage);
     }
   };
 
@@ -219,6 +221,21 @@ const EditProfilePage: React.FC = () => {
                   value={value}
                   onChangeText={onChange}
                   placeholder="YYYY-MM-DD"
+                />
+              )}
+            />
+          </View>
+          <View style={styles.inputRow}>
+            <Text style={styles.label}>{t('edit_profile_page.postal_code')}</Text>
+            <Controller
+              control={control}
+              name="postalCode"
+              render={({ field: { onChange, value } }) => (
+                <TextInput
+                  style={styles.input}
+                  value={value}
+                  onChangeText={onChange}
+                  placeholder="Postal Code"
                 />
               )}
             />

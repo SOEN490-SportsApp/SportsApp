@@ -8,6 +8,7 @@ import { useSelector } from "react-redux";
 import { Friend } from "@/types";
 import { getFriendsOfUser } from "@/services/userService";
 import { getSentFriendRequests, sendFriendRequest, removeFriendRequest} from "@/utils/api/profileApiClient";
+import { useTranslation } from "react-i18next";
 
 export default function UserProfilesLayout() {
     const [menuVisible, setMenuVisible] = useState(false);
@@ -18,6 +19,7 @@ export default function UserProfilesLayout() {
     const [isFriends, setIsFriends] = useState(false);
     const { id: visitingUserId } = useLocalSearchParams<{ id: string }>();
     const [friendList, setFriendList] = useState<Friend[]>([]);
+    const { t } = useTranslation();
 
     useEffect(() => {
         if (user?.id && visitingUserId) {
@@ -55,26 +57,26 @@ export default function UserProfilesLayout() {
         switch (option) {
           case "add":
             if (!user?.id) {
-              Alert.alert("Error", "User not found. Please log in.");
+              Alert.alert(t('user_profiles_layout.error'), t('user_profiles_layout.user_not_found'));
               return;
             }
             try {
               await sendFriendRequest(user.id, visitingUserId);
               setIsRequestSent(true);
-              Alert.alert("Success", "Friend request sent successfully!");
+              Alert.alert(t('user_profiles_layout.success'), t('user_profiles_layout.friend_request_sent'));
             } catch (error) {
-              Alert.alert("Error", "Failed to send friend request.");
+              Alert.alert(t('user_profiles_layout.error'), t('user_profiles_layout.failed_to_send_request'));
             }
             break;
       
             case "remove":
                 Alert.alert(
-                  "Remove Friend",
-                  "Are you sure you want to remove this friend?",
+                  t('user_profiles_layout.remove_friend'),
+                  t('user_profiles_layout.remove_friend_confirmation'),
                   [
-                    { text: "Cancel", style: "cancel" },
+                    { text: t('user_profiles_layout.cancel'), style: "cancel" },
                     {
-                      text: "Yes",
+                      text: t('user_profiles_layout.yes'),
                       onPress: async () => {
                         try {
                           const matchedFriend = friendList.find(
@@ -85,15 +87,15 @@ export default function UserProfilesLayout() {
 
               
                           if (!realFriendId) {
-                            Alert.alert("Error", "Could not find friendId to remove.");
+                            Alert.alert(t('user_profiles_layout.error'), t('user_profiles_layout.could_not_find_user'));
                             return;
                           }
               
                           await removeFriendRequest(user.id, realFriendId);
                           setIsFriends(false);
-                          Alert.alert("Success", "Friend removed successfully.");
+                          Alert.alert(t('user_profiles_layout.success'), t('user_profiles_layout.friend_removed'));
                         } catch (error) {
-                          Alert.alert("Error", "Failed to remove friend.");
+                          Alert.alert(t('user_profiles_layout.error'), t('user_profiles_layout.failed_to_remove_friend'));
                         }
                       },
                     },
