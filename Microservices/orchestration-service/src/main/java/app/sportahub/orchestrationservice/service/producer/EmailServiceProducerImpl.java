@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class EmailServiceProducerImpl implements EmailServiceProducer {
 
-
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @SneakyThrows
