@@ -6,6 +6,7 @@ import app.sportahub.eventservice.dto.response.ReactionResponse;
 import app.sportahub.eventservice.dto.response.social.CommentResponse;
 import app.sportahub.eventservice.dto.response.social.PostResponse;
 import app.sportahub.eventservice.model.event.reactor.ReactionType;
+import app.sportahub.eventservice.service.event.EventService;
 import app.sportahub.eventservice.service.social.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 public class PostController {
 
     private final PostService postService;
+    private final EventService eventService;
 
     @PostMapping
     @PreAuthorize("@eventService.isParticipant(#eventId, authentication.name) || hasRole('ROLE_ADMIN')")
@@ -75,7 +77,6 @@ public class PostController {
     }
 
     @GetMapping("/{postId}/")
-    @PreAuthorize("@eventService.isParticipant(#eventId, authentication.name) || hasRole('ROLE_ADMIN')")
     @Operation(
             summary = "Get post in a specific event",
             description = "Get post by providing eventId and postId.",
@@ -97,7 +98,7 @@ public class PostController {
     }
 
     @DeleteMapping("/{postId}/")
-    @PreAuthorize("@eventService.isParticipant(#eventId, authentication.name) || hasRole('ROLE_ADMIN')")
+    @PreAuthorize("@postService.isPostCreator(#postId, authentication.name) || hasRole('ROLE_ADMIN')")
     @Operation(
             summary = "Deletes post in an event",
             description = "Deletes post in an event by providing eventId and postId.",
@@ -107,7 +108,7 @@ public class PostController {
             }
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Attachment added successfully", content = @Content),
+            @ApiResponse(responseCode = "200", description = "Post deleted successfully", content = @Content),
             @ApiResponse(responseCode = "403", description = "Forbidden – User is not authorized"),
             @ApiResponse(responseCode = "404", description = "Post not found")
     })
@@ -119,7 +120,6 @@ public class PostController {
     }
 
     @PostMapping("/{postId}/comment")
-    @PreAuthorize("@eventService.isParticipant(#eventId, authentication.name) || hasRole('ROLE_ADMIN')")
     @Operation(
             summary = "Creates comment in a post",
             description = "Adds comment to post by providing eventId, postId, userId, and content."
@@ -133,7 +133,10 @@ public class PostController {
     }
 
     @DeleteMapping("/{postId}/comment")
-    @PreAuthorize("@eventService.isParticipant(#eventId, authentication.name) || hasRole('ROLE_ADMIN')")
+    @PreAuthorize("@postService.isCommentCreator(#eventId, authentication.name) ||" +
+            " @postService.isPostCreator(#postId, authentication.name) ||" +
+            " @eventService.isCreator(#eventId, authentication.name) ||" +
+            " hasRole('ROLE_ADMIN')")
     @Operation(
             summary = "Deletes comment in a post",
             description = "Deletes comment in a post by providing eventId, postId, and commentId.",
@@ -144,7 +147,7 @@ public class PostController {
             }
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Attachment added successfully", content = @Content),
+            @ApiResponse(responseCode = "200", description = "Comment deleted successfully", content = @Content),
             @ApiResponse(responseCode = "403", description = "Forbidden – User is not authorized"),
             @ApiResponse(responseCode = "404", description = "Post not found")
     })

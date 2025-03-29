@@ -132,7 +132,7 @@ public class PostServiceImpl implements PostService {
         Post post = event.getPosts().stream()
                 .filter(p -> p.getId().equals(postId))
                 .findFirst()
-                .orElseThrow(() -> new PostDoesNotExistException(postId, eventId));
+                .orElseThrow(() -> new PostDoesNotExistException(postId));
 
         log.info("Retrieved post with Id: {} in event with Id: {}", postId, eventId);
         return  postMapper.postToPostResponse(post);
@@ -157,7 +157,7 @@ public class PostServiceImpl implements PostService {
         Post postToDelete = event.getPosts().stream()
                 .filter(p -> p.getId().equals(postId))
                 .findFirst()
-                .orElseThrow(() -> new PostDoesNotExistException(postId, eventId));
+                .orElseThrow(() -> new PostDoesNotExistException(postId));
 
         event.getPosts().remove(postToDelete);
 
@@ -191,7 +191,7 @@ public class PostServiceImpl implements PostService {
         Post post = event.getPosts().stream()
                 .filter(p -> p.getId().equals(postId))
                 .findFirst()
-                .orElseThrow(() -> new PostDoesNotExistException(postId, eventId));
+                .orElseThrow(() -> new PostDoesNotExistException(postId));
 
         String commentCreator = commentRequest.createdBy();
         String commentContent = commentRequest.content();
@@ -236,12 +236,12 @@ public class PostServiceImpl implements PostService {
         Post post = event.getPosts().stream()
                 .filter(p -> p.getId().equals(postId))
                 .findFirst()
-                .orElseThrow(() -> new PostDoesNotExistException(postId, eventId));
+                .orElseThrow(() -> new PostDoesNotExistException(postId));
 
         Comment commentToDelete = post.getComments().stream()
                 .filter(comment -> comment.getId().equals(commentId))
                 .findFirst()
-                .orElseThrow(() -> new CommentDoesNotExistException(commentId, postId, eventId));
+                .orElseThrow(() -> new CommentDoesNotExistException(commentId));
 
         post.getComments().removeIf(comment -> comment.getId().equals(commentId));
 
@@ -254,6 +254,19 @@ public class PostServiceImpl implements PostService {
         return commentMapper.commentToCommentResponse(commentToDelete, eventId, postId);
     }
 
+    /**
+     * Allows a user to react to a post or remove their reaction.
+     *
+     * @param eventId     The unique identifier of the event.
+     * @param postId     The unique identifier of the post.
+     * @param newReaction The reaction type to be submitted. Must be either {@code ReactionType.LIKE} or {@code ReactionType.NO_REACTION}.
+     * @return A {@link ReactionResponse} containing the user's reaction details.
+     * @throws InvalidReactionException If the reaction type is not "LIKE" or "NO_REACTION".
+     * @throws EventDoesNotExistException If the event with the given ID does not exist.
+     * @throws PostDoesNotExistException If the post with the given ID does not exist.
+     * @throws ReactionAlreadySubmittedException If the user has already reacted with "LIKE" and tries to react again.
+     */
+    @Transactional
     @Override
     public ReactionResponse reactToPost(String eventId, String postId, ReactionType newReaction){
 
@@ -270,7 +283,7 @@ public class PostServiceImpl implements PostService {
         Post post = event.getPosts().stream()
                 .filter(p -> p.getId().equals(postId))
                 .findFirst()
-                .orElseThrow(() -> new PostDoesNotExistException(postId, eventId));
+                .orElseThrow(() -> new PostDoesNotExistException(postId));
 
         Optional<Reaction> reactorToEventOpt = post.getReactions()
                 .stream()
@@ -286,6 +299,7 @@ public class PostServiceImpl implements PostService {
                 reaction = Reaction.builder()
                         .withUserId(userId)
                         .withReactionType(ReactionType.NO_REACTION)
+                        .withReactionDate(LocalDateTime.now())
                         .build();
                 post.getReactions().remove(reactorToEvent);
             } else {
@@ -296,6 +310,7 @@ public class PostServiceImpl implements PostService {
                 reaction = Reaction.builder()
                         .withUserId(userId)
                         .withReactionType(ReactionType.LIKE)
+                        .withReactionDate(LocalDateTime.now())
                         .build();
                 post.getReactions().add(reaction);
             } else{
@@ -306,5 +321,35 @@ public class PostServiceImpl implements PostService {
         eventRepository.save(event);
         log.info("PostServiceImpl::reactToPost: Post with id: {} reaction: {}", eventId, newReaction);
         return new ReactionResponse( reaction.getUserId(), reaction.getReactionType());
+    }
+
+    /**
+     * Checks if the given user is the creator of the specified post.
+     *
+     * @param postId The unique identifier of the post.
+     * @param userId The unique identifier of the user.
+     * @return {@code true} if the user is the creator of the post, otherwise {@code false}.
+     * @throws PostDoesNotExistException if the post does not exist.
+     */
+    @Override
+    public boolean isPostCreator(String postId, String userId) {
+        return postRepository.findById(postId)
+                .map(post -> post.getCreatedBy().equals(userId))
+                .orElseThrow(() -> new PostDoesNotExistException(postId));
+    }
+
+    /**
+     * Checks if the given user is the creator of the specified comment.
+     *
+     * @param commentId The unique identifier of the comment.
+     * @param userId The unique identifier of the user.
+     * @return {@code true} if the user is the creator of the comment, otherwise {@code false}.
+     * @throws EventDoesNotExistException if the comment does not exist.
+     */
+    @Override
+    public boolean isCommentCreator(String commentId, String userId) {
+        return commentRepository.findById(commentId)
+                .map(post -> post.getCreatedBy().equals(userId))
+                .orElseThrow(() -> new CommentDoesNotExistException(commentId));
     }
 }

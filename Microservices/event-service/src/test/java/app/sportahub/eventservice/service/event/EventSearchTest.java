@@ -10,6 +10,7 @@ import app.sportahub.eventservice.model.event.Event;
 import app.sportahub.eventservice.model.event.Location;
 import app.sportahub.eventservice.repository.SearchingEventRepositoryImpl;
 import app.sportahub.eventservice.repository.event.EventRepository;
+import app.sportahub.eventservice.repository.social.PostRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,6 +46,9 @@ public class EventSearchTest {
 
     @Mock
     private EventMapper eventMapper;
+
+    @Mock
+    private PostRepository postRepository;
 
     @Mock
     private MongoTemplate mongoTemplate;
