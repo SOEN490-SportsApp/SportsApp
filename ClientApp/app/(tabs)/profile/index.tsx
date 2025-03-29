@@ -127,6 +127,7 @@ const ProfilePage: React.FC = () => {
         </Text> */}
 
         <ProfileSection
+          visitedId = ""
           user={user}
           isUserProfile={true}
           friendStatus={null}
