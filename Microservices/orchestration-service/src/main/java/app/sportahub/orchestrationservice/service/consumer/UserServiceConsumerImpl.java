@@ -37,7 +37,6 @@ import static app.sportahub.kafkevents.JoinedSportEventEvent.JoinedEventsByUserE
 @RequiredArgsConstructor
 public class UserServiceConsumerImpl{
 
-
     private final EmailServiceProducer emailServiceProducer;
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final ReplyingKafkaTemplate<String, Object, Object> replyingKafkaTemplate;
