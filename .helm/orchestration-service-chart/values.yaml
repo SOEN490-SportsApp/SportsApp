@@ -47,12 +47,12 @@ env:
 
 livenessProbe:
   enabled: true
-  path: /api/orchestration-service/actuator/health
+  path: /actuator/health
   initialDelaySeconds: 30
   periodSeconds: 10
 
 readinessProbe:
   enabled: true
-  path: /api/orchestration-service/actuator/health
+  path: /actuator/health
   initialDelaySeconds: 15
   periodSeconds: 5
