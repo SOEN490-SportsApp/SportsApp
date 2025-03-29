@@ -1,4 +1,4 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import { StyleSheet } from 'react-native';
 import { GiftedChat, IMessage } from 'react-native-gifted-chat';
@@ -10,7 +10,7 @@ import {message, chatroomProps, messageRequest} from "@/types/messaging";
 
 
 const ChatScreen = () => {
-  const { id } = useLocalSearchParams();
+  const { id, title } = useLocalSearchParams();
   const router = useRouter();
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [finalToken, setFinalToken] = useState<string>("");
@@ -18,7 +18,32 @@ const ChatScreen = () => {
   const [connected, setConnected] = useState(false);
   const clientRef = useRef<Client | null>(null);
   const [chatroom, setChatroom] = useState<chatroomProps>();
+  const navigation = useNavigation();
 
+  useEffect(() => {
+    // Hide tab bar when this screen is focused
+    const parent = navigation.getParent();
+    parent?.setOptions({ 
+      tabBarStyle: { 
+        display: 'none' 
+      } 
+    });
+    
+
+    // Restore it when unmounted
+    return () => {
+      parent?.setOptions({ 
+        tabBarStyle: undefined 
+      });
+    };
+  }, []);
+
+  useEffect(() => {
+    if (title && typeof title === 'string') {
+      navigation.setOptions({ headerTitle: title });
+    }
+  }, [title]);
+  
   useEffect(() => {
     const response = async () => {
       try {
