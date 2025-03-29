@@ -19,3 +19,7 @@ package-lock.json
 
 expo-env.d.ts
 # @end expo-cli
+
+google-services.json
+GoogleService-Info.plist
+*firebase-adminsdk*.json
