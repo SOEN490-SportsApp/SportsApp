@@ -23,4 +23,8 @@ public interface PostService {
     PostResponse deletePost(String eventId, String postId);
 
     ReactionResponse reactToPost(String eventId, String postId, ReactionType reactionType);
+
+    boolean isPostCreator(String eventId, String userId);
+
+    boolean isCommentCreator(String eventId, String userId);
 }
