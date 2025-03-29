@@ -59,6 +59,13 @@ const ProfileSection: React.FC<ProfileRequest> = ({
     console.log("Message button pressed");
     try{
       const response = await createUserChatroom(loggedInUser.id, visitedId, user.username, [], false, false);          
+      router.push({
+        pathname: '/(tabs)/chats/[id]',
+        params: { 
+          id: response.chatroomId, 
+          title: user.username },
+      });
+      
     }catch(e){
       console.log("Error in handlePress", e);
     }

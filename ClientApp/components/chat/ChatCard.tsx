@@ -26,7 +26,15 @@ const ChatCard: React.FC<CardProps> = ({
     return (
     <TouchableOpacity 
     style={styles.card}
-    onPress={() => router.push(`/messaging/${chatId}`)}
+    onPress={() =>
+      router.push({
+        pathname: '/(tabs)/chats/[id]',
+        params: {
+          id: chatId,
+          title: cardTitle,
+        },
+      })
+    }
     onLongPress={onLongPress}
     >
       <View style={styles.userInfo}>
