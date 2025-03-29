@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Alert, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TextInput, Alert, TouchableOpacity, StyleSheet, Linking, ScrollView } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from "expo-router";
@@ -27,6 +27,9 @@ const RegisterAccountPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { t } = useTranslation();
+  const [isTermsModalVisible, setIsTermsModalVisible] = useState(false);
+  const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
+  const [hasViewedTerms, setHasViewedTerms] = useState(false);
 
   const onSubmit = async (data: RegisterAccountPageFormData) => {
     if (data.password !== data.confirmPassword) return Alert.alert(t('register.password_mismatch_1'), t('register.password_mismatch_2'));
@@ -40,7 +43,7 @@ const RegisterAccountPage: React.FC = () => {
       Alert.alert(t('register.error'), t('register.fail_create_account'));
       console.error(`${t('register.fail_create_account')}: ${error}. ${error.message}`);
     }
-  };
+  };  
 
   return (
     <View style={styles.container}>
@@ -171,19 +174,28 @@ const RegisterAccountPage: React.FC = () => {
         {/* Terms and Conditions Checkbox */}
         <View style={styles.checkboxContainer}>
           <Checkbox
-            style={{height: mvs(15), width: mvs(15)}}
+            style={[
+              { height: mvs(15), width: mvs(15) },
+              !hasViewedTerms && { opacity: 0.5 },
+            ]}
 
             testID="agreeToTermsCheckbox"
             value={watch("agreeToTerms")}
             onValueChange={(value) => setValue("agreeToTerms", value)}
+            disabled={!hasViewedTerms}
           />
-          {/* TODO: Are we going to have terms? If so we need to write them up. */}
           <Text style={styles.termsText}>
             {t('register.by_continuing_1')}{" "}
-            <Text style={styles.linkText}>{t('register.by_continuing_2')}</Text> {t('register.by_continuing_3')} <Text style={styles.linkText}>{t('register.by_continuing_4')}</Text>
+            <Text style={styles.linkText} onPress={() => Linking.openURL('https://www.termsfeed.com/live/d818d293-3b1e-4b74-9ebd-d40a6852aa93')}>
+              {t('register.by_continuing_2')}
+            </Text>{" "}
+            {t('register.by_continuing_3')}{" "}
+            <Text style={styles.linkText} onPress={() => setIsTermsModalVisible(true)}>
+              {t('register.by_continuing_4')}
+            </Text>
           </Text>
         </View>
-
+        
         <View style={{height: vs(60)}} />
 
         {/* Confirm Button */}
@@ -205,6 +217,47 @@ const RegisterAccountPage: React.FC = () => {
           </Text>
         </TouchableOpacity>
       </View>
+
+      {isTermsModalVisible && (
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>{t('register.terms_of_use_title')}</Text>
+            <View
+              style={styles.modalScrollContainer}
+              onLayout={(e) => {
+              }}
+            >
+              <ScrollView
+                style={styles.modalScroll}
+                onScroll={({ nativeEvent }) => {
+                  const { layoutMeasurement, contentOffset, contentSize } = nativeEvent;
+                  const isAtBottom =
+                    layoutMeasurement.height + contentOffset.y >= contentSize.height - 20;
+                  if (isAtBottom) setHasScrolledToBottom(true);
+                }}
+                scrollEventThrottle={16}
+              >
+                <Text style={styles.modalText}>{t('register.terms_text')}</Text>
+              </ScrollView>
+            </View>
+            <TouchableOpacity
+              onPress={() => {
+                setIsTermsModalVisible(false);
+                setHasViewedTerms(true);
+              }}
+              disabled={!hasScrolledToBottom}
+              style={[
+                styles.modalCloseButton,
+                !hasScrolledToBottom && styles.modalCloseButtonDisabled,
+              ]}
+            >
+              <Text style={styles.modalCloseButtonText}>
+                {t('register.close_terms')}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
     </View>
   );
 };
@@ -293,5 +346,53 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: themeColors.primary,
   },
-
+  modalContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 999,
+    padding: hs(20),
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: hs(20),
+    maxHeight: vs(500),
+    width: '100%',
+  },
+  modalTitle: {
+    fontSize: mhs(18),
+    fontWeight: 'bold',
+    marginBottom: vs(10),
+  },
+  modalScrollContainer: {
+    maxHeight: vs(350),
+  },
+  modalScroll: {
+    paddingBottom: vs(10),
+  },
+  modalText: {
+    fontSize: mhs(13),
+    color: themeColors.text.dark,
+  },
+  modalCloseButton: {
+    marginTop: vs(12),
+    backgroundColor: themeColors.primary,
+    paddingVertical: vs(10),
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  modalCloseButtonDisabled: {
+    backgroundColor: themeColors.text.grey,
+  },
+  modalCloseButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: mhs(14),
+  },  
 });
