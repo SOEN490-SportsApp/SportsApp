@@ -4,6 +4,11 @@ import app.sportahub.kafkevents.BaseEvent;
 import app.sportahub.kafkevents.JoinedSportEventEvent.*;
 import app.sportahub.kafkevents.forgotPassword.ForgotPasswordRequestedEvent;
 import app.sportahub.kafkevents.forgotPassword.ForgotPasswordSendEmailEvent;
+import app.sportahub.kafkevents.user.UserEvent;
+import app.sportahub.kafkevents.user.UserFetchEvent;
+import app.sportahub.kafkevents.user.UserFetchedEvent;
+import app.sportahub.kafkevents.user.UserRequestEvent;
+import app.sportahub.kafkevents.user.UserResponseEvent;
 import app.sportahub.kafkevents.forgotPassword.ForgotPasswordEvent;
 import app.sportahub.orchestrationservice.service.producer.EmailServiceProducer;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +19,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.errors.TimeoutException;
 import org.apache.kafka.common.header.internals.RecordHeader;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.annotation.RetryableTopic;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
 import org.springframework.kafka.requestreply.RequestReplyFuture;
@@ -21,6 +27,7 @@ import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.retry.annotation.Backoff;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -134,5 +141,56 @@ public class UserServiceConsumerImpl{
         } finally {
             replyingKafkaTemplate.stop();
         }
+    }
+
+    @SneakyThrows
+    @KafkaListener(topics = UserEvent.REQUEST_TOPIC, groupId = "UserServiceKafkaConsumer")
+    public void listenForUserRequests(
+        @Payload UserRequestEvent requestEvent,
+        @Header(KafkaHeaders.CORRELATION_ID) byte[] correlationId
+    ) { 
+        log.info("EventServiceConsumer::listenForUserRequests: received user request event with id: {}", requestEvent.getUserId());
+        
+        String userId = requestEvent.getUserId();
+        BaseEvent fetchBaseEvent = new BaseEvent(
+            UUID.randomUUID().toString(),
+            "request",
+            "orchestration-service",
+            Instant.now(),
+            requestEvent.getBaseEvent().getCorrelationId()
+        );
+
+        UserFetchEvent fetchEvent = new UserFetchEvent(fetchBaseEvent, userId);
+        ProducerRecord<String, Object> record = new ProducerRecord<>(UserEvent.FETCH_TOPIC, fetchEvent);
+        record.headers().add(new RecordHeader(KafkaHeaders.REPLY_TOPIC, UserEvent.FETCHED_TOPIC.getBytes()));
+        record.headers().add(new RecordHeader(KafkaHeaders.CORRELATION_ID, correlationId));
+        
+        replyingKafkaTemplate.send(record);
+        log.info("EventServiceConsumer::listenForUserRequests: sent fetch request for user with id: {}", userId);
+    }
+
+    @SneakyThrows
+    @KafkaListener(topics = UserEvent.FETCHED_TOPIC, groupId = "UserServiceKafkaConsumer")
+    public void listenForFetchedUsers(
+        @Payload UserFetchedEvent fetchedEvent,
+        @Header(KafkaHeaders.CORRELATION_ID) byte[] correlationId
+    ) {
+
+        log.info("EventServiceConsumer::listenForFetchedUsers: received fetched user event with id: {}", fetchedEvent.getUser());
+        
+        BaseEvent fetchedBaseEvent = new BaseEvent(
+            UUID.randomUUID().toString(),
+            "response",
+            "orchestration-service",
+            Instant.now(),
+            fetchedEvent.getBaseEvent().getCorrelationId()
+        );  
+
+        UserResponseEvent responseEvent = new UserResponseEvent(fetchedBaseEvent, fetchedEvent.getUser());
+        ProducerRecord<String, Object> responseRecord = new ProducerRecord<>(UserEvent.RESPONSE_TOPIC, responseEvent);
+        responseRecord.headers().add(new RecordHeader(KafkaHeaders.CORRELATION_ID, correlationId));
+        responseRecord.headers().forEach(header -> log.info("Header key: {}, value: {}", header.key(),header.value().toString()));
+        kafkaTemplate.send(responseRecord);
+        log.info("EventServiceConsumer::listenForFetchedUsers: sent response to event-service for user with id: {}", fetchedEvent.getUser());
     }
 }
