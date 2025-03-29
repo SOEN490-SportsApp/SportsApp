@@ -1,13 +1,19 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Tabs } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { mvs } from '@/utils/helpers/uiScaler';
 import themeColors from '@/utils/constants/colors';
 import { useTranslation } from 'react-i18next';
+import { useNotification } from "@/context/NotificationContext";
 
 export default function TabLayout() {
+  const { notification, expoPushToken, error } = useNotification();
   const iconStyle = { marginBottom: -5 };
   const { t } = useTranslation();
+
+  useEffect(() => {
+    console.log("Push Token: ", expoPushToken);
+  }, [expoPushToken])
 
   return (
     <Tabs
