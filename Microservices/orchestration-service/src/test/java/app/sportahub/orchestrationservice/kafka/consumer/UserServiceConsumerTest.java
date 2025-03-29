@@ -49,12 +49,15 @@ public class UserServiceConsumerTest {
             userServiceConsumer.listenForForgotPasswordRequestedEvent(event);
             ArgumentCaptor<ForgotPasswordSendEmailEvent> captor = ArgumentCaptor.forClass(ForgotPasswordSendEmailEvent.class);
             verify(emailServiceProducer, times(1)).sendForgotPasswordSendEmailEvent(captor.capture());
+
             ForgotPasswordSendEmailEvent capturedEvent = captor.getValue();
             Assertions.assertEquals(email, capturedEvent.getEmail());
+            //verify that the base captured event uses randomUUID for ids and check for correct source and event type
             Assertions.assertEquals(uuid.toString() , capturedEvent.getBaseEvent().getEventId());
             Assertions.assertEquals(uuid.toString(), capturedEvent.getBaseEvent().getCorrelationId());
             Assertions.assertEquals(event.getBaseEvent().getEventType(), capturedEvent.getBaseEvent().getEventType());
             Assertions.assertEquals("orchestration-service", capturedEvent.getBaseEvent().getSource());
+            //verify randomUUID was called twice (once for eventId and once for correlationId)
             mocked.verify(UUID::randomUUID, times(2));
 
 
