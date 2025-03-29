@@ -40,7 +40,7 @@ const ChatListHeader: React.FC = () => {
         setModalVisible(true);
         fetchFriends();
     };
-    const handleCreateGroup = async() => {
+    const handleCreateGroupButton = async() => {
         // Call your API or navigate to group chat screen
         
     };
@@ -53,9 +53,10 @@ const ChatListHeader: React.FC = () => {
                 <FontAwesome size={32} name="plus-square-o" color="#333" />
             </TouchableOpacity> 
             <NewChatModal
+                friends={friends}
                 visible={modalVisible}
                 onClose={() => setModalVisible(false)}
-                onCreateGroup={handleCreateGroup}
+                onCreateGroup={handleCreateGroupButton}
             />
         </View>
     );
