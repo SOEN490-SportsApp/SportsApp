@@ -1,6 +1,6 @@
 {
   "cli": {
-    "version": ">= 15.0.12",
+    "version": ">=15.0.12",
     "appVersionSource": "remote"
   },
   "build": {
@@ -12,13 +12,25 @@
       },
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "GOOGLE_SERVICE_INFO_PLIST": "@env:GOOGLE_SERVICE_INFO_PLIST",
+        "GOOGLE_SERVICES_JSON": "@env:GOOGLE_SERVICES_JSON"
       }
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "GOOGLE_SERVICE_INFO_PLIST": "@env:GOOGLE_SERVICE_INFO_PLIST",
+        "GOOGLE_SERVICES_JSON": "@env:GOOGLE_SERVICES_JSON"
+      }
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "env": {
+        "GOOGLE_SERVICE_INFO_PLIST": "@env:GOOGLE_SERVICE_INFO_PLIST",
+        "GOOGLE_SERVICES_JSON": "@env:GOOGLE_SERVICES_JSON"
+      }
     },
     "development-simulator": {
       "developmentClient": true,
@@ -26,7 +38,11 @@
       "ios": {
         "simulator": true
       },
-      "environment": "development"
+      "environment": "development",
+      "env": {
+        "GOOGLE_SERVICE_INFO_PLIST": "@env:GOOGLE_SERVICE_INFO_PLIST",
+        "GOOGLE_SERVICES_JSON": "@env:GOOGLE_SERVICES_JSON"
+      }
     }
   },
   "submit": {
