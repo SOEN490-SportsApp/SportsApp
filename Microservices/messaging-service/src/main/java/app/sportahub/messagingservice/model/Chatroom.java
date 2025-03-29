@@ -36,7 +36,7 @@ public class Chatroom {
 
     @NotEmpty
     @Size(min = 1, max = 255)
-    private Set<String> members;
+    private Set<Member> members;
 
     @Builder.Default
     private List<Message> messages = new ArrayList<>();

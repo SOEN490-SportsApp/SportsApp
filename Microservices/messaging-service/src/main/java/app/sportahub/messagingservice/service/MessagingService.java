@@ -4,6 +4,7 @@ import app.sportahub.messagingservice.dto.request.message.MessageRequest;
 import app.sportahub.messagingservice.dto.request.chatroom.ChatroomRequest;
 import app.sportahub.messagingservice.dto.response.chatroom.ChatroomResponse;
 import app.sportahub.messagingservice.dto.response.message.MessageResponse;
+import app.sportahub.messagingservice.model.Member;
 
 import java.util.List;
 
@@ -27,9 +28,9 @@ public interface MessagingService {
 
     void deleteMessage(String messageId);
 
-    ChatroomResponse addMembers(String chatroomId, List<String> userIds);
+    ChatroomResponse addMembers(String chatroomId, List<Member> userIds);
 
-    ChatroomResponse removeMembers(String chatroomId, List<String> userIds);
+    ChatroomResponse removeMembers(String chatroomId, List<Member> userIds);
 
     ChatroomResponse leaveChatroom(String chatroomId, String userId);
 

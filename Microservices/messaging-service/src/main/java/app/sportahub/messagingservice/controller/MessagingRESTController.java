@@ -4,6 +4,7 @@ import app.sportahub.messagingservice.dto.request.message.MessageRequest;
 import app.sportahub.messagingservice.dto.request.chatroom.ChatroomRequest;
 import app.sportahub.messagingservice.dto.response.chatroom.ChatroomResponse;
 import app.sportahub.messagingservice.dto.response.message.MessageResponse;
+import app.sportahub.messagingservice.model.Member;
 import app.sportahub.messagingservice.service.MessagingService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -99,8 +100,8 @@ public class MessagingRESTController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "adds new members to a chatroom",
     description = " Adds members to an existing chatroom based on the provided chatroomId and userIds")
-    public ChatroomResponse addMembers(@PathVariable("chatroomId") String chatroomId, @RequestBody List<String> userIds) {
-        return messagingService.addMembers(chatroomId, userIds);
+    public ChatroomResponse addMembers(@PathVariable("chatroomId") String chatroomId, @RequestBody List<Member> members) {
+        return messagingService.addMembers(chatroomId, members);
     }
 
     @PostMapping("/chatroom/remove-members/{chatroomId}")
@@ -110,8 +111,8 @@ public class MessagingRESTController {
     description = "Allows the chatroom creator to remove members from an existing chatroom based on the provided " +
             "chatroomId and userIds")
     public ChatroomResponse removeMembers(@PathVariable("chatroomId") String chatroomId,
-                                          @RequestBody List<String> userIds) {
-        return messagingService.removeMembers(chatroomId, userIds);
+                                          @RequestBody List<Member> members ) {
+        return messagingService.removeMembers(chatroomId, members);
     }
 
     @PostMapping("/chatroom/leave-chatroom/{chatroomId}/{userId}")

@@ -1,6 +1,7 @@
 package app.sportahub.messagingservice.repository;
 
 import app.sportahub.messagingservice.model.Chatroom;
+import app.sportahub.messagingservice.model.Member;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -14,8 +15,11 @@ import java.util.Set;
 @Repository
 public interface ChatroomRepository extends MongoRepository<Chatroom, String> {
     Optional<Chatroom> findByCreatedByAndChatroomNameAndMembersEquals(String senderId,
-                                                                      String chatroomName, Set<String> members);
+                                                                      String chatroomName, Set<Member> members);
 
-    List<Chatroom> findAllByMembersContains(@NotEmpty @Size(min = 1, max = 255) Set<String> members);
+    List<Chatroom> findAllByMembers_UserId(@NotEmpty @Size(min = 1, max = 255) Set<Member> members);
     Optional<Chatroom> findByChatroomId(String chatroomId);
+    Optional<Chatroom> findByMembersEquals(@NotEmpty @Size(min = 1, max = 255) Set<Member> members);
+
+    List<Chatroom> findAllByMembers_UserId(@NotNull String userId);
 }

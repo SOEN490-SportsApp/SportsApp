@@ -8,6 +8,7 @@ import app.sportahub.messagingservice.exception.*;
 import app.sportahub.messagingservice.mapper.ChatroomMapper;
 import app.sportahub.messagingservice.mapper.MessageMapper;
 import app.sportahub.messagingservice.model.Chatroom;
+import app.sportahub.messagingservice.model.Member;
 import app.sportahub.messagingservice.model.Message;
 import app.sportahub.messagingservice.repository.ChatroomRepository;
 import app.sportahub.messagingservice.repository.MessageRepository;
@@ -92,9 +93,7 @@ public class MessagingServiceImpl  implements MessagingService {
      */
     @Override
     public List<ChatroomResponse> getChatrooms(String userId) {
-        Set<String> tempSet = new HashSet<>();
-        tempSet.add(userId);
-        List<Chatroom> chatrooms = chatroomRepository.findAllByMembersContains(tempSet);
+        List<Chatroom> chatrooms = chatroomRepository.findAllByMembers_UserId(userId);
 
         return chatrooms.stream()
                 .map(chatroomMapper::chatroomToChatroomResponse)
@@ -111,18 +110,26 @@ public class MessagingServiceImpl  implements MessagingService {
     @Override
     public ChatroomResponse createChatroom(ChatroomRequest chatroomRequest) {
         Chatroom newChatroom = chatroomMapper.chatroomRequestToChatroom(chatroomRequest);
-        Optional<Chatroom> existingChatroom = chatroomRepository.findByCreatedByAndChatroomNameAndMembersEquals(
-                newChatroom.getCreatedBy(), newChatroom.getChatroomName(), newChatroom.getMembers()
-        );
 
-        if (existingChatroom.isPresent()) {
+        if (chatroomRepository.findByCreatedByAndChatroomNameAndMembersEquals(newChatroom.getCreatedBy(),
+                newChatroom.getChatroomName(), newChatroom.getMembers()).isPresent()) {
             throw new ChatroomAlreadyExistsException(newChatroom.getCreatedBy(), newChatroom.getChatroomName());
         }
 
+        Set<Member> members = newChatroom.getMembers();
+
+        if (members.stream().noneMatch(member -> member.getUserId().equals(chatroomRequest.createdBy()))) {
+            throw new ChatroomCreatorMustBeAMemberException(chatroomRequest.createdBy());
+        }
+
+        if (members.size() == 2) {
+            Optional<Chatroom> existing1on1 = chatroomRepository.findByMembersEquals(members);
+            if (existing1on1.isPresent()) {
+                return chatroomMapper.chatroomToChatroomResponse(existing1on1.get());
+            }
+        }
+
         newChatroom.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
-        Set<String> members = newChatroom.getMembers();
-        members.add(chatroomRequest.createdBy());
-        newChatroom.setMembers(members);
 
         Chatroom savedChatroom = chatroomRepository.save(newChatroom);
         return chatroomMapper.chatroomToChatroomResponse(savedChatroom);
@@ -250,18 +257,18 @@ public class MessagingServiceImpl  implements MessagingService {
      * This method will convert the passed list into a set, removing duplicates and allowing for set operations
      *
      * @param chatroomId the unique identifier of the chatroom who's members you want to modify
-     * @param userIds the unique identifiers of the users you want to remove from the chatroom
+     * @param newMembers the unique identifiers of the users you want to remove from the chatroom
      * @return a {@link ChatroomResponse} object representing the newly modified chatroom object
      * @throws ChatroomDoesNotExistException if no chatroom is found with the specified chatroomId
      */
     @Override
-    public ChatroomResponse addMembers(String chatroomId, List<String> userIds) {
+    public ChatroomResponse addMembers(String chatroomId, List<Member> newMembers) {
         Chatroom chatroom = chatroomRepository.findByChatroomId(chatroomId)
                 .orElseThrow(() -> new ChatroomDoesNotExistException(chatroomId));
 
-        Set<String> userIdSet = new HashSet<>(userIds);
-        userIdSet.addAll(chatroom.getMembers());
-        chatroom.setMembers(userIdSet);
+        Set<Member> memberSet = new HashSet<>(newMembers);
+        memberSet.addAll(chatroom.getMembers());
+        chatroom.setMembers(memberSet);
         Chatroom savedChatroom = chatroomRepository.save(chatroom);
         log.info("MessagingServiceImpl::addMembers: Successfully added new members to the chatroom with id: {}",
                 savedChatroom.getChatroomId());
@@ -274,24 +281,24 @@ public class MessagingServiceImpl  implements MessagingService {
      * This method will convert the passed list into a set, removing duplicates and allowing for set operations.
      *
      * @param chatroomId the unique identifier of the chatroom who's members you want to modify
-     * @param userIds    the unique identifiers of the users you want to remove from the chatroom
+     * @param members    the unique identifiers of the users you want to remove from the chatroom
      * @return a {@link ChatroomResponse} object representing the newly modified chatroom object
      * @throws ChatroomDoesNotExistException if no chatroom is found with the specified chatroomId
      * @throws ChatroomCreatorTryingToRemoveThemselvesFromChatroomException if the creator's userId is in userIds
      */
     @Override
-    public ChatroomResponse removeMembers(String chatroomId, List<String> userIds) {
+    public ChatroomResponse removeMembers(String chatroomId, List<Member> members) {
         Chatroom chatroom = chatroomRepository.findByChatroomId(chatroomId)
                 .orElseThrow(() -> new ChatroomDoesNotExistException(chatroomId));
 
-        Set<String> paramUserIdSet = new HashSet<>(userIds);
-        Set<String> existingUserIdSet = chatroom.getMembers();
+        Set<Member> paramMembers = new HashSet<>(members);
+        Set<Member> existingMembers = chatroom.getMembers();
 
-        if (paramUserIdSet.contains(chatroom.getCreatedBy()))
+        if (paramMembers.contains(chatroom.getCreatedBy()))
             throw new ChatroomCreatorTryingToRemoveThemselvesFromChatroomException(chatroomId, chatroom.getCreatedBy());
 
-        existingUserIdSet.removeAll(paramUserIdSet);
-        chatroom.setMembers(existingUserIdSet);
+        existingMembers.removeAll(paramMembers);
+        chatroom.setMembers(existingMembers);
         Chatroom savedChatroom = chatroomRepository.save(chatroom);
         log.info("MessagingServiceImpl::removeMembers: Successfully removed members from the chatroom with id: {}",
                 savedChatroom.getChatroomId());
@@ -314,18 +321,17 @@ public class MessagingServiceImpl  implements MessagingService {
         Chatroom chatroom = chatroomRepository.findByChatroomId(chatroomId)
                 .orElseThrow(() -> new ChatroomDoesNotExistException(chatroomId));
 
-        Set<String> existingUserIdSet = chatroom.getMembers();
+        Set<Member> existingMembers = chatroom.getMembers();
 
-        System.out.println(existingUserIdSet);
-        if(!existingUserIdSet.contains(userId)) {
+        if(existingMembers.stream().noneMatch(m -> m.getUserId().equals(userId))) {
             throw new UserIsNotAChatroomMemberException(chatroomId, userId);
         }
 
         if(userId.equals(chatroom.getCreatedBy())) {
             throw new ChatroomCreatorTryingToRemoveThemselvesFromChatroomException(chatroomId, chatroom.getCreatedBy());
         }
-        existingUserIdSet.remove(userId);
-        chatroom.setMembers(existingUserIdSet);
+        existingMembers.removeIf(m -> m.getUserId().equals(userId));
+        chatroom.setMembers(existingMembers);
         Chatroom savedChatroom = chatroomRepository.save(chatroom);
         log.info("MessagingServiceImpl::leaveChatroom: Successfully removed the user with id: {} " +
                 "from the chatroom with id: {}.", userId, savedChatroom.getChatroomId());
