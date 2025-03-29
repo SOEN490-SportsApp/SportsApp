@@ -5,17 +5,16 @@ import app.sportahub.kafkevents.forgotPassword.ForgotPasswordRequestedEvent;
 import app.sportahub.kafkevents.forgotPassword.ForgotPasswordSendEmailEvent;
 import app.sportahub.orchestrationservice.service.consumer.UserServiceConsumerImpl;
 import app.sportahub.orchestrationservice.service.producer.EmailServiceProducer;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 
 import java.time.Instant;
 import java.util.UUID;
 
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 public class UserServiceConsumerTest {
     @Mock
@@ -44,10 +43,26 @@ public class UserServiceConsumerTest {
                 event.getBaseEvent(),
                 event.getEmail()
         );
+        UUID uuid = UUID.randomUUID();
+        try(var mocked = mockStatic(UUID.class)){
+            mocked.when(UUID::randomUUID).thenReturn(uuid);
+            userServiceConsumer.listenForForgotPasswordRequestedEvent(event);
+            ArgumentCaptor<ForgotPasswordSendEmailEvent> captor = ArgumentCaptor.forClass(ForgotPasswordSendEmailEvent.class);
+            verify(emailServiceProducer, times(1)).sendForgotPasswordSendEmailEvent(captor.capture());
+            ForgotPasswordSendEmailEvent capturedEvent = captor.getValue();
+            Assertions.assertEquals(email, capturedEvent.getEmail());
+            Assertions.assertEquals(uuid.toString() , capturedEvent.getBaseEvent().getEventId());
+            Assertions.assertEquals(uuid.toString(), capturedEvent.getBaseEvent().getCorrelationId());
+            Assertions.assertEquals(event.getBaseEvent().getEventType(), capturedEvent.getBaseEvent().getEventType());
+            Assertions.assertEquals("orchestration-service", capturedEvent.getBaseEvent().getSource());
+            mocked.verify(UUID::randomUUID, times(2));
 
-        userServiceConsumer.listenForForgotPasswordRequestedEvent(event);
 
-        verify(emailServiceProducer, times(1)).sendForgotPasswordSendEmailEvent(forgotPasswordSendEmailEvent);
+        }
+
+
+
+
     }
 
 }
