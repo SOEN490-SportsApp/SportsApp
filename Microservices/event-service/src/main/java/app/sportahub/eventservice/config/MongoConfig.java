@@ -25,7 +25,6 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class MongoConfig extends AbstractMongoClientConfiguration {
 
-
     @Value("${spring.data.mongodb.uri}")
     public String mongoUri;
 
