@@ -42,7 +42,7 @@ const EventsList: React.FC<userEventsListProps> = ({ forProfile, fetchEventsFunc
     return (
       <View style={styles.loaderContainer}>
         <ActivityIndicator size="large" color="#0000ff" />
-        <Text>{t('event_list.loading_event')}</Text>
+        <Text>{t('event_list.loading_events')}</Text>
       </View>
     );
   }
