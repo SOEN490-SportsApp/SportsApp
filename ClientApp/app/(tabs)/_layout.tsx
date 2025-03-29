@@ -50,7 +50,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="chats/index"
+        name="chats"
         options={{
           title: t('tab_layout.chats'),
           tabBarIcon: ({ color }) => (
@@ -58,9 +58,9 @@ export default function TabLayout() {
           ),
         }}
         listeners={{
-          tabPress: (e) => {
-            console.log('Chats tab pressed');
-          },
+          // tabPress: (e) => {
+          //   console.log('Chats tab pressed');
+          // },
         }}
       />
       <Tabs.Screen
