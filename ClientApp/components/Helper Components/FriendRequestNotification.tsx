@@ -40,7 +40,7 @@ const FriendRequestNotification: React.FC<FriendRequestNotificationProps> = ({ u
 
 
   return (
-    <TouchableOpacity onPress={() => router.push(`/(tabs)/home/userProfiles/${senderId}`)} activeOpacity={0.8}>
+    <TouchableOpacity onPress={() => router.push({ pathname: "/userProfiles/[id]", params: { id: senderId } })} activeOpacity={0.8}>
       <View style={{ flexDirection: "row", alignItems: "center", padding: 15, backgroundColor: "#f9f9f9", borderRadius: 10, marginVertical: 8, elevation: 2 }}>
         <Image source={require("@/assets/images/avatar-placeholder.png")} style={{ width: 50, height: 50, borderRadius: 25, marginRight: 10 }} />
         <View style={{ flex: 1 }}>
