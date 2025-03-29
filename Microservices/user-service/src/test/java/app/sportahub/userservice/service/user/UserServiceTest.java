@@ -421,7 +421,7 @@ public class UserServiceTest {
         );
 
         Optional<User> optionalExistingUser = Optional.of(new User("keycloak-123", "test@gmail.com",
-                "testusername", existingProfile, null, null, null));
+                "testusername", existingProfile, null, null, null, null));
         User existingUser = optionalExistingUser.get();
         when(userRepository.findUserById(existingUser.getId())).thenReturn(optionalExistingUser);
         existingUser.getProfile().setDateOfBirth(profileRequest.dateOfBirth());

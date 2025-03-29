@@ -17,6 +17,7 @@ import app.sportahub.userservice.dto.response.user.friendRequest.ViewFriendReque
 import app.sportahub.userservice.enums.user.FriendRequestStatusEnum;
 import app.sportahub.userservice.enums.user.UpdateFriendRequestActionEnum;
 import app.sportahub.userservice.exception.user.UserDoesNotExistException;
+import app.sportahub.userservice.service.recommendation.FriendRecommendationService;
 import app.sportahub.userservice.service.user.UserServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
@@ -53,6 +54,9 @@ public class UserControllerTest {
 
     @Autowired
     protected MockMvc mockMvc;
+
+    @MockBean
+    private FriendRecommendationService friendRecommendationService;
 
     @MockBean
     private UserServiceImpl userService;
