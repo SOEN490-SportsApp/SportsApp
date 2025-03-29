@@ -209,7 +209,7 @@ public class MessagingServiceTest {
         when(chatroomRepository.findAllByMembers_UserId(any(String.class))).thenReturn(List.of());
 
         // Act
-        List<ChatroomResponse> chatroomResponses = messagingService.getChatrooms(any());
+        List<ChatroomResponse> chatroomResponses = messagingService.getChatrooms("1");
 
         //Assert
         assertNotNull(chatroomResponses);
@@ -481,13 +481,13 @@ public class MessagingServiceTest {
     public void removeMemberShouldThrowChatroomCreatorTryingToRemoveThemselvesFromChatroomException() {
         // Arrange
         when(chatroomRepository.findByChatroomId(anyString())).thenReturn(Optional.of(chatroom));
-        Member memberToRemove1 = new Member("testSenderId", "testSenderName", null);
+        Member creator = new Member("testSenderId", "testSenderName", null);
         Member memberToRemove2 = new Member("testReceiverId1", "testReceiverName", null);
 
         // Act
         assertThrows(ChatroomCreatorTryingToRemoveThemselvesFromChatroomException.class, () ->
                 messagingService.removeMembers(chatroom.getChatroomId(),
-                        List.of(memberToRemove1, memberToRemove2)));
+                        List.of(creator, memberToRemove2)));
 
         // Assert
         verify(chatroomRepository, times(1)).findByChatroomId(anyString());
