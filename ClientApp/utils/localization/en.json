@@ -341,7 +341,20 @@
     "invite_friend": "Invite Friend",
     "edit_event": "Edit Event",
     "delete_event": "Delete Event",
-    "leave_event": "Leave Event"
+    "leave_event": "Leave Event",
+    "event_id_user_id_missing": "Event ID or User ID is missing.",
+    "confirm_leave_1": "Confirm Leave",
+    "confirm_leave_2": "Are you sure you want to leave this event?",
+    "leave": "Leave",
+    "success_leave": "You have successfully left the event.",
+    "error_leave": "Unable to leave event. Please try again.",
+    "event_id_missing": "Event ID is missing.",
+    "cancel_event": "Cancel Event",
+    "provide_reason": "Please provide a reason for cancellation.",
+    "confirm": "Confirm",
+    "reason_required_to_cancel": "Reason is required to cancel the event.",
+    "event_cancelled": "Event has been cancelled.",
+    "error_cancel_event": "Unable to cancel event. Please try again."
   },
   "qr": {
     "share_your": "Share your",

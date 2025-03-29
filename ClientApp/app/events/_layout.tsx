@@ -89,14 +89,14 @@ export default function EventDetailsLayout() {
   
   const handleLeaveEvent = async () => {
     if (!eventId || !user.id) {
-      Alert.alert("Error", "Event ID or User ID is missing.");
+      Alert.alert(t('event_details_layout.error'), t('event_details_layout.event_id_user_id_missing'));
       return;
     }
   
-    Alert.alert("Confirm Leave", "Are you sure you want to leave this event?", [
-      { text: "Cancel", style: "cancel" },
+    Alert.alert(t('event_details_layout.confirm_leave_1'), t('event_details_layout.confirm_leave_2'), [
+      { text: t('event_details_layout.cancel'), style: "cancel" },
       {
-        text: "Leave",
+        text: t('event_details_layout.leave'),
         style: "destructive",
         onPress: async () => {
           try {
@@ -118,9 +118,9 @@ export default function EventDetailsLayout() {
             const refetched = await getEventDetails(eventId);
             setEventData(refetched); 
   
-            Alert.alert("Success", "You have left the event.");
+            Alert.alert(t('event_details_layout.success_1'), t('event_details_layout.success_leave'));
           } catch (error) {
-            Alert.alert("Error", "Unable to leave event. Please try again.");
+            Alert.alert(t('event_details_layout.error'), t('event_details_layout.error_leave'));
           }
         },
       },
@@ -129,32 +129,32 @@ export default function EventDetailsLayout() {
 
   const handleCancelEvent = async (eventId: string | undefined) => {
     if (!eventId) {
-      Alert.alert("Error", "Event ID is missing.");
+      Alert.alert(t('event_details_layout.error'), t('event_details_layout.event_id_missing'));
       return;
     }
   
     Alert.prompt(
-      "Cancel Event",
-      "Please provide a reason for cancelling this event:",
+      t('event_details_layout.cancel_event'),
+      t('event_details_layout.provide_reason'),
       [
         {
-          text: "Cancel",
+          text: t('event_details_layout.cancel'),
           style: "cancel",
         },
         {
-          text: "Confirm",
+          text: t('event_details_layout.confirm'),
           onPress: async (reason) => {
             if (!reason) {
-              Alert.alert("Error", "A reason is required to cancel the event.");
+              Alert.alert(t('event_details_layout.error'), t('event_details_layout.reason_required_to_cancel'));
               return;
             }
   
             try {
               await cancelEvent(eventId, reason);
-              Alert.alert("Success", "Event has been cancelled.");
+              Alert.alert(t('event_details_layout.success_1'), t('event_details_layout.event_cancelled'));
               router.replace("/(tabs)/home");
             } catch (error) {
-              Alert.alert("Error", "Unable to cancel event.");
+              Alert.alert(t('event_details_layout.error'), t('event_details_layout.error_cancel_event'));
             }
           },
         },
@@ -165,7 +165,7 @@ export default function EventDetailsLayout() {
   
   const handleDeleteEvent = async (eventId: string | undefined) => {
     if (!eventId) {
-      Alert.alert("Error", "Event ID is missing.");
+      Alert.alert(t('event_details_layout.error'), t('event_details_layout.event_id_missing'));
       return;
     }
 
@@ -228,7 +228,7 @@ export default function EventDetailsLayout() {
   {isCreator && (
     <React.Fragment>
       <Menu.Item onPress={() => handleOptionPress("edit")} title={t('event_details_layout.edit_event')} />
-      <Menu.Item onPress={() => handleOptionPress("cancel")} title="Cancel Event" titleStyle={{ color: "orange" }} />
+      <Menu.Item onPress={() => handleOptionPress("cancel")} title={t('event_details_layout.cancel_event')} titleStyle={{ color: "orange" }} />
       <Menu.Item onPress={() => handleOptionPress("delete")} title={t('event_details_layout.delete_event')} titleStyle={{ color: "red" }} />
     </React.Fragment>
   )}
