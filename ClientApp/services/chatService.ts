@@ -50,18 +50,7 @@ export const createUserChatroom = async (createrId: string, chatWithUserId: stri
       {
         createdBy: createrId,
         chatroomName: nameOfChatRoom,
-        members : [  
-        {
-          userId: createrId,
-          username: creatorUsername,
-          userImage: null
-        },
-        {
-          userId: chatWithUserId,
-          username: participantUsername,
-          userImage: null
-        }
-        ],
+        members : [ createrId, chatWithUserId],
         messages: messages,
         isEvent: isEvent,
         unread: unread
@@ -75,6 +64,50 @@ export const createUserChatroom = async (createrId: string, chatWithUserId: stri
   }
 }
 
+export const createUserChatroomV2 = async (
+  creatorId: string,
+  participantIds: string[],           
+  nameOfChatRoom: string,
+  messages: string[],
+  isEvent: boolean,
+  unread: boolean,
+  usernames: string[],               
+  userImages: string[],            
+  creatorUsername: string,
+  creatorImage: string
+) => {
+  try {
+    const axiosLocalInstance = getAxiosInstance();
+
+    const members = [
+      {
+        userId: creatorId,
+        username: creatorUsername,
+        userImage: creatorImage,
+      },
+      ...participantIds.map((id, index) => ({
+        userId: id,
+        username: usernames[index],
+        userImage: userImages[index],
+      })),
+    ];
+
+    const response = await axiosLocalInstance.post(API_ENDPOINTS.CREATE_CHATROOM, {
+      createdBy: creatorId,
+      chatroomName: nameOfChatRoom,
+      members: members,
+      messages: messages,
+      isEvent: isEvent,
+      unread: unread,
+    });
+
+    console.log("createUserChatroom response:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error creating chatroom:', error);
+    throw error;
+  }
+};
 
 
 // API_ENDPOINTS.DELETE_CHATROOM
