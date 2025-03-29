@@ -341,7 +341,20 @@
     "invite_friend": "Inviter un ami",
     "edit_event": "Modifier l'événement",
     "delete_event": "Supprimer l'événement",
-    "leave_event": "Quitter l'événement"
+    "leave_event": "Quitter l'événement",
+    "event_id_user_id_missing": "ID d'événement ou ID d'utilisateur manquant",
+    "confirm_leave_1": "confirmer la sortie",
+    "confirm_leave_2": "Voulez-vous vraiment quitter cet événement?",
+    "leave": "Quitter",
+    "success_leave": "Vous avez quitté l'événement avec succès",
+    "error_leave": "Erreur lors de la sortie de l'événement",
+    "event_id_missing": "ID d'événement manquant",
+    "cancel_event": "Annuler l'événement",
+    "provide_reason": "Fournir une raison",
+    "confirm": "Confirmer",
+    "reason_required_to_cancel": "Une raison est requise pour annuler l'événement",
+    "event_cancelled": "Événement annulé",
+    "error_cancel_event": "Erreur lors de l'annulation de l'événement"
   },
   "qr": {
     "share_your": "Partagez votre",
