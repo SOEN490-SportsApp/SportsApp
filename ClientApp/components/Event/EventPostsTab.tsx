@@ -19,14 +19,19 @@ const EventPostsTab = ({ eventId, isUserParticipant }: { eventId: string, isUser
 
     const loadPosts = async () => {
         try {
-            const size = 10;
+            const size = 2;
             const response = await fetchPosts(eventId, page, size);
 
             if (page === 0) {
                 setPosts(response.content);
             } else {
-                setPosts((prevPosts) => [...prevPosts, ...response.content]);
-            }
+                setPosts((prevPosts) => {
+                    const existingIds = new Set(prevPosts.map(post => post.id));
+                    const uniqueNewPosts = response.content.filter((post: { id: string; }) => !existingIds.has(post.id));
+                    return uniqueNewPosts.length > 0 
+                        ? [...prevPosts, ...uniqueNewPosts] 
+                        : prevPosts;
+                });            }
             const profiles: { [userId: string]: any } = { ...userProfiles };
             for (const post of response.content) {
                 if (!profiles[post.createdBy]) {
@@ -46,12 +51,17 @@ const EventPostsTab = ({ eventId, isUserParticipant }: { eventId: string, isUser
         }
     };
 
-    const handleNewPost = () => {
-        setPage(0);
-        setHasMore(true); 
-        setUserProfiles({});
-        setPosts([]);
-        loadPosts();
+    const handleNewPost = (newPost: Post) => {
+        setPosts(prevPosts => [newPost, ...prevPosts]);
+        
+        if (!userProfiles[newPost.createdBy]) {
+            getProfile(newPost.createdBy).then(profile => {
+                setUserProfiles(prevProfiles => ({
+                    ...prevProfiles,
+                    [newPost.createdBy]: profile
+                }));
+            });
+        }
     };
 
     const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
