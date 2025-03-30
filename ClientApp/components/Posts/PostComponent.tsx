@@ -26,11 +26,10 @@ type PostComponentProps = {
 const PostComponent: React.FC<PostComponentProps> = ({ post, userProfile }) => {
   const [liked, setLiked] = useState<boolean>(false);
   const [likeCount, setLikeCount] = useState<number>(post.likes);
-  const [imageUris, setImageUris] = useState<string[]>([]);
+  const [imageUris, setImageUris] = useState<(string | null)[]>([]);
   const [loadingImages, setLoadingImages] = useState<boolean>(false);
   const [visible, setVisible] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [failedImages, setFailedImages] = useState<boolean[]>([]);
 
 
   const { t, i18n } = useTranslation();
@@ -41,16 +40,17 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, userProfile }) => {
       if (post.attachments.length > 0) {
         setLoadingImages(true);
         try {
-          const uris = await Promise.all(
+          const results = await Promise.all(
             post.attachments.map(async (attachment) => {
-              return await fetchImage(attachment);
+              try {
+                return await fetchImage(attachment);
+              } catch (error) {
+                console.error("Error loading image:", error);
+                return null;
+              }
             })
           );
-          setImageUris(uris.filter(uri => uri !== null) as string[]);
-          setFailedImages(uris.map(uri => uri === null));
-        } catch (error) {
-          console.error("Error loading images:", error);
-          setFailedImages(new Array(post.attachments.length).fill(true));
+          setImageUris(results);
         } finally {
           setLoadingImages(false);
         }
@@ -118,7 +118,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, userProfile }) => {
             imageUris={imageUris}
             loading={loadingImages}
             onImagePress={handleImagePress}
-            failedImages={failedImages} />
+          />
         </View>
 
         {/* Like and Comment Buttons */}
@@ -135,7 +135,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, userProfile }) => {
         </View>
         {/* Image Viewer */}
         <ImageView
-          images={imageUris.map(uri => ({ uri }))}
+          images={imageUris.filter(uri => uri != null).map(uri => ({ uri }))}
           imageIndex={currentImageIndex}
           visible={visible}
           onRequestClose={() => setVisible(false)}
