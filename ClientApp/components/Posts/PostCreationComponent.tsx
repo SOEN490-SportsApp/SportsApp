@@ -14,6 +14,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
@@ -24,12 +25,14 @@ import { UserState } from '@/types';
 import { mhs, mvs } from '@/utils/helpers/uiScaler';
 import { Camera } from "expo-camera";
 import { useTranslation } from 'react-i18next';
+import { Post } from '@/types/post';
+import * as FileSystem from 'expo-file-system';
 
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
 
 interface PostCreationProps {
   eventId: string;
-  onNewPost: () => void;
+  onNewPost: (post: Post) => void;
 }
 
 const PostCreationComponent: React.FC<PostCreationProps> = ({ eventId, onNewPost }) => {
@@ -39,11 +42,12 @@ const PostCreationComponent: React.FC<PostCreationProps> = ({ eventId, onNewPost
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [isPosting, setIsPosting] = useState<boolean>(false);
   const { t } = useTranslation();
 
   const pickImage = async (source: 'gallery' | 'camera') => {
     let result;
-  
+
     if (source === 'gallery') {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== 'granted') {
@@ -55,38 +59,70 @@ const PostCreationComponent: React.FC<PostCreationProps> = ({ eventId, onNewPost
         allowsEditing: false,
         quality: 1,
       });
-      
+
     } else if (source === 'camera') {
       const { status } = await Camera.requestCameraPermissionsAsync();
       if (status !== 'granted') {
         Alert.alert('Permission Denied', 'Allow camera access in settings.');
         return;
       }
-  
+
       result = await ImagePicker.launchCameraAsync({
         mediaTypes: ["images"],
         allowsEditing: false,
         quality: 1,
       });
     }
-  
+
     if (result && !result.canceled && result.assets.length > 0) {
       const { uri, width, height } = result.assets[0];
       setImages((prev) => [...prev, { uri, width, height }]);
       setCurrentImageIndex(images.length);
     }
   };
+
   const handlePost = async () => {
+    if (isPosting) return;
+
     try {
+      setIsPosting(true);
+
+      for (const image of images) {
+        const fileInfo = await FileSystem.getInfoAsync(image.uri);
+
+        if (!fileInfo.exists) {
+          throw new Error('Image file not found');
+        }
+
+        const fileSizeMB = fileInfo.size / (1024 * 1024); // Convert bytes to MB
+
+        if (fileSizeMB > 3) {
+          Alert.alert(
+            'Image too large',
+            `One of your images is ${fileSizeMB.toFixed(1)}MB. Maximum allowed is 3MB.`,
+            [{ text: 'OK' }]
+          );
+          return; 
+        }
+      }
+
       const uploadPromises = images.map((image) => uploadImage(image.uri));
       const downloadPaths = await Promise.all(uploadPromises);
-      await createPost(eventId, comment, downloadPaths);
-      onNewPost();
+      const post = await createPost(eventId, comment, downloadPaths);
+      onNewPost(post);
       resetModal();
-    } catch (error) {
+
+    } catch (error: any) {
       console.error('Failed to create post:', error);
+      Alert.alert(
+        'Error',
+        error.message.includes('too large')
+          ? 'One of your images is too large (max 3MB)'
+          : 'Failed to create post'
+      );
+    } finally {
+      setIsPosting(false);
     }
-    resetModal();
   };
 
   const removeImage = () => {
@@ -167,7 +203,7 @@ const PostCreationComponent: React.FC<PostCreationProps> = ({ eventId, onNewPost
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
             style={styles.modalOverlay}
           >
-            <View style={[styles.modalContent, { height: keyboardHeight == 0 ? SCREEN_HEIGHT * 0.90 : SCREEN_HEIGHT - keyboardHeight }]}>
+            <View style={[styles.modalContent, { height: keyboardHeight == 0 ? SCREEN_HEIGHT * 0.90 : SCREEN_HEIGHT * 0.90 - keyboardHeight }]}>
               <View style={styles.modalHeader}>
                 <Text style={styles.modalTitle}>{t('post_creation_component.create_post')}</Text>
                 <TouchableOpacity onPress={resetModal}>
@@ -254,12 +290,32 @@ const PostCreationComponent: React.FC<PostCreationProps> = ({ eventId, onNewPost
               </ScrollView>
 
               {/* Post Button */}
-              <TouchableOpacity onPress={handlePost} style={styles.modalPostButton}>
-                <Text style={styles.modalPostButtonText}>{t('post_creation_component.post')}</Text>
+              <TouchableOpacity
+                onPress={handlePost}
+                style={styles.modalPostButton}
+                disabled={isPosting}
+              >
+                {isPosting ? (
+                  <ActivityIndicator color={themeColors.text.light} />
+                ) : (
+                  <Text style={styles.modalPostButtonText}>
+                    {t('post_creation_component.post')}
+                  </Text>
+                )}
               </TouchableOpacity>
             </View>
           </KeyboardAvoidingView>
         </TouchableWithoutFeedback>
+        {isPosting && (
+          <View style={styles.postingOverlay}>
+            <View style={styles.postingIndicator}>
+              <ActivityIndicator size="large" color={themeColors.primary} />
+              <Text style={styles.postingText}>
+                {t('post_creation_component.creating_your_post')}
+              </Text>
+            </View>
+          </View>
+        )}
       </Modal>
     </View>
   );
@@ -407,6 +463,34 @@ const styles = StyleSheet.create({
     color: themeColors.text.light,
     fontWeight: 'bold',
     fontSize: mvs(16),
+  },
+  postingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    zIndex: 100,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  postingIndicator: {
+    backgroundColor: '#fff',
+    padding: mhs(20),
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  postingText: {
+    marginTop: mvs(10),
+    fontSize: mhs(14),
+    color: '#333',
   },
 });
 
