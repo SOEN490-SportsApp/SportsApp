@@ -2,37 +2,26 @@ import React, { useState } from 'react';
 import { View, Image, StyleSheet, ActivityIndicator, TouchableWithoutFeedback, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { mhs, mvs } from '@/utils/helpers/uiScaler';
+import themeColors from '@/utils/constants/colors';
 
 type ImageGridProps = {
-    imageUris: string[];
+    imageUris: (string | null)[];
     loading: boolean;
     onImagePress: (index: number) => void;
-    failedImages?: boolean[];
 };
 
-const ImageGridComponent: React.FC<ImageGridProps> = ({ imageUris, loading, onImagePress, failedImages = [] }) => {
-    const [localFailedImages, setLocalFailedImages] = useState<boolean[]>([]);
-
+const ImageGridComponent: React.FC<ImageGridProps> = ({ imageUris, loading, onImagePress }) => {
     if (loading) {
-        return <ActivityIndicator size="small" color="#0000ff" />;
+        return <ActivityIndicator size="small" color={themeColors.primary} />;
     }
 
-    const handleImageError = (index: number) => {
-        setLocalFailedImages(prev => {
-            const newFailed = [...prev];
-            newFailed[index] = true;
-            return newFailed;
-        });
-    };
-
     const renderImageWithFallback = (uri: string, index: number) => {
-        const isFailed = failedImages[index] || localFailedImages[index];
 
-        if (isFailed) {
+        if (uri === null) {
             return (
                 <View style={styles.fallbackContainer}>
                     <Ionicons name="image-outline" size={mhs(24)} color="#ccc" />
-                    <Text style={styles.fallbackText}>Failed to load</Text>
+                    <Text style={styles.fallbackText}>Failed to fetch Image.</Text>
                 </View>
             );
         }
@@ -42,7 +31,6 @@ const ImageGridComponent: React.FC<ImageGridProps> = ({ imageUris, loading, onIm
                 source={{ uri }}
                 style={StyleSheet.absoluteFill}
                 resizeMode="cover"
-                onError={() => handleImageError(index)}
             />
         );
     };
@@ -54,7 +42,7 @@ const ImageGridComponent: React.FC<ImageGridProps> = ({ imageUris, loading, onIm
             return (
                 <TouchableWithoutFeedback onPress={() => onImagePress(0)}>
                     <View style={styles.singleImage}>
-                        {renderImageWithFallback(imageUris[0], 0)}
+                        {renderImageWithFallback(imageUris[0]!, 0)}
                     </View>
                 </TouchableWithoutFeedback>
             );
@@ -65,12 +53,12 @@ const ImageGridComponent: React.FC<ImageGridProps> = ({ imageUris, loading, onIm
                 <View style={styles.twoImageContainer}>
                     <TouchableWithoutFeedback onPress={() => onImagePress(0)}>
                         <View style={styles.twoImage}>
-                            {renderImageWithFallback(imageUris[0], 0)}
+                            {renderImageWithFallback(imageUris[0]!, 0)}
                         </View>
                     </TouchableWithoutFeedback>
                     <TouchableWithoutFeedback onPress={() => onImagePress(1)}>
                         <View style={styles.twoImage}>
-                            {renderImageWithFallback(imageUris[1], 1)}
+                            {renderImageWithFallback(imageUris[1]!, 1)}
                         </View>
                     </TouchableWithoutFeedback>
                 </View>
@@ -82,18 +70,18 @@ const ImageGridComponent: React.FC<ImageGridProps> = ({ imageUris, loading, onIm
                 <View style={styles.threeImageContainer}>
                     <TouchableWithoutFeedback onPress={() => onImagePress(0)}>
                         <View style={styles.threeImageMain}>
-                            {renderImageWithFallback(imageUris[0], 0)}
+                            {renderImageWithFallback(imageUris[0]!, 0)}
                         </View>
                     </TouchableWithoutFeedback>
                     <View style={styles.threeImageRight}>
                         <TouchableWithoutFeedback onPress={() => onImagePress(1)}>
                             <View style={styles.threeImageSub}>
-                                {renderImageWithFallback(imageUris[1], 1)}
+                                {renderImageWithFallback(imageUris[1]!, 1)}
                             </View>
                         </TouchableWithoutFeedback>
                         <TouchableWithoutFeedback onPress={() => onImagePress(2)}>
                             <View style={styles.threeImageSub}>
-                                {renderImageWithFallback(imageUris[2], 2)}
+                                {renderImageWithFallback(imageUris[2]!, 2)}
                             </View>
                         </TouchableWithoutFeedback>
                     </View>
@@ -107,23 +95,23 @@ const ImageGridComponent: React.FC<ImageGridProps> = ({ imageUris, loading, onIm
                 <View style={styles.fourImageContainer}>
                     <TouchableWithoutFeedback onPress={() => onImagePress(0)}>
                         <View style={styles.fourImageMain}>
-                            {renderImageWithFallback(imageUris[0], 0)}
+                            {renderImageWithFallback(imageUris[0]!, 0)}
                         </View>
                     </TouchableWithoutFeedback>
                     <View style={styles.fourImageRight}>
                         <TouchableWithoutFeedback onPress={() => onImagePress(1)}>
                             <View style={styles.fourImageSub}>
-                                {renderImageWithFallback(imageUris[1], 1)}
+                                {renderImageWithFallback(imageUris[1]!, 1)}
                             </View>
                         </TouchableWithoutFeedback>
                         <TouchableWithoutFeedback onPress={() => onImagePress(2)}>
                             <View style={styles.fourImageSub}>
-                                {renderImageWithFallback(imageUris[2], 2)}
+                                {renderImageWithFallback(imageUris[2]!, 2)}
                             </View>
                         </TouchableWithoutFeedback>
                         <TouchableWithoutFeedback onPress={() => onImagePress(3)}>
                             <View style={[styles.fourImageSub, { marginTop: mvs(2) }]}>
-                                {renderImageWithFallback(imageUris[3], 3)}
+                                {renderImageWithFallback(imageUris[3]!, 3)}
                                 {remainingCount > 0 && (
                                     <View style={styles.remainingCountContainer}>
                                         <Text style={styles.remainingCountText}>+{remainingCount}</Text>
@@ -223,6 +211,12 @@ const styles = StyleSheet.create({
         marginTop: mvs(8),
         color: '#888',
         fontSize: mhs(12),
+    },
+    largeImageText: {
+        marginTop: mvs(8),
+        color: '#ff4444', // Red color for warning
+        fontSize: mhs(12),
+        fontWeight: 'bold',
     },
 });
 
