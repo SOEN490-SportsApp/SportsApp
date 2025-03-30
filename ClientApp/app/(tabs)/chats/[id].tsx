@@ -1,12 +1,13 @@
 import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import { StyleSheet } from 'react-native';
+import { Button, Modal, StyleSheet, View, Text } from 'react-native';
 import { GiftedChat, IMessage } from 'react-native-gifted-chat';
 import {useSelector} from "react-redux";
 import {getMessages, getChatroom} from "@/services/chatService";
 import { Client } from "@stomp/stompjs";
 import { getAccessToken } from "@/services/tokenService"
 import {message, chatroomProps, messageRequest} from "@/types/messaging";
+import { mvs } from '@/utils/helpers/uiScaler';
 
 
 const ChatScreen = () => {
@@ -17,9 +18,15 @@ const ChatScreen = () => {
   const user = useSelector((state: {user: any}) => state.user);
   const [connected, setConnected] = useState(false);
   const clientRef = useRef<Client | null>(null);
-  const [chatroom, setChatroom] = useState<chatroomProps>();
-  const navigation = useNavigation();
 
+  const [chatroom, setChatroom] = useState<chatroomProps>();
+  // TODO This will be a duplicate of the chatroom state
+  const [chatroomInformation, setChatroomInformation] = useState<any>();
+
+  const navigation = useNavigation();
+  const [infoVisible, setInfoVisible] = useState(false);
+
+  // use effect to control the bottom tab bar visibility of the part "chat"
   useEffect(() => {
     // Hide tab bar when this screen is focused
     const parent = navigation.getParent();
@@ -29,18 +36,27 @@ const ChatScreen = () => {
       } 
     });
     
-
     // Restore it when unmounted
     return () => {
       parent?.setOptions({ 
-        tabBarStyle: undefined 
+          tabBarStyle: {
+          paddingHorizontal: 10,
+          height: mvs(65),
+        },      
       });
     };
   }, []);
 
+
+
   useEffect(() => {
     if (title && typeof title === 'string') {
-      navigation.setOptions({ headerTitle: title });
+      navigation.setOptions({ 
+        headerTitle: title, 
+        headerRight: () => (
+          <Button onPress={() => setInfoVisible(true)} title="Info" />
+        ),
+      });
     }
   }, [title]);
   
@@ -59,7 +75,28 @@ const ChatScreen = () => {
     response();
   }, []);
 
+  //TODO to be removed once client issue is fixed
+  useEffect(() => {
+    const fetchChatroom = async () => {
+      if (!finalToken) return;
+      try {
+        const response = await getChatroom(id.toString());
+        setChatroomInformation(response);
+        console.log("response of the chat: ", response);
+      } catch (e) {
+        console.error("Error in useEffect: ", e);
+      }
+    };
 
+    fetchChatroom();
+  }, [finalToken]);
+
+  const handleDeleteChat = async () => {
+    console.log("Delete chatroom");
+  }
+  const handleLeaveChat = async () => {
+    console.log("Leave chatroom");
+  }
   // useEffect(() => {
   //   if (!finalToken) return;
 
@@ -175,12 +212,51 @@ const ChatScreen = () => {
   }, [finalToken, chatroom]);
 
   return (
-    
-        <GiftedChat
-          messages={messages}
-          onSend={messages => onSend(messages)}
-          user={{ _id: user.id }}
-        />
+    <>
+    <GiftedChat
+      messages={messages}
+      onSend={(messages) => onSend(messages)}
+      user={{ _id: user.id }}
+    />
+
+    <Modal visible={infoVisible} transparent>
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContent}>
+
+          {/* list of participants if it's a group chat*/}
+          {chatroomInformation?.members?.length > 2 && (
+            <View style={styles.participantTextRow}>
+              <Text style={styles.modalTitle}>Group Members</Text>
+              <Text style={styles.inlineName}>
+                {chatroomInformation.members
+                  .map((member: any) =>
+                    member.username === user.username ? 'You' : member.username
+                  )
+                  .join(', ')}
+              </Text>
+            </View>
+          )}
+          
+          {/*delete or leave group*/}
+          {chatroomInformation?.createdBy === user.id ? (
+            <Button
+              title="Delete Chat"
+              color="#e74c3c"
+              onPress={() => handleDeleteChat()}
+            />
+          ) : (
+            <Button
+              title="Leave Chat"
+              color="#f39c12"
+              onPress={() => handleLeaveChat()}
+            />
+          )}
+
+          <Button title="Close" onPress={() => setInfoVisible(false)} />
+        </View>
+      </View>
+    </Modal>
+  </>
   );
 };
 
@@ -196,4 +272,45 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 24,
+    width: '100%',
+    maxWidth: 400,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  participantText: {
+    fontSize: 14,
+    color: '#333',
+    alignSelf: 'flex-start',
+    marginBottom: 4,
+    marginLeft: 4,
+  },
+  participantTextRow: {
+    marginTop: 10,
+    marginBottom: 20,
+    alignSelf: 'center',
+    alignContent: 'center',
+    justifyContent: 'center',
+  },
+  inlineName: {
+    fontSize: 15,
+    color: '#333',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },  
 });

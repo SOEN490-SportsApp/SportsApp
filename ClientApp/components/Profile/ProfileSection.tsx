@@ -58,7 +58,10 @@ const ProfileSection: React.FC<ProfileRequest> = ({
     // Handle press event
     console.log("Message button pressed");
     try{
-      const response = await createUserChatroom(loggedInUser.id, visitedId, user.username, [], false, false);          
+      const participants = [{ userId: visitedId, username: user.username, userImage: ''}];
+      const response = await createUserChatroom(loggedInUser.id , loggedInUser.username, '','',participants, [],false, false);          
+
+      // const response = await createUserChatroom(loggedInUser.id, visitedId, user.username, [], false, false, loggedInUser.username, user.username);          
       router.push({
         pathname: '/(tabs)/chats/[id]',
         params: { 

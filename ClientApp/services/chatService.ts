@@ -43,38 +43,46 @@ export const getMessages = async (chatroomId: string) => {
 };
 
 // API_ENDPOINTS.CREATE_CHATROOM
-export const createUserChatroom = async (createrId: string, chatWithUserId: string, nameOfChatRoom: string, messages: string[], isEvent: boolean, unread: boolean, creatorUsername: string, participantUsername: string) => {
-  try {
-    const axiosLocalInstance = getAxiosInstance();
-    const response = await axiosLocalInstance.post(API_ENDPOINTS.CREATE_CHATROOM,
-      {
-        createdBy: createrId,
-        chatroomName: nameOfChatRoom,
-        members : [ createrId, chatWithUserId],
-        messages: messages,
-        isEvent: isEvent,
-        unread: unread
-      }
-    );
-    console.log("createUserChatroom response:", response.data);
-    return response.data;
-  } catch (error) {
-    console.error('Error creating chatroom:', error);
-    throw error;
-  }
-}
+// export const createUserChatroom = async (createrId: string, chatWithUserId: string, nameOfChatRoom: string, messages: string[], isEvent: boolean, unread: boolean, creatorUsername: string, participantUsername: string) => {
+//   try {
+//     const axiosLocalInstance = getAxiosInstance();
+//     const response = await axiosLocalInstance.post(API_ENDPOINTS.CREATE_CHATROOM,
+//       {
+//         createdBy: createrId,
+//         chatroomName: nameOfChatRoom,
+//         members : [ 
+//           {
+//             userId: createrId,
+//             username: creatorUsername,
+//             userImage: "",
+//           }, 
+//           {
+//             userId: chatWithUserId,
+//             username: participantUsername,
+//             userImage: "",
+//           },],
+//         messages: messages,
+//         isEvent: isEvent,
+//         unread: unread
+//       }
+//     );
+//     console.log("createUserChatroom response:", response.data);
+//     return response.data;
+//   } catch (error) {
+//     console.error('Error creating chatroom:', error);
+//     throw error;
+//   }
+// }
 
-export const createUserChatroomV2 = async (
+export const createUserChatroom = async (
   creatorId: string,
-  participantIds: string[],           
+  creatorUsername: string,
+  creatorImage: string,
   nameOfChatRoom: string,
+  participants: any [],           
   messages: string[],
   isEvent: boolean,
-  unread: boolean,
-  usernames: string[],               
-  userImages: string[],            
-  creatorUsername: string,
-  creatorImage: string
+  unread: boolean,          
 ) => {
   try {
     const axiosLocalInstance = getAxiosInstance();
@@ -85,13 +93,24 @@ export const createUserChatroomV2 = async (
         username: creatorUsername,
         userImage: creatorImage,
       },
-      ...participantIds.map((id, index) => ({
-        userId: id,
-        username: usernames[index],
-        userImage: userImages[index],
-      })),
+      ...participants.map((participant) => ({
+        userId: participant.userId,
+        username: participant.username,
+        userImage: "",
+        }))
     ];
 
+    console.log("members: ", members);
+    console.log(
+      {
+      createdBy: creatorId,
+      chatroomName: nameOfChatRoom,
+      members: members,
+      messages: messages,
+      isEvent: isEvent,
+      unread: unread,
+    }
+  )
     const response = await axiosLocalInstance.post(API_ENDPOINTS.CREATE_CHATROOM, {
       createdBy: creatorId,
       chatroomName: nameOfChatRoom,
