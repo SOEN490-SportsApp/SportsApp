@@ -21,14 +21,15 @@ const Chats = () => {
 
     const handleDelete = (chatroomId: string) => {
         Alert.alert(
-        "Delete Chat",
-        "Do you want to delete this chat?",
+        "Leave Chat",
+        "Do you want to leave this chat?",
         [
             { text: "Cancel", style: "cancel" },
             {
-            text: "Delete",
+            text: "Leave",
             style: "destructive",
             onPress: async () => {
+                // TODO JOUD handle selection between delete and leave endpoint calls
                 try {
                   await deleteChatroom(chatroomId);
                   setChatrooms(prev => prev.filter(c => c.chatroomId !== chatroomId));

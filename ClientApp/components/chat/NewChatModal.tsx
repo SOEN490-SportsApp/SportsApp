@@ -2,29 +2,22 @@ import React, { useState } from 'react';
 import {Modal,View,Text,FlatList,TouchableOpacity,StyleSheet,Pressable,Image} from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { hs, mhs, mvs, vs } from '@/utils/helpers/uiScaler';
-
-const sampleFriends = [
-    { id: '1', name: 'User1' },
-    { id: '2', name: 'User2' },
-    { id: '3', name: 'User3' },
-    { id: '4', name: 'User4' },
-  ];
+import { createUserChatroom } from '@/services/chatService';
+import { useSelector } from 'react-redux';
 
 interface NewChatModalProps {
   friends: any [];
   visible: boolean;
   onClose: () => void;
-  onCreateGroup: (selected: typeof sampleFriends) => void;
 }
 
 const NewChatModal: React.FC<NewChatModalProps> = ({
   friends,
   visible,
   onClose,
-  onCreateGroup,
 }) => {
     const [selected, setSelected] = useState<{ userId: string; username: string; userImage: string }[]>([]);
-    console.log("Selected friends:", selected);
+    const LoggedUser = useSelector((state: { user: any }) => state.user);
     const toggleSelect = (item: any) => {
         const exists = selected.find((u) => u.userId === item.friendUserId);
       
@@ -40,12 +33,22 @@ const NewChatModal: React.FC<NewChatModalProps> = ({
         }
     };
 
+    const onCreateGroup = (selectedFriends: any[]) => {
+        
+        console.log("Creating group with friends from onCreateGroup:", selectedFriends);
+
+        //TODO Joud check if the selected Friends are a group and ask for a group name
+        try {
+            createUserChatroom(LoggedUser.id, LoggedUser.username, '', "name", selectedFriends, [], false, false)
+        }catch (error) {
+            console.error("Error creating group:", error);
+        }
+
+        //TODO Joud route to the channel just created
+    };
+
     const handleCreate = () => {
-        const selectedFriends = friends.filter((f) =>
-        selected.includes(f.id)
-        );
-        console.log("Selected friends:", selectedFriends);
-        onCreateGroup(selectedFriends);
+        onCreateGroup(selected);
         onClose();
         setSelected([]);
     };
@@ -89,7 +92,8 @@ const NewChatModal: React.FC<NewChatModalProps> = ({
             onPress={handleCreate}
             disabled={selected.length === 0}
           >
-            <Text style={styles.createBtnText}>Start Group Chat</Text>
+            {/*TODO JOUD udpate the langague and check for name if the selected ones are more than 2 */}
+            <Text style={styles.createBtnText}>Start Chat</Text>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
