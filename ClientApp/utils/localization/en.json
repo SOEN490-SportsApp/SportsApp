@@ -301,7 +301,10 @@
     "whats_on_your_mind": "What's on your mind?",
     "attach_image": "Attach Image",
     "take_photo": "Take Photo",
-    "post": "Post"
+    "post": "Post",
+    "creating_your_post": "Creating your post...",
+    "image_too_large": "One of your images is too large (max 3MB allowed)",
+    "failed_to_create_post": "Failed to create post. Please try again."
   },
   "post_component": {
     "likes": "Likes",
@@ -315,7 +318,7 @@
     "days_ago": "{{count}} days ago"
   },
   "event_posts_tab": {
-    "failed_to_fetch_posts": "Failed to fetch posts.",
+    "failed_to_fetch_posts": "Failed to fetch posts. Please try again later.",
     "be_the_first_to_post": "Be the first one to post!",
     "reached_the_end": "You've reached the end!"
   },

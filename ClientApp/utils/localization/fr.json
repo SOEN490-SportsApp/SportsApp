@@ -301,7 +301,10 @@
     "whats_on_your_mind": "Qu'avez-vous en tête?",
     "attach_image": "Joindre une image",
     "take_photo": "Prendre une photo",
-    "post": "Poster"
+    "post": "Poster",
+    "creating_your_post": "Création de votre publication...",
+    "image_too_large": "Une de vos images est trop volumineuse (3MB maximum autorisé)",
+    "failed_to_create_post": "Échec de la création de la publication. Veuillez réessayer."
   },
   "post_component": {
     "likes": "J'aimes",
@@ -315,7 +318,7 @@
     "days_ago": "il y a {{count}} jours"
   },
   "event_posts_tab": {
-    "failed_to_fetch_posts": "Échec de la récupération des messages",
+    "failed_to_fetch_posts": "Échec de la récupération des messages, veuillez réessayer plus tard.",
     "be_the_first_to_post": "Soyez le premier à poster!",
     "reached_the_end": "Vous avez atteint la fin"
   },
