@@ -12,39 +12,37 @@ import ImageView from 'react-native-image-viewing';
 const PostPage: React.FC = () => {
   const { id, post: postString, timeAgo, userProfile: profileString } = useLocalSearchParams();
   const [post, userProfile] = React.useMemo(() => {
-      try {
-        return [
-          postString ? JSON.parse(postString as string) : null,
-          profileString ? JSON.parse(profileString as string) : null
-        ];
-      } catch (e) {
-        return [null, null];
-      }
-    }, [postString, profileString]);
+    try {
+      return [
+        postString ? JSON.parse(postString as string) : null,
+        profileString ? JSON.parse(profileString as string) : null
+      ];
+    } catch (e) {
+      return [null, null];
+    }
+  }, [postString, profileString]);
   const [imageUris, setImageUris] = useState<string[]>([]);
   const [loadingImages, setLoadingImages] = useState<boolean>(false);
   const [visible, setVisible] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [failedImages, setFailedImages] = useState<boolean[]>([]);
 
-  
-  useEffect(() => {
-    if (!post) return; 
 
+useEffect(() => {
     const loadImages = async () => {
       if (post.attachments.length > 0) {
         setLoadingImages(true);
         try {
-          const uris = await Promise.all(
+          const results = await Promise.all(
             post.attachments.map(async (attachment: string) => {
-              return await fetchImage(attachment);
+              try {
+                return await fetchImage(attachment);
+              } catch (error) {
+                console.error("Error loading image:", error);
+                return null;
+              }
             })
           );
-          setImageUris(uris.filter(uri => uri !== null) as string[]);
-          setFailedImages(uris.map(uri => uri === null));
-        } catch (error) {
-          console.error("Error loading images:", error);
-          setFailedImages(new Array(post.attachments.length).fill(true));
+          setImageUris(results);
         } finally {
           setLoadingImages(false);
         }
@@ -52,7 +50,7 @@ const PostPage: React.FC = () => {
     };
 
     loadImages();
-  }, [post]);
+  }, []);
 
   const handleImagePress = (index: number) => {
     setCurrentImageIndex(index);
@@ -90,7 +88,7 @@ const PostPage: React.FC = () => {
           imageUris={Array.isArray(imageUris) ? imageUris : [imageUris]}
           loading={loadingImages}
           onImagePress={handleImagePress}
-          failedImages={failedImages} />
+        />
       </View>
 
       {/* Like and Comment Buttons */}

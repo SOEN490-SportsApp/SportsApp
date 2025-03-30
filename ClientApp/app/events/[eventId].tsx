@@ -167,7 +167,7 @@ const EventPage: React.FC = () => {
   if (loading) {
     return (
       <View style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color="#000" />
+        <ActivityIndicator size="large" color={themeColors.primary} />
       </View>
     );
   }
