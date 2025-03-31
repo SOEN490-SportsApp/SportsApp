@@ -20,6 +20,7 @@ const ChatScreen = () => {
   const [connected, setConnected] = useState(false);
   const clientRef = useRef<Client | null>(null);
 
+  
   const [chatroom, setChatroom] = useState<chatroomProps>();
   // TODO This will be a duplicate of the chatroom state
   const [chatroomInformation, setChatroomInformation] = useState<any>();
