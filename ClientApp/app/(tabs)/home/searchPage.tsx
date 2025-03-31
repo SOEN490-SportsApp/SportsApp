@@ -63,7 +63,6 @@ export default function searchPage() {
   useEffect(() => {
     const fetchInitialEvents = async () => {
       const response = await getAllRelevantEvents(LocationOfUser,100, true, false, 0 , 10);
-      console.log('response: ', response.data)
       setEvents(response.data);
     };
     fetchInitialEvents();
@@ -134,8 +133,6 @@ export default function searchPage() {
         if (updateState) {
           updateState(eventArray);
         }
-  
-        // Ensure the response matches the expected structure
         return {
           data: {
             content: eventArray,
@@ -248,11 +245,14 @@ export default function searchPage() {
 
     if (loading) {
       return (
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        >
-          <ActivityIndicator size="large" color="blue" />
+        <View>
+        <View style={styles.container}>
+          <ActivityIndicator
+            size="large"
+            color={themeColors.sportIcons.lightGrey}
+          />
         </View>
+      </View>
       );
     }
 
