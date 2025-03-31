@@ -24,6 +24,7 @@ public class OpenApiConfig {
                                         .bearerFormat("JWT")
                         ))
                 .servers(List.of(
+                        new Server().url("https://api.sportahub.app/api/user-service").description("Production"),
                         new Server().url("https://api-dev.sportahub.app/api/user-service").description("Development"),
                         new Server().url("http://localhost:8080/api/user-service").description("Local")
                 ));
