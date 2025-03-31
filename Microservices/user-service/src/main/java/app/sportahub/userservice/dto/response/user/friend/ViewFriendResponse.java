@@ -1,4 +1,6 @@
 package app.sportahub.userservice.dto.response.user.friend;
 
-public record ViewFriendResponse(String friendUsername, String friendUserId, String FriendId,String profilePicture) {
+import app.sportahub.userservice.dto.response.user.ProfileResponse;
+
+public record ViewFriendResponse(String friendUsername, String friendUserId, String FriendId, ProfileResponse profile) {
 }

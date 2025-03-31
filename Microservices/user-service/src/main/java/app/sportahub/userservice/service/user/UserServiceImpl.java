@@ -434,7 +434,7 @@ public class UserServiceImpl implements UserService {
                 .map(friend -> {
                     Optional<User> friendUser = userRepository.findUserById(friend.getUserId());
                     return friendUser.map(value -> new ViewFriendResponse(value.getUsername(), friend.getUserId(),
-                            friend.getId(), friendUser.get().getProfile().getProfilePicture())).orElse(null);
+                            friend.getId(), profileMapper.profileToProfileResponse(friendUser.get().getProfile()))).orElse(null);
                 }).filter(Objects::nonNull).toList();
     }
 
