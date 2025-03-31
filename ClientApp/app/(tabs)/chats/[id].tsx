@@ -3,11 +3,12 @@ import React, {useCallback, useEffect, useRef, useState} from 'react';
 import { Button, Modal, StyleSheet, View, Text } from 'react-native';
 import { GiftedChat, IMessage } from 'react-native-gifted-chat';
 import {useSelector} from "react-redux";
-import {getMessages, getChatroom} from "@/services/chatService";
+import {getMessages, getChatroom, deleteChatroom, leaveChatroom} from "@/services/chatService";
 import { Client } from "@stomp/stompjs";
 import { getAccessToken } from "@/services/tokenService"
 import {message, chatroomProps, messageRequest} from "@/types/messaging";
 import { mvs } from '@/utils/helpers/uiScaler';
+import { set } from 'date-fns';
 
 
 const ChatScreen = () => {
@@ -93,9 +94,24 @@ const ChatScreen = () => {
 
   const handleDeleteChat = async () => {
     console.log("Delete chatroom");
+    try {
+      deleteChatroom(id.toString());
+      setInfoVisible(false);
+      router.back();
+    }catch (error) {
+      console.error("Error deleting chatroom: ", error);
+    }
   }
+
   const handleLeaveChat = async () => {
     console.log("Leave chatroom");
+    try {
+      leaveChatroom(id.toString(), user.id);
+      setInfoVisible(false);
+      router.back();
+    }catch (error) {
+      console.error("Error deleting chatroom: ", error);
+    }
   }
   // useEffect(() => {
   //   if (!finalToken) return;
@@ -242,7 +258,7 @@ const ChatScreen = () => {
             <Button
               title="Delete Chat"
               color="#e74c3c"
-              onPress={() => handleDeleteChat()}
+              onPress={handleDeleteChat}
             />
           ) : (
             <Button

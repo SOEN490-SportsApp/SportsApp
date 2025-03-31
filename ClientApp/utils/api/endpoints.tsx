@@ -45,4 +45,5 @@ export const API_ENDPOINTS = {
   GET_CHATROOM: 'messaging-service/messaging/chatroom/{chatroomId}',
   CREATE_CHATROOM: 'messaging-service/messaging/chatroom',
   DELETE_CHATROOM: 'messaging-service/messaging/chatroom/{chatroomId}',
+  LEAVE_CHATROOM: 'messaging-service/messaging//chatroom/leave-chatroom/{chatroomId}/{userId}',
 };

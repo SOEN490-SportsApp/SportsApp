@@ -2,6 +2,7 @@ import { mvs } from '@/utils/helpers/uiScaler';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { format, isToday, isThisWeek, parseISO, differenceInCalendarDays } from 'date-fns';
 
 interface CardProps {
   chatId: string;
@@ -23,6 +24,23 @@ const ChatCard: React.FC<CardProps> = ({
 }) => {
     const router = useRouter();
     
+
+    const formatChatTimestamp = (isoTimestamp: string): string => {
+      const date = parseISO(isoTimestamp);
+
+      if (isToday(date)) {
+        return format(date, 'hh:mm a'); // e.g. 04:26 AM
+      }
+
+      const daysDiff = differenceInCalendarDays(new Date(), date);
+      
+      if (daysDiff < 7) {
+        return format(date, 'EEEE'); // e.g. Monday
+      }
+
+      return format(date, 'dd/MM/yyyy'); // e.g. 25/03/2025
+    };
+
     return (
     <TouchableOpacity 
     style={styles.card}
@@ -44,7 +62,7 @@ const ChatCard: React.FC<CardProps> = ({
         <View style={styles.textSection}>
           <View style={styles.userInfoText}>
             <Text style={styles.userName}>{cardTitle}</Text>
-            <Text style={styles.postTime}>{messageTime}</Text>
+            <Text style={styles.postTime}>{formatChatTimestamp(messageTime)}</Text>
           </View>
           <Text style={styles.messageText}>{messageText}</Text>
         </View>
