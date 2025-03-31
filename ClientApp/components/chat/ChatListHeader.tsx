@@ -13,7 +13,6 @@ const ChatListHeader: React.FC = () => {
 
     const [modalVisible, setModalVisible] = useState(false);
     const [friends, setFriends] = useState<any[]>([]);
-    const [selectedFriends, setSelectedFriends] = useState<any[]>([]);
 
     const user = useSelector((state: { user: any }) => state.user);
 

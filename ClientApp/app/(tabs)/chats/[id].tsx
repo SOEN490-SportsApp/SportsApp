@@ -9,6 +9,7 @@ import { getAccessToken } from "@/services/tokenService"
 import {message, chatroomProps, messageRequest} from "@/types/messaging";
 import { mvs } from '@/utils/helpers/uiScaler';
 import { set } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 
 
 const ChatScreen = () => {
@@ -27,6 +28,8 @@ const ChatScreen = () => {
 
   const navigation = useNavigation();
   const [infoVisible, setInfoVisible] = useState(false);
+
+  const { t } = useTranslation();
 
   // use effect to control the bottom tab bar visibility of the part "chat"
   useEffect(() => {
@@ -257,19 +260,19 @@ const ChatScreen = () => {
           {/*delete or leave group*/}
           {chatroomInformation?.createdBy === user.id ? (
             <Button
-              title="Delete Chat"
+              title={t('chat.delete_chat')}
               color="#e74c3c"
               onPress={handleDeleteChat}
             />
           ) : (
             <Button
-              title="Leave Chat"
+              title={t('chat.leave_chat')}
               color="#f39c12"
               onPress={() => handleLeaveChat()}
             />
           )}
 
-          <Button title="Close" onPress={() => setInfoVisible(false)} />
+          <Button title={t('chat.close')} onPress={() => setInfoVisible(false)} />
         </View>
       </View>
     </Modal>

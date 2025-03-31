@@ -43,6 +43,7 @@ const Chats = () => {
         );
     };
 
+    //TODO Joud find a balance between automatic updates and performance
     useFocusEffect(
         useCallback(() => {
             const fetchChatrooms = async (user: any) => {
