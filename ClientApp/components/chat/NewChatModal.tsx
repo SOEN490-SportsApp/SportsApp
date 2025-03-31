@@ -5,6 +5,9 @@ import { hs, mhs, mvs, vs } from '@/utils/helpers/uiScaler';
 import { createUserChatroom } from '@/services/chatService';
 import { useSelector } from 'react-redux';
 import { router } from 'expo-router';
+import themeColors from '@/utils/constants/colors';
+import { useTranslation } from 'react-i18next';
+import { enUS, fr, ar } from 'date-fns/locale';
 
 interface NewChatModalProps {
   friends: any [];
@@ -21,6 +24,7 @@ const NewChatModal: React.FC<NewChatModalProps> = ({
     const LoggedUser = useSelector((state: { user: any }) => state.user);
     const [chatTitle, setChatTitle] = useState('');
     const user = useSelector((state: { user: any }) => state.user);
+    const { t } = useTranslation();
     
     const toggleSelect = (item: any) => {
         const exists = selected.find((u) => u.userId === item.friendUserId);
@@ -67,7 +71,8 @@ const NewChatModal: React.FC<NewChatModalProps> = ({
       }
     
       const titleToUse = selected.length > 1 ? chatTitle.trim() : 'Direct Chat';
-    
+      
+      //TODO when creating this, it's taking the "Direct Chat" name only on the first routing
       onCreateGroup(selected, titleToUse);
       setChatTitle('');
       setSelected([]);
@@ -78,10 +83,10 @@ const NewChatModal: React.FC<NewChatModalProps> = ({
     <Modal visible={visible} animationType="slide" transparent>
       <View style={styles.overlay}>
         <View style={styles.modalContent}>
-          <Text style={styles.title}>Select Friends</Text>
+          <Text style={styles.title}>{t('chat.select_Friends')}</Text>
           <FlatList
             data={friends}
-            keyExtractor={(item) => item.friendUserId} // fix: use actual unique friend ID
+            keyExtractor={(item) => item.friendUserId}
             renderItem={({ item }) => {
                 const isSelected = selected.some((u) => u.userId === item.friendUserId);
                 return (
@@ -101,16 +106,13 @@ const NewChatModal: React.FC<NewChatModalProps> = ({
                             {item.friendUsername }
                         </Text>
                     </View>
-                  {isSelected && (
-                    <FontAwesome name="check" size={18} color="#007AFF" />
-                  )}
                 </Pressable>
               );
             }}
           />
           {selected.length > 1 && (
             <View style={{ marginBottom: 10 }}>
-              <Text style={{ fontSize: 16, marginBottom: 6 }}>Group Name</Text>
+              <Text style={{ fontSize: 16, marginBottom: 6 }}>{t('chat.Group_name')}</Text>
               <View style={{
                 borderWidth: 1,
                 borderColor: '#ccc',
@@ -119,7 +121,7 @@ const NewChatModal: React.FC<NewChatModalProps> = ({
                 paddingVertical: 6,
               }}>
                 <TextInput
-                  placeholder="Enter group name"
+                  placeholder={t('chat.enter_group_name_placeholder')}
                   value={chatTitle}
                   onChangeText={setChatTitle}
                   style={{ fontSize: 14 }}
@@ -133,11 +135,11 @@ const NewChatModal: React.FC<NewChatModalProps> = ({
             disabled={selected.length === 0}
           >
             {/*TODO JOUD udpate the langague and check for name if the selected ones are more than 2 */}
-            <Text style={styles.createBtnText}>Start Chat</Text>
+            <Text style={styles.createBtnText}>{t('chat.start_chat')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
-            <Text style={styles.closeBtnText}>Cancel</Text>
+            <Text style={styles.closeBtnText}>{t('chat.cancel')}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -181,19 +183,25 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
   selectedFriend: {
-    backgroundColor: '#e0f0ff',
-    borderColor: '#007AFF',
+    backgroundColor: '#dff2de',
+    borderColor: '#00b803',
   },
   friendName: {
     fontSize: 16,
     color: '#333',  
 },
   createBtn: {
-    backgroundColor: '#007AFF',
-    padding: 12,
-    borderRadius: 10,
+    backgroundColor: themeColors.button.primaryBackground,
+    height: vs(50),
+    borderRadius: mhs(25),
     alignItems: 'center',
-    marginTop: 10,
+    justifyContent: "center",
+    marginBottom: vs(16),
+    shadowColor: '#475569',
+    shadowOffset: { width: 0, height: vs(2) },
+    shadowOpacity: 0.25,
+    shadowRadius: hs(4),
+    minHeight: 40
   },
   createBtnText: {
     color: 'white',
