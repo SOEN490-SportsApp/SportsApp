@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { format, isToday, isThisWeek, parseISO, differenceInCalendarDays } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 
 interface CardProps {
   chatId: string;
@@ -23,6 +24,7 @@ const ChatCard: React.FC<CardProps> = ({
   onLongPress
 }) => {
     const router = useRouter();
+    const { t } = useTranslation();
     
 
     const formatChatTimestamp = (isoTimestamp: string): string => {
@@ -35,7 +37,8 @@ const ChatCard: React.FC<CardProps> = ({
       const daysDiff = differenceInCalendarDays(new Date(), date);
       
       if (daysDiff < 7) {
-        return format(date, 'EEEE'); // e.g. Monday
+        const weekday = format(date, 'EEEE'); // e.g. "Monday"
+        return t(`days.${weekday}`);      
       }
 
       return format(date, 'dd/MM/yyyy'); // e.g. 25/03/2025

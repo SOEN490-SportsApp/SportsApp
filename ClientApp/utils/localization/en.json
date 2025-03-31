@@ -374,5 +374,24 @@
     "select_cutoff_time": "Select Cut-off Time",
     "enter_event_description": "Enter event description...",
     "failed_to_load_details": "Failed to load event details."
+  }, 
+  "chat" : {
+    "select_Friends" : "Select Friends",
+    "start_chat" : "Start Chat",
+    "cancel": "Cancel",
+    "Group_name" : "Group name",
+    "enter_group_name_placeholder" : "Enter group name",
+    "delete_chat" : "Delete Chat",
+    "leave_chat": "Leave Chat",
+    "close": "Close"
+  }, 
+  "days": {
+    "Monday": "Monday",
+    "Tuesday": "Tuesday",
+    "Wednesday": "Wednesday",
+    "Thursday": "Thursday",
+    "Friday": "Friday",
+    "Saturday": "Saturday",
+    "Sunday": "Sunday"
   }
 }

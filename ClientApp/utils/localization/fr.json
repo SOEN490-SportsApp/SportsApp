@@ -374,5 +374,24 @@
     "select_cutoff_time": "Sélectionnez l'heure limite d'inscription",
     "enter_event_description": "Entrez la description de l'événement",
     "failed_to_load_details": "Échec du chargement des détails de l'événement"
+  }, 
+  "chat" : {
+    "select_Friends" : "Sélectionner des amis",
+    "start_chat" : "Démarrer la discussion",
+    "cancel": "Annuler",
+    "Group_name" : "Nom du groupe",
+    "enter_group_name_placeholder" : "Entrez le nom du groupe",
+    "delete_chat" : "Supprimer la discussion",
+    "leave_chat": "Quitter la discussion",
+    "close": "Fermer"
+  },
+  "days": {
+    "Monday": "Lundi",
+    "Tuesday": "Mardi",
+    "Wednesday": "Mercredi",
+    "Thursday": "Jeudi",
+    "Friday": "Vendredi",
+    "Saturday": "Samedi",
+    "Sunday": "Dimanche"
   }
 }
