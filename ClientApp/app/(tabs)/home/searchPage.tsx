@@ -351,61 +351,7 @@ export default function searchPage() {
           />
         </TouchableOpacity>
         {MemoizedMap}
-        {/* <MapView
-          showsMyLocationButton={false}
-          showsUserLocation
-          ref={mapRef}
-          style={{
-            flex: isMapExpanded ? 1 : 0.3,
-            margin: isMapExpanded ? 0 : 10,
-          }}
-          initialRegion={
-            userLocation
-              ? {
-                  latitude: userLocation.latitude,
-                  longitude: userLocation.longitude,
-                  latitudeDelta: 0.05,
-                  longitudeDelta: 0.05,
-                }
-              : {
-                  latitude:
-                    events.length &&
-                    events[0].locationResponse.coordinates?.coordinates?.[1] !==
-                      undefined
-                      ? Number(
-                          events[0].locationResponse.coordinates.coordinates[1]
-                        )
-                      : 45.5017,
-                  longitude:
-                    events.length &&
-                    events[0].locationResponse.coordinates?.coordinates?.[0] !==
-                      undefined
-                      ? Number(
-                          events[0].locationResponse.coordinates.coordinates[0]
-                        )
-                      : -73.5673,
-                  latitudeDelta: 0.1,
-                  longitudeDelta: 0.1,
-                }
-          }
-        >
-          {events.map((event) => (
-            <Marker
-              key={event.id}
-              coordinate={{
-                latitude: event.locationResponse.coordinates?.coordinates?.[1]
-                  ? Number(event.locationResponse.coordinates.coordinates[1])
-                  : 0,
-                longitude: event.locationResponse.coordinates?.coordinates?.[0]
-                  ? Number(event.locationResponse.coordinates.coordinates[0])
-                  : 0,
-              }}
-              title={event.eventName}
-              onPress={() => handleEventPress(event.id)}
-            />
-          ))}
-        </MapView> */}
-
+       
         {viewMode === "map" ? (
           <>
             <TouchableOpacity

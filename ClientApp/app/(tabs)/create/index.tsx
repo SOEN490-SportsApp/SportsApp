@@ -396,7 +396,7 @@ const Create = () => {
                         onBlur={onBlur}
                         onChangeText={onChange}
                         value={value || ""}
-                        maxLength={30}
+                        maxLength={20}
                       />
                     )}
                   />
