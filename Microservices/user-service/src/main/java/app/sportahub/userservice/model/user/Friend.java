@@ -22,7 +22,4 @@ public class Friend extends BaseEntity {
 
     @NotBlank(message = "Friend request status must be provided.")
     private FriendRequestStatusEnum friendRequestStatus;
-
-    @NotBlank(message = "profilePicture must be provided.")
-    private String profilePicture;
 }

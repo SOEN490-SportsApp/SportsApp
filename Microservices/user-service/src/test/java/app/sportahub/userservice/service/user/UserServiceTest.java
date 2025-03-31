@@ -1076,8 +1076,8 @@ public class UserServiceTest {
         friendUser2.setId("friend2Id");
 
         List<Friend> friendList = new ArrayList<>();
-        friendList.add(new Friend("friend1", FriendRequestStatusEnum.ACCEPTED,"https://example.com/profile.jpg"));
-        friendList.add(new Friend("friend2", FriendRequestStatusEnum.ACCEPTED,"https://example.com/profile.jpg"));
+        friendList.add(new Friend("friend1", FriendRequestStatusEnum.ACCEPTED));
+        friendList.add(new Friend("friend2", FriendRequestStatusEnum.ACCEPTED));
         user.setFriendList(friendList);
 
         lenient().when(userRepository.findUserById("userId")).thenReturn(Optional.of(user));
@@ -1115,10 +1115,10 @@ public class UserServiceTest {
         User friend = new User();
         friend.setId("userId2");
 
-        Friend requesterFriend = new Friend(friend.getId(), FriendRequestStatusEnum.ACCEPTED,"https://example.com/profile.jpg");
+        Friend requesterFriend = new Friend(friend.getId(), FriendRequestStatusEnum.ACCEPTED);
         requesterFriend.setId("friend1Id");
 
-        Friend friendFriend = new Friend(requester.getId(), FriendRequestStatusEnum.ACCEPTED,"https://example.com/profile.jpg");
+        Friend friendFriend = new Friend(requester.getId(), FriendRequestStatusEnum.ACCEPTED);
 
         friendFriend.setId("friend2Id");
 
@@ -1174,10 +1174,10 @@ public class UserServiceTest {
         User friend = new User();
         friend.setId("userId2");
 
-        Friend requesterFriend = new Friend(friend.getId(), FriendRequestStatusEnum.ACCEPTED,"https://example.com/profile.jpg");
+        Friend requesterFriend = new Friend(friend.getId(), FriendRequestStatusEnum.ACCEPTED);
         requesterFriend.setId("friend1Id");
 
-        Friend friendFriend = new Friend(requester.getId(), FriendRequestStatusEnum.ACCEPTED,"https://example.com/profile.jpg");
+        Friend friendFriend = new Friend(requester.getId(), FriendRequestStatusEnum.ACCEPTED);
         friendFriend.setId("friend2Id");
 
         List<Friend> requesterFriendList = new ArrayList<>();
