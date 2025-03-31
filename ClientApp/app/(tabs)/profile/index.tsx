@@ -115,17 +115,6 @@ const ProfilePage: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Profile Header */}
-      {/* <View className="items-center p-4 bg-white"> */}
-        {/* <Image
-          className="w-20 h-20 rounded-full"
-          source={require("@/assets/images/avatar-placeholder.png")}
-          defaultSource={require("@/assets/images/Unknown.jpg")}
-        />
-        <Text testID="firstName" className="text-2xl font-bold text-black mt-2">
-          {user?.profile.firstName} {user?.profile.lastName}
-        </Text> */}
-
         <ProfileSection
           user={user}
           isUserProfile={true}
