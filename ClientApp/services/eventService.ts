@@ -35,7 +35,7 @@ export const getAllEvents = async () => {
 
 export const getAllRelevantEvents = async (
   location: LocationState,
-  radius = 15, 
+  radius = 50, 
   radiusExpansion: boolean, 
   paginate: boolean, 
   page = 0 , 
@@ -225,6 +225,11 @@ export const searchEventsWithFilter = async (
       size,
     };
 
+    if(location){
+      queryParams.longitude = location.longitude
+      queryParams.latitude = location.latitude
+    }
+
     if (searchText) {
       queryParams.eventName = searchText;
     }
@@ -241,7 +246,8 @@ export const searchEventsWithFilter = async (
       queryParams.sportType = params.filterType;
     }
 
-    
+    queryParams.longitude = location.longitude
+    queryParams.latitude = location.latitude
     const response = await axiosInstance.get(endpoint, {
       params: queryParams,
     });

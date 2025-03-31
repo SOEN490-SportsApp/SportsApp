@@ -7,7 +7,8 @@ import { useSelector } from 'react-redux';
 import usePagination from '@/app/hooks/usePagination';
 
 interface userEventsListProps {
-  forProfile: boolean, fetchEventsFunction: (page: number, size: number) => Promise<{ data: { content: Event[]; totalElements: number; totalPages: number; pageable: { pageNumber: number; pageSize: number } } }>;
+  forProfile: boolean, 
+  fetchEventsFunction: (page: number, size: number) => Promise<{ data: { content: Event[] ; totalElements: number; totalPages: number; pageable: { pageNumber: number; pageSize: number } } }>;
 }
 
 const EventsList: React.FC<userEventsListProps> = ({ forProfile, fetchEventsFunction }) => {
@@ -23,11 +24,11 @@ const EventsList: React.FC<userEventsListProps> = ({ forProfile, fetchEventsFunc
     totalPages,
     pageNo,
   } = usePagination<Event>((page: any, size: any) => fetchEventsFunction(page, size), user.id);
-
+  
   const handleEventPress = (eventId: string) => {
     router.push(`/events/${eventId}`);
   };
-
+  
   // Auto-refresh when user visits the screen
   useFocusEffect(
     useCallback(() => {
@@ -53,7 +54,7 @@ const EventsList: React.FC<userEventsListProps> = ({ forProfile, fetchEventsFunc
         </View>
       ) : (
         <FlatList
-          data={events}
+          data={events || []}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <EventCard event={item} onPress={handleEventPress} isForProfile={forProfile} />

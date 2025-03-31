@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useRouter } from "expo-router";
 import {
   View,
@@ -9,8 +9,6 @@ import {
   FlatList,
   ActivityIndicator,
   Animated,
-  TextInputEndEditingEventData,
-  NativeSyntheticEvent,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import themeColors from "@/utils/constants/colors";
@@ -21,7 +19,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import FriendCard from "@/components/Helper Components/FriendCard";
 import { Profile } from "@/types";
 import MapView, { Marker } from "react-native-maps";
-import { getAllEvents, getAllRelevantEvents, searchEventsWithFilter } from "@/services/eventService";
+import { getAllRelevantEvents, searchEventsWithFilter } from "@/services/eventService";
 import { Event } from "@/types/event";
 import * as Location from "expo-location";
 import { Linking } from "react-native";
@@ -31,8 +29,8 @@ import { useSelector } from "react-redux";
 import FilterModal, {
   FilterState,
 } from "@/components/Helper Components/FilterSection/FilterModal";
-import { set } from "react-hook-form";
 import { useTranslation } from 'react-i18next';
+import { debounce } from "lodash";
 
 export default function searchPage() {
   const router = useRouter();
@@ -50,7 +48,6 @@ export default function searchPage() {
   const [loading, setLoading] = useState(false);
   const [viewMode, setViewMode] = useState<"map" | "list">("list");
   const [activeIndex, setActiveIndex] = useState(0)
-  const [searchContent, setSearchContent] = useState<string>('')
   const location = useSelector(
     (state: { location: Location.LocationObjectCoords | null }) =>
       state.location
@@ -61,46 +58,50 @@ export default function searchPage() {
   const [filter, setFilter] = useState(false);
   const [filterState, setFilterState] = useState(initialState);
   const LocationOfUser = useSelector((state: { location: any }) => state.location);
-  const [refresh, setRefresh] = useState(false)
   const { t } = useTranslation();
 
   useEffect(() => {
     const fetchInitialEvents = async () => {
-      const response = await getAllEvents();
-      setEvents(response);
+      const response = await getAllRelevantEvents(LocationOfUser,100, true, false, 0 , 10);
+      console.log('response: ', response.data)
+      setEvents(response.data);
     };
     fetchInitialEvents();
   },[])
 
+
   const fetchEvents = useCallback(async (): Promise<void> => {
-    setLoading(true);
     try {
       let response;
+      
       if (activeIndex === 0) {
         await fetchUserResults(searchText);
         
       } else {        
-        response = await handleEventListData(0,10, setEvents);
-        // setEvents(Array.isArray(response) ? response : []);       
+        response = await handleEventListData(0,10, setEvents);     
       }
     } catch (err) {
       console.error("Error fetching events:", err);
     } finally {
       setLoading(false);
     }
-  }, [searchText, filter]);
+  }, [filter]);
 
   useEffect(() => {
-    const fetchAndSetEvents = async () => {
+    if(activeIndex === 1){
+       const fetchAndSetEvents = async () => {
       await fetchEvents()
     }
       fetchAndSetEvents()
+    }
   }, [fetchEvents, activeIndex]);
+
   
   const handleFilterToggle = async () => {
     setFilter(true);
     setIsVisible(false);
   };
+
   const handleCleanFilters = () => {
     setFilterState(initialState);
     setFilter(false);
@@ -120,25 +121,46 @@ export default function searchPage() {
     }
   }, [location]);
 
-  const handleEventListData = async (page: number, size: number, updateState?: (events: Event[]) => void) => {
-    let response;
-    if (filter || searchText) {
-      response = await searchEventsWithFilter(searchText, filterState, LocationOfUser, page, size);
-    } else {
-      response = await getAllRelevantEvents(LocationOfUser, 15, false, true, page, size);
-    }
+  const handleEventListData = async (page: number, size: number, updateState?: (events: Event[]) => void): Promise<{ data: { content: Event[]; totalElements: number; totalPages: number; pageable: { pageNumber: number; pageSize: number; } } }> => {
+      let response;
+      try {
+        if (filter || searchText) {
+          response = await searchEventsWithFilter(searchText, filterState, LocationOfUser, page, size);
+        } else {
+          response = await getAllRelevantEvents(LocationOfUser, 50, true, true, page, size);
+        }
+        const eventArray = response?.data?.content || [];
   
-    const eventArray = response?.data?.content || [];
-
-    if (updateState) {
-      updateState(eventArray); 
-    }
-    return response;
-  };
+        if (updateState) {
+          updateState(eventArray);
+        }
+  
+        // Ensure the response matches the expected structure
+        return {
+          data: {
+            content: eventArray,
+            totalElements: response?.data?.totalElements || 0,
+            totalPages: response?.data?.totalPages || 0,
+            pageable: response?.data?.pageable || { pageNumber: page, pageSize: size },
+          },
+        };
+      } catch (error) {
+        console.log(error);
+        return {
+          data: {
+            content: [],
+            totalElements: 0,
+            totalPages: 0,
+            pageable: { pageNumber: page, pageSize: size },
+          },
+        };
+      } finally {
+        setLoading(false);
+      }
+    };
 
   
   const fetchUserResults = async (searchText: string) => {
-    setLoading(true);
     try {
       const response = await searchUser(searchText);
       if (response) {
@@ -151,36 +173,40 @@ export default function searchPage() {
     }
   };
 
+
+  const debouncedFetchEvents = useMemo(() => debounce(() => fetchEvents(), 700), [fetchEvents])
   const handleChangeText = (text: string) => {
+    if(!loading){
+      setLoading(true)
+    }
     setCancel(true);
     setSearchText(text);
+    debouncedFetchEvents()
   };
 
-  const LoadingScreen = () => {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator
-          size="large"
-          color={themeColors.sportIcons.lightGrey}
-        />
-      </View>
-    );
-  };
+  
   const UsersTab = () => {
     return (
       <View>
         {loading ? (
           <View>
-            <LoadingScreen />
+            <View style={styles.container}>
+              <ActivityIndicator
+                size="large"
+                color={themeColors.sportIcons.lightGrey}
+              />
+            </View>
           </View>
         ) : searchText.length >= 1 ? (
           <FlatList
             data={userResults}
             renderItem={({ item }) => <FriendCard user={item} />}
-            ListEmptyComponent={<CenterMessage message={t('search_page.no_users_found')} />}
+            ListEmptyComponent={
+              <CenterMessage message={t("search_page.no_users_found")} />
+            }
           />
         ) : (
-          <CenterMessage message={t('search_page.connect_with_others')} />
+          <CenterMessage message={t("search_page.connect_with_others")} />
         )}
       </View>
     );
@@ -254,6 +280,64 @@ export default function searchPage() {
       setIsMapExpanded(newMode === "map");
     };
 
+    const MemoizedMap = useMemo(() => (
+      <MapView
+        showsMyLocationButton={false}
+        showsUserLocation
+        ref={mapRef}
+        style={{
+          flex: isMapExpanded ? 1 : 0.3,
+          margin: isMapExpanded ? 0 : 10,
+        }}
+        initialRegion={
+          userLocation
+            ? {
+                latitude: userLocation.latitude,
+                longitude: userLocation.longitude,
+                latitudeDelta: 0.05,
+                longitudeDelta: 0.05,
+              }
+            : {
+                latitude:
+                  events.length &&
+                  events[0].locationResponse.coordinates?.coordinates?.[1] !==
+                    undefined
+                    ? Number(
+                        events[0].locationResponse.coordinates.coordinates[1]
+                      )
+                    : 45.5017,
+                longitude:
+                  events.length &&
+                  events[0].locationResponse.coordinates?.coordinates?.[0] !==
+                    undefined
+                    ? Number(
+                        events[0].locationResponse.coordinates.coordinates[0]
+                      )
+                    : -73.5673,
+                latitudeDelta: 0.1,
+                longitudeDelta: 0.1,
+              }
+        }
+      >
+        {events.map((event) => (
+          <Marker
+            key={event.id}
+            coordinate={{
+              latitude: event.locationResponse.coordinates?.coordinates?.[1]
+                ? Number(event.locationResponse.coordinates.coordinates[1])
+                : 0,
+              longitude: event.locationResponse.coordinates?.coordinates?.[0]
+                ? Number(event.locationResponse.coordinates.coordinates[0])
+                : 0,
+            }}
+            title={event.eventName}
+            onPress={() => handleEventPress(event.id)}
+          />
+        ))}
+      </MapView>
+    ), [events, userLocation, isMapExpanded]);
+    
+
     return (
       <View style={{ flex: 1 }}>
         <TouchableOpacity
@@ -266,8 +350,8 @@ export default function searchPage() {
             color="white"
           />
         </TouchableOpacity>
-
-        <MapView
+        {MemoizedMap}
+        {/* <MapView
           showsMyLocationButton={false}
           showsUserLocation
           ref={mapRef}
@@ -320,7 +404,7 @@ export default function searchPage() {
               onPress={() => handleEventPress(event.id)}
             />
           ))}
-        </MapView>
+        </MapView> */}
 
         {viewMode === "map" ? (
           <>
@@ -447,8 +531,6 @@ export default function searchPage() {
           placeholder={t("search_page.search")}
           value={searchText}
           onChangeText={(text) => handleChangeText(text)}
-          // onEndEditing={handleSubmitEvents}
-          // onSubmitEditing={handleSubmitEvents}
           placeholderTextColor="#999"
           clearButtonMode="while-editing"
         />

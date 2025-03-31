@@ -33,7 +33,7 @@ const HomePageFeed = () => {
       <EventsList
         forProfile={false}
         fetchEventsFunction={(page, size) =>
-          getAllRelevantEvents(Location, 15, true, true, page, size)
+          getAllRelevantEvents(Location, 100, true, true, page, size)
         }
       />
     )}
