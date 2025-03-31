@@ -42,37 +42,6 @@ export const getMessages = async (chatroomId: string) => {
   }
 };
 
-// API_ENDPOINTS.CREATE_CHATROOM
-// export const createUserChatroom = async (createrId: string, chatWithUserId: string, nameOfChatRoom: string, messages: string[], isEvent: boolean, unread: boolean, creatorUsername: string, participantUsername: string) => {
-//   try {
-//     const axiosLocalInstance = getAxiosInstance();
-//     const response = await axiosLocalInstance.post(API_ENDPOINTS.CREATE_CHATROOM,
-//       {
-//         createdBy: createrId,
-//         chatroomName: nameOfChatRoom,
-//         members : [ 
-//           {
-//             userId: createrId,
-//             username: creatorUsername,
-//             userImage: "",
-//           }, 
-//           {
-//             userId: chatWithUserId,
-//             username: participantUsername,
-//             userImage: "",
-//           },],
-//         messages: messages,
-//         isEvent: isEvent,
-//         unread: unread
-//       }
-//     );
-//     console.log("createUserChatroom response:", response.data);
-//     return response.data;
-//   } catch (error) {
-//     console.error('Error creating chatroom:', error);
-//     throw error;
-//   }
-// }
 
 export const createUserChatroom = async (
   creatorId: string,
@@ -133,6 +102,7 @@ export const createUserChatroom = async (
 export const deleteChatroom = async (chatroomId: string) => {
   try {
     const axiosLocalInstance = getAxiosInstance();
+    console.log("deleteChatroom: ", chatroomId);
     const response = await axiosLocalInstance.delete(API_ENDPOINTS.DELETE_CHATROOM.replace("{chatroomId}", chatroomId));
     return response.data;
   } catch (error) {
@@ -140,3 +110,18 @@ export const deleteChatroom = async (chatroomId: string) => {
     throw error;
   }
 };
+
+export const leaveChatroom = async (chatroomId: string, userId: string) => {
+  try {
+    const axiosLocalInstance = getAxiosInstance();
+    const response = await axiosLocalInstance.post(
+        API_ENDPOINTS.LEAVE_CHATROOM
+            .replace("{chatroomId}", chatroomId)
+            .replace("{userId}", userId)
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting chatroom:', error);
+    throw error;
+  }
+}

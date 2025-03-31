@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import {Modal,View,Text,FlatList,TouchableOpacity,StyleSheet,Pressable,Image} from 'react-native';
+import {Modal,View,Text,FlatList,TouchableOpacity,StyleSheet,Pressable,Image, TextInput} from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { hs, mhs, mvs, vs } from '@/utils/helpers/uiScaler';
 import { createUserChatroom } from '@/services/chatService';
 import { useSelector } from 'react-redux';
+import { router } from 'expo-router';
 
 interface NewChatModalProps {
   friends: any [];
@@ -18,6 +19,9 @@ const NewChatModal: React.FC<NewChatModalProps> = ({
 }) => {
     const [selected, setSelected] = useState<{ userId: string; username: string; userImage: string }[]>([]);
     const LoggedUser = useSelector((state: { user: any }) => state.user);
+    const [chatTitle, setChatTitle] = useState('');
+    const user = useSelector((state: { user: any }) => state.user);
+    
     const toggleSelect = (item: any) => {
         const exists = selected.find((u) => u.userId === item.friendUserId);
       
@@ -33,24 +37,41 @@ const NewChatModal: React.FC<NewChatModalProps> = ({
         }
     };
 
-    const onCreateGroup = (selectedFriends: any[]) => {
-        
+    const onCreateGroup = async (selectedFriends: any[], title: string) => {
+        let chatroomId = '';
         console.log("Creating group with friends from onCreateGroup:", selectedFriends);
-
-        //TODO Joud check if the selected Friends are a group and ask for a group name
         try {
-            createUserChatroom(LoggedUser.id, LoggedUser.username, '', "name", selectedFriends, [], false, false)
-        }catch (error) {
-            console.error("Error creating group:", error);
-        }
-
-        //TODO Joud route to the channel just created
+            const response = await createUserChatroom(LoggedUser.id, LoggedUser.username, '', title, selectedFriends, [], false, false)
+            chatroomId = response.chatroomId;
+            
+            if (!chatroomId) {
+              console.error("No chatroomId returned from server.");
+              return;
+            }
+            
+            router.push({
+              pathname: '/(tabs)/chats/[id]',
+              params: { 
+                id: chatroomId, 
+                title: title || user.username },
+              });
+            }catch (error) {
+              console.error("Error creating group:", error);
+          }
     };
 
     const handleCreate = () => {
-        onCreateGroup(selected);
-        onClose();
-        setSelected([]);
+      if (selected.length > 1 && chatTitle.trim() === '') {
+        alert('Please enter a group name.');
+        return;
+      }
+    
+      const titleToUse = selected.length > 1 ? chatTitle.trim() : 'Direct Chat';
+    
+      onCreateGroup(selected, titleToUse);
+      setChatTitle('');
+      setSelected([]);
+      onClose();
     };
 
   return (
@@ -87,6 +108,25 @@ const NewChatModal: React.FC<NewChatModalProps> = ({
               );
             }}
           />
+          {selected.length > 1 && (
+            <View style={{ marginBottom: 10 }}>
+              <Text style={{ fontSize: 16, marginBottom: 6 }}>Group Name</Text>
+              <View style={{
+                borderWidth: 1,
+                borderColor: '#ccc',
+                borderRadius: 8,
+                paddingHorizontal: 10,
+                paddingVertical: 6,
+              }}>
+                <TextInput
+                  placeholder="Enter group name"
+                  value={chatTitle}
+                  onChangeText={setChatTitle}
+                  style={{ fontSize: 14 }}
+                />
+              </View>
+            </View>
+          )}
           <TouchableOpacity
             style={styles.createBtn}
             onPress={handleCreate}
