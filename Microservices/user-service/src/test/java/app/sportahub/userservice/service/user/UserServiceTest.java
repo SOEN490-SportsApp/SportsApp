@@ -39,6 +39,9 @@ import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import reactor.core.publisher.Mono;
 
 import java.sql.Timestamp;
@@ -71,7 +74,9 @@ public class UserServiceTest {
     @Mock
     private KeycloakApiClient keycloakApiClient;
 
-    private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
+    @Mock
+    private UserMapper userMapper;
+
     private final ProfileMapper profileMapper = Mappers.getMapper(ProfileMapper.class);
     private final FriendMapper friendMapper = Mappers.getMapper(FriendMapper.class);
     private final PublicProfileMapper publicProfileMapper = Mappers.getMapper(PublicProfileMapper.class);
@@ -83,6 +88,75 @@ public class UserServiceTest {
     void setUp() {
         userService = new UserServiceImpl(userRepository, badgeRepository, keycloakApiClient, userMapper, profileMapper,
                 friendMapper, friendRepository, friendRequestRepository, publicProfileMapper);
+    }
+
+    @Test
+    void getFriendRecommendations_ShouldReturnRecommendedFriends() {
+        // Arrange
+        User user = new User();
+        user.setId("user-123");
+        user.setRecommendedFriends(List.of("friend-1", "friend-2"));
+
+        User friend1 = new User();
+        friend1.setId("friend-1");
+
+        User friend2 = new User();
+        friend2.setId("friend-2");
+
+        UserResponse friendResponse1 = new UserResponse("friend-1", "Friend One", "friend1@email.com", null, null, null, null, null);
+        UserResponse friendResponse2 = new UserResponse("friend-2", "Friend Two", "friend2@email.com", null, null, null, null, null);
+
+        Pageable pageable = PageRequest.of(0, 10);
+
+        when(userRepository.findUserById("user-123")).thenReturn(Optional.of(user));
+        when(userRepository.findUserById("friend-1")).thenReturn(Optional.of(friend1));
+        when(userRepository.findUserById("friend-2")).thenReturn(Optional.of(friend2));
+        when(userMapper.userToUserResponse(friend1)).thenReturn(friendResponse1);
+        when(userMapper.userToUserResponse(friend2)).thenReturn(friendResponse2);
+
+        // Act
+        Page<UserResponse> result = userService.getFriendRecommendations("user-123", pageable);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(2, result.getTotalElements());
+        assertTrue(result.getContent().contains(friendResponse1));
+        assertTrue(result.getContent().contains(friendResponse2));
+
+        // Verify interactions
+        verify(userRepository, times(1)).findUserById("user-123");
+        verify(userRepository, times(1)).findUserById("friend-1");
+        verify(userRepository, times(1)).findUserById("friend-2");
+    }
+
+    @Test
+    void getFriendRecommendations_ShouldThrowException_WhenUserNotFound() {
+        // Arrange
+        when(userRepository.findUserById("invalid-user")).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(UserDoesNotExistException.class, () -> userService.getFriendRecommendations("invalid-user", PageRequest.of(0, 10)));
+
+        // Verify interactions
+        verify(userRepository, times(1)).findUserById("invalid-user");
+    }
+
+    @Test
+    void getFriendRecommendations_ShouldThrowException_WhenFriendNotFound() {
+        // Arrange
+        User user = new User();
+        user.setId("user-123");
+        user.setRecommendedFriends(List.of("friend-1"));
+
+        when(userRepository.findUserById("user-123")).thenReturn(Optional.of(user));
+        when(userRepository.findUserById("friend-1")).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(UserDoesNotExistException.class, () -> userService.getFriendRecommendations("user-123", PageRequest.of(0, 10)));
+
+        // Verify interactions
+        verify(userRepository, times(1)).findUserById("user-123");
+        verify(userRepository, times(1)).findUserById("friend-1");
     }
 
     private UserRequest getUserRequest() {
@@ -1198,5 +1272,4 @@ public class UserServiceTest {
         assertEquals("404 NOT_FOUND \"User with identifier: " + requester.getId() + " does not have friend with identifier: " + wrongId + " in their friend list.\"",
                 exception.getMessage());
     }
-
 }
