@@ -248,6 +248,9 @@ public class UserServiceImpl implements UserService {
         userSender.getFriendRequestList().add(newSenderFriendRequest);
         userReceiver.getFriendRequestList().add(newReceiverFriendRequest);
 
+        userSender.getRecommendedFriends().remove(userReceiver.getId());
+        userReceiver.getRecommendedFriends().remove(userSender.getId());
+
         User savedSenderUser = userRepository.save(userSender);
         log.info("UserServiceImpl::sendFriendRequest: User with id: {} sent a new friend request", savedSenderUser.getId());
 
@@ -490,6 +493,15 @@ public class UserServiceImpl implements UserService {
         return new PageImpl<>(userProfileResponses, users.getPageable(), users.getTotalElements());
     }
 
+    /**
+     * Retrieves a list of friend recommendations for a given user.
+     *
+     * @param userId The ID of the user for whom friend recommendations are requested.
+     * @param pageable The pagination information including page number and size requirements.
+     * @return A page of {@link UserResponse} objects representing the recommended friends.
+     * @throws UserDoesNotExistException If the user with the given ID does not exist.
+     */
+    @Override
     public Page<UserResponse> getFriendRecommendations(String userId, Pageable pageable) {
         User user = userRepository.findUserById(userId)
                 .orElseThrow(() -> new UserDoesNotExistException(userId));
