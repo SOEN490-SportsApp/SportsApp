@@ -108,7 +108,7 @@ public class MessagingServiceTest {
 
     MessageRequest getMessageRequest(Message message) {
         return new MessageRequest(message.getChatroomId(), message.getSenderId(), message.getSenderName(),
-                message.getReceiverIds(), message.getContent(), message.getAttachments());
+               chatroom.getMembers(), message.getContent(), message.getAttachments());
     }
 
     @Test
