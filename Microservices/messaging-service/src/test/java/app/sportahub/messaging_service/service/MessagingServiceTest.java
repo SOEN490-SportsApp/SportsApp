@@ -51,7 +51,7 @@ public class MessagingServiceTest {
     private final MessageMapper messageMapper = Mappers.getMapper(MessageMapper.class);
     private Chatroom chatroom;
     private ChatroomRequest chatroomRequest;
-    private Set<String> receiverIds;
+    private Set<Member> receivers;
 
     @BeforeEach
     void setUp() {
@@ -63,11 +63,7 @@ public class MessagingServiceTest {
         chatroomRequest = new ChatroomRequest(chatroom.getCreatedBy(), chatroom.getChatroomName(), chatroom.getMembers(),
                 chatroom.getMessages(), chatroom.getIsEvent(), chatroom.getUnread());
 
-        receiverIds = new HashSet<String>();
-        receiverIds.add(chatroom.getCreatedBy());
-        receiverIds.add("testReceiverId1");
-        receiverIds.add("testReceiverId2");
-        receiverIds.add("testReceiverId3");
+        receivers = chatroom.getMembers();
     }
 
     Chatroom getChatroom() {
@@ -92,7 +88,7 @@ public class MessagingServiceTest {
                 .build();
     }
 
-    Message getMessage(String chatroomId, String senderId, Set<String> receiverIds, String content) {
+    Message getMessage(String chatroomId, String senderId, Set<Member> receivers, String content) {
         String messageId = "testMessageId";
         String senderName = senderId+"name";
         return Message.builder()
@@ -101,20 +97,21 @@ public class MessagingServiceTest {
                 .withChatroomId(chatroomId)
                 .withSenderId(senderId)
                 .withSenderName(senderName)
-                .withReceiverIds(receiverIds)
+                .withSenderImage("testImage.url")
+                .withReceivers(receivers)
                 .withContent(content)
                 .build();
     }
 
     MessageRequest getMessageRequest(Message message) {
-        return new MessageRequest(message.getChatroomId(), message.getSenderId(), message.getSenderName(),
+        return new MessageRequest(message.getChatroomId(), message.getSenderId(), message.getSenderName(), message.getSenderImage(),
                 chatroom.getMembers(), message.getContent(), message.getAttachments());
     }
 
     @Test
     public void processMessageShouldSucceed() {
         // Arrange
-        Message message = getMessage(chatroom.getChatroomId(), "testSenderId", receiverIds,
+        Message message = getMessage(chatroom.getChatroomId(), "testSenderId", receivers,
                 "testContent");
         MessageRequest messageRequest = getMessageRequest(message);
 
@@ -133,7 +130,7 @@ public class MessagingServiceTest {
     @Test
     public void processMessageShouldThrowChatroomDoesNotExistException() {
         // Arrange
-        Message message = getMessage(chatroom.getChatroomId(), "testSenderId", receiverIds,
+        Message message = getMessage(chatroom.getChatroomId(), "testSenderId", receivers,
                 "testContent");
         MessageRequest messageRequest = getMessageRequest(message);
 
@@ -151,9 +148,9 @@ public class MessagingServiceTest {
     @Test
     public void getMessagesShouldSucceed() {
         //Arrange
-       Message message1 = getMessage(chatroom.getChatroomId(), "testSenderId1", receiverIds,
+       Message message1 = getMessage(chatroom.getChatroomId(), "testSenderId1", receivers,
                "testContent1");
-       Message message2 = getMessage(chatroom.getChatroomId(), "testSenderId2", receiverIds,
+       Message message2 = getMessage(chatroom.getChatroomId(), "testSenderId2", receivers,
                "testContent2");
        chatroom.setMessages(List.of(message1,message2));
        MessageResponse messageResponse1 = messageMapper.MessageToMessageResponse(message1);
@@ -341,7 +338,7 @@ public class MessagingServiceTest {
     @Test
     public void patchMessageShouldSucceed() {
         // Arrange
-        Message message = getMessage(chatroom.getChatroomId(), "testSenderId", receiverIds,
+        Message message = getMessage(chatroom.getChatroomId(), "testSenderId", receivers,
                 "testContent" );
         MessageRequest messageRequest = getMessageRequest(message);
 
@@ -376,7 +373,7 @@ public class MessagingServiceTest {
     @Test
     public void deleteMessageShouldSucceed() {
         // Arrange
-        Message message = getMessage(chatroom.getChatroomId(), "testSenderId", receiverIds,
+        Message message = getMessage(chatroom.getChatroomId(), "testSenderId", receivers,
                 "testContent" );
         when(messageRepository.findByMessageId(anyString())).thenReturn(Optional.of(message));
         doNothing().when(messageRepository).delete(any(Message.class));

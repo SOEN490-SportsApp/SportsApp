@@ -16,7 +16,7 @@ public interface MessageMapper {
     @Mapping(target = "chatroomId", ignore = true)
     @Mapping(target = "senderId", ignore = true)
     @Mapping(target = "senderName", ignore = true)
-    @Mapping(target = "receiverIds", ignore = true)
+    @Mapping(target = "receivers", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void patchMessageFromRequest(MessageRequest messageRequest, @MappingTarget Message message);

@@ -32,9 +32,11 @@ public class Message {
 
     private String senderName;
 
+    private String senderImage;
+
     @NotEmpty
     @Size(min = 1, max = 255)
-    private Set<String> receiverIds;
+    private Set<Member> receivers;
 
     @NotNull
     private String content;
