@@ -25,8 +25,7 @@ public interface EventRepository extends MongoRepository<Event, String>, Searchi
 
     Page<Event> findByParticipantsUserId(String userId, Pageable pageable);
     
-    @Query("{ 'participants.userId' : ?0 }")
-    List<Event> findAllByParticipantUserId(String userId);
+    List<Event> findByParticipantsUserId(String userId);
 
     Page<Event> findByCreatedBy(String userId, Pageable pageable);
 
