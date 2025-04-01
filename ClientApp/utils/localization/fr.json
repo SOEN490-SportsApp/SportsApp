@@ -303,8 +303,15 @@
     "take_photo": "Prendre une photo",
     "post": "Poster",
     "creating_your_post": "Création de votre publication...",
-    "image_too_large": "Une de vos images est trop volumineuse (3MB maximum autorisé)",
-    "failed_to_create_post": "Échec de la création de la publication. Veuillez réessayer."
+    "permission_denied": "Permission refusée",
+    "photo_library_access": "Autorisez l'accès à la bibliothèque photo dans les paramètres.",
+    "camera_access": "Autorisez l'accès à la caméra dans les paramètres.",
+    "image_too_large": "Image trop grande",
+    "image_size_warning": "Votre image fait {{size}}MB. Le maximum autorisé est 3MB.",
+    "select_smaller_image": "Veuillez sélectionner une image plus petite ou la recadrer davantage.",
+    "error": "Erreur",
+    "failed_to_create_post": "Échec de la création du post",
+    "image_file_not_found": "Fichier image introuvable"
   },
   "post_component": {
     "likes": "J'aimes",
