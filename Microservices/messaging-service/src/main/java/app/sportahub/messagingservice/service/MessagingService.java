@@ -28,9 +28,9 @@ public interface MessagingService {
 
     void deleteMessage(String messageId);
 
-    ChatroomResponse addMembers(String chatroomId, List<Member> userIds);
+    ChatroomResponse addMembers(String chatroomId, List<Member> membersToAdd);
 
-    ChatroomResponse removeMembers(String chatroomId, List<Member> userIds);
+    ChatroomResponse removeMembers(String chatroomId, List<Member> membersToRemove);
 
     ChatroomResponse leaveChatroom(String chatroomId, String userId);
 

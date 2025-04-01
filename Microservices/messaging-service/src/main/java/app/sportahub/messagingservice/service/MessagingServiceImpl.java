@@ -269,16 +269,16 @@ public class MessagingServiceImpl  implements MessagingService {
      * This method will convert the passed list into a set, removing duplicates and allowing for set operations
      *
      * @param chatroomId the unique identifier of the chatroom who's members you want to modify
-     * @param newMembers the unique identifiers of the users you want to remove from the chatroom
+     * @param membersToAdd the unique identifiers of the users you want to add to the chatroom
      * @return a {@link ChatroomResponse} object representing the newly modified chatroom object
      * @throws ChatroomDoesNotExistException if no chatroom is found with the specified chatroomId
      */
     @Override
-    public ChatroomResponse addMembers(String chatroomId, List<Member> newMembers) {
+    public ChatroomResponse addMembers(String chatroomId, List<Member> membersToAdd) {
         Chatroom chatroom = chatroomRepository.findByChatroomId(chatroomId)
                 .orElseThrow(() -> new ChatroomDoesNotExistException(chatroomId));
 
-        Set<Member> memberSet = new HashSet<>(newMembers);
+        Set<Member> memberSet = new HashSet<>(membersToAdd);
         memberSet.addAll(chatroom.getMembers());
         chatroom.setMembers(memberSet);
         Chatroom savedChatroom = chatroomRepository.save(chatroom);
@@ -293,17 +293,17 @@ public class MessagingServiceImpl  implements MessagingService {
      * This method will convert the passed list into a set, removing duplicates and allowing for set operations.
      *
      * @param chatroomId the unique identifier of the chatroom who's members you want to modify
-     * @param members    the unique identifiers of the users you want to remove from the chatroom
+     * @param membersToRemove    the unique identifiers of the users you want to remove from the chatroom
      * @return a {@link ChatroomResponse} object representing the newly modified chatroom object
      * @throws ChatroomDoesNotExistException if no chatroom is found with the specified chatroomId
      * @throws ChatroomCreatorTryingToRemoveThemselvesFromChatroomException if the creator's userId is in userIds
      */
     @Override
-    public ChatroomResponse removeMembers(String chatroomId, List<Member> members) {
+    public ChatroomResponse removeMembers(String chatroomId, List<Member> membersToRemove) {
         Chatroom chatroom = chatroomRepository.findByChatroomId(chatroomId)
                 .orElseThrow(() -> new ChatroomDoesNotExistException(chatroomId));
 
-        Set<Member> paramMembers = new HashSet<>(members);
+        Set<Member> paramMembers = new HashSet<>(membersToRemove);
         Set<Member> existingMembers = chatroom.getMembers();
 
         if (paramMembers.stream().anyMatch(m -> m.getUserId().equals(chatroom.getCreatedBy())))
