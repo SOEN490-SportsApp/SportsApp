@@ -52,6 +52,8 @@
   "dependencies": {
     "@expo/config-plugins": "~9.0.0",
     "@expo/vector-icons": "^14.0.3",
+    "@fortawesome/free-solid-svg-icons": "^6.7.2",
+    "@fortawesome/react-native-fontawesome": "^0.3.2",
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-native-community/datetimepicker": "8.2.0",
     "@react-native-picker/picker": "^2.9.0",
