@@ -13,7 +13,6 @@ const HomePageFeed = () => {
   const dispatch = useDispatch();
   const user = useSelector((state: { user: any }) => state.user);
   const [isLocationFetching, setIsLocationFetching] = useState(true);
-  const events = useSelector((state: { events: Event[] }) => state.events);
   
   const Location = useSelector((state: { location: any }) => state.location);
 
@@ -25,10 +24,6 @@ const HomePageFeed = () => {
     };
     fetchLocation();
   }, [user.id]);
-
-  useEffect(() => {
-    dispatch({ type: 'REFRESH_EVENTS' });
-  }, [events]);
 
   return (
     <View testID="feed-container" style={styles.container}>
