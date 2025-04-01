@@ -6,5 +6,5 @@ import java.util.Set;
 import java.util.List;
 
 public record MessageRequest(String chatroomId, String senderId, String senderName,
-                             Set<Member> receivers, String content, List<String> attachments) {
+                             Set<Member> receivers , String content, List<String> attachments) {
 }
