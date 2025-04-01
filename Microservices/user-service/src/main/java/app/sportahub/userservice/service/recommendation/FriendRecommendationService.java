@@ -8,6 +8,7 @@ import app.sportahub.userservice.model.user.User;
 import app.sportahub.userservice.repository.user.UserRepository;
 import app.sportahub.userservice.service.kafka.producer.OrchestrationServiceProducer;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -20,6 +21,7 @@ public class FriendRecommendationService {
     private final UserRepository userRepository;
     private final OrchestrationServiceProducer orchestrationServiceProducer;
 
+    @Scheduled(cron = "0 0 0 ? * SUN") // Runs every Sunday at midnight
     public List<UserResponse> getFriendRecommendations(String userId) {
         User currentUser = userRepository.findById(userId).orElseThrow();
 
