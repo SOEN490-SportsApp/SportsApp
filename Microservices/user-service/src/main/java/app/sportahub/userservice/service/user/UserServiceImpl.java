@@ -489,4 +489,17 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
         return new PageImpl<>(userProfileResponses, users.getPageable(), users.getTotalElements());
     }
+
+    public Page<UserResponse> getFriendRecommendations(String userId, Pageable pageable) {
+        User user = userRepository.findUserById(userId)
+                .orElseThrow(() -> new UserDoesNotExistException(userId));
+
+        List<UserResponse> recommendedFriends = user.getRecommendedFriends().stream()
+                .map(recommendedFriendId -> userRepository.findUserById(recommendedFriendId)
+                        .orElseThrow(() -> new UserDoesNotExistException(recommendedFriendId)))
+                .map(userMapper::userToUserResponse)
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(recommendedFriends, pageable, recommendedFriends.size());
+    }
 }
