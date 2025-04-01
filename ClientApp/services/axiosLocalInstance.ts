@@ -23,7 +23,7 @@ export const setupLocalAxiosInstance = (dispatch: any): AxiosInstance => {
         return (global as any).axiosLocalInstance;
     }
     const config: AxiosRequestConfig = {
-        baseURL: 'http://localhost:8080/api/', // Fallback for baseURL
+        baseURL: 'https://api-dev.sportahub.com/', // Fallback for baseURL
         timeout: 5000,
         headers: {
             'Content-Type': 'application/json',
