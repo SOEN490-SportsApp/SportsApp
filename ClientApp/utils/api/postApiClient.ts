@@ -69,7 +69,6 @@ export async function fetchPosts(eventId: string, page: number, size: number): P
                     page,
                     size,
                 },
-                timeout: 10000,
             }
         );
         return response.data;
@@ -89,31 +88,18 @@ export async function fetchImage(filePath: string, retries: number = 3): Promise
     const axiosInstance = getAxiosInstance();
     for (var i = 0; i < retries; i++) {
         try {
-            const headResponse = await axiosInstance.head(
-                API_ENDPOINTS.GET_FILE.replace("{objectPath}", filePath)
-            );
-            console.log(`HEAD response for ${filePath}:`);
-            const contentLength = headResponse.headers['content-length'];
-            if (contentLength && parseInt(contentLength) > 3 * 1024 * 1024) { // 3MB
-                console.warn(`Image too large (${Math.round(parseInt(contentLength) / 1024 / 1024)}MB): ${filePath}`);
-                return null;
-            }
-            console.log('Image size is acceptable. Proceeding to fetch the image.');
             const response = await axiosInstance.get(
                 API_ENDPOINTS.GET_FILE.replace("{objectPath}", filePath),
                 {
                     responseType: 'blob',
-                    timeout: 100000
                 }
             );
-            console.log(`Image fetched successfully: ${filePath}`);
             const result = await new Promise<string>((resolve, reject) => {
                 const reader = new FileReader();
                 reader.onload = () => resolve(reader.result as string);
                 reader.onerror = (error) => reject(error);
                 reader.readAsDataURL(response.data);
             });
-            console.log(`Image converted to base64: ${filePath}`);
             imageCache[filePath] = result;
             return result;
 

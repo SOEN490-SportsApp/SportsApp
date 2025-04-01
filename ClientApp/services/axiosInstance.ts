@@ -45,6 +45,19 @@ export const setupAxiosInstance = (dispatch: any): AxiosInstance => {
                     API_ENDPOINTS.RESET_PASSWORD,
                 ];
 
+                const LONG_TIMEOUT_ENDPOINTS = [
+                    "event-service/event/", 
+                    "storage-service/objects/",
+                ];
+
+                const needsLongTimeout = LONG_TIMEOUT_ENDPOINTS.some(endpoint => 
+                    config.url?.includes(endpoint)
+                );
+
+                if (needsLongTimeout) {
+                    config.timeout = 20000;
+                }
+
                 // Skip adding Authorization header for auth-related endpoints
                 if (AUTH_ENDPOINTS.some((endpoint) => config.url?.includes(endpoint))) {
                     return config;

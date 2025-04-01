@@ -19,7 +19,7 @@ const EventPostsTab = ({ eventId, isUserParticipant }: { eventId: string, isUser
 
     const loadPosts = async () => {
         try {
-            const size = 2;
+            const size = 3;
             const response = await fetchPosts(eventId, page, size);
 
             if (page === 0) {

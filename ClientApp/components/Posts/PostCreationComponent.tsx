@@ -56,8 +56,8 @@ const PostCreationComponent: React.FC<PostCreationProps> = ({ eventId, onNewPost
       }
       result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ["images"],
-        allowsEditing: false,
-        quality: 1,
+        allowsEditing: true,
+        quality: 0.6,
       });
 
     } else if (source === 'camera') {
@@ -69,13 +69,28 @@ const PostCreationComponent: React.FC<PostCreationProps> = ({ eventId, onNewPost
 
       result = await ImagePicker.launchCameraAsync({
         mediaTypes: ["images"],
-        allowsEditing: false,
-        quality: 1,
+        allowsEditing: true,
+        quality: 0.6,
       });
     }
 
     if (result && !result.canceled && result.assets.length > 0) {
       const { uri, width, height } = result.assets[0];
+
+      const fileInfo = await FileSystem.getInfoAsync(uri);
+      if (!fileInfo.exists) {
+        throw new Error('Image file not found');
+      }
+      console.log('File Info:', fileInfo.size / (1024 * 1024), 'MB');
+      if (fileInfo.size > 3 * 1024 * 1024) {
+        Alert.alert(
+          'Image too large',
+          'Please select a smaller image or crop it further.',
+          [{ text: 'OK' }]
+        );
+        return;
+      }
+
       setImages((prev) => [...prev, { uri, width, height }]);
       setCurrentImageIndex(images.length);
     }
@@ -102,7 +117,7 @@ const PostCreationComponent: React.FC<PostCreationProps> = ({ eventId, onNewPost
             `One of your images is ${fileSizeMB.toFixed(1)}MB. Maximum allowed is 3MB.`,
             [{ text: 'OK' }]
           );
-          return; 
+          return;
         }
       }
 
