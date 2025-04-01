@@ -74,9 +74,7 @@ public class UserServiceTest {
     @Mock
     private KeycloakApiClient keycloakApiClient;
 
-    @Mock
-    private UserMapper userMapper;
-
+    private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
     private final ProfileMapper profileMapper = Mappers.getMapper(ProfileMapper.class);
     private final FriendMapper friendMapper = Mappers.getMapper(FriendMapper.class);
     private final PublicProfileMapper publicProfileMapper = Mappers.getMapper(PublicProfileMapper.class);
@@ -103,16 +101,11 @@ public class UserServiceTest {
         User friend2 = new User();
         friend2.setId("friend-2");
 
-        UserResponse friendResponse1 = new UserResponse("friend-1", "Friend One", "friend1@email.com", null, null, null, null, null);
-        UserResponse friendResponse2 = new UserResponse("friend-2", "Friend Two", "friend2@email.com", null, null, null, null, null);
-
         Pageable pageable = PageRequest.of(0, 10);
 
         when(userRepository.findUserById("user-123")).thenReturn(Optional.of(user));
         when(userRepository.findUserById("friend-1")).thenReturn(Optional.of(friend1));
         when(userRepository.findUserById("friend-2")).thenReturn(Optional.of(friend2));
-        when(userMapper.userToUserResponse(friend1)).thenReturn(friendResponse1);
-        when(userMapper.userToUserResponse(friend2)).thenReturn(friendResponse2);
 
         // Act
         Page<UserResponse> result = userService.getFriendRecommendations("user-123", pageable);
@@ -120,8 +113,12 @@ public class UserServiceTest {
         // Assert
         assertNotNull(result);
         assertEquals(2, result.getTotalElements());
-        assertTrue(result.getContent().contains(friendResponse1));
-        assertTrue(result.getContent().contains(friendResponse2));
+
+        UserResponse expectedResponse1 = userMapper.userToUserResponse(friend1);
+        UserResponse expectedResponse2 = userMapper.userToUserResponse(friend2);
+
+        assertTrue(result.getContent().contains(expectedResponse1));
+        assertTrue(result.getContent().contains(expectedResponse2));
 
         // Verify interactions
         verify(userRepository, times(1)).findUserById("user-123");
