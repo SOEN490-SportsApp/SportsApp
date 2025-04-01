@@ -2,7 +2,7 @@ export interface message {
     messageId: string;
     chatroomId: string; //required
     senderId: string; //required
-    receiverIds: string[]; //required
+    receivers: member[]; //required
     senderName: string;
     content: string; //required
     createdAt: Number | Date;
@@ -13,7 +13,7 @@ export interface chatroomProps {
     chatroomId: string;
     createdAt: Number | Date;
     createdBy: string;
-    members: string[];
+    members: member[];
     messages: message[];
     isEvent: boolean;
     unread: boolean;
@@ -22,7 +22,13 @@ export interface chatroomProps {
 export interface messageRequest {
     chatroomId: string;
     senderId: string;
-    receiverIds: string[];
+    receivers: member[];
     content: string;
     attachments: string[];
     }
+
+export interface member {
+    userId: string;
+    username: string;
+    userImage: string;
+}
