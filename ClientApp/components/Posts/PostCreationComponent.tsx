@@ -51,7 +51,7 @@ const PostCreationComponent: React.FC<PostCreationProps> = ({ eventId, onNewPost
     if (source === 'gallery') {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Permission Denied', 'Allow photo library access in settings.');
+        Alert.alert(t('post_creation_component.permission_denied'), t('post_creation_component.photo_library_access'));
         return;
       }
       result = await ImagePicker.launchImageLibraryAsync({
@@ -63,7 +63,7 @@ const PostCreationComponent: React.FC<PostCreationProps> = ({ eventId, onNewPost
     } else if (source === 'camera') {
       const { status } = await Camera.requestCameraPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Permission Denied', 'Allow camera access in settings.');
+        Alert.alert(t('post_creation_component.permission_denied'), t('post_creation_component.photo_library_access'));
         return;
       }
 
@@ -113,8 +113,8 @@ const PostCreationComponent: React.FC<PostCreationProps> = ({ eventId, onNewPost
 
         if (fileSizeMB > 3) {
           Alert.alert(
-            'Image too large',
-            `One of your images is ${fileSizeMB.toFixed(1)}MB. Maximum allowed is 3MB.`,
+              t('post_creation_component.image_too_large'),
+              t('post_creation_component.image_size_warning', { size: fileSizeMB.toFixed(1) }),
             [{ text: 'OK' }]
           );
           return;
@@ -129,12 +129,7 @@ const PostCreationComponent: React.FC<PostCreationProps> = ({ eventId, onNewPost
 
     } catch (error: any) {
       console.error('Failed to create post:', error);
-      Alert.alert(
-        'Error',
-        error.message.includes('too large')
-          ? 'One of your images is too large (max 3MB)'
-          : 'Failed to create post'
-      );
+      Alert.alert(t('post_creation_component.error'), t('post_creation_component.failed_to_create_post'));
     } finally {
       setIsPosting(false);
     }

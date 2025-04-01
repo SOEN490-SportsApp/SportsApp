@@ -312,8 +312,15 @@
     "take_photo": "Take Photo",
     "post": "Post",
     "creating_your_post": "Creating your post...",
-    "image_too_large": "One of your images is too large (max 3MB allowed)",
-    "failed_to_create_post": "Failed to create post. Please try again."
+    "permission_denied": "Permission Denied",
+    "photo_library_access": "Allow photo library access in settings.",
+    "camera_access": "Allow camera access in settings.",
+    "image_too_large": "Image too large",
+    "image_size_warning": "Your image is {{size}}MB. Maximum allowed is 3MB.",
+    "select_smaller_image": "Please select a smaller image or crop it further.",
+    "error": "Error",
+    "failed_to_create_post": "Failed to create post",
+    "image_file_not_found": "Image file not found"
   },
   "post_component": {
     "likes": "Likes",
