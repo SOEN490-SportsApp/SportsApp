@@ -52,52 +52,39 @@ public class OrchestrationServiceProducerImpl implements OrchestrationServicePro
                 Instant.now(),
                 UUID.randomUUID().toString());
 
-        try {
-            UserRequestEvent userRequestEvent = new UserRequestEvent(baseEvent, userId);
+        UserRequestEvent userRequestEvent = new UserRequestEvent(baseEvent, userId);
 
-            ProducerRecord<String, Object> record = new ProducerRecord<>(
-                    UserEvent.REQUEST_TOPIC,
-                    userRequestEvent);
-            record.headers().add(KafkaHeaders.REPLY_TOPIC, UserEvent.RESPONSE_TOPIC.getBytes());
+        ProducerRecord<String, Object> record = new ProducerRecord<>(
+                UserEvent.REQUEST_TOPIC,
+                userRequestEvent);
+        record.headers().add(KafkaHeaders.REPLY_TOPIC, UserEvent.RESPONSE_TOPIC.getBytes());
 
-            RequestReplyFuture<String, Object, Object> future = replyingKafkaTemplate.sendAndReceive(record);
-            log.info("OrchestrationServiceProducerImpl::getUserById: sent request for user with id: {}",
-                    userRequestEvent.getUserId());
+        RequestReplyFuture<String, Object, Object> future = replyingKafkaTemplate.sendAndReceive(record);
+        log.info("OrchestrationServiceProducerImpl::getUserById: sent request for user with id: {}",
+                userRequestEvent.getUserId());
 
-            SendResult<String, Object> sendResult = future.getSendFuture().get();
-            sendResult.getProducerRecord().headers()
-                    .forEach(header -> log.info(
-                            "OrchestrationServiceProducerImpl::getUserById: header key: {}, header value: {}",
-                            header.key(), header.value()));
+        SendResult<String, Object> sendResult = future.getSendFuture().get();
+        sendResult.getProducerRecord().headers()
+                .forEach(header -> log.info(
+                        "OrchestrationServiceProducerImpl::getUserById: header key: {}, header value: {}",
+                        header.key(), header.value()));
 
-            ConsumerRecord<String, Object> response = future.get(15, TimeUnit.SECONDS);
-            log.info("OrchestrationServiceProducerImpl::getUserById: received response for user with id: {}",
-                    userRequestEvent.getUserId());
+        ConsumerRecord<String, Object> response = future.get(15, TimeUnit.SECONDS);
+        log.info("OrchestrationServiceProducerImpl::getUserById: received response for user with id: {}",
+                userRequestEvent.getUserId());
 
-            if (response.value() instanceof UserResponseEvent userResponseEvent
-                    && Objects.equals(userResponseEvent.getBaseEvent().getCorrelationId(),
-                            userRequestEvent.getBaseEvent().getCorrelationId())) {
-                log.info("OrchestrationServiceImpl::getUserById: response is of type UserResponseEvent: {}",
-                        response.value());
+        if (response.value() instanceof UserResponseEvent userResponseEvent
+                && Objects.equals(userResponseEvent.getBaseEvent().getCorrelationId(),
+                        userRequestEvent.getBaseEvent().getCorrelationId())) {
+            log.info("OrchestrationServiceImpl::getUserById: response is of type UserResponseEvent: {}",
+                    response.value());
 
-                return userResponseEvent.getUser();
-            } else {
-                log.info("OrchestrationServiceImpl::getUserById: response is not of type UserResponseEvent: {}",
-                        response.value());
-                return null;
-            }
-
-        } catch (InterruptedException e) {
-            log.error(e.getMessage());
-        } catch (ExecutionException e) {
-            log.error(e.getMessage());
-        } catch (TimeoutException e) {
-            log.error(e.getMessage());
-            log.error(e.getCause().getMessage());
-        } catch (Exception e) {
-            log.error(e.getMessage());
+            return userResponseEvent.getUser();
+        } else {
+            log.info("OrchestrationServiceImpl::getUserById: response is not of type UserResponseEvent: {}",
+                    response.value());
+            return null;
         }
 
-        return "{}";
     }
 }
