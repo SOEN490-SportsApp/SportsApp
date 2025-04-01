@@ -2,8 +2,8 @@ import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import { Button, Modal, StyleSheet, View, Text } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
-import { Composer, GiftedChat, IMessage, InputToolbar, InputToolbarProps, Send, SendProps } from 'react-native-gifted-chat';
+import { faChevronDown, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
+import { Bubble, Composer, GiftedChat, IMessage, InputToolbar, InputToolbarProps, Send, SendProps, Time } from 'react-native-gifted-chat';
 import {useSelector} from "react-redux";
 import {getMessages, getChatroom, deleteChatroom, leaveChatroom} from "@/services/chatService";
 import { Client } from "@stomp/stompjs";
@@ -15,7 +15,6 @@ import { useTranslation } from 'react-i18next';
 import { IconButton } from 'react-native-paper';
 import themeColors from '@/utils/constants/colors';
 
-
 const ChatScreen = () => {
   const { id, title } = useLocalSearchParams();
   const router = useRouter();
@@ -24,6 +23,7 @@ const ChatScreen = () => {
   const user = useSelector((state: {user: any}) => state.user);
   const [connected, setConnected] = useState(false);
   const clientRef = useRef<Client | null>(null);
+  const avatarPlaceholder = require('@/assets/images/avatar-placeholder.png');
 
 
   const [chatroom, setChatroom] = useState<chatroomProps>();
@@ -55,8 +55,6 @@ const ChatScreen = () => {
       });
     };
   }, []);
-
-
 
   useEffect(() => {
     if (title && typeof title === 'string') {
@@ -121,11 +119,12 @@ const ChatScreen = () => {
       console.error("Error deleting chatroom: ", error);
     }
   }
+  
   useEffect(() => {
     if (!finalToken) return;
 
       const client = new Client({
-        brokerURL: "ws://localhost:8080/api/messaging-service/ws",
+        brokerURL: "ws://api-dev.sportahub.app/api/messagin-service/ws",
         heartbeatIncoming: 0,
         heartbeatOutgoing: 0,
         connectHeaders: {
@@ -139,7 +138,6 @@ const ChatScreen = () => {
           client.subscribe(`/topic/chatroom/${id}`, (message: any) => {
             console.log(JSON.parse(message.body));
                 setMessages((prev: IMessage[]) => [
-                  ...prev,
                   {
                     _id: JSON.parse(message.body).messageId,
                     text: JSON.parse(message.body).content,
@@ -147,9 +145,10 @@ const ChatScreen = () => {
                     user: {
                       _id: JSON.parse(message.body).senderId,
                       name: 'Sender Name', // Replace with actual sender name if available
-                      avatar: 'https://example.com/sender-avatar.png', // Replace with actual avatar URL if available
+                      avatar: avatarPlaceholder, // Replace with actual avatar URL if available
                     },
                   },
+                  ...prev,
                 ]);
           },
               {
@@ -166,6 +165,7 @@ const ChatScreen = () => {
       clientRef.current = client;
 
     const fetchChatroom = async () => {
+
       try {
         const messagesData = await getMessages(id.toString());
         console.log("messageData: ", messagesData);
@@ -178,7 +178,7 @@ const ChatScreen = () => {
           user: {
             _id: message.senderId,
             name: message.senderName || "Unknown", // Replace with sender's name if available
-            avatar: message.senderAvatar || "https://example.com/default-avatar.png", // Replace with avatar URL if available
+            avatar: message.senderAvatar || avatarPlaceholder, // Replace with avatar URL if available
           },
         }));
 
@@ -220,6 +220,9 @@ const ChatScreen = () => {
           content: newMessage.text,
           receivers: chatroom.members,
           senderId: user.id,
+          // TODO joud use when supported
+          // senderName: user.username,
+          // senderImage: user.avatar,
         }
         console.log("newMessageRequest: ",newMessageRequest);
         // @ts-ignore
@@ -235,28 +238,52 @@ const ChatScreen = () => {
 
   }, [finalToken, chatroom]);
 
-  const renderSend = (props: any) => (
-    <Send {...props}>
-      <View style={styles.sendButton}>
-        <FontAwesomeIcon icon={faPaperPlane} size={20} color="#007AFF" />
-      </View>
-    </Send>
-  );
 
   const renderInputToolbar = ( props: InputToolbarProps<IMessage> ) => (
     <InputToolbar
       {...props}
       containerStyle={{
         backgroundColor: themeColors.background.lightGrey,
-        borderTopWidth: 1,
-        paddingTop: 10,
-        paddingBottom: 10,
-        paddingLeft: 10,
+        borderTopWidth: 2,
+        paddingBottom: 15,
+        paddingLeft: 0,
       }}
       primaryStyle={{ alignItems: 'center' }}
     />
   );
 
+  const renderBubble = (props: any) => (
+    <Bubble
+      {...props}
+      wrapperStyle={{
+        left: {
+          backgroundColor: '#d4f5dd',
+        },
+        right: {
+          backgroundColor: '#34c759',
+        },
+      }}
+      textStyle={{
+        left: {
+          color: '#1a1a1a',
+        },
+        right: {
+          color: '#ffffff',
+        },
+      }}
+    />
+  );
+  
+  const renderTime = (props: any) => (
+    <Time
+      {...props}
+      timeTextStyle={{
+        left: { color: "#4b5563" },
+        right: { color: '4b5563' },
+      }}
+    />
+  );
+  
   const renderComposer = (props: any) => (
   <Composer
     {...props}
@@ -274,21 +301,21 @@ const ChatScreen = () => {
   />
   );
 
-  // const renderSend = (props:any) => (
-  //   <Send
-  //     {...props}
-  //     disabled={!props.text}
-  //     containerStyle={{
-  //       width: 44,
-  //       height: 44,
-  //       alignItems: 'center',
-  //       justifyContent: 'center',
-  //       marginRight: 15,
-  //     }}
-  //   >
-  //     <IconButton icon='send' size={35} iconColor={themeColors.primary} />
-  //   </Send>
-  // );
+  const renderSend = (props:any) => (
+    <Send
+      {...props}
+      disabled={!props.text}
+      containerStyle={{
+        width: 44,
+        height: 44,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: 15,
+      }}
+    >
+      <IconButton icon='send' size={35} iconColor={themeColors.primary} />
+    </Send>
+  );
 
   return (
     <>
@@ -299,8 +326,15 @@ const ChatScreen = () => {
       alwaysShowSend
       renderInputToolbar={renderInputToolbar}
       renderComposer={renderComposer}
-      // renderSend={renderSend}
-    />
+      renderSend={renderSend}
+      isScrollToBottomEnabled={true}
+      scrollToBottomComponent={() => (
+        <FontAwesomeIcon icon={faChevronDown} size={16} color="#007AFF" />
+      )}
+      renderBubble={renderBubble}
+      renderTime={renderTime}
+      renderUsernameOnMessage={true}
+      />
 
     <Modal visible={infoVisible} transparent>
       <View style={styles.modalOverlay}>
