@@ -1,7 +1,9 @@
 import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import { Button, Modal, StyleSheet, View, Text } from 'react-native';
-import { GiftedChat, IMessage } from 'react-native-gifted-chat';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
+import { Composer, GiftedChat, IMessage, InputToolbar, InputToolbarProps, Send, SendProps } from 'react-native-gifted-chat';
 import {useSelector} from "react-redux";
 import {getMessages, getChatroom, deleteChatroom, leaveChatroom} from "@/services/chatService";
 import { Client } from "@stomp/stompjs";
@@ -10,6 +12,8 @@ import {message, chatroomProps, messageRequest} from "@/types/messaging";
 import { mvs } from '@/utils/helpers/uiScaler';
 import { set } from 'date-fns';
 import { useTranslation } from 'react-i18next';
+import { IconButton } from 'react-native-paper';
+import themeColors from '@/utils/constants/colors';
 
 
 const ChatScreen = () => {
@@ -231,12 +235,71 @@ const ChatScreen = () => {
 
   }, [finalToken, chatroom]);
 
+  // const renderSend = (props: any) => (
+  //   <Send {...props}>
+  //     <View style={styles.sendButton}>
+  //       <FontAwesomeIcon icon={faPaperPlane} size={20} color="#007AFF" />
+  //     </View>
+  //   </Send>
+  // );
+
+  const renderInputToolbar = ( props: InputToolbarProps<IMessage> ) => (
+    <InputToolbar
+      {...props}
+      containerStyle={{
+        backgroundColor: themeColors.background.lightGrey,
+        borderTopWidth: 1,
+        paddingTop: 10,
+        paddingBottom: 10,
+        paddingLeft: 10,
+      }}
+      primaryStyle={{ alignItems: 'center' }}
+    />
+  );
+
+  const renderComposer = (props: any) => (
+  <Composer
+    {...props}
+    textInputStyle={{
+      backgroundColor: themeColors.background.light,
+      color: themeColors.text.dark,
+      borderWidth: 0,
+      borderRadius: 15,
+      paddingTop: 8.5,
+      paddingHorizontal: 10,
+      marginLeft: 20,
+      marginRight: 5,
+      minHeight: 40,
+    }}
+  />
+  );
+
+  const renderSend = (props:any) => (
+    <Send
+      {...props}
+      disabled={!props.text}
+      containerStyle={{
+        width: 44,
+        height: 44,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: 15,
+      }}
+    >
+      <IconButton icon='send' size={35} iconColor={themeColors.primary} />
+    </Send>
+  );
+  
   return (
     <>
     <GiftedChat
       messages={messages}
       onSend={(messages) => onSend(messages)}
       user={{ _id: user.id }}
+      alwaysShowSend
+      renderInputToolbar={renderInputToolbar}
+      renderComposer={renderComposer}
+      renderSend={renderSend}
     />
 
     <Modal visible={infoVisible} transparent>
@@ -332,5 +395,12 @@ const styles = StyleSheet.create({
     color: '#333',
     justifyContent: 'center',
     alignItems: 'center',
-  },  
+  }, 
+  sendButton: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    marginRight: 4,
+  },
 });
