@@ -5,14 +5,15 @@ import {useSelector} from "react-redux";
 import {deleteChatroom, getAllChatrooms} from "@/services/chatService";
 import {User} from "react-native-gifted-chat";
 import { useFocusEffect } from '@react-navigation/native';
+import { message } from '@/types/messaging';
 
 interface CardProps {
     chatroomId: string;
     createdBy: string;
     userImg: any;
     createdAt: string;
-    content: string;
     chatroomName: string
+    messages: message[]
 }
 
 const Chats = () => {
@@ -62,7 +63,7 @@ const Chats = () => {
             };
         }, [user])
     );
-
+    console.log("chatrooms", chatrooms);
     return (
         <FlatList
             data={chatrooms}
@@ -70,8 +71,8 @@ const Chats = () => {
             renderItem={({ item }) => (
                 <ChatCard 
                     userImg={require('@/assets/images/avatar-placeholder.png')}
-                    messageText={"hello"}
-                    messageTime={item.createdAt}
+                    messageText={item.messages[0].content}
+                    messageTime={item.messages[0].createdAt.toString()}
                     cardTitle={item.chatroomName}
                     chatId={item.chatroomId}
                     onLongPress={() => handleDelete(item.chatroomId)}

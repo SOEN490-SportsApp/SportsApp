@@ -26,7 +26,7 @@ export interface messageRequest {
     receivers: member[];
     content: string;
     attachments: string[];
-    // senderName: string;
+    senderName: string;
     // senderImage: string;
     }
 
