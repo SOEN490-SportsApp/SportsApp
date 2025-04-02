@@ -16,6 +16,7 @@ import app.sportahub.userservice.repository.FriendRepository;
 import app.sportahub.userservice.repository.FriendRequestRepository;
 import app.sportahub.userservice.repository.user.SearchingUserRepositoryImpl;
 import app.sportahub.userservice.repository.user.UserRepository;
+import app.sportahub.userservice.service.kafka.producer.OrchestrationServiceProducer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -82,10 +83,14 @@ public class UserSearchTest {
     @Mock
     private KafkaTemplate<String, Object> kafkaTemplate;
 
+    @Mock
+    private OrchestrationServiceProducer orchestrationServiceProducer;
+
+
     @BeforeEach
     void setUp() {
         userService = new UserServiceImpl(userRepository, badgeRepository, keycloakApiClient, userMapper,
-                profileMapper, friendMapper, friendRepository, friendRequestRepository, publicProfileMapper, kafkaTemplate);
+                profileMapper, friendMapper, friendRepository, friendRequestRepository, publicProfileMapper, kafkaTemplate, orchestrationServiceProducer);
         searchingUserRepository = new SearchingUserRepositoryImpl(mongoTemplate);
     }
 
