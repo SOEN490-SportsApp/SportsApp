@@ -1,6 +1,7 @@
 package app.sportahub.notificationservice.model.notification;
 
 import app.sportahub.notificationservice.model.BaseEntity;
+import com.mongodb.lang.Nullable;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,16 +22,22 @@ public class Notification extends BaseEntity {
     private String userId;
 
     @NotBlank
-    private String title;
+    String messageTitle;
 
     @NotBlank
-    private String body;
+    String messageBody;
+
+    Map<String, String> data;
 
     private String clickAction;
 
     private String icon;
 
-    private Map<String, String> data;
+    String messageSubtitle;
+
+    Integer badgeCount;
+
+    Boolean playSound;
 
     private Boolean isRead;
 }

@@ -1,7 +1,7 @@
 package app.sportahub.notificationservice.dto.request.notification;
 
+import com.mongodb.lang.Nullable;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Null;
 
 import java.util.Map;
 
@@ -9,16 +9,26 @@ public record NotificationRequest(@NotBlank
                                   String userId,
 
                                   @NotBlank
-                                  String title,
+                                  String messageTitle,
 
                                   @NotBlank
-                                  String body,
+                                  String messageBody,
+
+                                  @Nullable
+                                  Map<String, String> data,
 
                                   @NotBlank
                                   String clickAction,
 
-                                  @Null
+                                  @Nullable
                                   String icon,
 
-                                  Map<String, String> data) {
+                                  @Nullable
+                                  String messageSubtitle,
+
+                                  @Nullable
+                                  Integer badgeCount,
+
+                                  @Nullable
+                                  Boolean playSound) {
 }
