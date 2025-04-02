@@ -56,9 +56,6 @@ public class UserControllerTest {
     protected MockMvc mockMvc;
 
     @MockBean
-    private FriendRecommendationService friendRecommendationService;
-
-    @MockBean
     private UserServiceImpl userService;
 
     @Autowired

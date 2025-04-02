@@ -4,8 +4,6 @@ import java.util.List;
 
 import app.sportahub.userservice.dto.response.user.PublicProfileResponse;
 import app.sportahub.userservice.dto.response.user.UserProfileResponse;
-import app.sportahub.userservice.service.kafka.producer.OrchestrationServiceProducer;
-import app.sportahub.userservice.service.recommendation.FriendRecommendationService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -48,7 +46,6 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
 
     private final UserService userService;
-    private final FriendRecommendationService friendRecommendationService;
 
     @GetMapping("/{id}")
     @PreAuthorize("#id == authentication.name || hasRole('ROLE_ADMIN')")
@@ -182,7 +179,11 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "get recommended friends",
             description = "Allows user to get a recommended list of users to add as friends.")
-    public List<UserResponse> getRecommendedFriends(@PathVariable String userId) {
-        return friendRecommendationService.getFriendRecommendations(userId);
+    public Page<UserResponse> getRecommendedFriends(
+            @PathVariable String userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return userService.getFriendRecommendations(userId, pageable);
     }
 }

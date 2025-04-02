@@ -50,4 +50,6 @@ public interface UserService {
     void deleteFriend(String userId, String friendId);
 
     Page<UserProfileResponse> searchUsers(String firstName, String lastName, List<String> sport, List<String> rankings, String gender, String age, Pageable pageable);
+
+    Page<UserResponse> getFriendRecommendations(String userId, Pageable pageable);
 }
