@@ -1,9 +1,9 @@
 package app.sportahub.orchestrationservice.service.consumer;
 
 import app.sportahub.kafka.events.BaseEvent;
-import app.sportahub.kafka.events.ForgotPasswordEvent;
-import app.sportahub.kafka.events.ForgotPasswordRequestedEvent;
-import app.sportahub.kafka.events.ForgotPasswordSendEmailEvent;
+import app.sportahub.kafka.events.forgotpassword.ForgotPasswordEvent;
+import app.sportahub.kafka.events.forgotpassword.ForgotPasswordRequestedEvent;
+import app.sportahub.kafka.events.forgotpassword.ForgotPasswordSendEmailEvent;
 import app.sportahub.kafka.events.joinsporteventevent.*;
 import app.sportahub.orchestrationservice.service.producer.EmailServiceProducer;
 import lombok.RequiredArgsConstructor;
