@@ -1,9 +1,8 @@
 package app.sportahub.userservice.service.kafka.producer;
 
 import app.sportahub.kafka.events.BaseEvent;
-import app.sportahub.kafka.events.ForgotPasswordEvent;
-import app.sportahub.kafka.events.ForgotPasswordRequestedEvent;
-import app.sportahub.kafka.events.joinsporteventevent.JoinedEventsByUserEvent;
+import app.sportahub.kafka.events.SportaKafkaEvents;
+import app.sportahub.kafka.events.forgotpassword.ForgotPasswordRequestedEvent;
 import app.sportahub.kafka.events.joinsporteventevent.JoinedEventsByUserRequestEvent;
 import app.sportahub.kafka.events.joinsporteventevent.JoinedEventsByUserResponseEvent;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +41,7 @@ public class OrchestrationServiceProducerImpl implements OrchestrationServicePro
                 Instant.now(),
                 UUID.randomUUID().toString());
         ForgotPasswordRequestedEvent forgotPasswordRequestedEvent = new ForgotPasswordRequestedEvent(baseEvent, email);
-        kafkaTemplate.send(ForgotPasswordEvent.SEND_REQUEST_TOPIC, forgotPasswordRequestedEvent);
+        kafkaTemplate.send(SportaKafkaEvents.SEND_REQUEST_TOPIC, forgotPasswordRequestedEvent);
         log.info("OrchestrationServiceProducerImpl::sendPasswordResetEmail: forgot password reset email sent to 'forgot-password.request' topic");
     }
 
@@ -63,10 +62,10 @@ public class OrchestrationServiceProducerImpl implements OrchestrationServicePro
             JoinedEventsByUserRequestEvent requestEvent = new JoinedEventsByUserRequestEvent(baseEvent, userId);
 
             ProducerRecord<String, Object> record = new ProducerRecord<>(
-                    JoinedEventsByUserEvent.REQUEST_TOPIC,
+                    SportaKafkaEvents.REQUEST_TOPIC,
                     requestEvent
             );
-            record.headers().add(KafkaHeaders.REPLY_TOPIC, JoinedEventsByUserEvent.RESPONSE_TOPIC.getBytes());
+            record.headers().add(KafkaHeaders.REPLY_TOPIC, SportaKafkaEvents.RESPONSE_TOPIC.getBytes());
 
             RequestReplyFuture<String, Object, Object> future = replyingKafkaTemplate.sendAndReceive(record);
             log.info("OrchestrationServiceProducerImpl::getEventsJoinedByUser: sent request for event ids for user with id: {}", requestEvent.getUserId());
