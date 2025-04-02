@@ -3,7 +3,7 @@ package app.sportahub.eventservice.service.kafka.consumer;
 import app.sportahub.eventservice.model.event.Event;
 import app.sportahub.eventservice.repository.event.EventRepository;
 import app.sportahub.kafka.events.BaseEvent;
-import app.sportahub.kafka.events.joinsporteventevent.JoinedEventsByUserEvent;
+import app.sportahub.kafka.events.SportaKafkaEvents;
 import app.sportahub.kafka.events.joinsporteventevent.JoinedEventsByUserFetchEvent;
 import app.sportahub.kafka.events.joinsporteventevent.JoinedEventsByUserFetchedEvent;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,7 @@ public class OrchestrationServiceConsumerImpl implements OrchestrationServiceCon
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final EventRepository eventRepository;
 
-    @KafkaListener(topics = JoinedEventsByUserEvent.FETCH_TOPIC, groupId = "OrchestrationServiceKafkaConsumer")
+    @KafkaListener(topics = SportaKafkaEvents.FETCH_TOPIC, groupId = "OrchestrationServiceKafkaConsumer")
     public void handleEventsByUserRequest(
             @Payload JoinedEventsByUserFetchEvent fetchEvent,
             @Header(KafkaHeaders.CORRELATION_ID) byte[] correlationId) {
@@ -52,7 +52,7 @@ public class OrchestrationServiceConsumerImpl implements OrchestrationServiceCon
         );
 
         JoinedEventsByUserFetchedEvent fetchedEvent = new JoinedEventsByUserFetchedEvent(responseBaseEvent, eventIds);
-        ProducerRecord<String, Object> responseRecord = new ProducerRecord<>(JoinedEventsByUserEvent.FETCHED_TOPIC, fetchedEvent);
+        ProducerRecord<String, Object> responseRecord = new ProducerRecord<>(SportaKafkaEvents.FETCHED_TOPIC, fetchedEvent);
         responseRecord.headers().add(new RecordHeader(KafkaHeaders.CORRELATION_ID, correlationId));
         kafkaTemplate.send(responseRecord);
         log.info("OrchestrationServiceConsumerImpl::handleEventsByUserRequest: sent event ids for user with id: {}", fetchEvent.getUserId());
