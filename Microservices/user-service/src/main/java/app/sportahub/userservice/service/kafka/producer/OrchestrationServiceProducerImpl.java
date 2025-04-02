@@ -23,8 +23,8 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-@Service
 @Slf4j
+@Service
 @RequiredArgsConstructor
 public class OrchestrationServiceProducerImpl implements OrchestrationServiceProducer {
 
@@ -39,10 +39,12 @@ public class OrchestrationServiceProducerImpl implements OrchestrationServicePro
                 "request",
                 "user-service",
                 Instant.now(),
-                UUID.randomUUID().toString());
-        ForgotPasswordRequestedEvent forgotPasswordRequestedEvent = new ForgotPasswordRequestedEvent(baseEvent, email);
-        kafkaTemplate.send(SportaKafkaEvents.SEND_REQUEST_TOPIC, forgotPasswordRequestedEvent);
-        log.info("OrchestrationServiceProducerImpl::sendPasswordResetEmail: forgot password reset email sent to 'forgot-password.request' topic");
+                UUID.randomUUID().toString()
+        );
+
+        ForgotPasswordRequestedEvent event = new ForgotPasswordRequestedEvent(baseEvent, email);
+        kafkaTemplate.send(SportaKafkaEvents.SEND_REQUEST_TOPIC, event);
+        log.info("OrchestrationServiceProducerImpl::sendPasswordResetEmail: password reset email triggered.");
     }
 
     @SneakyThrows
@@ -56,45 +58,61 @@ public class OrchestrationServiceProducerImpl implements OrchestrationServicePro
                 UUID.randomUUID().toString()
         );
 
-        try{
+        try {
             replyingKafkaTemplate.start();
 
             JoinedEventsByUserRequestEvent requestEvent = new JoinedEventsByUserRequestEvent(baseEvent, userId);
 
-            ProducerRecord<String, Object> record = new ProducerRecord<>(
-                    SportaKafkaEvents.REQUEST_TOPIC,
-                    requestEvent
-            );
+            ProducerRecord<String, Object> record = new ProducerRecord<>(SportaKafkaEvents.REQUEST_TOPIC, requestEvent);
             record.headers().add(KafkaHeaders.REPLY_TOPIC, SportaKafkaEvents.RESPONSE_TOPIC.getBytes());
 
             RequestReplyFuture<String, Object, Object> future = replyingKafkaTemplate.sendAndReceive(record);
-            log.info("OrchestrationServiceProducerImpl::getEventsJoinedByUser: sent request for event ids for user with id: {}", requestEvent.getUserId());
+            log.info("OrchestrationServiceProducerImpl::getEventsJoinedByUser: Sent Kafka request for userId={}", userId);
 
             SendResult<String, Object> sendResult = future.getSendFuture().get();
-            sendResult.getProducerRecord().headers().forEach(header -> System.out.println(header.key() + ":" + header.value().toString()));
-
             ConsumerRecord<String, Object> response = future.get(5, TimeUnit.SECONDS);
 
             if (response.value() instanceof JoinedEventsByUserResponseEvent responseEvent
-                    &&
-                    Objects.equals(responseEvent.getBaseEvent().getCorrelationId(), requestEvent.getBaseEvent().getCorrelationId())
-            ) {
-                log.info("UserServiceConsumerImpl::listenForJoinedEventsByUserRequestEvent: received response for event ids for user with id: {}", requestEvent.getUserId());
+                    && Objects.equals(responseEvent.getBaseEvent().getCorrelationId(), requestEvent.getBaseEvent().getCorrelationId())) {
+                log.info("OrchestrationServiceProducerImpl::getEventsJoinedByUser: Received Kafka response for userId={}", userId);
                 return responseEvent.getEventIds();
             }
-
-        } catch (InterruptedException e) {
-            log.error(e.getMessage());
-        } catch (ExecutionException e) {
-            log.error(e.getMessage());
-        } catch (TimeoutException e) {
-            log.error(e.getMessage());
-        } catch (Exception e) {
-            log.error(e.getMessage());
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            log.error("Kafka error: {}", e.getMessage());
         } finally {
             replyingKafkaTemplate.stop();
         }
 
-        return Collections.<String> emptyList();
+        return Collections.emptyList();
+    }
+
+    @Override
+    public void sendFriendRequestNotification(String senderId, String receiverId, String senderUsername) {
+        Map<String, Object> payload = Map.of(
+                "userId", receiverId,
+                "title", "New Friend Request",
+                "body", senderUsername + " has sent you a friend request.",
+                "clickAction", "/friends",
+                "icon", "https://example.com/friend-request-icon.png",
+                "data", Map.of("senderId", senderId, "receiverId", receiverId)
+        );
+
+        kafkaTemplate.send("event-updates", payload);
+        log.info("OrchestrationServiceProducerImpl::sendFriendRequestNotification: Notification sent to {}", receiverId);
+    }
+
+    @Override
+    public void sendBadgeAssignmentNotification(String userId, String giverId, String badgeId) {
+        Map<String, Object> payload = Map.of(
+                "userId", userId,
+                "title", "🎖️ You Received a New Badge!",
+                "body", "You’ve just received a new badge from user " + giverId,
+                "clickAction", "/profile/badges",
+                "icon", "https://example.com/badge-icon.png",
+                "data", Map.of("badgeId", badgeId, "giverId", giverId)
+        );
+
+        kafkaTemplate.send("event-updates", payload);
+        log.info("OrchestrationServiceProducerImpl::sendBadgeAssignmentNotification: Notification sent to {}", userId);
     }
 }
