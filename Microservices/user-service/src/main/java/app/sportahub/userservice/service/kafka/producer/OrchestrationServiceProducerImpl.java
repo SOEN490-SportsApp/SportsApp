@@ -1,6 +1,7 @@
 package app.sportahub.userservice.service.kafka.producer;
 
 import app.sportahub.kafka.events.BaseEvent;
+import app.sportahub.kafka.events.notification.NotificationEvent;
 import app.sportahub.kafka.events.SportaKafkaEvents;
 import app.sportahub.kafka.events.forgotpassword.ForgotPasswordRequestedEvent;
 import app.sportahub.kafka.events.joinsporteventevent.JoinedEventsByUserRequestEvent;
@@ -88,4 +89,12 @@ public class OrchestrationServiceProducerImpl implements OrchestrationServicePro
 
         return Collections.emptyList();
     }
+
+    @SneakyThrows
+    @Override
+    public void sendNotificationEvent(NotificationEvent event) {
+        kafkaTemplate.send(SportaKafkaEvents.NOTIFICATION_REQUEST_TOPIC, event);
+        log.info("OrchestrationServiceProducerImpl::sendNotificationEvent: Sent notification for user {}", event.getUserId());
+    }
+
 }
