@@ -31,6 +31,7 @@ import app.sportahub.userservice.repository.BadgeRepository;
 import app.sportahub.userservice.repository.FriendRepository;
 import app.sportahub.userservice.repository.FriendRequestRepository;
 import app.sportahub.userservice.repository.user.UserRepository;
+import app.sportahub.userservice.service.kafka.producer.OrchestrationServiceProducer;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -80,13 +81,16 @@ public class UserServiceTest {
     @Mock
     private KafkaTemplate<String, Object> kafkaTemplate;
 
+    @Mock
+    private OrchestrationServiceProducer orchestrationServiceProducer;
+
     @InjectMocks
     private UserServiceImpl userService;
 
     @BeforeEach
     void setUp() {
         userService = new UserServiceImpl(userRepository, badgeRepository, keycloakApiClient, userMapper, profileMapper,
-                friendMapper, friendRepository, friendRequestRepository, publicProfileMapper, kafkaTemplate);
+                friendMapper, friendRepository, friendRequestRepository, publicProfileMapper, kafkaTemplate, orchestrationServiceProducer);
     }
 
     private UserRequest getUserRequest() {
