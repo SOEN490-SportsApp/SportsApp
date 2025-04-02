@@ -116,6 +116,7 @@ const ProfilePage: React.FC = () => {
       </View>
 
         <ProfileSection
+          visitedId = ""
           user={user}
           isUserProfile={true}
           friendStatus={null}

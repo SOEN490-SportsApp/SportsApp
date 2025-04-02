@@ -273,6 +273,7 @@ const ProfilePage: React.FC = () => {
   return (
     <SafeAreaView className="flex-1 bg-white pt-6">
       <ProfileSection
+        visitedId = {id}
         user={user}
         friendStatus={friendStatus}
         handleFriendRequest={handleFriendRequest}

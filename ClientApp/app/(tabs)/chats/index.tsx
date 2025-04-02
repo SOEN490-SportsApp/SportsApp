@@ -1,15 +1,15 @@
 import React from 'react';
-import { SafeAreaView, StyleSheet, View, Text } from 'react-native';
+import ChatList from '@/components/chat/ChatList';
+import ChatListHeader from '@/components/chat/ChatListHeader';
+import { SafeAreaView } from 'react-native-safe-area-context';
+const Chats =() => {
 
-
-const Chats = () => {
-
-
-  return (
-    <SafeAreaView>
-      <Text>Chats</Text>
-    </SafeAreaView>
-  );
+    return (
+        <SafeAreaView style={{ flex: 1 }}>
+            <ChatListHeader />
+            <ChatList />
+        </SafeAreaView>
+    )
 }
 
 export default Chats
