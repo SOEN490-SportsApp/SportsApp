@@ -2,10 +2,10 @@ package app.sportahub.eventservice.service.kafka.consumer;
 
 import app.sportahub.eventservice.model.event.Event;
 import app.sportahub.eventservice.repository.event.EventRepository;
-import app.sportahub.kafkevents.BaseEvent;
-import app.sportahub.kafkevents.joinsporteventevent.JoinedEventsByUserEvent;
-import app.sportahub.kafkevents.joinsporteventevent.JoinedEventsByUserFetchEvent;
-import app.sportahub.kafkevents.joinsporteventevent.JoinedEventsByUserFetchedEvent;
+import app.sportahub.kafka.events.BaseEvent;
+import app.sportahub.kafka.events.joinsporteventevent.JoinedEventsByUserEvent;
+import app.sportahub.kafka.events.joinsporteventevent.JoinedEventsByUserFetchEvent;
+import app.sportahub.kafka.events.joinsporteventevent.JoinedEventsByUserFetchedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;

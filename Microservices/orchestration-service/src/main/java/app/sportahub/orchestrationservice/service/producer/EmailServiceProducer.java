@@ -1,6 +1,6 @@
 package app.sportahub.orchestrationservice.service.producer;
 
-import app.sportahub.kafkevents.forgotpassword.ForgotPasswordSendEmailEvent;
+import app.sportahub.kafka.events.ForgotPasswordSendEmailEvent;
 
 public interface EmailServiceProducer {
 
