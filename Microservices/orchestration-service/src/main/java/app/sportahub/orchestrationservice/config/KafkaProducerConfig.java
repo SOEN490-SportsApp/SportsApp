@@ -1,6 +1,6 @@
 package app.sportahub.orchestrationservice.config;
 
-import app.sportahub.kafka.events.joinsporteventevent.JoinedEventsByUserEvent;
+import app.sportahub.kafka.events.SportaKafkaEvents;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,7 +53,7 @@ public class KafkaProducerConfig {
     @Bean
     public KafkaMessageListenerContainer<String, Object> replyContainer(
             ConsumerFactory<String, Object> consumerFactory) {
-        ContainerProperties containerProperties = new ContainerProperties(JoinedEventsByUserEvent.FETCHED_TOPIC);
+        ContainerProperties containerProperties = new ContainerProperties(SportaKafkaEvents.FETCHED_TOPIC);
         containerProperties.setGroupId("UserServiceKafkaConsumer");
         return new KafkaMessageListenerContainer<>(consumerFactory, containerProperties);
     }
