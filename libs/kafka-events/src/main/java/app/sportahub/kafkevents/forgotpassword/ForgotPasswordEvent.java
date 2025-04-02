@@ -1,4 +1,4 @@
-package app.sportahub.kafkevents.forgotPassword;
+package app.sportahub.kafkevents.forgotpassword;
 
 public final class ForgotPasswordEvent {
     public static final String SEND_REQUEST_TOPIC = "forgot-password.request";

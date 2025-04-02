@@ -1,4 +1,4 @@
-package app.sportahub.kafkevents.JoinedSportEventEvent;
+package app.sportahub.kafkevents.joinsporteventevent;
 
 public final class JoinedEventsByUserEvent {
     public static final String REQUEST_TOPIC = "joined-events-by-user.request";

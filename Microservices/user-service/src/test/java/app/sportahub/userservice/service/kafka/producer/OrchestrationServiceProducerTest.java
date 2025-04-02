@@ -1,6 +1,6 @@
 package app.sportahub.userservice.service.kafka.producer;
 
-import app.sportahub.kafkevents.forgotPassword.ForgotPasswordRequestedEvent;
+import app.sportahub.kafkevents.forgotpassword.ForgotPasswordRequestedEvent;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -1,8 +1,8 @@
 package app.sportahub.orchestrationservice.kafka.consumer;
 
 import app.sportahub.kafkevents.BaseEvent;
-import app.sportahub.kafkevents.forgotPassword.ForgotPasswordRequestedEvent;
-import app.sportahub.kafkevents.forgotPassword.ForgotPasswordSendEmailEvent;
+import app.sportahub.kafkevents.forgotpassword.ForgotPasswordRequestedEvent;
+import app.sportahub.kafkevents.forgotpassword.ForgotPasswordSendEmailEvent;
 import app.sportahub.orchestrationservice.service.consumer.UserServiceConsumerImpl;
 import app.sportahub.orchestrationservice.service.producer.EmailServiceProducer;
 import org.junit.jupiter.api.Assertions;
@@ -13,7 +13,6 @@ import org.mockito.*;
 import java.time.Instant;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 public class UserServiceConsumerTest {

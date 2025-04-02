@@ -1,7 +1,7 @@
 package app.sportahub.emailservice.service.kafka.consumer;
 
-import app.sportahub.kafkevents.forgotPassword.ForgotPasswordSendEmailEvent;
-import app.sportahub.kafkevents.forgotPassword.ForgotPasswordEvent;
+import app.sportahub.kafkevents.forgotpassword.ForgotPasswordSendEmailEvent;
+import app.sportahub.kafkevents.forgotpassword.ForgotPasswordEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;

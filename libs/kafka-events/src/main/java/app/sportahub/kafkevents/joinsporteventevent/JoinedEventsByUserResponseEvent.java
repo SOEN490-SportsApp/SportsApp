@@ -1,4 +1,4 @@
-package app.sportahub.kafkevents.JoinedSportEventEvent;
+package app.sportahub.kafkevents.joinsporteventevent;
 
 import app.sportahub.kafkevents.BaseEvent;
 import com.fasterxml.jackson.annotation.JsonCreator;
