@@ -1,4 +1,4 @@
-package app.sportahub.kafkevents;
+package app.sportahub.kafka.events;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -19,17 +19,31 @@ public class BaseEvent implements Serializable {
             @JsonProperty("eventType") String eventType,
             @JsonProperty("source") String source,
             @JsonProperty("timestamp") Instant timestamp,
-            @JsonProperty("correlationId") String correlationId)
-    {
+            @JsonProperty("correlationId") String correlationId) {
         this.eventId = eventId;
         this.eventType = eventType;
         this.source = source;
         this.timestamp = timestamp;
         this.correlationId = correlationId;
     }
-    public String getEventId() {return eventId;}
-    public String getEventType() {return eventType;}
-    public String getSource() {return source;}
-    public Instant getTimestamp() {return timestamp;}
-    public String getCorrelationId() {return correlationId;}
+
+    public String getEventId() {
+        return eventId;
+    }
+
+    public String getEventType() {
+        return eventType;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public Instant getTimestamp() {
+        return timestamp;
+    }
+
+    public String getCorrelationId() {
+        return correlationId;
+    }
 }

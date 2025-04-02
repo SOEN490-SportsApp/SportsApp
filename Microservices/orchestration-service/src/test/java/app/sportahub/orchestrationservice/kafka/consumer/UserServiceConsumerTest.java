@@ -1,8 +1,8 @@
 package app.sportahub.orchestrationservice.kafka.consumer;
 
-import app.sportahub.kafkevents.BaseEvent;
-import app.sportahub.kafkevents.forgotpassword.ForgotPasswordRequestedEvent;
-import app.sportahub.kafkevents.forgotpassword.ForgotPasswordSendEmailEvent;
+import app.sportahub.kafka.events.BaseEvent;
+import app.sportahub.kafka.events.ForgotPasswordRequestedEvent;
+import app.sportahub.kafka.events.ForgotPasswordSendEmailEvent;
 import app.sportahub.orchestrationservice.service.consumer.UserServiceConsumerImpl;
 import app.sportahub.orchestrationservice.service.producer.EmailServiceProducer;
 import org.junit.jupiter.api.Assertions;

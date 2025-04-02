@@ -1,11 +1,11 @@
 package app.sportahub.userservice.service.kafka.producer;
 
-import app.sportahub.kafkevents.BaseEvent;
-import app.sportahub.kafkevents.joinsporteventevent.JoinedEventsByUserEvent;
-import app.sportahub.kafkevents.joinsporteventevent.JoinedEventsByUserRequestEvent;
-import app.sportahub.kafkevents.joinsporteventevent.JoinedEventsByUserResponseEvent;
-import app.sportahub.kafkevents.forgotpassword.ForgotPasswordRequestedEvent;
-import app.sportahub.kafkevents.forgotpassword.ForgotPasswordEvent;
+import app.sportahub.kafka.events.BaseEvent;
+import app.sportahub.kafka.events.ForgotPasswordEvent;
+import app.sportahub.kafka.events.ForgotPasswordRequestedEvent;
+import app.sportahub.kafka.events.joinsporteventevent.JoinedEventsByUserEvent;
+import app.sportahub.kafka.events.joinsporteventevent.JoinedEventsByUserRequestEvent;
+import app.sportahub.kafka.events.joinsporteventevent.JoinedEventsByUserResponseEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;

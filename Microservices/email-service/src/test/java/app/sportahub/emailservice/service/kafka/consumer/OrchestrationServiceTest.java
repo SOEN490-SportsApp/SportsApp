@@ -1,7 +1,7 @@
 package app.sportahub.emailservice.service.kafka.consumer;
 
-import app.sportahub.kafkevents.forgotpassword.ForgotPasswordSendEmailEvent;
-import app.sportahub.kafkevents.BaseEvent;
+import app.sportahub.kafka.events.ForgotPasswordSendEmailEvent;
+import app.sportahub.kafka.events.BaseEvent;
 import app.sportahub.emailservice.service.EmailService;
 import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,6 +1,6 @@
 package app.sportahub.emailservice.service.kafka.consumer;
 
-import app.sportahub.kafkevents.forgotpassword.ForgotPasswordSendEmailEvent;
+import app.sportahub.kafka.events.ForgotPasswordSendEmailEvent;
 
 public interface OrchestrationServiceConsumer {
 

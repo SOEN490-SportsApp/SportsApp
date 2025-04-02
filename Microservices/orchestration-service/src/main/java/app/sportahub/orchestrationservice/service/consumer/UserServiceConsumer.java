@@ -1,7 +1,7 @@
 package app.sportahub.orchestrationservice.service.consumer;
 
-import app.sportahub.kafkevents.joinsporteventevent.JoinedEventsByUserRequestEvent;
-import app.sportahub.kafkevents.forgotpassword.ForgotPasswordRequestedEvent;
+import app.sportahub.kafka.events.ForgotPasswordRequestedEvent;
+import app.sportahub.kafka.events.joinsporteventevent.JoinedEventsByUserRequestEvent;
 
 public interface UserServiceConsumer {
     public void listenForForgotPasswordRequestedEvent(ForgotPasswordRequestedEvent forgotPasswordRequestedEvent);
