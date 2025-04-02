@@ -56,14 +56,19 @@ const Chats = () => {
                     throw error;
                 }
             };
-            fetchChatrooms(user);
+
+            const intervalId = setInterval(() => {
+                fetchChatrooms(user);
+            }, 3000);
+
+            fetchChatrooms(user); // Initial fetch
 
             return () => {
+                clearInterval(intervalId); // Cleanup interval
                 setChatrooms([]); // Cleanup if needed
             };
         }, [user])
     );
-    console.log("chatrooms", chatrooms);
     return (
         <FlatList
             data={chatrooms}

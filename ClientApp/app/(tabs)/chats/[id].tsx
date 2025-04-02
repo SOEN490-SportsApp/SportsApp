@@ -7,7 +7,7 @@ import { Bubble, Composer, GiftedChat, IMessage, InputToolbar, InputToolbarProps
 import {useSelector} from "react-redux";
 import {getMessages, getChatroom, deleteChatroom, leaveChatroom} from "@/services/chatService";
 import { Client } from "@stomp/stompjs";
-import { getAccessToken } from "@/services/tokenService"
+import { getAccessToken, refreshAccessToken, startTokenRefresh } from "@/services/tokenService"
 import {message, chatroomProps, messageRequest} from "@/types/messaging";
 import { mvs } from '@/utils/helpers/uiScaler';
 import { set } from 'date-fns';
@@ -78,7 +78,12 @@ const ChatScreen = () => {
         console.error('Failed to get access token:', error);
       }
     };
+    const interval = setInterval(() => {
+      refreshAccessToken()
+      response();
+    }, 180000);
 
+    refreshAccessToken();
     response();
   }, []);
 
@@ -144,8 +149,8 @@ const ChatScreen = () => {
                     createdAt: new Date(JSON.parse(message.body).createdAt),
                     user: {
                       _id: JSON.parse(message.body).senderId,
-                      name: 'Sender Name', // Replace with actual sender name if available
-                      avatar: avatarPlaceholder, // Replace with actual avatar URL if available
+                      name: JSON.parse(message.body).sendName, // Replace with actual sender name if available
+                      avatar: JSON.parse(message.body).senderAvatar, // Replace with actual avatar URL if available
                     },
                   },
                   ...prev,
@@ -168,7 +173,6 @@ const ChatScreen = () => {
 
       try {
         const messagesData = await getMessages(id.toString());
-        console.log("messageData: ", messagesData);
 
         // Ensure messagesData is mapped to IMessage structure
         const formattedMessages = messagesData.map((message: any) => ({
@@ -183,7 +187,8 @@ const ChatScreen = () => {
         }));
 
         const chatroomData = await getChatroom(id.toString());
-        console.log("chatroomData: ", chatroomData);
+
+        // console.log("chatroomData: ", chatroomData);
 
         setChatroom(chatroomData);
         setMessages(formattedMessages);
@@ -201,8 +206,6 @@ const ChatScreen = () => {
 
   const onSend = useCallback((newMessages: IMessage[] = []) => {
     let attachments: string[] = [];
-    console.log("newMessages: ", newMessages);
-    console.log("chatroom: ", chatroom);
 
     if (!Array.isArray(newMessages)) return;
     try {
@@ -224,7 +227,7 @@ const ChatScreen = () => {
           senderName: user.username,
           // senderImage: user.avatar,
         }
-        console.log("newMessageRequest: ",newMessageRequest);
+        // TODO remove log
         // @ts-ignore
         clientRef.current.publish({
           destination: "/app/message",

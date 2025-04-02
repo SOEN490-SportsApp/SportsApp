@@ -7,7 +7,7 @@ export interface message {
     content: string; //required
     createdAt: Number | Date;
     attachments: string[];
-    // avatar: string
+    senderImage: string
     }
 
 export interface chatroomProps {
