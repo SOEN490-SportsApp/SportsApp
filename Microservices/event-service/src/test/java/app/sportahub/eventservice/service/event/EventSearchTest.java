@@ -11,6 +11,7 @@ import app.sportahub.eventservice.model.event.Location;
 import app.sportahub.eventservice.repository.SearchingEventRepositoryImpl;
 import app.sportahub.eventservice.repository.event.EventRepository;
 import app.sportahub.eventservice.repository.social.PostRepository;
+import app.sportahub.eventservice.service.kafka.producer.OrchestrationServiceProducer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,7 +37,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 public class EventSearchTest {
@@ -62,9 +62,12 @@ public class EventSearchTest {
     private Location location;
     private LocationRequest locationRequest;
 
+    @Mock
+    private OrchestrationServiceProducer orchestrationServiceProducer;
+
     @BeforeEach
     void setUp() {
-        eventService = new EventServiceImpl(eventRepository, eventMapper);
+        eventService = new EventServiceImpl(eventRepository, eventMapper, orchestrationServiceProducer);
         searchingEventRepository = new SearchingEventRepositoryImpl(mongoTemplate);
 
         locationRequest = new LocationRequest(
@@ -285,7 +288,7 @@ public class EventSearchTest {
         when(eventRepository.searchEvents(
                 null, null, null, null, null, null, null, null,
                 "2023-10-15-2023-10-20", null, null, null, null, null, null, null, pageable
-       )).thenReturn(mockEventPage);
+        )).thenReturn(mockEventPage);
 
         EventResponse eventResponse = new EventResponse(
                 "event123",
