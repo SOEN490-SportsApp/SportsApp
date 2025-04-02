@@ -45,7 +45,8 @@ const NewChatModal: React.FC<NewChatModalProps> = ({
         let chatroomId = '';
         console.log("Creating group with friends from onCreateGroup:", selectedFriends);
         try {
-            const response = await createUserChatroom(LoggedUser.id, LoggedUser.username, '', title, selectedFriends, [], false, false)
+          // TODO the last "true" is done to help the read unread status
+            const response = await createUserChatroom(LoggedUser.id, LoggedUser.username, '', title, selectedFriends, [], false, true)
             chatroomId = response.chatroomId;
             
             if (!chatroomId) {
