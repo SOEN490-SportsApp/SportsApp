@@ -81,7 +81,6 @@ public class UserServiceImpl implements UserService {
     private final FriendRepository friendRepository;
     private final FriendRequestRepository friendRequestRepository;
     private final PublicProfileMapper publicProfileMapper;
-    private final KafkaTemplate<String, Object> kafkaTemplate;
     private final OrchestrationServiceProducer orchestrationServiceProducer;
 
     @Override
