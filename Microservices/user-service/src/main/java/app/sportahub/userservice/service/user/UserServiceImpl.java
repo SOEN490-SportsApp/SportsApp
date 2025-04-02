@@ -45,6 +45,7 @@ import app.sportahub.userservice.repository.BadgeRepository;
 import app.sportahub.userservice.repository.FriendRepository;
 import app.sportahub.userservice.repository.FriendRequestRepository;
 import app.sportahub.userservice.repository.user.UserRepository;
+import app.sportahub.userservice.service.kafka.producer.OrchestrationServiceProducer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -81,6 +82,7 @@ public class UserServiceImpl implements UserService {
     private final FriendRequestRepository friendRequestRepository;
     private final PublicProfileMapper publicProfileMapper;
     private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final OrchestrationServiceProducer orchestrationServiceProducer;
 
     @Override
     public UserResponse createUser(UserRequest userRequest) {
@@ -181,8 +183,7 @@ public class UserServiceImpl implements UserService {
                 )
         );
 
-        kafkaTemplate.send("badge-assignments", notificationPayload);
-        log.info("assignBadge: Sent notification to user {} for badge {}", userId, badgeId);
+        orchestrationServiceProducer.sendBadgeAssignmentNotification(userId, giverId, badgeId);
 
         return userMapper.userToUserResponse(userRepository.save(user));
     }
@@ -284,8 +285,7 @@ public class UserServiceImpl implements UserService {
                 "data", Map.of("senderId", userSender.getId(), "receiverId", userReceiver.getId())
         );
 
-        kafkaTemplate.send("friend-requests", notificationPayload);
-        log.info("UserServiceImpl::sendFriendRequest: Notification sent to Kafka for user {}", userReceiver.getId());
+        orchestrationServiceProducer.sendFriendRequestNotification(userSender.getId(), userReceiver.getId(), userSender.getUsername());
 
         return new FriendRequestResponse("Friend request sent successfully.",
                 savedSenderFriendRequest.getId(),
