@@ -1,24 +1,22 @@
 package app.sportahub.eventservice.service.event;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.*;
 
 import app.sportahub.eventservice.exception.event.*;
 import app.sportahub.eventservice.service.kafka.producer.OrchestrationServiceProducer;
+import app.sportahub.kafka.events.BaseEvent;
+import app.sportahub.kafka.events.notification.NotificationEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.Metrics;
-import org.springframework.data.mongodb.core.geo.GeoJson;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 
 import org.springframework.http.ResponseEntity;
@@ -189,13 +187,6 @@ public class EventServiceImpl implements EventService {
                 .map(Participant::getUserId)
                 .toList();
 
-        orchestrationServiceProducer.sendEventUpdateNotifications(
-                savedEvent.getId(),
-                savedEvent.getEventName(),
-                userIds,
-                savedEvent.getUpdatedAt().toString()
-        );
-
         return eventMapper.eventToEventResponse(savedEvent);
     }
 
@@ -222,13 +213,6 @@ public class EventServiceImpl implements EventService {
         List<String> userIds = savedEvent.getParticipants().stream()
                 .map(Participant::getUserId)
                 .toList();
-
-        orchestrationServiceProducer.sendEventUpdateNotifications(
-                savedEvent.getId(),
-                savedEvent.getEventName(),
-                userIds,
-                savedEvent.getUpdatedAt().toString()
-        );
 
         return eventMapper.eventToEventResponse(savedEvent);
     }
@@ -348,12 +332,6 @@ public class EventServiceImpl implements EventService {
         eventRepository.save(event);
         log.info("EventServiceImpl::joinEvent: User with id:{} joined event with id:{}", userId, id);
 
-        orchestrationServiceProducer.notifyParticipantsOfNewJoiner(
-                event.getId(),
-                event.getEventName(),
-                previousParticipants.stream().map(Participant::getUserId).toList(),
-                userId
-        );
         return new ParticipantResponse(participant.getUserId(), participant.getAttendStatus(),
                 participant.getJoinedOn());
     }
@@ -496,13 +474,20 @@ public class EventServiceImpl implements EventService {
                 .map(Participant::getUserId)
                 .toList();
 
-        orchestrationServiceProducer.sendEventCancellationNotifications(
-                savedEvent.getId(),
-                savedEvent.getEventName(),
-                userIds,
-                savedEvent.getCancellation().getReason(),
-                savedEvent.getCancellation().getCancelledBy()
-        );
+        userIds.stream()
+                .map(userId -> new NotificationEvent(
+                        new BaseEvent(UUID.randomUUID().toString(), "request", "event-service", Instant.now(), UUID.randomUUID().toString()),
+                        userId,
+                        "Event Cancelled",
+                        "The event '" + savedEvent.getEventName() + "' was cancelled. Reason: " + savedEvent.getCancellation().getReason(),
+                        Map.of("eventId", savedEvent.getId(), "cancelledBy", savedEvent.getCancellation().getCancelledBy()),
+                        "/events/" + savedEvent.getId(),
+                        "https://example.com/icons/event-cancelled.png",
+                        null,
+                        null,
+                        true
+                ))
+                .forEach(orchestrationServiceProducer::sendNotificationEvent);
 
         return eventMapper.eventToEventResponse(savedEvent);
     }
