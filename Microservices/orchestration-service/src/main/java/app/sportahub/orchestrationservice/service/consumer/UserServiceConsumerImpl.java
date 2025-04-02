@@ -1,7 +1,7 @@
 package app.sportahub.orchestrationservice.service.consumer;
 
 import app.sportahub.kafka.events.BaseEvent;
-import app.sportahub.kafka.events.forgotpassword.ForgotPasswordEvent;
+import app.sportahub.kafka.events.SportaKafkaEvents;
 import app.sportahub.kafka.events.forgotpassword.ForgotPasswordRequestedEvent;
 import app.sportahub.kafka.events.forgotpassword.ForgotPasswordSendEmailEvent;
 import app.sportahub.kafka.events.joinsporteventevent.*;
@@ -29,9 +29,6 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import static app.sportahub.kafka.events.joinsporteventevent.JoinedEventsByUserEvent.FETCHED_TOPIC;
-import static app.sportahub.kafka.events.joinsporteventevent.JoinedEventsByUserEvent.REQUEST_TOPIC;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -42,7 +39,7 @@ public class UserServiceConsumerImpl{
     private final ReplyingKafkaTemplate<String, Object, Object> replyingKafkaTemplate;
 
     @SneakyThrows
-    @KafkaListener(topics = ForgotPasswordEvent.SEND_REQUEST_TOPIC, groupId ="UserServiceKafkaConsumer")
+    @KafkaListener(topics = SportaKafkaEvents.SEND_REQUEST_TOPIC, groupId ="UserServiceKafkaConsumer")
     public void listenForForgotPasswordRequestedEvent(ForgotPasswordRequestedEvent forgotPasswordRequestedEvent) {
         log.info("EmailServiceProducerImpl::listenForForgotPasswordRequestedEvent: received forgot password request with email : {} ", forgotPasswordRequestedEvent.getEmail());
 
@@ -61,7 +58,7 @@ public class UserServiceConsumerImpl{
     }
 
     @SneakyThrows
-    @KafkaListener(topics = {REQUEST_TOPIC, FETCHED_TOPIC} , groupId = "UserServiceKafkaConsumer")
+    @KafkaListener(topics = {SportaKafkaEvents.REQUEST_TOPIC, SportaKafkaEvents.FETCHED_TOPIC} , groupId = "UserServiceKafkaConsumer")
     public void listenForJoinedEventsByUserRequestEvent(
             @Payload JoinedEventsByUserRequestEvent requestEvent,
             @Header(KafkaHeaders.CORRELATION_ID) byte[] correlationId){
@@ -82,10 +79,10 @@ public class UserServiceConsumerImpl{
 
             JoinedEventsByUserFetchEvent fetchEvent = new JoinedEventsByUserFetchEvent(fetchBaseEvent, userId);
             ProducerRecord<String, Object> record = new ProducerRecord<>(
-                    JoinedEventsByUserEvent.FETCH_TOPIC,
+                    SportaKafkaEvents.FETCH_TOPIC,
                     fetchEvent
             );
-            record.headers().add(new RecordHeader(KafkaHeaders.REPLY_TOPIC, JoinedEventsByUserEvent.FETCHED_TOPIC.getBytes()));
+            record.headers().add(new RecordHeader(KafkaHeaders.REPLY_TOPIC, SportaKafkaEvents.FETCHED_TOPIC.getBytes()));
             record.headers().add(new RecordHeader(KafkaHeaders.CORRELATION_ID, correlationId));
 
             RequestReplyFuture<String, Object, Object> future =
@@ -117,7 +114,7 @@ public class UserServiceConsumerImpl{
             );
             JoinedEventsByUserResponseEvent responseEvent = new JoinedEventsByUserResponseEvent(fetchedBaseEvent, fetchedEvent.getEventIds());
 
-            ProducerRecord<String, Object> responseRecord = new ProducerRecord<>(JoinedEventsByUserEvent.RESPONSE_TOPIC, responseEvent);
+            ProducerRecord<String, Object> responseRecord = new ProducerRecord<>(SportaKafkaEvents.RESPONSE_TOPIC, responseEvent);
             responseRecord.headers().add(new RecordHeader(KafkaHeaders.CORRELATION_ID, correlationId));
 
             kafkaTemplate.send(responseRecord);

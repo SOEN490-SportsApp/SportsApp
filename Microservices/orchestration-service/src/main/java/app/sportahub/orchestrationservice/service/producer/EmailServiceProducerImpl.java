@@ -1,6 +1,6 @@
 package app.sportahub.orchestrationservice.service.producer;
 
-import app.sportahub.kafka.events.forgotpassword.ForgotPasswordEvent;
+import app.sportahub.kafka.events.SportaKafkaEvents;
 import app.sportahub.kafka.events.forgotpassword.ForgotPasswordSendEmailEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -18,7 +18,7 @@ public class EmailServiceProducerImpl implements EmailServiceProducer {
     @SneakyThrows
     @Override
     public void sendForgotPasswordSendEmailEvent(ForgotPasswordSendEmailEvent forgotPasswordSendEmailEvent){
-        kafkaTemplate.send(ForgotPasswordEvent.SEND_EMAIL_TOPIC, forgotPasswordSendEmailEvent);
+        kafkaTemplate.send(SportaKafkaEvents.SEND_EMAIL_TOPIC, forgotPasswordSendEmailEvent);
         log.info("EmailServiceProducerImpl::sendForgotPasswordSendEmailEvent: forgot password reset email sent to 'forgot-password.send-email' topic");
     }
 }
