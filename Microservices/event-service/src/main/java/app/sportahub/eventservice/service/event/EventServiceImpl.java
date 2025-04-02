@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import app.sportahub.eventservice.exception.event.*;
+import app.sportahub.eventservice.service.kafka.producer.OrchestrationServiceProducer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -48,7 +49,6 @@ import app.sportahub.eventservice.repository.event.EventRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
-import org.springframework.kafka.core.KafkaTemplate;
 
 
 @Slf4j
@@ -58,7 +58,7 @@ public class EventServiceImpl implements EventService {
 
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final OrchestrationServiceProducer orchestrationServiceProducer;
 
     /**
      * Returns a specific event with an id matching the provided id.
@@ -185,7 +185,16 @@ public class EventServiceImpl implements EventService {
         Event savedEvent = eventRepository.save(updatedEvent);
         log.info("EventServiceImpl::updateEvent: Event with id:{} was updated", savedEvent.getId());
 
-        notifyParticipantsAboutUpdate(savedEvent);
+        List<String> userIds = savedEvent.getParticipants().stream()
+                .map(Participant::getUserId)
+                .toList();
+
+        orchestrationServiceProducer.sendEventUpdateNotifications(
+                savedEvent.getId(),
+                savedEvent.getEventName(),
+                userIds,
+                savedEvent.getUpdatedAt().toString()
+        );
 
         return eventMapper.eventToEventResponse(savedEvent);
     }
@@ -210,7 +219,16 @@ public class EventServiceImpl implements EventService {
         Event savedEvent = eventRepository.save(event);
         log.info("EventServiceImpl::patchEvent: Event with id:{} was patched", savedEvent.getId());
 
-        notifyParticipantsAboutUpdate(savedEvent);
+        List<String> userIds = savedEvent.getParticipants().stream()
+                .map(Participant::getUserId)
+                .toList();
+
+        orchestrationServiceProducer.sendEventUpdateNotifications(
+                savedEvent.getId(),
+                savedEvent.getEventName(),
+                userIds,
+                savedEvent.getUpdatedAt().toString()
+        );
 
         return eventMapper.eventToEventResponse(savedEvent);
     }
@@ -330,7 +348,12 @@ public class EventServiceImpl implements EventService {
         eventRepository.save(event);
         log.info("EventServiceImpl::joinEvent: User with id:{} joined event with id:{}", userId, id);
 
-        notifyExistingParticipantsOfNewJoiner(event, previousParticipants, userId);
+        orchestrationServiceProducer.notifyParticipantsOfNewJoiner(
+                event.getId(),
+                event.getEventName(),
+                previousParticipants.stream().map(Participant::getUserId).toList(),
+                userId
+        );
         return new ParticipantResponse(participant.getUserId(), participant.getAttendStatus(),
                 participant.getJoinedOn());
     }
@@ -469,7 +492,17 @@ public class EventServiceImpl implements EventService {
         log.info("EventServiceImpl::cancelEvent: Event with id:{} was cancelled by user:{}", eventId,
                 authentication.getName());
 
-        sendEventCancellationNotifications(savedEvent);
+        List<String> userIds = savedEvent.getParticipants().stream()
+                .map(Participant::getUserId)
+                .toList();
+
+        orchestrationServiceProducer.sendEventCancellationNotifications(
+                savedEvent.getId(),
+                savedEvent.getEventName(),
+                userIds,
+                savedEvent.getCancellation().getReason(),
+                savedEvent.getCancellation().getCancelledBy()
+        );
 
         return eventMapper.eventToEventResponse(savedEvent);
     }
@@ -676,87 +709,6 @@ public class EventServiceImpl implements EventService {
         Event savedEvent = eventRepository.save(event);
         log.info("EventServiceImpl::whitelistUsers: Users with ids: {} were added to the whitelist for event with id: {}", userIds, id);
         return eventMapper.eventToEventResponse(savedEvent);
-    }
-
-    private void sendEventCancellationNotifications(Event event) {
-        List<Participant> participants = event.getParticipants();
-        if (participants == null || participants.isEmpty()) {
-            log.info("No participants registered for event: {}", event.getId());
-            return;
-        }
-
-        for (Participant participant : participants) {
-            String userId = participant.getUserId(); // adjust if needed
-
-            Map<String, Object> notificationPayload = Map.of(
-                    "userId", userId,
-                    "title", "Event Cancelled",
-                    "body", "The event '" + event.getEventName() + "' has been cancelled.",
-                    "clickAction", "/events/" + event.getId(),
-                    "icon", "https://example.com/event-cancel-icon.png",
-                    "data", Map.of(
-                            "eventId", event.getId(),
-                            "reason", event.getCancellation().getReason(),
-                            "cancelledBy", event.getCancellation().getCancelledBy()
-                    )
-            );
-
-            kafkaTemplate.send("event-updates", notificationPayload);
-            log.info("Notification sent to user {} for event {}", userId, event.getId());
-        }
-    }
-
-    private void notifyParticipantsAboutUpdate(Event event) {
-        List<Participant> participants = event.getParticipants();
-
-        if (participants == null || participants.isEmpty()) {
-            log.info("No participants to notify for event: {}", event.getId());
-            return;
-        }
-
-        for (Participant participant : participants) {
-            String userId = participant.getUserId(); // adjust based on your model
-
-            Map<String, Object> notificationPayload = Map.of(
-                    "userId", userId,
-                    "title", "Event Updated",
-                    "body", "The event '" + event.getEventName() + "' has been updated.",
-                    "clickAction", "/events/" + event.getId(),
-                    "icon", "https://example.com/event-update-icon.png",
-                    "data", Map.of(
-                            "eventId", event.getId(),
-                            "updatedAt", event.getUpdatedAt().toString()
-                    )
-            );
-
-            kafkaTemplate.send("event-updates", notificationPayload);
-            log.info("Event update notification sent to user {} for event {}", userId, event.getId());
-        }
-    }
-
-    private void notifyExistingParticipantsOfNewJoiner(Event event, List<Participant> previousParticipants, String newUserId) {
-        if (previousParticipants == null || previousParticipants.isEmpty()) {
-            return;
-        }
-
-        for (Participant participant : previousParticipants) {
-            String receiverId = participant.getUserId();
-
-            Map<String, Object> payload = Map.of(
-                    "userId", receiverId,
-                    "title", "New Player Joined",
-                    "body", "A new player has joined the event '" + event.getEventName() + "'.",
-                    "clickAction", "/events/" + event.getId(),
-                    "icon", "https://example.com/user-join-icon.png",
-                    "data", Map.of(
-                            "eventId", event.getId(),
-                            "newUserId", newUserId
-                    )
-            );
-
-            kafkaTemplate.send("event-updates", payload);
-            log.info("Notification sent to {} about new participant {} for event {}", receiverId, newUserId, event.getId());
-        }
     }
 
 }
