@@ -187,6 +187,21 @@ public class EventServiceImpl implements EventService {
                 .map(Participant::getUserId)
                 .toList();
 
+        userIds.stream()
+                .map(userId -> new NotificationEvent(
+                        new BaseEvent(UUID.randomUUID().toString(), "request", "event-service", Instant.now(), UUID.randomUUID().toString()),
+                        userId,
+                        "Event Updated",
+                        "The event '" + savedEvent.getEventName() + "' has been updated.",
+                        Map.of("eventId", savedEvent.getId()),
+                        "/events/" + savedEvent.getId(),
+                        "https://example.com/icons/event-updated.png",
+                        null,
+                        null,
+                        true
+                ))
+                .forEach(orchestrationServiceProducer::sendNotificationEvent);
+
         return eventMapper.eventToEventResponse(savedEvent);
     }
 
@@ -213,6 +228,21 @@ public class EventServiceImpl implements EventService {
         List<String> userIds = savedEvent.getParticipants().stream()
                 .map(Participant::getUserId)
                 .toList();
+
+        userIds.stream()
+                .map(userId -> new NotificationEvent(
+                        new BaseEvent(UUID.randomUUID().toString(), "request", "event-service", Instant.now(), UUID.randomUUID().toString()),
+                        userId,
+                        "Event Modified",
+                        "Some details of the event '" + savedEvent.getEventName() + "' have been changed.",
+                        Map.of("eventId", savedEvent.getId()),
+                        "/events/" + savedEvent.getId(),
+                        "https://example.com/icons/event-modified.png",
+                        null,
+                        null,
+                        true
+                ))
+                .forEach(orchestrationServiceProducer::sendNotificationEvent);
 
         return eventMapper.eventToEventResponse(savedEvent);
     }
