@@ -1,10 +1,10 @@
 package app.sportahub.orchestrationservice.service.consumer;
 
 import app.sportahub.kafkevents.BaseEvent;
-import app.sportahub.kafkevents.JoinedSportEventEvent.*;
-import app.sportahub.kafkevents.forgotPassword.ForgotPasswordRequestedEvent;
-import app.sportahub.kafkevents.forgotPassword.ForgotPasswordSendEmailEvent;
-import app.sportahub.kafkevents.forgotPassword.ForgotPasswordEvent;
+import app.sportahub.kafkevents.joinsporteventevent.*;
+import app.sportahub.kafkevents.forgotpassword.ForgotPasswordRequestedEvent;
+import app.sportahub.kafkevents.forgotpassword.ForgotPasswordSendEmailEvent;
+import app.sportahub.kafkevents.forgotpassword.ForgotPasswordEvent;
 import app.sportahub.orchestrationservice.service.producer.EmailServiceProducer;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -29,8 +29,8 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import static app.sportahub.kafkevents.JoinedSportEventEvent.JoinedEventsByUserEvent.FETCHED_TOPIC;
-import static app.sportahub.kafkevents.JoinedSportEventEvent.JoinedEventsByUserEvent.REQUEST_TOPIC;
+import static app.sportahub.kafkevents.joinsporteventevent.JoinedEventsByUserEvent.FETCHED_TOPIC;
+import static app.sportahub.kafkevents.joinsporteventevent.JoinedEventsByUserEvent.REQUEST_TOPIC;
 
 @Slf4j
 @Service

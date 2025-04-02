@@ -1,21 +1,23 @@
-package app.sportahub.kafkevents.JoinedSportEventEvent;
+package app.sportahub.kafkevents.joinsporteventevent;
 
 import app.sportahub.kafkevents.BaseEvent;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class JoinedEventsByUserRequestEvent {
+import java.util.List;
+
+public class JoinedEventsByUserFetchedEvent {
     private final BaseEvent baseEvent;
-    private final String userId;
+    private final List<String> eventIds;
 
     @JsonCreator
-    public JoinedEventsByUserRequestEvent(
+    public JoinedEventsByUserFetchedEvent(
             @JsonProperty("baseEvent") BaseEvent baseEvent,
-            @JsonProperty("userId") String userId)
+            @JsonProperty("eventIds") List<String> eventIds)
     {
         this.baseEvent = baseEvent;
-        this.userId = userId;
+        this.eventIds = eventIds;
     }
-    public String getUserId() {return this.userId;}
     public BaseEvent getBaseEvent() {return this.baseEvent;}
+    public List<String> getEventIds() {return this.eventIds;}
 }
