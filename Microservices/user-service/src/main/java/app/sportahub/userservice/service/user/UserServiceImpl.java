@@ -1,12 +1,6 @@
 package app.sportahub.userservice.service.user;
 
 import app.sportahub.userservice.client.KeycloakApiClient;
-import app.sportahub.userservice.config.kafka.KafkaProducerConfig;
-import app.sportahub.userservice.dto.request.user.friend.FriendRequestRequest;
-import app.sportahub.userservice.dto.request.user.friend.UpdateFriendRequestRequest;
-import app.sportahub.userservice.dto.response.user.UserProfileResponse;
-import app.sportahub.userservice.dto.response.user.friend.ViewFriendResponse;
-import app.sportahub.userservice.dto.response.user.friendRequest.FriendRequestResponse;
 import app.sportahub.userservice.dto.request.user.ProfileRequest;
 import app.sportahub.userservice.dto.request.user.UserRequest;
 import app.sportahub.userservice.dto.request.user.friend.FriendRequestRequest;
@@ -14,29 +8,29 @@ import app.sportahub.userservice.dto.request.user.friend.UpdateFriendRequestRequ
 import app.sportahub.userservice.dto.request.user.keycloak.KeycloakRequest;
 import app.sportahub.userservice.dto.response.user.ProfileResponse;
 import app.sportahub.userservice.dto.response.user.PublicProfileResponse;
+import app.sportahub.userservice.dto.response.user.UserProfileResponse;
 import app.sportahub.userservice.dto.response.user.UserResponse;
 import app.sportahub.userservice.dto.response.user.badge.BadgeResponse;
 import app.sportahub.userservice.dto.response.user.badge.BadgeWithCountResponse;
+import app.sportahub.userservice.dto.response.user.friend.ViewFriendResponse;
+import app.sportahub.userservice.dto.response.user.friendRequest.FriendRequestResponse;
 import app.sportahub.userservice.dto.response.user.friendRequest.UpdateFriendRequestResponse;
 import app.sportahub.userservice.dto.response.user.friendRequest.ViewFriendRequestsResponse;
 import app.sportahub.userservice.enums.user.FriendRequestStatusEnum;
 import app.sportahub.userservice.enums.user.UpdateFriendRequestActionEnum;
-import app.sportahub.userservice.exception.user.friend.*;
+import app.sportahub.userservice.exception.user.NoSearchCriteriaProvidedException;
 import app.sportahub.userservice.exception.user.UserDoesNotExistException;
 import app.sportahub.userservice.exception.user.UserEmailAlreadyExistsException;
-import app.sportahub.userservice.exception.user.*;
+import app.sportahub.userservice.exception.user.UsernameAlreadyExistsException;
 import app.sportahub.userservice.exception.user.badge.BadgeNotFoundException;
 import app.sportahub.userservice.exception.user.badge.UserAlreadyAssignedBadgeByThisGiverException;
-import app.sportahub.userservice.exception.user.friend.InvalidFriendRequestStatusTypeException;
-import app.sportahub.userservice.exception.user.friend.UserSentFriendRequestToSelfException;
-import app.sportahub.userservice.exception.user.UsernameAlreadyExistsException;
+import app.sportahub.userservice.exception.user.friend.*;
 import app.sportahub.userservice.exception.user.friendRequest.FriendNotFoundInFriendRequestListException;
 import app.sportahub.userservice.exception.user.friendRequest.FriendRequestDoesNotExistException;
 import app.sportahub.userservice.exception.user.friendRequest.GivenFriendUserIdDoesNotMatchFriendRequestFoundByIdException;
 import app.sportahub.userservice.exception.user.friendRequest.UserAlreadyInFriendRequestListException;
-import app.sportahub.userservice.mapper.user.FriendMapper;
-import app.sportahub.userservice.exception.user.friend.*;
 import app.sportahub.userservice.exception.user.keycloak.KeycloakCommunicationException;
+import app.sportahub.userservice.mapper.user.FriendMapper;
 import app.sportahub.userservice.mapper.user.ProfileMapper;
 import app.sportahub.userservice.mapper.user.PublicProfileMapper;
 import app.sportahub.userservice.mapper.user.UserMapper;
@@ -51,7 +45,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,12 +52,9 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.toList;
 
 
 @Slf4j
@@ -170,20 +160,6 @@ public class UserServiceImpl implements UserService {
                 .build();
         profile.getBadges().add(newBadge);
 
-        Map<String, Object> notificationPayload = Map.of(
-                "userId", userId,
-                "title", "🎖️ You Received a New Badge!",
-                "body", "You’ve just received a new badge from user " + giverId,
-                "clickAction", "/profile/badges", // frontend
-                "icon", "https://example.com/badge-icon.png",
-                "data", Map.of(
-                        "badgeId", badgeId,
-                        "giverId", giverId
-                )
-        );
-
-        orchestrationServiceProducer.sendBadgeAssignmentNotification(userId, giverId, badgeId);
-
         return userMapper.userToUserResponse(userRepository.save(user));
     }
 
@@ -274,17 +250,6 @@ public class UserServiceImpl implements UserService {
         User savedReceiverUser = userRepository.save(userReceiver);
         log.info("UserServiceImpl::sendFriendRequest: User with id: {} received a new friend request",
                 savedReceiverUser.getId());
-
-        Map<String, Object> notificationPayload = Map.of(
-                "userId", userReceiver.getId(),
-                "title", "New Friend Request",
-                "body", userSender.getUsername() + " has sent you a friend request.",
-                "clickAction", "/friends",
-                "icon", "https://example.com/friend-request-icon.png",
-                "data", Map.of("senderId", userSender.getId(), "receiverId", userReceiver.getId())
-        );
-
-        orchestrationServiceProducer.sendFriendRequestNotification(userSender.getId(), userReceiver.getId(), userSender.getUsername());
 
         return new FriendRequestResponse("Friend request sent successfully.",
                 savedSenderFriendRequest.getId(),
