@@ -1,9 +1,9 @@
 package app.sportahub.notificationservice.model.notification;
 
 import app.sportahub.notificationservice.model.BaseEntity;
-import com.mongodb.lang.Nullable;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -39,5 +39,6 @@ public class Notification extends BaseEntity {
 
     Boolean playSound;
 
-    private Boolean isRead;
+    @Builder.Default
+    private Boolean isRead = false;
 }
