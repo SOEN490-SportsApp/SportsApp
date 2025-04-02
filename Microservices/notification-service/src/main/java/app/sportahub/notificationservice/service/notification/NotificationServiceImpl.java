@@ -6,7 +6,6 @@ import app.sportahub.notificationservice.exception.notification.NotificationNotF
 import app.sportahub.notificationservice.mapper.notification.NotificationMapper;
 import app.sportahub.notificationservice.model.notification.Notification;
 import app.sportahub.notificationservice.repository.notification.NotificationRepository;
-import app.sportahub.notificationservice.service.firebase.FirebaseMessagingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -24,7 +23,7 @@ import java.time.LocalDateTime;
 public class NotificationServiceImpl implements NotificationService {
 
     private final NotificationRepository notificationRepository;
-    private final FirebaseMessagingService firebaseMessagingService;
+    private final PushNotificationService pushNotificationService;
     private final NotificationMapper notificationMapper;
 
     /**
@@ -44,7 +43,7 @@ public class NotificationServiceImpl implements NotificationService {
 
         log.info("NotificationServiceImpl::processNotification: Notification saved with ID: {}", savedNotification.getId());
 
-        firebaseMessagingService.sendNotificationToUser(notificationRequest);
+        pushNotificationService.sendExpoPushNotificationToUser(notificationRequest);
 
         log.info("NotificationServiceImpl::processNotification: Notification sent to user {}: {}",
                 notificationRequest.userId(), savedNotification);
