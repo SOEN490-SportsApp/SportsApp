@@ -1,7 +1,7 @@
 package app.sportahub.orchestrationservice.service.producer;
 
-import app.sportahub.kafka.events.ForgotPasswordEvent;
-import app.sportahub.kafka.events.ForgotPasswordSendEmailEvent;
+import app.sportahub.kafka.events.forgotpassword.ForgotPasswordEvent;
+import app.sportahub.kafka.events.forgotpassword.ForgotPasswordSendEmailEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
