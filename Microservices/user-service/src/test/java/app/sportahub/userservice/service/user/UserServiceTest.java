@@ -90,7 +90,7 @@ public class UserServiceTest {
     @BeforeEach
     void setUp() {
         userService = new UserServiceImpl(userRepository, badgeRepository, keycloakApiClient, userMapper, profileMapper,
-                friendMapper, friendRepository, friendRequestRepository, publicProfileMapper, kafkaTemplate, orchestrationServiceProducer);
+                friendMapper, friendRepository, friendRequestRepository, publicProfileMapper, orchestrationServiceProducer);
     }
 
     private UserRequest getUserRequest() {
