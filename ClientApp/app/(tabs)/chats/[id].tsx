@@ -124,7 +124,7 @@ const ChatScreen = () => {
     if (!finalToken) return;
 
       const client = new Client({
-        brokerURL: "ws://api-dev.sportahub.app/api/messagin-service/ws",
+        brokerURL: "ws://api.sportahub.app/api/messaging-service/ws",
         heartbeatIncoming: 0,
         heartbeatOutgoing: 0,
         connectHeaders: {
@@ -221,7 +221,7 @@ const ChatScreen = () => {
           receivers: chatroom.members,
           senderId: user.id,
           // TODO joud use when supported
-          // senderName: user.username,
+          senderName: user.username,
           // senderImage: user.avatar,
         }
         console.log("newMessageRequest: ",newMessageRequest);
