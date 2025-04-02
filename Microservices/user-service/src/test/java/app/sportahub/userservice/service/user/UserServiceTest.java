@@ -39,6 +39,7 @@ import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.kafka.core.KafkaTemplate;
 import reactor.core.publisher.Mono;
 
 import java.sql.Timestamp;
@@ -76,13 +77,16 @@ public class UserServiceTest {
     private final FriendMapper friendMapper = Mappers.getMapper(FriendMapper.class);
     private final PublicProfileMapper publicProfileMapper = Mappers.getMapper(PublicProfileMapper.class);
 
+    @Mock
+    private KafkaTemplate<String, Object> kafkaTemplate;
+
     @InjectMocks
     private UserServiceImpl userService;
 
     @BeforeEach
     void setUp() {
         userService = new UserServiceImpl(userRepository, badgeRepository, keycloakApiClient, userMapper, profileMapper,
-                friendMapper, friendRepository, friendRequestRepository, publicProfileMapper);
+                friendMapper, friendRepository, friendRequestRepository, publicProfileMapper, kafkaTemplate);
     }
 
     private UserRequest getUserRequest() {

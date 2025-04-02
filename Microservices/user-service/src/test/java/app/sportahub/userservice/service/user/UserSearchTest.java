@@ -30,6 +30,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.kafka.core.KafkaTemplate;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -78,10 +79,13 @@ public class UserSearchTest {
     @Mock
     private FriendRequestRepository friendRequestRepository;
 
+    @Mock
+    private KafkaTemplate<String, Object> kafkaTemplate;
+
     @BeforeEach
     void setUp() {
         userService = new UserServiceImpl(userRepository, badgeRepository, keycloakApiClient, userMapper,
-                profileMapper, friendMapper, friendRepository, friendRequestRepository, publicProfileMapper);
+                profileMapper, friendMapper, friendRepository, friendRequestRepository, publicProfileMapper, kafkaTemplate);
         searchingUserRepository = new SearchingUserRepositoryImpl(mongoTemplate);
     }
 
