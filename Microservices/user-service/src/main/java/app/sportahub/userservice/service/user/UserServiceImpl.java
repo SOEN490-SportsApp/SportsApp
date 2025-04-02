@@ -1,5 +1,7 @@
 package app.sportahub.userservice.service.user;
 
+import app.sportahub.kafka.events.BaseEvent;
+import app.sportahub.kafka.events.notification.NotificationEvent;
 import app.sportahub.userservice.client.KeycloakApiClient;
 import app.sportahub.userservice.dto.request.user.ProfileRequest;
 import app.sportahub.userservice.dto.request.user.UserRequest;
@@ -49,10 +51,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -160,6 +161,22 @@ public class UserServiceImpl implements UserService {
                 .build();
         profile.getBadges().add(newBadge);
 
+        NotificationEvent badgeNotification = new NotificationEvent(
+                new BaseEvent(UUID.randomUUID().toString(), "request", "user-service", Instant.now(), UUID.randomUUID().toString()),
+                userId,
+                "You've earned a new badge!",
+                "You received a new badge from a teammate.",
+                Map.of("badgeId", badgeId, "giverId", giverId),
+                "/profile/badges",
+                "https://example.com/icons/badge.png",
+                null,
+                null,
+                true
+        );
+
+        orchestrationServiceProducer.sendNotificationEvent(badgeNotification);
+
+
         return userMapper.userToUserResponse(userRepository.save(user));
     }
 
@@ -250,6 +267,22 @@ public class UserServiceImpl implements UserService {
         User savedReceiverUser = userRepository.save(userReceiver);
         log.info("UserServiceImpl::sendFriendRequest: User with id: {} received a new friend request",
                 savedReceiverUser.getId());
+
+        NotificationEvent friendRequestNotification = new NotificationEvent(
+                new BaseEvent(UUID.randomUUID().toString(), "request", "user-service", Instant.now(), UUID.randomUUID().toString()),
+                userReceiver.getId(),
+                "New Friend Request",
+                userSender.getUsername() + " sent you a friend request.",
+                Map.of("senderId", userSender.getId()),
+                "/friends/requests",
+                "https://example.com/icons/friend-request.png",
+                null,
+                null,
+                true
+        );
+
+        orchestrationServiceProducer.sendNotificationEvent(friendRequestNotification);
+
 
         return new FriendRequestResponse("Friend request sent successfully.",
                 savedSenderFriendRequest.getId(),
