@@ -19,6 +19,7 @@ import app.sportahub.eventservice.model.event.participant.ParticipantAttendStatu
 import app.sportahub.eventservice.repository.event.EventRepository;
 import app.sportahub.eventservice.model.event.reactor.ReactionType;
 import app.sportahub.eventservice.model.event.reactor.Reaction;
+import app.sportahub.eventservice.service.kafka.producer.OrchestrationServiceProducer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -58,6 +59,9 @@ class EventServiceTest {
 
     @Mock
     private EventMapper eventMapper;
+
+    @Mock
+    private OrchestrationServiceProducer orchestrationServiceProducer;
 
     @InjectMocks
     private EventServiceImpl eventServiceImpl;
@@ -106,6 +110,7 @@ class EventServiceTest {
                 .withCutOffTime(LocalDateTime.now().plusDays(1).toString())
                 .withState(EventState.ACTIVE)
                 .withWhitelistedUsers(new ArrayList<>(List.of("user1")))
+                .withUpdatedAt(Timestamp.valueOf(LocalDateTime.now())) // Set updatedAt field
                 .build();
 
         eventResponse = new EventResponse(
@@ -276,6 +281,19 @@ class EventServiceTest {
 
     @Test
     void updateEventShouldSuccessfullyUpdateEvent() {
+        List<Participant> participants = List.of(
+                Participant.builder()
+                        .withUserId("user123")
+                        .withAttendStatus(ParticipantAttendStatus.JOINED)
+                        .withJoinedOn(LocalDate.now())
+                        .build()
+        );
+
+        event = event.toBuilder()
+                .withParticipants(participants)
+                .withUpdatedAt(Timestamp.valueOf(LocalDateTime.now()))
+                .build();
+
         when(eventRepository.findById(anyString())).thenReturn(Optional.of(event));
         when(eventMapper.eventRequestToEvent(any(EventRequest.class))).thenReturn(event);
         when(eventRepository.save(any(Event.class))).thenReturn(event);
@@ -284,9 +302,16 @@ class EventServiceTest {
         EventResponse response = eventServiceImpl.updateEvent("1", eventRequest);
 
         assertEquals(eventResponse, response);
-        verify(eventRepository, times(1)).findById("1");
-        verify(eventRepository, times(1)).save(any(Event.class));
+        verify(eventRepository).findById("1");
+        verify(eventRepository).save(any(Event.class));
+        verify(orchestrationServiceProducer).sendEventUpdateNotifications(
+                eq("1"),
+                eq("Basketball Game"),
+                eq(List.of("user123")),
+                anyString()
+        );
     }
+
 
     @Test
     void updateEventShouldThrowEventDoesNotExistException() {
@@ -305,9 +330,15 @@ class EventServiceTest {
         EventResponse response = eventServiceImpl.patchEvent("1", eventRequest);
 
         assertEquals(eventResponse, response);
-        verify(eventRepository, times(1)).findById("1");
-        verify(eventMapper, times(1)).patchEventFromRequest(any(EventRequest.class), any(Event.class));
-        verify(eventRepository, times(1)).save(any(Event.class));
+        verify(eventRepository).findById("1");
+        verify(eventMapper).patchEventFromRequest(any(EventRequest.class), any(Event.class));
+        verify(eventRepository).save(any(Event.class));
+        verify(orchestrationServiceProducer).sendEventUpdateNotifications(
+                eq("1"),
+                eq("Basketball Game"),
+                anyList(),
+                anyString()
+        );
     }
 
     @Test
@@ -381,8 +412,14 @@ class EventServiceTest {
         assertEquals("newUser", response.userId());
         assertEquals(ParticipantAttendStatus.JOINED, response.attendStatus());
 
-        verify(eventRepository, times(1)).findById("1");
-        verify(eventRepository, times(1)).save(event);
+        verify(eventRepository).findById("1");
+        verify(eventRepository).save(event);
+        verify(orchestrationServiceProducer).notifyParticipantsOfNewJoiner(
+                eq("1"),
+                eq("Basketball Game"),
+                anyList(),
+                eq("newUser")
+        );
     }
 
     @Test
@@ -635,7 +672,15 @@ class EventServiceTest {
         assertNotNull(event.getCancellation());
         assertEquals("adminUser", event.getCancellation().getCancelledBy());
         assertEquals("Weather conditions", event.getCancellation().getReason());
-        verify(eventRepository, times(1)).save(event);
+
+        verify(eventRepository).save(event);
+        verify(orchestrationServiceProducer).sendEventCancellationNotifications(
+                eq("1"),
+                eq("Basketball Game"),
+                anyList(),
+                eq("Weather conditions"),
+                eq("adminUser")
+        );
     }
 
     @Test
