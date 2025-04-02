@@ -1,5 +1,7 @@
 package app.sportahub.notificationservice.service.kafka.consumer;
 
+import app.sportahub.kafka.events.SportaKafkaEvents;
+import app.sportahub.kafka.events.notification.NotificationEvent;
 import app.sportahub.notificationservice.dto.request.notification.NotificationRequest;
 import app.sportahub.notificationservice.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
@@ -14,11 +16,21 @@ public class OrchestrationServiceConsumerImpl implements OrchestrationServiceCon
 
     private final NotificationService notificationService;
 
-    @KafkaListener(topics = "event-updates", groupId = "notification-service", containerFactory = "kafkaListenerContainerFactory")
-    @Override
-    public void consumeNotification(NotificationRequest request) {
-        log.info("Received notification: {}", request);
-        notificationService.processNotification(request);
-    }
+    @KafkaListener(topics = SportaKafkaEvents.NOTIFICATION_SEND_TOPIC, groupId = "NotificationServiceKafkaConsumer")
+    public void listenForNotificationEvent(NotificationEvent event) {
+        log.info("NotificationServiceConsumerImpl:: Received NotificationEvent for user {}", event.getUserId());
 
+        NotificationRequest notificationRequest = new NotificationRequest(
+                event.getUserId(),
+                event.getMessageTitle(),
+                event.getMessageBody(),
+                event.getData(),
+                event.getClickAction(),
+                event.getIcon(),
+                event.getMessageSubtitle(),
+                event.getBadgeCount(),
+                event.getPlaySound()
+        );
+        notificationService.processNotification(notificationRequest);
+    }
 }
