@@ -19,7 +19,10 @@ import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -84,35 +87,5 @@ public class OrchestrationServiceProducerImpl implements OrchestrationServicePro
         }
 
         return Collections.emptyList();
-    }
-
-    @Override
-    public void sendFriendRequestNotification(String senderId, String receiverId, String senderUsername) {
-        Map<String, Object> payload = Map.of(
-                "userId", receiverId,
-                "title", "New Friend Request",
-                "body", senderUsername + " has sent you a friend request.",
-                "clickAction", "/friends",
-                "icon", "https://example.com/friend-request-icon.png",
-                "data", Map.of("senderId", senderId, "receiverId", receiverId)
-        );
-
-        kafkaTemplate.send("event-updates", payload);
-        log.info("OrchestrationServiceProducerImpl::sendFriendRequestNotification: Notification sent to {}", receiverId);
-    }
-
-    @Override
-    public void sendBadgeAssignmentNotification(String userId, String giverId, String badgeId) {
-        Map<String, Object> payload = Map.of(
-                "userId", userId,
-                "title", "🎖️ You Received a New Badge!",
-                "body", "You’ve just received a new badge from user " + giverId,
-                "clickAction", "/profile/badges",
-                "icon", "https://example.com/badge-icon.png",
-                "data", Map.of("badgeId", badgeId, "giverId", giverId)
-        );
-
-        kafkaTemplate.send("event-updates", payload);
-        log.info("OrchestrationServiceProducerImpl::sendBadgeAssignmentNotification: Notification sent to {}", userId);
     }
 }
