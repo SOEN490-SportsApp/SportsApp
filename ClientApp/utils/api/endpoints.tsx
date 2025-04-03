@@ -38,4 +38,9 @@ export const API_ENDPOINTS = {
 
   UPLOAD_FILE: "storage-service/objects/upload",
   GET_FILE: "storage-service/objects/file{objectPath}",
+
+  REGISTER_DEVICE: "notification-service/devices/register",
+  UNREGISTER_DEVICE: "notification-service/devices/{deviceId}",
+  GET_ALL_NOTIFICATIONS: "notification-service/notifications",
+  MARK_NOTIFICATION_AS_READ: "notification-service/notifications/{notificationId}",
 };
