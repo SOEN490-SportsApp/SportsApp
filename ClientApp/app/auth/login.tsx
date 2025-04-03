@@ -8,9 +8,11 @@ import themeColors from "@/utils/constants/colors";
 import { IconPlacement } from "@/utils/constants/enums";
 import { hs, vs, mvs, mhs } from "@/utils/helpers/uiScaler";
 import { loginUser } from "@/services/authService";
+import { registerDevice } from "@/services/notificationService";
 import { useUpdateUserToStore } from '@/state/user/actions';
 import { getUserById } from "@/state/user/api";
 import { useTranslation } from 'react-i18next';
+import { useNotification } from "@/context/NotificationContext";
 
 interface LoginPageFormData {
   identifier: string;
@@ -20,12 +22,14 @@ interface LoginPageFormData {
 const LoginPage: React.FC = () => {
   const router = useRouter();
   const updateUserToStore = useUpdateUserToStore();
+  const { expoPushToken } = useNotification();
   const { control, handleSubmit, formState: { errors } } = useForm<LoginPageFormData>();
   const [showPassword, setShowPassword] = useState(false);
   const { t } = useTranslation();
 
   const onSubmit = async (data: LoginPageFormData) => {
     try {
+        // Call the login function from authService
         const res = await loginUser(data.identifier, data.password);
         await updateUserToStore(res.userID);
         const response = await getUserById(res.userID);
@@ -34,6 +38,11 @@ const LoginPage: React.FC = () => {
             router.push({ pathname: '/auth/registerProfile', params: { userID: res.userID } });
         } else {
             router.replace('/(tabs)/home');
+        }
+
+        // Register device token for push notifications
+        if (expoPushToken != null) {
+            await registerDevice(expoPushToken);
         }
     } catch (error: any) {
         console.log(error);
