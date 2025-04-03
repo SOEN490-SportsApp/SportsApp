@@ -15,7 +15,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "googleServicesFile": "process.env.GOOGLE_SERVICE_INFO_PLIST ?? ./GoogleService-Info.plist",
+      "googleServicesFile": "./GoogleService-Info.plist",
       "bundleIdentifier": "com.nchelico.ClientApp",
      "infoPlist": {
       "ITSAppUsesNonExemptEncryption": false,
@@ -45,7 +45,7 @@
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION"
       ],
-      "googleServicesFile": "process.env.GOOGLE_SERVICES_JSON ?? ./google-services.json",
+      "googleServicesFile": "./google-services.json",
       "package": "com.sporta.clientApp",
       "config" : {
         "googleMaps": {
