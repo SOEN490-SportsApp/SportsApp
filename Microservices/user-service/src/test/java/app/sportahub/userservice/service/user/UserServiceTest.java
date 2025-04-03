@@ -1127,6 +1127,7 @@ public class UserServiceTest {
         requesterFriend.setId("friend1Id");
 
         Friend friendFriend = new Friend(requester.getId(), FriendRequestStatusEnum.ACCEPTED);
+
         friendFriend.setId("friend2Id");
 
         List<Friend> requesterFriendList = new ArrayList<>();
