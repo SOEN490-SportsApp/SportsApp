@@ -50,7 +50,12 @@ const Chats = () => {
             const fetchChatrooms = async (user: any) => {
                 try {
                     const chatroomData = await getAllChatrooms(user.id);
-                    setChatrooms(chatroomData);
+                    const sortedChatrooms = chatroomData.sort((a: CardProps, b: CardProps) => {
+                        const dateA = new Date(a.messages[0]?.createdAt.toString()).getTime();
+                        const dateB = new Date(b.messages[0]?.createdAt.toString()).getTime();
+                        return dateB - dateA; // most recent first
+                    });
+                    setChatrooms(sortedChatrooms);
                 } catch (error) {
                     console.error("Failed to fetch chatrooms:", error);
                     throw error;
@@ -76,8 +81,8 @@ const Chats = () => {
             renderItem={({ item }) => (
                 <ChatCard 
                     userImg={require('@/assets/images/avatar-placeholder.png')}
-                    messageText={item.messages[0].content}
-                    messageTime={item.messages[0].createdAt.toString()}
+                    messageText={item?.messages[0]?.content || ""}
+                    messageTime={item?.messages[0]?.createdAt?.toString() || item.createdAt.toString()}
                     cardTitle={item.chatroomName}
                     chatId={item.chatroomId}
                     onLongPress={() => handleDelete(item.chatroomId)}

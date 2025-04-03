@@ -76,118 +76,155 @@ const ProfileSection: React.FC<ProfileRequest> = ({
 
   return (
     <>
+      <View
+      style={{
+        alignItems: "center",
+        marginTop: isUserProfile ? 16 : 0,
+        marginHorizontal: mvs(50),
+      }}
+      >
       <ImageBackground
-        className="flex flex-1 items-start justify-end"
-        style={{ height: vs(320), marginTop: isUserProfile ? 16 : 0 }}
+        style={{
+        height: vs(100),
+        width: vs(100),
+        borderRadius: vs(50),
+        overflow: "hidden",
+        }}
         resizeMode="cover"
-        source={require("@/assets/images/testBackground.jpg")}
+        source={require("@/assets/images/Unknown.jpg")}
         defaultSource={require("@/assets/images/Unknown.jpg")}
       />
+      </View>
 
       <View
-        style={{
-          borderTopLeftRadius: 20,
-          borderTopRightRadius: 20,
-          paddingVertical: mvs(15),
-          marginTop: mhs(-200),
-          borderColor: "#FFF",
-          backgroundColor: "#FFF",
-        }}
+      style={{
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        paddingVertical: mvs(15),
+        marginTop: mhs(16),
+        borderColor: "#FFF",
+        backgroundColor: "#FFF",
+      }}
       >
-        <View className="items-center flex flex-row gap-4">
-          <View style={styles.container}>
-            <View
-              style={{
-                display:'flex',
-                flexDirection:'row',
-                gap:vs(8),
-                width:'86%',
-                alignItems:'baseline'
-              }}
+      <View className="items-center flex flex-row gap-4">
+        <View style={styles.container}>
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            width: "100%",
+          }}
+        >
+          <Text
+            testID="firstName"
+            style={{ fontSize: 26, fontWeight: "700", marginBottom: vs(4), textAlign: "center" }}
+          >
+            {user?.profile.firstName} {user?.profile.lastName}
+          </Text>
+          <Text style={{ fontSize: 18, color: themeColors.border.dark, textAlign: "center" }}>
+            @{user?.username}
+          </Text>
+        </View>
+        <View style={styles.headerContainer}>
+          {!isUserProfile ? (
+          <>
+            {friendStatus === "ACCEPTED" ? (
+            <TouchableOpacity
+              style={[
+              styles.button,
+              { backgroundColor: "#fff", borderColor: "#0C9E04" },
+              ]}
+              onPress={handleRemoveFriend}
+            >
+              <Text style={{ color: "#0C9E04", fontWeight: "bold" }}>
+              {t("profile_section.unfriend")}
+              </Text>
+              <MaterialCommunityIcons
+              name="account-remove"
+              size={22}
+              color="#0C9E04"
+              />
+            </TouchableOpacity>
+            ) : (
+            <TouchableOpacity
+              style={[
+              styles.button,
+              {
+                backgroundColor:
+                friendStatus === "UNKNOWN" ? "#0C9E04" : "#fff",
+                borderColor:
+                friendStatus !== "UNKNOWN" ? "#0C9E04" : "#fff",
+              },
+              ]}
+              onPress={handleFriendRequest}
+              disabled={friendStatus !== "UNKNOWN"}
             >
               <Text
-                testID="firstName"
-                style={{ fontSize: 26, fontWeight: 700, marginBottom: vs(4) }}
+              className="font-bold"
+              style={{
+                color:
+                friendStatus === "UNKNOWN" ? "#fff" : "#0C9E04",
+              }}
               >
-                {user?.profile.firstName} {user?.profile.lastName}
+              {friendStatus === "PENDING" ? "Pending" : "Add"}
               </Text>
-              <Text style={{fontSize:18, color:themeColors.border.dark}}>@{user?.username}</Text>
-            </View>
-            <View style={styles.headerContainer}>
-              {!isUserProfile ? (
-                <>
-                  {friendStatus === "ACCEPTED" ? (
-                    <TouchableOpacity
-                      style={[styles.button, { backgroundColor: "#fff", borderColor: "#0C9E04" }]}
-                      onPress={handleRemoveFriend}
-                    >
-                      <Text style={{ color: "#0C9E04", fontWeight: "bold" }}>{t('profile_section.unfriend')}</Text>
-                      <MaterialCommunityIcons name="account-remove" size={22} color="#0C9E04" />
-                    </TouchableOpacity>
-                  ) : (
-                    <TouchableOpacity
-                      style={[
-                        styles.button,
-                        {
-                          backgroundColor:
-                            friendStatus === "UNKNOWN" ? "#0C9E04" : "#fff",
-                          borderColor:
-                            friendStatus !== "UNKNOWN" ? "#0C9E04" : "#fff",
-                        },
-                      ]}
-                      onPress={handleFriendRequest}
-                      disabled={friendStatus !== "UNKNOWN"}
-                    >
-                      <Text
-                        className="font-bold"
-                        style={{
-                          color: friendStatus === "UNKNOWN" ? "#fff" : "#0C9E04",
-                        }}
-                      >
-                        {friendStatus === "PENDING" ? "Pending" : "Add"}
-                      </Text>
-                      <MaterialCommunityIcons
-                        name={
-                          friendStatus === "PENDING"
-                            ? "account-clock"
-                            : "account-plus"
-                        }
-                        size={22}
-                        color={friendStatus === "UNKNOWN" ? "#fff" : "#0C9E04"}
-                      />
-                    </TouchableOpacity>
-                  )}
+              <MaterialCommunityIcons
+              name={
+                friendStatus === "PENDING"
+                ? "account-clock"
+                : "account-plus"
+              }
+              size={22}
+              color={
+                friendStatus === "UNKNOWN" ? "#fff" : "#0C9E04"
+              }
+              />
+            </TouchableOpacity>
+            )}
 
-                  {/* Message button */}
-                  <TouchableOpacity style={[styles.button,{backgroundColor:friendStatus === "UNKNOWN" ? "#fff" : "#0C9E04",},]} onPress={handlePressMessage}>
-                    <Text
-                      className="font-bold"
-                      style={{
-                        color: friendStatus === "UNKNOWN" ? "#0C9E04" : "#fff",
-                      }}
-                    >
-                      {t('profile_section.message')}
-                    </Text>
+            {/* Message button */}
+            <TouchableOpacity
+            style={[
+              styles.button,
+              {
+              backgroundColor:
+                friendStatus === "UNKNOWN" ? "#fff" : "#0C9E04",
+              },
+            ]}
+            onPress={handlePressMessage}
+            >
+            <Text
+              className="font-bold"
+              style={{
+              color:
+                friendStatus === "UNKNOWN" ? "#0C9E04" : "#fff",
+              }}
+            >
+              {t("profile_section.message")}
+            </Text>
 
-                    <MaterialCommunityIcons
-                      name={
-                        friendStatus === "UNKNOWN"
-                          ? "chat-outline"
-                          : "chat"
-                      }
-                      size={22}
-                      color={friendStatus === "UNKNOWN" ? "#0C9E04" : "#fff"}
-                    />
-                  </TouchableOpacity>
-                </>
-              ) : (
-                <FavoriteSportsBadges
-                  sports={user?.profile.sportsOfPreference}
-                />
-              )}
-            </View>
-          </View>
+            <MaterialCommunityIcons
+              name={
+              friendStatus === "UNKNOWN"
+                ? "chat-outline"
+                : "chat"
+              }
+              size={22}
+              color={
+              friendStatus === "UNKNOWN" ? "#0C9E04" : "#fff"
+              }
+            />
+            </TouchableOpacity>
+          </>
+          ) : (
+          <FavoriteSportsBadges
+            sports={user?.profile.sportsOfPreference}
+          />
+          )}
         </View>
+        </View>
+      </View>
       </View>
     </>
   );
