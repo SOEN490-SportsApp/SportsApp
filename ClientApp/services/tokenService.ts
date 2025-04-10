@@ -82,7 +82,7 @@ export function stopTokenRefresh() {
 //#endregion
 
 //#region Helpers
-function decodeJWT(jwt: string): { exp: number } {
+export function decodeJWT(jwt: string): { exp: number } {
     try {
         const payload = JSON.parse(
             Buffer.from(
@@ -112,7 +112,7 @@ function joinToken(part1: string, part2: string): string {
     return part1 + part2;
 }
 
-async function getAccessToken() {
+export async function getAccessToken() {
     try {
     const part1 = await getFromSecureStore('accessTokenPart1');
     const part2 = await getFromSecureStore('accessTokenPart2');

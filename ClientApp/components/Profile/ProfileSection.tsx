@@ -11,9 +11,13 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { hs, mhs, mvs, vs } from "@/utils/helpers/uiScaler";
 import FavoriteSportsBadges from "../FavoriteSportsBadges";
 import themeColors from "@/utils/constants/colors";
+import { createUserChatroom } from "@/services/chatService";
+import { useSelector } from "react-redux";
+import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 
 interface ProfileRequest {
+  visitedId: string;
   user: any | null;
   friendStatus: string | null;
   handleFriendRequest: () => void | Promise<void> | null;
@@ -22,13 +26,16 @@ interface ProfileRequest {
 }
 
 const ProfileSection: React.FC<ProfileRequest> = ({
+  visitedId,
   user,
   friendStatus,
   handleFriendRequest,
   handleRemoveFriend,
   isUserProfile,
 }) => {
+  const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
+  const loggedInUser = useSelector((state: { user: any }) => state.user);
   const { t } = useTranslation();
 
   if (loading) {
@@ -47,22 +54,54 @@ const ProfileSection: React.FC<ProfileRequest> = ({
     );
   }
 
+  const handlePressMessage = async () => {
+    // Handle press event
+    console.log("Message button pressed");
+    try{
+      const participants = [{ userId: visitedId, username: user.username, userImage: ''}];
+      const response = await createUserChatroom(loggedInUser.id , loggedInUser.username, '','',participants, [],false, false);
+
+      // const response = await createUserChatroom(loggedInUser.id, visitedId, user.username, [], false, false, loggedInUser.username, user.username);
+      router.push({
+        pathname: '/(tabs)/chats/[id]',
+        params: {
+          id: response.chatroomId,
+          title: user.username },
+      });
+
+    }catch(e){
+      console.log("Error in handlePress", e);
+    }
+  };
+
   return (
     <>
-      <ImageBackground
-        className="flex flex-1 items-start justify-end"
-        style={{ height: vs(320), marginTop: isUserProfile ? 16 : 0 }}
-        resizeMode="cover"
-        source={require("@/assets/images/testBackground.jpg")}
-        defaultSource={require("@/assets/images/Unknown.jpg")}
-      />
+      <View
+        style={{
+          alignItems: "center",
+          marginTop: isUserProfile ? 16 : 0,
+          marginHorizontal: mvs(50),
+        }}
+      >
+        <ImageBackground
+          style={{
+            height: vs(100),
+            width: vs(100),
+            borderRadius: vs(50),
+            overflow: "hidden",
+          }}
+          resizeMode="cover"
+          source={require("@/assets/images/Unknown.jpg")}
+          defaultSource={require("@/assets/images/Unknown.jpg")}
+        />
+      </View>
 
       <View
         style={{
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
           paddingVertical: mvs(15),
-          marginTop: mhs(-200),
+          marginTop: mhs(16),
           borderColor: "#FFF",
           backgroundColor: "#FFF",
         }}
@@ -71,31 +110,41 @@ const ProfileSection: React.FC<ProfileRequest> = ({
           <View style={styles.container}>
             <View
               style={{
-                display:'flex',
-                flexDirection:'row',
-                gap:vs(8),
-                width:'86%',
-                alignItems:'baseline'
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                width: "100%",
               }}
             >
               <Text
                 testID="firstName"
-                style={{ fontSize: 26, fontWeight: 700, marginBottom: vs(4) }}
+                style={{ fontSize: 26, fontWeight: "700", marginBottom: vs(4), textAlign: "center" }}
               >
                 {user?.profile.firstName} {user?.profile.lastName}
               </Text>
-              <Text style={{fontSize:18, color:themeColors.border.dark}}>@{user?.username}</Text>
+              <Text style={{ fontSize: 18, color: themeColors.border.dark, textAlign: "center" }}>
+                @{user?.username}
+              </Text>
             </View>
             <View style={styles.headerContainer}>
               {!isUserProfile ? (
                 <>
                   {friendStatus === "ACCEPTED" ? (
                     <TouchableOpacity
-                      style={[styles.button, { backgroundColor: "#fff", borderColor: "#0C9E04" }]}
+                      style={[
+                        styles.button,
+                        { backgroundColor: "#fff", borderColor: "#0C9E04" },
+                      ]}
                       onPress={handleRemoveFriend}
                     >
-                      <Text style={{ color: "#0C9E04", fontWeight: "bold" }}>{t('profile_section.unfriend')}</Text>
-                      <MaterialCommunityIcons name="account-remove" size={22} color="#0C9E04" />
+                      <Text style={{ color: "#0C9E04", fontWeight: "bold" }}>
+                        {t("profile_section.unfriend")}
+                      </Text>
+                      <MaterialCommunityIcons
+                        name="account-remove"
+                        size={22}
+                        color="#0C9E04"
+                      />
                     </TouchableOpacity>
                   ) : (
                     <TouchableOpacity
@@ -114,7 +163,8 @@ const ProfileSection: React.FC<ProfileRequest> = ({
                       <Text
                         className="font-bold"
                         style={{
-                          color: friendStatus === "UNKNOWN" ? "#fff" : "#0C9E04",
+                          color:
+                            friendStatus === "UNKNOWN" ? "#fff" : "#0C9E04",
                         }}
                       >
                         {friendStatus === "PENDING" ? "Pending" : "Add"}
@@ -126,7 +176,9 @@ const ProfileSection: React.FC<ProfileRequest> = ({
                             : "account-plus"
                         }
                         size={22}
-                        color={friendStatus === "UNKNOWN" ? "#fff" : "#0C9E04"}
+                        color={
+                          friendStatus === "UNKNOWN" ? "#fff" : "#0C9E04"
+                        }
                       />
                     </TouchableOpacity>
                   )}
@@ -140,15 +192,18 @@ const ProfileSection: React.FC<ProfileRequest> = ({
                           friendStatus === "UNKNOWN" ? "#fff" : "#0C9E04",
                       },
                     ]}
+                    onPress={handlePressMessage}
                   >
                     <Text
                       className="font-bold"
                       style={{
-                        color: friendStatus === "UNKNOWN" ? "#0C9E04" : "#fff",
+                        color:
+                          friendStatus === "UNKNOWN" ? "#0C9E04" : "#fff",
                       }}
                     >
-                      {t('profile_section.message')}
+                      {t("profile_section.message")}
                     </Text>
+
                     <MaterialCommunityIcons
                       name={
                         friendStatus === "UNKNOWN"
@@ -156,7 +211,9 @@ const ProfileSection: React.FC<ProfileRequest> = ({
                           : "chat"
                       }
                       size={22}
-                      color={friendStatus === "UNKNOWN" ? "#0C9E04" : "#fff"}
+                      color={
+                        friendStatus === "UNKNOWN" ? "#0C9E04" : "#fff"
+                      }
                     />
                   </TouchableOpacity>
                 </>

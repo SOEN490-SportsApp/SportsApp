@@ -56,17 +56,18 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="chats/index"
+        name="chats"
         options={{
           title: t('tab_layout.chats'),
+          headerShown: false,
           tabBarIcon: ({ color }) => (
             <FontAwesome size={24} name="comments" color={color} style={iconStyle} />
           ),
         }}
         listeners={{
-          tabPress: (e) => {
-            console.log('Chats tab pressed');
-          },
+          // tabPress: (e) => {
+          //   console.log('Chats tab pressed');
+          // },
         }}
       />
       <Tabs.Screen

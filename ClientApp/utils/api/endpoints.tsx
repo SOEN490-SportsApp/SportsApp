@@ -31,6 +31,7 @@ export const API_ENDPOINTS = {
   GET_ALL_FRIENDS: 'user-service/user/{userId}/friends',
   RESPOND_TO_FRIEND_REQUEST: 'user-service/user/{userId}/friend-requests/{requestId}',
   GET_PROFILE_BY_ID: 'user-service/user/{userId}/profile',
+
   GET_PUBLIC_PROFILE:  'user-service/user/{userId}/profile',
 
   GET_ALL_POSTS: "event-service/event/{eventId}/social/post",
@@ -38,4 +39,11 @@ export const API_ENDPOINTS = {
 
   UPLOAD_FILE: "storage-service/objects/upload",
   GET_FILE: "storage-service/objects/file{objectPath}",
+
+  GET_All_CHATROOMS: 'messaging-service/messaging/chatrooms/{userId}',
+  GET_MESSAGES: 'messaging-service/messaging/chatrooms/messages/{chatroomId}',
+  GET_CHATROOM: 'messaging-service/messaging/chatroom/{chatroomId}',
+  CREATE_CHATROOM: 'messaging-service/messaging/chatroom',
+  DELETE_CHATROOM: 'messaging-service/messaging/chatroom/{chatroomId}',
+  LEAVE_CHATROOM: 'messaging-service/messaging//chatroom/leave-chatroom/{chatroomId}/{userId}',
 };
