@@ -32,7 +32,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'app.sportahub:kafka-events:1.0.6'
+    implementation 'app.sportahub:kafka-events:1.0.8'
     implementation 'com.github.hlspablo:expo-server-sdk-java:v3.1.2'
     implementation 'javax.annotation:javax.annotation-api:1.3.2'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
