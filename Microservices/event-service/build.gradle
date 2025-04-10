@@ -35,7 +35,7 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'app.sportahub:kafka-events:1.0.8'
+	implementation 'app.sportahub:kafka-events:1.0.9'
 	implementation 'org.apache.kafka:kafka-streams'
 	implementation 'org.springframework.kafka:spring-kafka'
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
