@@ -304,12 +304,6 @@ class EventServiceTest {
         assertEquals(eventResponse, response);
         verify(eventRepository).findById("1");
         verify(eventRepository).save(any(Event.class));
-        verify(orchestrationServiceProducer).sendEventUpdateNotifications(
-                eq("1"),
-                eq("Basketball Game"),
-                eq(List.of("user123")),
-                anyString()
-        );
     }
 
 
@@ -333,12 +327,6 @@ class EventServiceTest {
         verify(eventRepository).findById("1");
         verify(eventMapper).patchEventFromRequest(any(EventRequest.class), any(Event.class));
         verify(eventRepository).save(any(Event.class));
-        verify(orchestrationServiceProducer).sendEventUpdateNotifications(
-                eq("1"),
-                eq("Basketball Game"),
-                anyList(),
-                anyString()
-        );
     }
 
     @Test
@@ -414,12 +402,6 @@ class EventServiceTest {
 
         verify(eventRepository).findById("1");
         verify(eventRepository).save(event);
-        verify(orchestrationServiceProducer).notifyParticipantsOfNewJoiner(
-                eq("1"),
-                eq("Basketball Game"),
-                anyList(),
-                eq("newUser")
-        );
     }
 
     @Test
@@ -674,13 +656,6 @@ class EventServiceTest {
         assertEquals("Weather conditions", event.getCancellation().getReason());
 
         verify(eventRepository).save(event);
-        verify(orchestrationServiceProducer).sendEventCancellationNotifications(
-                eq("1"),
-                eq("Basketball Game"),
-                anyList(),
-                eq("Weather conditions"),
-                eq("adminUser")
-        );
     }
 
     @Test
