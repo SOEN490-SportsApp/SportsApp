@@ -1,8 +1,13 @@
 <h1>Release Demos</h1>
 
 [Release 2 Video Presentation](https://drive.google.com/file/d/1nWpURlvlSsaBed25e8k0oZryIKKR7ceT/view?usp=drive_link)  
-
 [Release 1 Video Presentation](https://drive.google.com/file/d/1eRpaNODa4Dt50EICdGhrMVTBgtZf7av6/view?usp=drive_link)
+
+<p align="center">
+  <a href="https://youtu.be/4d0tcheM6pI">
+    <img src="https://github.com/user-attachments/assets/049ad161-e044-4a47-8b56-973ef32456aa" width="300" />
+  </a>
+</p>
 
 <h1>Important Files</h1>
 
