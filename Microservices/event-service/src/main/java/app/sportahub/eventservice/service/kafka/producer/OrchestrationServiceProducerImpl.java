@@ -13,8 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.kafka.support.SendResult;

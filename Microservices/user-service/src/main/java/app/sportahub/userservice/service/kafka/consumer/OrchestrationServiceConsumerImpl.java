@@ -15,10 +15,10 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import app.sportahub.kafkevents.BaseEvent;
-import app.sportahub.kafkevents.user.UserEvent;
-import app.sportahub.kafkevents.user.UserFetchEvent;
-import app.sportahub.kafkevents.user.UserFetchedEvent;
+import app.sportahub.kafka.events.BaseEvent;
+import app.sportahub.kafka.events.user.UserEvent;
+import app.sportahub.kafka.events.user.UserFetchEvent;
+import app.sportahub.kafka.events.user.UserFetchedEvent;
 import app.sportahub.userservice.model.user.User;
 import app.sportahub.userservice.repository.user.UserRepository;
 import lombok.AllArgsConstructor;

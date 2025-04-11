@@ -21,8 +21,6 @@ import org.springframework.kafka.support.serializer.JsonSerializer;
 
 import app.sportahub.kafka.events.user.UserEvent;
 
-import java.util.UUID;
-
 @EnableKafka
 @Configuration
 public class KafkaProducerConfig {
