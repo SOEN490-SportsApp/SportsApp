@@ -7,6 +7,8 @@ Sporta connects users who are passionate about playing sports, enabling them to 
 
 ## 📑 Table of Contents
 
+[Release 2 Video Presentation](https://drive.google.com/file/d/1nWpURlvlSsaBed25e8k0oZryIKKR7ceT/view?usp=drive_link)  
+
 1. [🎥 Release Demos](#-release-demos)
 2. [📂 Important Files](#-important-files)
 3. [🧪 Important Tests](#-important-tests)
