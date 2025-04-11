@@ -84,8 +84,7 @@ Ensure the following tools are installed:
 - Docker
 - Java JDK 21
 - Gradle (or use `./gradlew` wrapper)
-- **Note that this is the main setup for the backend. In order to setup the frontend, please consult the following [README.md](https://github.com/SOEN490-SportsApp/SportsApp/tree/chore/issue-137/read-me-setup-for-project/ClientApp#readme
-) to understand more about the Expo app.**
+- **Note that this is the main setup for the backend. In order to setup the frontend, please consult the following [README.md](https://github.com/SOEN490-SportsApp/SportsApp/tree/main/ClientApp#readme) to understand more about the Expo app.**
 
 ---
 
