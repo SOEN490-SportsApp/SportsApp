@@ -1,18 +1,25 @@
 package app.sportahub.eventservice.config.kafka;
 
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
+import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.listener.ContainerProperties;
+import org.springframework.kafka.listener.KafkaMessageListenerContainer;
+import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
-import java.util.HashMap;
-import java.util.Map;
+import app.sportahub.kafka.events.user.UserEvent;
 
 @EnableKafka
 @Configuration
@@ -31,7 +38,25 @@ public class KafkaProducerConfig {
     }
 
     @Bean
-    public KafkaTemplate<String, Object> kafkaTemplate(ProducerFactory<String, Object> producerFactory) {
-        return new KafkaTemplate<>(producerFactory);
+    public KafkaTemplate<String, Object> kafkaTemplate() {
+        return new KafkaTemplate<>(producerFactory());
+    }
+
+    @Bean
+    public ReplyingKafkaTemplate<String, Object, Object> replyingKafkaTemplate(
+            ProducerFactory<String, Object> producerFactory,
+            KafkaMessageListenerContainer<String, Object> replyContainer) {
+        ReplyingKafkaTemplate<String, Object, Object> template = new ReplyingKafkaTemplate<>(producerFactory,
+                replyContainer);
+        template.setDefaultReplyTimeout(Duration.ofSeconds(6));
+        return template;
+    }
+
+    @Bean
+    public KafkaMessageListenerContainer<String, Object> replyContainer(
+            ConsumerFactory<String, Object> consumerFactory) {
+        ContainerProperties containerProperties = new ContainerProperties(UserEvent.RESPONSE_TOPIC);
+        containerProperties.setGroupId("OrchestrationServiceConsumer");
+        return new KafkaMessageListenerContainer<>(consumerFactory, containerProperties);
     }
 }

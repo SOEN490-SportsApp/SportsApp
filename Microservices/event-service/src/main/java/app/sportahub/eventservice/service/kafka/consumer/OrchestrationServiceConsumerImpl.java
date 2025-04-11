@@ -38,7 +38,7 @@ public class OrchestrationServiceConsumerImpl implements OrchestrationServiceCon
 
         String userId = fetchEvent.getUserId();
 
-        List<String> eventIds = eventRepository.findAllByParticipantUserId(userId)
+        List<String> eventIds = eventRepository.findByParticipantsUserId(userId)
                 .stream()
                 .map(Event::getId)
                 .collect(Collectors.toList());

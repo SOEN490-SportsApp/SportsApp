@@ -4,6 +4,11 @@ import app.sportahub.kafka.events.BaseEvent;
 import app.sportahub.kafka.events.SportaKafkaEvents;
 import app.sportahub.kafka.events.forgotpassword.ForgotPasswordRequestedEvent;
 import app.sportahub.kafka.events.forgotpassword.ForgotPasswordSendEmailEvent;
+import app.sportahub.kafka.events.user.UserEvent;
+import app.sportahub.kafka.events.user.UserFetchEvent;
+import app.sportahub.kafka.events.user.UserFetchedEvent;
+import app.sportahub.kafka.events.user.UserRequestEvent;
+import app.sportahub.kafka.events.user.UserResponseEvent;
 import app.sportahub.kafka.events.joinsporteventevent.*;
 import app.sportahub.orchestrationservice.service.producer.EmailServiceProducer;
 import lombok.RequiredArgsConstructor;
@@ -131,5 +136,56 @@ public class UserServiceConsumerImpl{
         } finally {
             replyingKafkaTemplate.stop();
         }
+    }
+
+    @SneakyThrows
+    @KafkaListener(topics = UserEvent.REQUEST_TOPIC, groupId = "UserServiceKafkaConsumer")
+    public void listenForUserRequests(
+        @Payload UserRequestEvent requestEvent,
+        @Header(KafkaHeaders.CORRELATION_ID) byte[] correlationId
+    ) { 
+        log.info("EventServiceConsumer::listenForUserRequests: received user request event with id: {}", requestEvent.getUserId());
+        
+        String userId = requestEvent.getUserId();
+        BaseEvent fetchBaseEvent = new BaseEvent(
+            UUID.randomUUID().toString(),
+            "request",
+            "orchestration-service",
+            Instant.now(),
+            requestEvent.getBaseEvent().getCorrelationId()
+        );
+
+        UserFetchEvent fetchEvent = new UserFetchEvent(fetchBaseEvent, userId);
+        ProducerRecord<String, Object> record = new ProducerRecord<>(UserEvent.FETCH_TOPIC, fetchEvent);
+        record.headers().add(new RecordHeader(KafkaHeaders.REPLY_TOPIC, UserEvent.FETCHED_TOPIC.getBytes()));
+        record.headers().add(new RecordHeader(KafkaHeaders.CORRELATION_ID, correlationId));
+        
+        replyingKafkaTemplate.send(record);
+        log.info("EventServiceConsumer::listenForUserRequests: sent fetch request for user with id: {}", userId);
+    }
+
+    @SneakyThrows
+    @KafkaListener(topics = UserEvent.FETCHED_TOPIC, groupId = "UserServiceKafkaConsumer")
+    public void listenForFetchedUsers(
+        @Payload UserFetchedEvent fetchedEvent,
+        @Header(KafkaHeaders.CORRELATION_ID) byte[] correlationId
+    ) {
+
+        log.info("EventServiceConsumer::listenForFetchedUsers: received fetched user event with id: {}", fetchedEvent.getUser());
+        
+        BaseEvent fetchedBaseEvent = new BaseEvent(
+            UUID.randomUUID().toString(),
+            "response",
+            "orchestration-service",
+            Instant.now(),
+            fetchedEvent.getBaseEvent().getCorrelationId()
+        );  
+
+        UserResponseEvent responseEvent = new UserResponseEvent(fetchedBaseEvent, fetchedEvent.getUser());
+        ProducerRecord<String, Object> responseRecord = new ProducerRecord<>(UserEvent.RESPONSE_TOPIC, responseEvent);
+        responseRecord.headers().add(new RecordHeader(KafkaHeaders.CORRELATION_ID, correlationId));
+        responseRecord.headers().forEach(header -> log.info("Header key: {}, value: {}", header.key(),header.value().toString()));
+        kafkaTemplate.send(responseRecord);
+        log.info("EventServiceConsumer::listenForFetchedUsers: sent response to event-service for user with id: {}", fetchedEvent.getUser());
     }
 }
