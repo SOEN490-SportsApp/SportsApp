@@ -1,4 +1,4 @@
-package app.sportahub.kafkevents.user;
+package app.sportahub.kafka.events.user;
 
 public class UserEvent {
     public static final String REQUEST_TOPIC = "user.request";

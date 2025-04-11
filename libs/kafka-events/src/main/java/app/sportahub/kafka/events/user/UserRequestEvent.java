@@ -1,6 +1,6 @@
-package app.sportahub.kafkevents.user;
+package app.sportahub.kafka.events.user;
 
-import app.sportahub.kafkevents.BaseEvent;
+import app.sportahub.kafka.events.BaseEvent;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
