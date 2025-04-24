@@ -2,7 +2,8 @@
 
 Sporta connects users who are passionate about playing sports, enabling them to create and join public events for games like soccer, basketball, tennis, and more. Users can register, create profiles with their skill levels, and browse events based on location and availability. The app allows for real-time updates on event participation, skill-based filtering, and in-app messaging to coordinate with others. Sporta enables users to post photos and rate fellow players to foster engagement.
 
-
+- try the app on iphone https://testflight.apple.com/join/3brC3d7J
+- try the app on android https://www.mediafire.com/file/dekdov8jjy2m1fn/sportahub.apk/file
 ---
 
 ## 📑 Table of Contents
